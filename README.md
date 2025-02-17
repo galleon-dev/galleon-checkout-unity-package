@@ -1,1 +1,1 @@
-# com.galleon.checkout
+The Official Galleon Checkout Unity Package
