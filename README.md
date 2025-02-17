@@ -1,1 +1,1 @@
-The Official Galleon Checkout Unity Package
+The Official Public Galleon Checkout Unity Package
