@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.Purchasing.Extension;
 
-namespace CheckoutIAPStore
+namespace Galleon.Checkout
 {
     public class CheckoutIAPStore : IStore
     {

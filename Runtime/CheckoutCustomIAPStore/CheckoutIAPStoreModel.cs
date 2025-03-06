@@ -27,6 +27,6 @@ public class CheckoutIAPStoreModel : AbstractPurchasingModule
 
     private IStore InstantiateStore()
     {
-        return new CheckoutTestStore();
+        return new CheckoutIAPStore();
     }
 }
