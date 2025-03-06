@@ -77,7 +77,7 @@ namespace Galleon.Checkout
                 
                 request = UnityWebRequest.Post(uri        : url
                                              ,postData    : jsonBody
-                                             ,contentType : "application/json");
+                                             );
             }
             else if (encodingType == RequestEncodingType.FormUrlEncoded)
             {
