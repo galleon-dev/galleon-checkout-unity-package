@@ -75,9 +75,14 @@ namespace Galleon.Checkout
                 if (body != default)
                     jsonBody = JsonConvert.SerializeObject(body);
                 
+                #if UNITY_6000_0_OR_NEWER
                 request = UnityWebRequest.Post(uri        : url
                                              ,postData    : jsonBody
-                                             );
+                                             ,contentType : "application/json");
+                #else
+                request = UnityWebRequest.Post(uri        : url
+                                             ,postData    : jsonBody);
+                #endif
             }
             else if (encodingType == RequestEncodingType.FormUrlEncoded)
             {
