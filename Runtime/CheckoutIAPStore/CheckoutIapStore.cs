@@ -48,11 +48,13 @@ namespace Galleon.Checkout
             this.callback.OnProductsRetrieved(productDescriptions);
         }
 
-        public void Purchase(ProductDefinition product, string developerPayload)
+        public async void Purchase(ProductDefinition product, string developerPayload)
         {
             Debug.Log("===============================");
             Debug.Log($"IAP - Purchasing {product.id} ({product.type})");
             Debug.Log("===============================");
+            
+            await CheckoutClient.Instance.TestUI.Execute();
             
             // Simulate a successful purchase
             this.callback.OnPurchaseSucceeded(storeSpecificId       : product.storeSpecificId

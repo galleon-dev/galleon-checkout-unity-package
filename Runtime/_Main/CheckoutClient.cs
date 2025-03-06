@@ -130,6 +130,8 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         GameObject.Instantiate(Resources.CheckoutPopupPrefab);
+                        
+                        await Task.Delay(5000);
                     });
         
     }
