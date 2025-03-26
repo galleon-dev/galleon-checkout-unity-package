@@ -1,10 +1,14 @@
+#define GALLEON_DEV
+
 using System.Linq;
 using UnityEngine;
 
 namespace Galleon.Checkout
 {
+    #if GALLEON_DEV
+    #endif
     [CreateAssetMenu(fileName = "CheckoutResources", menuName = "Galleon/CheckoutResources")]
-    public class CheckoutResources : ScriptableObject
+    public partial class CheckoutResources : ScriptableObject, IEntity
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Singleton
         
@@ -20,7 +24,16 @@ namespace Galleon.Checkout
             }
         }
         
+        /////////////////////////////////////////////////////////////////////////////////////////////////// Entity
+        
+        public EntityNode Node { get; set; }
+        
         /////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public CheckoutResources()
+        {
+            Node = new EntityNode(this);
+        }
         
         public Step Initialize
         =>
@@ -31,6 +44,7 @@ namespace Galleon.Checkout
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public GameObject CheckoutPopupPrefab;       
+        public GameObject CheckoutPopupPrefab;
+        
     }
 }

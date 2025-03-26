@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class CreditCardsController
+    public class CreditCardsController : Entity
     {
         public List<CreditCard> creditCards = new();
         

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class TransactionsController
+    public class TransactionsController : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         

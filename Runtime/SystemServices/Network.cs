@@ -15,7 +15,7 @@ namespace Galleon.Checkout
         FormUrlEncoded,
     }
     
-    public class Network
+    public class Network : Entity
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle 
         
@@ -43,6 +43,8 @@ namespace Galleon.Checkout
             
             // Send request
             var op = request.SendWebRequest();
+            Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}){request.url}");
+
             
             // Await request and handle timeout
             DateTime starTime = DateTime.Now;
@@ -56,6 +58,7 @@ namespace Galleon.Checkout
             
             // handle result
             string result = request.downloadHandler.text;
+            Debug.Log($"<<<".Color(Color.yellow)+$" ({request.responseCode}) {request.url} \n{result}");
             return result;
         }
         
@@ -102,7 +105,7 @@ namespace Galleon.Checkout
             // Send Request
             //string formattedRequest = JToken.Parse(jsonBody).ToString(Formatting.Indented);
             //Debug.Log($">>> ({request.method}){request.url}\n{formattedRequest}");
-            Debug.Log($">>> ({request.method}){request.url}");
+            Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}){request.url}");
             var op = request.SendWebRequest();
             
             // Wait for request and Handle timeout
@@ -118,7 +121,7 @@ namespace Galleon.Checkout
             string result          = request.downloadHandler.text;
             //string formattedResult = JToken.Parse(result).ToString(Formatting.Indented);
             //Debug.Log($"<<< ({request.responseCode}) {request.url} \n{formattedResult}");
-            Debug.Log($"<<< ({request.responseCode}) {request.url} \n{result}");
+            Debug.Log($"<<<".Color(Color.yellow)+$" ({request.responseCode}) {request.url} \n{result}");
             
             return result;
         }

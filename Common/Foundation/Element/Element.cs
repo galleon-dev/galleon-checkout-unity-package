@@ -1,0 +1,68 @@
+#define GALLEON_DEV
+
+using System;
+using UnityEngine;
+
+namespace Galleon.Checkout
+{
+    #if GALLEON_DEV
+    [CreateAssetMenu(fileName = "Element", menuName = "Galleon/Element")]
+    #endif
+    public partial class Element : ScriptableObject, IEntity
+    {
+        /////////////////////////////////////////////////// Members
+        
+        public string     Name;
+        public Element    Parent;
+        
+        /////////////////////////////////////////////////// Entity
+        
+        public EntityNode Node { get; set; }
+        
+        /////////////////////////////////////////////////// Lifecycle
+
+        public void Reset()
+        {
+            if (Name == null)
+                Name = name;
+            
+            // Get the name of the scriptable object file
+            #if UNITY_EDITOR
+            if (string.IsNullOrEmpty(Name))
+            {
+                string assetPath = UnityEditor.AssetDatabase.GetAssetPath(this);
+                if (!string.IsNullOrEmpty(assetPath))
+                {
+                    string fileName = System.IO.Path.GetFileNameWithoutExtension(assetPath);
+                    Name = fileName;
+                }
+            }
+            Name = Name.Replace(".element", "");
+            this.Node.DisplayName = Name;
+            #endif
+
+            
+            // Assign the Parent field to the Project instance
+            if (Parent == null)
+            {
+                #if UNITY_EDITOR
+                var projectGuid = UnityEditor.AssetDatabase.FindAssets("t:Element Project")[0];
+                if (!string.IsNullOrEmpty(projectGuid))
+                {
+                    var projectPath = UnityEditor.AssetDatabase.GUIDToAssetPath(projectGuid);
+                    Parent = UnityEditor.AssetDatabase.LoadAssetAtPath<Element>(projectPath);
+                }
+                #endif
+            }
+        }
+
+        public Element()
+        {
+            Node = new EntityNode(this);
+            Root.Instance.Project.Node.Children.Add(this);
+            
+            this.Node.DisplayName = Name;
+        }
+    }
+}
+

@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 
 namespace Galleon.Checkout
 {
-    public class TokensController
+    public class TokensController : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////// Members
         

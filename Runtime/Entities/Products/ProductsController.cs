@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class ProductsController
+    public class ProductsController : Entity
     {
-        public List<Product> products = new();
+        public List<CheckoutProduct> products = new();
         
         public Step Initialize => new Step(name   : "initialize_products_controller"
                                           ,tags   : new[] { "init"}

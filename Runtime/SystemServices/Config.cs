@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class Config
+    public class Config : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
@@ -16,12 +16,12 @@ namespace Galleon.Checkout
                                           ,tags   : new[] { "init"}
                                           ,action : async s =>
                                           {
-                                              var result = await CHECKOUT.Network.Get("http://localhost:5007/config");
-                                              
-                                              var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToString());
-                                              
-                                              foreach (var pair in dictionary)
-                                                  this.ConfigData.Add(pair.Key, pair.Value);
+                                              //var result = await CHECKOUT.Network.Get("http://localhost:5007/config");
+                                              //
+                                              //var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToString());
+                                              //
+                                              //foreach (var pair in dictionary)
+                                              //    this.ConfigData.Add(pair.Key, pair.Value);
                                           });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flow
@@ -32,3 +32,4 @@ namespace Galleon.Checkout
         public float  GetFloat (string key) => ConfigData.ContainsKey(key) ? float.Parse(ConfigData[key].ToString()) : 0;
     }
 }
+

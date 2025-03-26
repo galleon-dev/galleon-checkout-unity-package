@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace Galleon.Checkout
@@ -8,7 +8,7 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////// Members
         
-        public GUID            ID = new GUID();
+        public Guid            ID = new Guid();
         
         public User            User;
         public CreditCardToken CreditCardToken;
@@ -46,7 +46,7 @@ namespace Galleon.Checkout
                                                                  {
                                                                      { "BT-API-KEY",    BasisTheoryAPI.API_KEY                      },
                                                                      { "BT-PROXY-URL",  "https://api.stripe.com/v1/payment_intents" },
-                                                                     { "Authorization", "Bearer sk_test_51QwRLHRDfmbt2CPAcQeUhTu5VnPf3Vxzth4xJQ2XmZPxEmjZg9mPlwmsxPlxcoBtF4ka598qqHSOAYe0SrilYdiR00Di6SRLNR" }
+                                                                     { "Authorization", "Bearer sk_test_51Odv6ZBonvPlF6MTC1gy7o44X7v9Kj0ZPjosTLa9kOtSCbtacEH5BcYYt7ZDzIC15TvDhsqeBNTgqF2cJmSQtGuc00P6rKMAwa" }
                                                                  }
                                                                  // ,body   : new
                                                                  // {
@@ -78,8 +78,8 @@ namespace Galleon.Checkout
             new Step(name   : $"validate_receipt"
                     ,action : async (s) =>
                     {
-                        var result = await CHECKOUT.Network.Get("http://localhost:5007/validate");
-                        s.Log(result);
+                        // var result = await CHECKOUT.Network.Get("http://localhost:5007/validate");
+                        // s.Log(result);
                     });
     }
 }

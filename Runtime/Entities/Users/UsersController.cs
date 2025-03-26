@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class UsersController
+    public class UsersController : Entity
     {
         public List<User> Users = new();
         

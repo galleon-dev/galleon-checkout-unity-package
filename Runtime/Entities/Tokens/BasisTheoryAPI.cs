@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Galleon.Checkout
