@@ -856,11 +856,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a8f942f8d5a0d4cc790cc82e8c2d1949, type: 3}
---- !u!224 &78541515 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 2364425318826448673, guid: a8f942f8d5a0d4cc790cc82e8c2d1949, type: 3}
-  m_PrefabInstance: {fileID: 78541514}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &216673944
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1234,7 +1229,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 361312333}
-  - {fileID: 78541515}
+  - {fileID: 2364425318887417323}
   m_Father: {fileID: 2075147689}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &655869850
@@ -1566,11 +1561,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: RuntimeExplorer
       objectReference: {fileID: 0}
+    - target: {fileID: 8459332754397263611, guid: 6e4aab0cfb3064d40b576ecd2236ae3e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e4aab0cfb3064d40b576ecd2236ae3e, type: 3}
+--- !u!224 &2364425318887417323 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2364425318826448673, guid: a8f942f8d5a0d4cc790cc82e8c2d1949, type: 3}
+  m_PrefabInstance: {fileID: 78541514}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -83,7 +83,7 @@ namespace Galleon.Checkout
                               {
                                   // Test
                                   s.AddChildStep(this.SetupTest);
-                                  s.AddChildStep(this.TestRealServer);
+                                //s.AddChildStep(this.TestRealServer);
                                 //s.AddChildStep(this.TestConfig);
                                 //s.AddChildStep(this.TestToken);
                                 //s.AddChildStep(this.TestTransaction);
@@ -336,9 +336,9 @@ namespace Galleon.Checkout
 
                                   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                   
-                                  #if UNITY_EDITOR
-                                  UnityEditor.EditorApplication.isPlaying = false;
-                                  #endif
+                                  //#if UNITY_EDITOR
+                                  //UnityEditor.EditorApplication.isPlaying = false;
+                                  //#endif
                                   
                                   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                   
