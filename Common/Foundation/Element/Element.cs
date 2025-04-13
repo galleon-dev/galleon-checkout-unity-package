@@ -1,6 +1,7 @@
 #define GALLEON_DEV
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Galleon.Checkout
@@ -12,8 +13,9 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////// Members
         
-        public string     Name;
-        public Element    Parent;
+        public string       Name;
+        public List<string> Tags = new List<string>();
+        public Element      Parent;
         
         /////////////////////////////////////////////////// Entity
         
