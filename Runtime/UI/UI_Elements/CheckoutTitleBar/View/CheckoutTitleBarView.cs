@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -9,16 +10,23 @@ namespace Galleon.Checkout.UI
         
         public TMP_Text title;
         
+        public static event Action GalleonLogoClicked;
+        
         /////////////////////////////////////////////////////// UI Events
         
         public async void OnGearsButtonClick()
         {
-            await OpencheckoutSettingsView().Execute();
+            await OpenCheckoutSettingsView().Execute();
+        }
+        
+        public async void OnGalleonLogoClick()
+        {
+            GalleonLogoClicked?.Invoke();
         }
         
         /////////////////////////////////////////////////////// Steps
         
-        public Step OpencheckoutSettingsView()
+        public Step OpenCheckoutSettingsView()
         =>
             new Step(name   : $"open_checkout_settings_view"
                     ,action : async (s) =>

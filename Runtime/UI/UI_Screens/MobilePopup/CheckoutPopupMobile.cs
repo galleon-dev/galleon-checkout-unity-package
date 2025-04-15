@@ -27,10 +27,8 @@ public class CheckoutPopupMobile : MonoBehaviour
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-    private void OnEnable()
+    private async void OnEnable()
     {
-        ParentPanel.SetOriginalHeight();
-        
         if (ABTest == "a")
         {
             CheckoutPanel = CheckoutPanelA;

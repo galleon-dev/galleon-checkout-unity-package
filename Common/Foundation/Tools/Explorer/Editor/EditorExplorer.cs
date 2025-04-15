@@ -1,6 +1,8 @@
-using UnityEditor;
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEditor;
 
 namespace Galleon.Checkout
 {
@@ -22,3 +24,5 @@ namespace Galleon.Checkout
         }
     }
 }
+
+#endif

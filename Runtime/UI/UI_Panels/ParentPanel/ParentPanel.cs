@@ -15,6 +15,9 @@ namespace Galleon.Checkout
             this.RectTransform             = this.GetComponent<RectTransform>();
             this.originalHeightAnchorTop   = this.RectTransform.rect.height;
             this.fullscreenHeightAnchorTop = 0;
+            
+            // TEMP 
+            SetFullscreenHeight();
         }
 
         [ContextMenu("Set Fullscreen")]

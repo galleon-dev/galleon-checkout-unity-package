@@ -138,9 +138,7 @@ namespace Galleon.Checkout
             new Step(name   : $"test_ui"
                     ,action : async (s) =>
                               {
-                                  GameObject.Instantiate(Resources.CheckoutPopupPrefab, position: new Vector3(0,0,999999), rotation: Quaternion.identity);
-                        
-                                  await Task.Delay(5000);
+                                  GameObject.Instantiate(Resources.CheckoutPopupPrefab, position: new Vector3(0,0,9999), rotation: Quaternion.identity);
                               });
         
         public Step TestRealServer

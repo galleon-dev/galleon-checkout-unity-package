@@ -1,12 +1,15 @@
+#if UNITY_EDITOR
 using UnityEngine;
-using UnityEditor;
 using System.IO;
+using UnityEditor;
 
 namespace Galleon.Checkout
 {
     public class ProjectExtentions : MonoBehaviour
     {
+        #if UNITY_EDITOR
         [MenuItem("Assets/Create/Galleon/View")]
+        #endif
         public static void CreateView()
         {
             string path = GetSelectedPath();
@@ -119,3 +122,5 @@ namespace Galleon.Checkout.UI
         }
     }
 }
+
+#endif
