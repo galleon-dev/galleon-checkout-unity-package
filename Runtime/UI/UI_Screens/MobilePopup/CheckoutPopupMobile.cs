@@ -3,50 +3,104 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Galleon.Checkout;
+using Galleon.Checkout.UI;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
 
 public class CheckoutPopupMobile : MonoBehaviour
 {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+
+    // Panels
     
+    [Header("Parent Panel")]
+    public  ParentPanel                  ParentPanel;
     [Header("Panels")]
-    public  ParentPanel  ParentPanel;
-    public  GameObject   CheckoutPanel;
-    public  GameObject   CreditCardPanel;
-    public  GameObject   SuccessPanel;
-    public  GameObject   ErrorPanel;
-    
-    [Header("A/B Tests")]
-    public  GameObject   CheckoutPanelA;
-    public  GameObject   CheckoutPanelB;
-     
-    private bool         isPending = false;
-    
-    public static string ABTest = "a"; 
-    
+    public  CheckoutPanelView            CheckoutPanel;
+    public  CreditCardInfoPanelView      CreditCardPanel;
+    public  SettingsPanelView            SettingsPanelView;
+    public  SuccessPanelView             SuccessPanelView;
+    public  ErrorPanelView               ErrorPanelView;
+    public  SelectCurrencyPanelView      SelectCurrencyPanelView;
+    public  SelectPaymentMethodPanelView SelectPaymentMethodPanelView;
+    public  SimpleDialogPanelView        SimpleDialogPanelView;
+
+    private bool                         isPending = false;
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-    private async void OnEnable()
+    private void Start()
     {
-        if (ABTest == "a")
-        {
-            CheckoutPanel = CheckoutPanelA;
-            CheckoutPanelA.gameObject.SetActive(true);
-            CheckoutPanelB.gameObject.SetActive(false);
-          //ABTest = "b";
-        }
-        else
-        {
-            CheckoutPanel = CheckoutPanelB;
-            CheckoutPanelB.gameObject.SetActive(true);
-            CheckoutPanelA.gameObject.SetActive(false);
-            ABTest = "a";
-        }
+        ViewCheckoutPanel().Execute();
     }
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Steps
+    
+    public Step ViewCheckoutPanel()
+    =>
+        new Step(name   : $"view_checkout_panel"
+                ,action : async (s) =>
+                {
+                    DisableAllPanels();
+                    await CheckoutPanel.View().Execute();
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
+                    switch (CheckoutPanel.Result)
+                    {
+                        case CheckoutPanelView.ViewResult.Confirm             : ViewSuccessPanel()            .Execute(); break;
+                        case CheckoutPanelView.ViewResult.Settings            : ViewSettingsPanel()           .Execute(); break;
+                        case CheckoutPanelView.ViewResult.OtherPaymentMethods : ViewSelectPaymentMethodPanel().Execute(); break;
+                    }
 
+                });
+    
+    public Step ViewSuccessPanel()
+    =>
+        new Step(name   : $"view_success_panel"
+                ,action : async (s) =>
+                {
+                    DisableAllPanels();
+                    await SuccessPanelView.View().Execute();
+
+                    switch (SuccessPanelView.Result)
+                    {
+                        case SuccessPanelView.ViewResult.Confirm : Close(); break;
+                    }
+                });
+    
+    public Step ViewSettingsPanel()
+    =>
+        new Step(name   : $"view_settings_panel"
+                ,action : async (s) =>
+                {
+                    DisableAllPanels();
+                    await SettingsPanelView.View().Execute();
+                    
+                    switch (SettingsPanelView.Result)
+                    {
+                        case SettingsPanelView.ViewResult.Close : ViewCheckoutPanel().Execute(); break;
+                    }
+                });
+    
+    public Step ViewSelectPaymentMethodPanel()
+    =>
+        new Step(name   : $"view_select_payment_methods_panel"
+                ,action : async (s) =>
+                {
+                    DisableAllPanels();
+                    await CreditCardPanel.View().Execute();
+                    
+                    switch (CreditCardPanel.Result)
+                    {
+                        case CreditCardInfoPanelView.ViewResult.Confirm : Close(); break;
+                    }
+                });
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events (OLD)
+
+    #region OLD
+    
     [ContextMenu("Test")]
     public async void OnPurchaseClick()
     {
@@ -83,8 +137,8 @@ public class CheckoutPopupMobile : MonoBehaviour
 
     public void OnCreditCardConfirmClick()
     {
-        CreditCardPanel.gameObject.SetActive(false);
-        SuccessPanel   .gameObject.SetActive(true);
+        CreditCardPanel .gameObject.SetActive(false);
+        SuccessPanelView.gameObject.SetActive(true);
     }
 
     public void OnSuccessConfirmClick()
@@ -94,9 +148,13 @@ public class CheckoutPopupMobile : MonoBehaviour
 
     public void OnErrorConfirmClick()
     {
-        ErrorPanel   .gameObject.SetActive(false);
-        CheckoutPanel.gameObject.SetActive(true);
+        ErrorPanelView.gameObject.SetActive(false);
+        CheckoutPanel .gameObject.SetActive(true);
     }
+
+    #endregion // OLD
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
 
     public void OnShadeClick()
     {
@@ -125,22 +183,27 @@ public class CheckoutPopupMobile : MonoBehaviour
     public void SetSuccessPanelActive()
     {
         DisableAllPanels();
-        SuccessPanel.gameObject.SetActive(true);
-    }
-
-    private void DisableAllPanels()
-    {
-        CheckoutPanel  .gameObject.SetActive(false);
-        CheckoutPanelA .gameObject.SetActive(false);
-        CheckoutPanelB .gameObject.SetActive(false);
-        CreditCardPanel.gameObject.SetActive(false);
-        SuccessPanel   .gameObject.SetActive(false);
-        ErrorPanel     .gameObject.SetActive(false);
+        SuccessPanelView.gameObject.SetActive(true);
     }
 
     public void Close()
     {
+        this.gameObject.SetActive(false);
         Destroy(this.gameObject);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper UI Actions
+
+    private void DisableAllPanels()
+    {
+        CheckoutPanel               .gameObject.SetActive(false);
+        CreditCardPanel             .gameObject.SetActive(false);
+        SettingsPanelView           .gameObject.SetActive(false);
+        SuccessPanelView            .gameObject.SetActive(false);
+        ErrorPanelView              .gameObject.SetActive(false);
+        SelectCurrencyPanelView     .gameObject.SetActive(false);
+        SelectPaymentMethodPanelView.gameObject.SetActive(false);
+        SimpleDialogPanelView       .gameObject.SetActive(false);
     }
 
     void Update()

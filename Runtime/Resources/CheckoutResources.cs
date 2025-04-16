@@ -7,7 +7,7 @@ namespace Galleon.Checkout
 {
     #if GALLEON_DEV
     #endif
-    [CreateAssetMenu(fileName = "CheckoutResources", menuName = "Galleon/CheckoutResources")]
+    [CreateAssetMenu(fileName = "CheckoutResources", menuName = "Galleon/Checkout/CheckoutResources")]
     public partial class CheckoutResources : ScriptableObject, IEntity
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Singleton

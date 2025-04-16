@@ -317,6 +317,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6282585467631232159}
   - component: {fileID: 1746615479972558017}
+  - component: {fileID: 2515309582764764660}
   m_Layer: 5
   m_Name: ErrorPanel
   m_TagString: Untagged
@@ -374,6 +375,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &2515309582764764660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392588956585611156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6d5b52db799d4d2cb9a17626ce2901d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6977113160565480497
 GameObject:
   m_ObjectHideFlags: 0

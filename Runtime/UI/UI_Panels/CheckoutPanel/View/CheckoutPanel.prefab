@@ -409,9 +409,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DTCScreenController, Assembly-CSharp
-        m_MethodName: OnPurchaseClick
+      - m_Target: {fileID: 606836997332876015}
+        m_TargetAssemblyTypeName: Galleon.Checkout.UI.CheckoutPanelView, CheckoutRuntime
+        m_MethodName: OnConfirmPurchaseClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -572,6 +572,8 @@ MonoBehaviour:
   LayoutDirection: 0
   Local: en-us
   appearance: 0
+  Result: 0
+  IsCompleted: 0
 --- !u!1 &6938591095835172586
 GameObject:
   m_ObjectHideFlags: 0
@@ -1246,6 +1248,34 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6510907057447888451, guid: 84e95db903b5c48f5ba1e1645d48c708, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6510907057447888451, guid: 84e95db903b5c48f5ba1e1645d48c708, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6510907057447888451, guid: 84e95db903b5c48f5ba1e1645d48c708, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 606836997332876015}
+    - target: {fileID: 6510907057447888451, guid: 84e95db903b5c48f5ba1e1645d48c708, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6510907057447888451, guid: 84e95db903b5c48f5ba1e1645d48c708, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnSettingsClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 6510907057447888451, guid: 84e95db903b5c48f5ba1e1645d48c708, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Galleon.Checkout.UI.CheckoutPanelView, CheckoutRuntime
+      objectReference: {fileID: 0}
+    - target: {fileID: 6510907057447888451, guid: 84e95db903b5c48f5ba1e1645d48c708, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 7248615258225693350, guid: 84e95db903b5c48f5ba1e1645d48c708, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1613,6 +1643,34 @@ PrefabInstance:
     - target: {fileID: 3122116812065347451, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4585244616770207080, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4585244616770207080, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4585244616770207080, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 606836997332876015}
+    - target: {fileID: 4585244616770207080, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4585244616770207080, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnOtherPaymentMethodsClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 4585244616770207080, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Galleon.Checkout.UI.CheckoutPanelView, CheckoutRuntime
+      objectReference: {fileID: 0}
+    - target: {fileID: 4585244616770207080, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 4998081036528196255, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
       propertyPath: m_Name

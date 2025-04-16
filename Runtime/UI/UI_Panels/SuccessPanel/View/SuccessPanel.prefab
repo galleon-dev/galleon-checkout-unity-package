@@ -607,9 +607,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DTCScreenController, Assembly-CSharp
-        m_MethodName: OnPurchaseClick
+      - m_Target: {fileID: -644297477114063402}
+        m_TargetAssemblyTypeName: Galleon.Checkout.UI.SuccessPanelView, CheckoutRuntime
+        m_MethodName: OnConfirmSuccessButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1176,6 +1176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6282585467631232159}
   - component: {fileID: 1630219350561152231}
+  - component: {fileID: -644297477114063402}
   m_Layer: 5
   m_Name: SuccessPanel
   m_TagString: Untagged
@@ -1234,6 +1235,25 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &-644297477114063402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392588956585611156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebd34d4b1def840449decca23509e565, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ViewGameObject: {fileID: 0}
+  ChildContainer: {fileID: 0}
+  LayoutDirection: 0
+  Local: en-us
+  appearance: 0
+  Result: 0
+  IsCompleted: 0
 --- !u!1 &6672036312593844102
 GameObject:
   m_ObjectHideFlags: 0
