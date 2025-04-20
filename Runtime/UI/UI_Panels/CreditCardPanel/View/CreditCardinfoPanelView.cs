@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Galleon.Checkout;
+using Galleon.Checkout.UI;
 using TMPro;
 using UnityEngine;
 
-public class CreditCardInfoPanelView : MonoBehaviour
+public class CreditCardInfoPanelView : View
 {
     //////////////////////////////////////////////////////////////////////////// Members
     
