@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using Galleon.Checkout.UI;
@@ -9,7 +9,7 @@ using Color = UnityEngine.Color;
 
 namespace Galleon.Checkout.UI
 {
-    public class View : MonoBehaviour, IEntity
+    public class UIElement : MonoBehaviour, IEntity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// IEntity
         
@@ -17,28 +17,81 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        [Header("View")]
-        public GameObject ViewGameObject;
-        public GameObject ChildContainer;
+        [Header("UI Element")]
+        public GameObject      UIGameObject;
+        public GameObject      ChildContainer;
+        public LayoutGroup     LayoutGroup;
+        
         
         public LayoutDirection LayoutDirection = LayoutDirection.LeftToRight;
         public string          Local           = "en-us";
         public Appearance      appearance      = Appearance.System;
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
+        
+        public IEnumerable<UIElement> ChildUIElements => UIGameObject.GetComponentsInChildren<UIElement>(true);
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public View()
+        public UIElement()
         {
-            this.Node  = new EntityNode(this);
+            this.Node = new EntityNode(this);
         }
 
         private void Awake()
         {
-            this.ViewGameObject = this.gameObject;
+            this.UIGameObject = this.gameObject;
             
             if (ChildContainer == null)
                 ChildContainer = this.gameObject;
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh methods
+        
+        [ContextMenu("Refresh UI Element")]
+        public void Refresh()
+        {
+            RefreshLayout();
+        }
+        
+        [ContextMenu("Refresh Layout")]
+        public void RefreshLayout()
+        {
+            if (this.LayoutGroup is HorizontalLayoutGroup h)
+            {
+                h.childAlignment = this.LayoutDirection == LayoutDirection.LeftToRight
+                                 ? TextAnchor.MiddleLeft
+                                 : TextAnchor.MiddleRight;
+            }
+
+            foreach (var child in this.ChildUIElements)
+                child.RefreshLayout();
+        }
+        
+        [ContextMenu("RefreshStyle")]
+        public void RefreshStyle()
+        {
+            foreach (var child in this.ChildUIElements)
+                child.RefreshStyle();
+
+        }
+        
+        [ContextMenu("Refresh Locale")]
+        public void RefreshLocale()
+        {
+            foreach (var child in this.ChildUIElements)
+                child.RefreshLocale();
+        }
+        
+        [ContextMenu("Refresh Config")]
+        public void RefreshConfig()
+        {
+            foreach (var child in this.ChildUIElements)
+                child.RefreshConfig();
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     }
     
     ///
@@ -58,6 +111,8 @@ namespace Galleon.Checkout.UI
         Dark,
     }
 }
+
+#region EXTRAS
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,3 +257,5 @@ public class Tags : MonoBehaviour
     public List<string> tags = new List<string>();
 }
 
+
+#endregion // Extras

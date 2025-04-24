@@ -6,7 +6,7 @@ using UnityEngine.Purchasing.Extension;
 
 namespace Galleon.Checkout
 {       
-    public class CheckoutTestStore : IStore
+    public class CheckoutTestStore : Entity, IStore
     {
         //////////////////////////////////////////////////////////////////////////////////////// Members
 

@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="ParentPanel" style="height: 449px; background-color: rgb(255, 255, 255);">
+        <ui:VisualElement name="Header" style="height: 43px; border-bottom-color: rgb(224, 224, 224); border-bottom-width: 2px; flex-direction: row; justify-content: space-between;">
+            <ui:Label text="Dice Dreams Checkout" display-tooltip-when-elided="true" name="lbl_Title" style="width: 209px; justify-content: center; align-items: center; -unity-text-align: middle-left; font-size: 18%; white-space: nowrap; -unity-font: initial; color: rgba(166, 166, 166, 255);" />
+            <ui:Button display-tooltip-when-elided="true" name="btn_Gears" style="height: 40px; width: 29px; background-image: url(&quot;project://database/Packages/com.galleon.checkout/Runtime/UI/UI_Common/Textures/Gear.png?fileID=2800000&amp;guid=06f8dd85542a14b409e99d5ade9bb6d8&amp;type=3#Gear&quot;); -unity-background-scale-mode: scale-to-fit; background-color: rgba(88, 88, 88, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; -unity-text-align: middle-right; white-space: nowrap;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Panels" style="height: 377px; width: 346px; align-items: auto; justify-content: space-around; flex-direction: column;">
+            <ui:VisualElement name="pnl_CheckoutPanel" style="height: 371px; width: 346px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Footer" style="height: 28px; flex-direction: row; justify-content: space-around;">
+            <ui:Label text="Terms Of Service" display-tooltip-when-elided="true" name="lbl_TermsOfService" />
+            <ui:Label text="Prvicy Policy" display-tooltip-when-elided="true" name="lbl_PrivacyPolicy" />
+            <ui:Label text="Return Policy" display-tooltip-when-elided="true" name="lbl_ReturnPolicy" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

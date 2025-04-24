@@ -20,7 +20,6 @@ namespace Galleon.Checkout
         
         public Runtime  Runtime  = new Runtime();
         public Project  Project  = new Project();
-        public Pipeline Pipeline = new Pipeline();
         
         ////////////////////////////////////////////////////// Lifecycle
         

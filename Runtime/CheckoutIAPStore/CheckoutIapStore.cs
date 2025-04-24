@@ -6,7 +6,7 @@ using UnityEngine.Purchasing.Extension;
 
 namespace Galleon.Checkout
 {
-    public class CheckoutIAPStore : IStore
+    public class CheckoutIAPStore : Entity, IStore
     {
         //////////////////////////////////////////////////////////////////////////////////////// Members
 
@@ -54,7 +54,7 @@ namespace Galleon.Checkout
             Debug.Log($"IAP - Purchasing {product.id} ({product.type})");
             Debug.Log("===============================");
             
-            await CheckoutClient.Instance.TestUI.Execute();
+            await CheckoutClient.Instance.TestUI();
             
             // Simulate a successful purchase
             this.callback.OnPurchaseSucceeded(storeSpecificId       : product.storeSpecificId

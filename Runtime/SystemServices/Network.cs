@@ -30,6 +30,14 @@ namespace Galleon.Checkout
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// API
         
+        public async Task<object> Get2(string                     url
+                                      ,Dictionary<string, string> headers = null)
+        {
+            var webRequest = new NetworkRequest();
+            
+            return default;
+        }
+        
         public async Task<object> Get(string                     url
                                      ,Dictionary<string, string> headers = null)
         {

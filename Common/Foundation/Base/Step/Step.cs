@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Galleon.Checkout;
+using UnityEngine.UIElements;
 using StepAction=System.Func<Galleon.Checkout.Step,System.Threading.Tasks.Task>;
 
 namespace Galleon.Checkout
 {
-
     public class Step
     {
         ////////////////////////////////////////// Members
@@ -83,5 +84,24 @@ namespace Galleon.Checkout
             
             Debug.Log($"{prefix}{message}");
         }
+
+        ////////////////////////////////////////// Awaitable Implementation
+        
+        public TaskAwaiter GetAwaiter()
+        {
+            return Execute().GetAwaiter();
+        }
+        
+        ////////////////////////////////////////// Inspector
+        
+        public class StepInspector : Inspector<Step>
+        {
+            public StepInspector(Step target) : base(target)
+            {
+                this.Add(new Label($"Step {this}"));
+            }
+        }
     }
+    
+    
 }

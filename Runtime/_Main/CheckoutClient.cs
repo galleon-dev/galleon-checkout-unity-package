@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.UI;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -17,10 +18,15 @@ namespace Galleon.Checkout
         
         // Services
         [Header("Services")]
-        public Logger                 Logger    = new();
-        public Network                Network   = new();
-        public Config                 Config    = new();
-        public Analytics              Analytics = new();
+        public Logger                 Logger        = new();
+        public Network                Network       = new();
+        public Config                 Config        = new();
+        public Analytics              Analytics     = new();
+        
+        // APIs
+        public CheckoutAPI            CheckoutAPI   = new();
+        public CheckoutIAPStore       IAPStore      = new();
+      //public CheckoutIapStoreListener IapStoreListener = new(); // for testing
         
         // Resources
         [Header("Resources")]
@@ -34,6 +40,14 @@ namespace Galleon.Checkout
         public UsersController        Users        = new();
         public TransactionsController Transactions = new();
         
+        // UI
+        [Header("UI")]
+        public CheckoutScreenMobile CheckoutScreenMobile; 
+        
+        // Data
+        [Header("Data")]
+        public CheckoutViewModel CheckoutViewModel;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Entry Point
         
         [RuntimeInitializeOnLoadMethod]
@@ -44,14 +58,14 @@ namespace Galleon.Checkout
             
             Root.Instance.Runtime.Node.Children.Add(Instance);
             
-            await Instance.Initialize.Execute();
-            await Instance.TEST_FLOW.Execute();
+            await Instance.Initialize();
+            await Instance.TEST_FLOW();
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public Step Initialize 
-            => 
+        public Step Initialize() 
+        => 
             new Step(name   : "initialize_checkout_client"
                     ,tags   : new[] { "init"}
                     ,action : async s =>
@@ -75,14 +89,14 @@ namespace Galleon.Checkout
                               });
         
         
-        public Step TEST_FLOW
+        public Step TEST_FLOW()
             => 
             new Step(name   : "TEST_FLOW"
                     ,tags   : new[] { "init"}
                     ,action : async s =>
                               {
                                   // Test
-                                  s.AddChildStep(this.SetupTest);
+                                  s.AddChildStep(this.SetupTest());
                                 //s.AddChildStep(this.TestRealServer);
                                 //s.AddChildStep(this.TestConfig);
                                 //s.AddChildStep(this.TestToken);
@@ -92,8 +106,8 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow
 
-        public Step SetupTest
-            =>
+        public Step SetupTest()
+        =>
             new Step(name   : $"setup_test"
                     ,action : async (s) =>
                               {
@@ -102,8 +116,8 @@ namespace Galleon.Checkout
                               });
         
         
-        public Step TestConfig
-            =>
+        public Step TestConfig()
+        =>
             new Step(name   : $"test_config"
                     ,action : async (s) =>
                               {
@@ -114,8 +128,8 @@ namespace Galleon.Checkout
                               });
 
 
-        public Step TestToken
-            =>
+        public Step TestToken()
+        =>
             new Step(name   : $"test_token"
                     ,action : async (s) =>
                               {
@@ -124,8 +138,8 @@ namespace Galleon.Checkout
                                   user.Tokens.Add(token);
                               });
 
-        public Step TestTransaction
-            =>
+        public Step TestTransaction()
+        =>
             new Step(name   : $"test_transaction"
                     ,action : async (s) =>
                               {
@@ -133,16 +147,16 @@ namespace Galleon.Checkout
                                   s.AddChildStep(transaction.Purchase);
                               });
 
-        public Step TestUI
-            =>
+        public Step TestUI()
+        =>
             new Step(name   : $"test_ui"
                     ,action : async (s) =>
                               {
                                   GameObject.Instantiate(Resources.CheckoutPopupPrefab, position: new Vector3(0,0,9999), rotation: Quaternion.identity);
                               });
         
-        public Step TestRealServer
-            =>
+        public Step TestRealServer()
+        =>
             new Step(name   : $"test_real_server"
                     ,action : async (s) =>
                               {

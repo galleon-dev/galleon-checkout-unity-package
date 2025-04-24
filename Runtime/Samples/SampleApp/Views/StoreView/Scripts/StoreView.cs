@@ -42,8 +42,9 @@ namespace Galleon.Checkout.Samples
         
         public async void PurchaseGooglePay()
         {
-            await CheckoutAPI.PurchaseGooglePay();
+            // IAP button component in the gameobject
         }   
+        
         public async void PurchaseGalleon()
         {
             await CheckoutAPI.PurchaseGalleon();
