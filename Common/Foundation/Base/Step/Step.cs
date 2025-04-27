@@ -21,6 +21,16 @@ namespace Galleon.Checkout
         public List<Step>   ChildSteps = new();
         public Step         ParentStep = null;
         
+        
+        //////// TEMP
+        public static event Action<Step> ReportStep;
+        public async Task CaptureReport()
+        {
+            ReportStep?.Invoke(this);
+            await Task.Yield();
+        }
+        
+        
         ////////////////////////////////////////// Lifecycle
 
         public Step(string name = null, IEnumerable<string> tags = default, StepAction action = null)
@@ -43,7 +53,8 @@ namespace Galleon.Checkout
                 this.Log($"<color=white>[{this.Name}]</color>");
                 
                 // Execute
-                await Action(this);
+                if (Action != null)
+                    await Action.Invoke(this);
                 
                 // Execute Child Steps
                 foreach (var childStep in ChildSteps)
@@ -63,6 +74,11 @@ namespace Galleon.Checkout
         {
             this.ChildSteps.Add(step);
             step.ParentStep = this;
+        }
+        public void AddChildStep(string name = "temp", StepAction action = default)
+        {
+            Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
+            this.ChildSteps.Add(tempStep);
         }
         
         ////////////////////////////////////////// Methods
@@ -102,6 +118,4 @@ namespace Galleon.Checkout
             }
         }
     }
-    
-    
 }

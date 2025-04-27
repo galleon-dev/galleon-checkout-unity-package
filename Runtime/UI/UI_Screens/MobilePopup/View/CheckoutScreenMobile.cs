@@ -31,18 +31,32 @@ namespace Galleon.Checkout.UI
         public  SelectCurrencyPanelView      SelectCurrencyPanelView;
         public  SelectPaymentMethodPanelView SelectPaymentMethodPanelView;
         public  SimpleDialogPanelView        SimpleDialogPanelView;
+        public  GameObject                   TestPanel;
 
         private bool                         isPending = false;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-        private void Start()
+        private async void Start()
         {
-            ViewCheckoutPanel().Execute();
+            await ViewTestPanel();
         }
         
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Steps
+        
+        public Step ViewTestPanel()
+        =>
+            new Step(name   : $"view_checkout_panel" 
+                    ,action : async (s) =>
+                    {
+                        DisableAllPanels();
+                        TestPanel.SetActive(true);
+                        await s.CaptureReport();
+                        await Task.Delay(1000);
+                        TestPanel.SetActive(false);
+                    });
+        
         
         public Step ViewCheckoutPanel()
         =>
@@ -50,7 +64,7 @@ namespace Galleon.Checkout.UI
                     ,action : async (s) =>
                     {
                         DisableAllPanels();
-                        await CheckoutPanel.View().Execute();
+                        await CheckoutPanel.View();
 
                         switch (CheckoutPanel.Result)
                         {
@@ -58,7 +72,6 @@ namespace Galleon.Checkout.UI
                             case CheckoutPanelView.ViewResult.Settings            : ViewSettingsPanel()           .Execute(); break;
                             case CheckoutPanelView.ViewResult.OtherPaymentMethods : ViewSelectPaymentMethodPanel().Execute(); break;
                         }
-
                     });
         
         public Step ViewSuccessPanel()
@@ -67,12 +80,12 @@ namespace Galleon.Checkout.UI
                     ,action : async (s) =>
                     {
                         DisableAllPanels();
-                        await SuccessPanelView.View().Execute();
+                        await SuccessPanelView.View();
 
-                        switch (SuccessPanelView.Result)
-                        {
-                            case SuccessPanelView.ViewResult.Confirm : Close(); break;
-                        }
+                        // switch (SuccessPanelView.Result)
+                        // {
+                        //     case SuccessPanelView.ViewResult.Confirm : Close(); break;
+                        // }
                     });
         
         public Step ViewSettingsPanel()

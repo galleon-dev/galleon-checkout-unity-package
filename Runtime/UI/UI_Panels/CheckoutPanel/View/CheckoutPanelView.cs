@@ -1,5 +1,6 @@
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 
 namespace Galleon.Checkout.UI
@@ -18,6 +19,11 @@ namespace Galleon.Checkout.UI
             OtherPaymentMethods,
         }
         
+        //////////////////////////////////////////////////////////////////////////// Members
+        
+        public TextMeshProUGUI ProductTitleText;
+        public TextMeshProUGUI PriceText;
+        
         //////////////////////////////////////////////////////////////////////////// View Flow
         
         public bool IsCompleted = false;
@@ -31,10 +37,28 @@ namespace Galleon.Checkout.UI
                         
                         this.gameObject.SetActive(true);
                         
-                        while (!IsCompleted)
-                            await Task.Yield();
+                        // TEMP
+                        //await s.CaptureReport();
+                        this.Flow.AddChildStep(Refresh());
+                        this.Flow.AddChildStep(name:"capture report", s => s.CaptureReport());
+                        this.Flow.AddChildStep(name: "wait a second", action: async s => await Task.Delay(5000));
+                        
+                        await this.Flow;
+                        //while (!IsCompleted)
+                        //    await Task.Yield();
                         
                         this.gameObject.SetActive(false);
+                    });
+        
+        //////////////////////////////////////////////////////////////////////////// Refresh
+        
+        public Step Refresh()
+        =>
+            new Step(name   : $"Refresh"
+                    ,action : async (s) =>
+                    {
+                        this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
+                        this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
                     });
         
         //////////////////////////////////////////////////////////////////////////// UI Events

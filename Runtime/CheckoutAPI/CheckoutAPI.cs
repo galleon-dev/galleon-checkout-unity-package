@@ -7,8 +7,18 @@ namespace Galleon.Checkout
     {
         public static async Task PurchaseGalleon()
         {
-            await CheckoutClient.Instance.TestUI();
+            CheckoutProduct product = new CheckoutProduct()
+                                      { 
+                                          DisplayName = "fake_product_1",
+                                          PriceText   = "$24.99",
+                                      };
+            
+            await PurchaseGalleon(product);
+        }
+        
+        public static async Task PurchaseGalleon(CheckoutProduct product)
+        {
+            await CheckoutClient.Instance.RunCheckoutSession(product);
         }
     }
 }
-

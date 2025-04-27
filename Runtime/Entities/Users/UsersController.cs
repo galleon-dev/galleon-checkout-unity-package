@@ -11,7 +11,8 @@ namespace Galleon.Checkout
                                           ,tags   : new[] { "init"}
                                           ,action : async s =>
                                           {
-                                              
+                                              CheckoutClient.Instance.CurrentUser = new User();
+                                              CheckoutClient.Instance.Users.Users.Add(CheckoutClient.Instance.CurrentUser);
                                           });
     }
 }

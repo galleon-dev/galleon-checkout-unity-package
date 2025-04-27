@@ -25,18 +25,18 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////// Main API
         
-        public Step Purchase
+        public Step Purchase()
         =>
             new Step(name   : $"transaction_checkout"
                     ,action : async (s) =>
                     {
-                        s.AddChildStep(Checkout);
-                        s.AddChildStep(ValidateReceipt);
+                        s.AddChildStep(Checkout());
+                        s.AddChildStep(ValidateReceipt());
                     });
         
         //////////////////////////////////////// Transaction Steps
         
-        public Step Checkout
+        public Step Checkout()
         =>
             new Step(name   : $"checkout"
                     ,action : async (s) =>
@@ -73,7 +73,7 @@ namespace Galleon.Checkout
                         s.Log(result);
                     });
         
-        public Step ValidateReceipt
+        public Step ValidateReceipt()
         =>
             new Step(name   : $"validate_receipt"
                     ,action : async (s) =>

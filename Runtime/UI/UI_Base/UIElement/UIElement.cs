@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using Galleon.Checkout.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -18,18 +20,22 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         [Header("UI Element")]
+        public string          ID              = "";
+        public List<string>    Tags            = new List<string>();
+        
+        [Header("UI Objects")]
         public GameObject      UIGameObject;
         public GameObject      ChildContainer;
         public LayoutGroup     LayoutGroup;
         
-        
+        [Header("Settings")]
         public LayoutDirection LayoutDirection = LayoutDirection.LeftToRight;
         public string          Local           = "en-us";
         public Appearance      appearance      = Appearance.System;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public IEnumerable<UIElement> ChildUIElements => UIGameObject.GetComponentsInChildren<UIElement>(true);
+        public IEnumerable<UIElement> ChildUIElements => UIGameObject.GetComponentsInChildren<UIElement>(true).Except(new[] { this });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
@@ -40,10 +46,15 @@ namespace Galleon.Checkout.UI
 
         private void Awake()
         {
+            if (this.ID.IsNullOrEmpty())
+                this.ID = this.gameObject.name;
+            
             this.UIGameObject = this.gameObject;
             
             if (ChildContainer == null)
                 ChildContainer = this.gameObject;
+            
+            this.LayoutGroup = this.gameObject.GetComponent<LayoutGroup>(); // (if exists)
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh methods
@@ -63,7 +74,20 @@ namespace Galleon.Checkout.UI
                                  ? TextAnchor.MiddleLeft
                                  : TextAnchor.MiddleRight;
             }
+            else if (this.LayoutGroup is VerticalLayoutGroup v)
+            {
+                v.reverseArrangement = !v.reverseArrangement;
+            }
 
+            var texts = this.gameObject.GetComponentsInChildren<TMP_Text>();
+            foreach (var text in texts)
+            {
+                text.alignment = this.LayoutDirection == LayoutDirection.LeftToRight
+                               ? TextAlignmentOptions.Left
+                               : TextAlignmentOptions.Right;
+                
+            }
+            
             foreach (var child in this.ChildUIElements)
                 child.RefreshLayout();
         }

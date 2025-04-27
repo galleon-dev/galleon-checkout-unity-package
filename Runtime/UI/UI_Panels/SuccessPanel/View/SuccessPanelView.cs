@@ -28,8 +28,10 @@ namespace Galleon.Checkout.UI
                         
                         this.gameObject.SetActive(true);
                         
-                        while (!IsCompleted)
-                            await Task.Yield();
+                        await s.CaptureReport();
+                        // while (!IsCompleted)
+                        //     await Task.Yield();
+                        await Task.Delay(1000);
                         
                         this.gameObject.SetActive(false);
                     });

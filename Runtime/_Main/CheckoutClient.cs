@@ -38,7 +38,12 @@ namespace Galleon.Checkout
         public CreditCardsController  CreditCards  = new();
         public TokensController       Tokens       = new();
         public UsersController        Users        = new();
+        public User                   CurrentUser  = new();
         public TransactionsController Transactions = new();
+        
+        // Sessions
+        public CheckoutSession       CurrentSession;
+        public List<CheckoutSession> CheckoutSessions = new List<CheckoutSession>();
         
         // UI
         [Header("UI")]
@@ -88,6 +93,55 @@ namespace Galleon.Checkout
                                   s.AddChildStep(Transactions.Initialize);
                               });
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow Steps
+
+        public Step RunCheckoutSession(CheckoutProduct product)
+        =>
+            new Step(name   : $"run_checkout_session"
+                    ,action : async (s) =>
+                              {
+                                  // Archive last session
+                                  if (CurrentSession!= null)
+                                      CheckoutSessions.Add(CurrentSession);
+                                  
+                                  // Create new session
+                                  CurrentSession = new CheckoutSession();
+                                  
+                                  // Assign product
+                                  CurrentSession.SelectedProduct = product;
+                                  
+                                  // Start Session
+                                  await CurrentSession.Flow();
+                              });
+
+        public Step OpenCheckoutScreenMobile()
+        =>
+            new Step(name   : $"show_checkout_screen_mobile"
+                    ,action : async (s) =>
+                              {
+                                  // Show UI
+                                  var CheckoutScreenMobileGO = GameObject.Instantiate(original : Resources.CheckoutPopupPrefab
+                                                                                     ,position : new Vector3(0,0,9999)
+                                                                                     ,rotation : Quaternion.identity);
+                                  
+                                  this.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>(); 
+                              });
+        
+        public Step CloseCheckoutScreenMobile()
+        =>
+            new Step(name   : $"close_checkout_screen_mobile"
+                    ,action : async (s) =>
+                              {   
+                                  if (CheckoutScreenMobile == null)
+                                      return;
+                                  
+                                  await s.CaptureReport();
+                                  
+                                  GameObject.Destroy(this.CheckoutScreenMobile.gameObject); 
+                              });
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
         
         public Step TEST_FLOW()
             => 
@@ -97,14 +151,12 @@ namespace Galleon.Checkout
                               {
                                   // Test
                                   s.AddChildStep(this.SetupTest());
-                                //s.AddChildStep(this.TestRealServer);
-                                //s.AddChildStep(this.TestConfig);
-                                //s.AddChildStep(this.TestToken);
-                                //s.AddChildStep(this.TestTransaction);
-                                //s.AddChildStep(this.TestUI);
+                                  //s.AddChildStep(this.TestRealServer);
+                                  //s.AddChildStep(this.TestConfig);
+                                  //s.AddChildStep(this.TestToken);
+                                  //s.AddChildStep(this.TestTransaction);
+                                  //s.AddChildStep(this.TestUI);
                               });
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow
 
         public Step SetupTest()
         =>
@@ -144,7 +196,7 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                               {
                                   var transaction = await Transactions.CreateTestTransaction();
-                                  s.AddChildStep(transaction.Purchase);
+                                  s.AddChildStep(transaction.Purchase());
                               });
 
         public Step TestUI()
