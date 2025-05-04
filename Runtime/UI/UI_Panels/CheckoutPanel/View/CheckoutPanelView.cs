@@ -65,20 +65,20 @@ namespace Galleon.Checkout.UI
         
         public void OnConfirmPurchaseClick()
         {
-            Result      = ViewResult.Confirm;
-            IsCompleted = true;
+            this.Result = ViewResult.Confirm;
+            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
         
         public void OnSettingsClick()
         {
-            Result      = ViewResult.Settings;
-            IsCompleted = true;
+            this.Result = ViewResult.Settings;
+            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
         
         public void OnOtherPaymentMethodsClick()
         {
-            Result      = ViewResult.OtherPaymentMethods;
-            IsCompleted = true;
+            this.Result = ViewResult.OtherPaymentMethods;
+            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
     }
 }

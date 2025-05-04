@@ -11,7 +11,7 @@ using Color = UnityEngine.Color;
 
 namespace Galleon.Checkout.UI
 {
-    public class UIElement : MonoBehaviour, IEntity
+    public class UI_Element : MonoBehaviour, IEntity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// IEntity
         
@@ -23,23 +23,21 @@ namespace Galleon.Checkout.UI
         public string          ID              = "";
         public List<string>    Tags            = new List<string>();
         
-        [Header("UI Objects")]
-        public GameObject      UIGameObject;
-        public GameObject      ChildContainer;
-        public LayoutGroup     LayoutGroup;
-        
         [Header("Settings")]
         public LayoutDirection LayoutDirection = LayoutDirection.LeftToRight;
         public string          Local           = "en-us";
         public Appearance      appearance      = Appearance.System;
-
+        
+        [Space(10)]
+        public string TypeSpace;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public IEnumerable<UIElement> ChildUIElements => UIGameObject.GetComponentsInChildren<UIElement>(true).Except(new[] { this });
+        public IEnumerable<UI_Element> ChildUIElements => gameObject.GetComponentsInChildren<UI_Element>(true).Except(new[] { this });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public UIElement()
+        public UI_Element()
         {
             this.Node = new EntityNode(this);
         }
@@ -48,13 +46,6 @@ namespace Galleon.Checkout.UI
         {
             if (this.ID.IsNullOrEmpty())
                 this.ID = this.gameObject.name;
-            
-            this.UIGameObject = this.gameObject;
-            
-            if (ChildContainer == null)
-                ChildContainer = this.gameObject;
-            
-            this.LayoutGroup = this.gameObject.GetComponent<LayoutGroup>(); // (if exists)
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh methods
@@ -66,30 +57,8 @@ namespace Galleon.Checkout.UI
         }
         
         [ContextMenu("Refresh Layout")]
-        public void RefreshLayout()
+        public virtual void RefreshLayout()
         {
-            if (this.LayoutGroup is HorizontalLayoutGroup h)
-            {
-                h.childAlignment = this.LayoutDirection == LayoutDirection.LeftToRight
-                                 ? TextAnchor.MiddleLeft
-                                 : TextAnchor.MiddleRight;
-            }
-            else if (this.LayoutGroup is VerticalLayoutGroup v)
-            {
-                v.reverseArrangement = !v.reverseArrangement;
-            }
-
-            var texts = this.gameObject.GetComponentsInChildren<TMP_Text>();
-            foreach (var text in texts)
-            {
-                text.alignment = this.LayoutDirection == LayoutDirection.LeftToRight
-                               ? TextAlignmentOptions.Left
-                               : TextAlignmentOptions.Right;
-                
-            }
-            
-            foreach (var child in this.ChildUIElements)
-                child.RefreshLayout();
         }
         
         [ContextMenu("RefreshStyle")]
@@ -97,7 +66,6 @@ namespace Galleon.Checkout.UI
         {
             foreach (var child in this.ChildUIElements)
                 child.RefreshStyle();
-
         }
         
         [ContextMenu("Refresh Locale")]
@@ -113,6 +81,15 @@ namespace Galleon.Checkout.UI
             foreach (var child in this.ChildUIElements)
                 child.RefreshConfig();
         }
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Style Methods
+        
+        public virtual void ApplyStyleRule(CSS.Rule rule)
+        {
+            
+        }
+        
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

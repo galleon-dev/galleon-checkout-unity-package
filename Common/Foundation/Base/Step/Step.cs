@@ -21,6 +21,9 @@ namespace Galleon.Checkout
         public List<Step>   ChildSteps = new();
         public Step         ParentStep = null;
         
+        ////////////////////////////////////////// Link
+        
+        public StepController StepController => Root.Instance.Runtime.StepController;
         
         //////// TEMP
         public static event Action<Step> ReportStep;
@@ -48,18 +51,21 @@ namespace Galleon.Checkout
         public async Task Execute()
         {
             try
-            {
+            {   
                 // Log
                 this.Log($"<color=white>[{this.Name}]</color>");
+                
+                StepController.Steps.Add(this);
                 
                 // Execute
                 if (Action != null)
                     await Action.Invoke(this);
                 
                 // Execute Child Steps
-                foreach (var childStep in ChildSteps)
+                for (int i = 0; i < ChildSteps.Count; i++)
                 {
-                    await childStep.Execute();
+                    var child = ChildSteps[i];
+                    await child.Execute();
                 }
             }
             catch (Exception e)
@@ -114,7 +120,7 @@ namespace Galleon.Checkout
         {
             public StepInspector(Step target) : base(target)
             {
-                this.Add(new Label($"Step {this}"));
+                TitleLabel.text = $"Step {target.Name}";
             }
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using Galleon.Checkout.UI;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -15,6 +16,13 @@ namespace Galleon.Checkout.UI
         
         public EntityNode Node { get; set; }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+        
+        public UI UI;
+        
+        public string State = "";
+        public string Style = "";
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flow
         
         public Step Flow;
@@ -23,9 +31,55 @@ namespace Galleon.Checkout.UI
         
         public View()
         {
-            this.Node  = new EntityNode(this);
-            
+            this.Node = new EntityNode(this);
             this.Flow = new Step(name: $"{this.GetType().Name}_Flow", tags: new []{"view_flow"});
+        }
+
+        private void Awake()
+        {
+            this.UI   = new UI(this.gameObject);
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
+
+        
+        [ContextMenu("Refresh")]
+        public void DoRefresh() => Refresh();
+        public void Refresh()
+        {
+            RefreshState();
+            RefreshUI();
+        }
+        
+        
+        [ContextMenu("Refresh UI")]
+        public void DoRefreshUI() => RefreshUI();
+        public void RefreshUI()
+        {
+            // Style
+            var style = this.Style;
+            var rules = CSS.ParseCSS(style);
+            
+            foreach (var element in UI.UI_Elements)
+            {
+                foreach (var rule in rules)
+                {
+                    if (element.Tags.Contains(rule.Tag) || element.ID == rule.ID)
+                    {
+                        element.ApplyStyleRule(rule);
+                    }
+                }
+            }
+            
+            // Layout
+            
+            // Locale
+        }
+        
+        [ContextMenu("Refresh State")]
+        public void DoRefreshState() => RefreshState();
+        public virtual void RefreshState()
+        {   
         }
     }
 }

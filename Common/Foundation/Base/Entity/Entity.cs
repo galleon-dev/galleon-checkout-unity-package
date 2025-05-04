@@ -137,7 +137,15 @@ namespace Galleon.Checkout
             yield break;
         }
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Editor
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Inspector
+        
+        private System.WeakReference<Inspector> _Inspector = new WeakReference<Inspector>(null);
+        public  Inspector                       Inspector   {
+                                                                get { _Inspector.TryGetTarget(out var i); return i; } 
+                                                                set { _Inspector = new WeakReference<Inspector>(value); }
+                                                            }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Unity Editor
         #if UNITY_EDITOR
         
         public EditorExtras editorExtras = new EditorExtras();

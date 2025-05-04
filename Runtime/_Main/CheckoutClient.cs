@@ -42,16 +42,13 @@ namespace Galleon.Checkout
         public TransactionsController Transactions = new();
         
         // Sessions
-        public CheckoutSession       CurrentSession;
-        public List<CheckoutSession> CheckoutSessions = new List<CheckoutSession>();
+        public CheckoutSession        CurrentSession;
+        public List<CheckoutSession>  CheckoutSessions = new List<CheckoutSession>();
         
         // UI
         [Header("UI")]
-        public CheckoutScreenMobile CheckoutScreenMobile; 
+        public CheckoutScreenMobile   CheckoutScreenMobile; 
         
-        // Data
-        [Header("Data")]
-        public CheckoutViewModel CheckoutViewModel;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Entry Point
         

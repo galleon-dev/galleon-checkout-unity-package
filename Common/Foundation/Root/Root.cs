@@ -1,4 +1,6 @@
+using Galleon.Checkout.Foundation;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -20,6 +22,7 @@ namespace Galleon.Checkout
         
         public Runtime  Runtime  = new Runtime();
         public Project  Project  = new Project();
+        public Assets   Assets   = new Assets();
         
         ////////////////////////////////////////////////////// Lifecycle
         

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.UI;
@@ -13,15 +14,14 @@ namespace Galleon.Checkout.UI
     public class CheckoutScreenMobile : View
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
-        
-        public CheckoutViewModel ViewModel => CheckoutClient.Instance.CheckoutViewModel;
-            
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
-        // Panels
+        // UI
         
         [Header("Parent Panel")]
         public  ParentPanel                  ParentPanel;
+        [Header("Header & Footer")]
+        public HeaderPanelView               HeaderPanelView;
+        public FooterPanelView               FooterPanelView;
         [Header("Panels")]
         public  CheckoutPanelView            CheckoutPanel;
         public  CreditCardInfoPanelView      CreditCardPanel;
@@ -31,30 +31,279 @@ namespace Galleon.Checkout.UI
         public  SelectCurrencyPanelView      SelectCurrencyPanelView;
         public  SelectPaymentMethodPanelView SelectPaymentMethodPanelView;
         public  SimpleDialogPanelView        SimpleDialogPanelView;
-        public  GameObject                   TestPanel;
+        [Header("Test")]
+        public  TestPanelView                TestPanelView;
 
+        // Fields
+        
         private bool                         isPending = false;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-        private async void Start()
+        public CheckoutScreenMobile()
         {
-            await ViewTestPanel();
+            this.Node.SetParent(CheckoutClient.Instance);
         }
         
+        private async void Start()
+        {
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Navigation
+        
+      //public       Navigation Nav;
+      //public class Navigation
+      //{
+      //    public List<Func<Step>> Flow = new List<Func<Step>>();
+      //    
+      //    public void RunNext(Func<Step> next)
+      //    {
+      //        // push to history
+      //        this.Flow.Add(next);
+      //        
+      //        // run next
+      //        var s = next?.Invoke();
+      //    }
+      //}
+        
+        /////////////////////// State
+        
+        public enum STATE
+        {
+            test_panel,
+            checkout_panel,
+            success_panel,
+            error_panel,
+            credit_card_panel, 
+            settings_panel,
+        }
+        
+        public enum NavigationStates
+        {
+            Back,
+            Close,
+            Settings,
+            Confirm,
+        }
+        
+        /////////////////////// Page
+        
+        public class Page : Entity
+        {
+            public CheckoutScreenMobile screen => CheckoutClient.Instance.CheckoutScreenMobile;
+            
+            public string Name;
+            
+            public string headerState;
+            public string panelState;
+            public string FooterState;
+
+            public string PageResult;
+            
+            public Action<Page> Setup;
+                    
+            public Dictionary<string, Step> NavigationMap = new();
+        
+            public Page(string name, string header, string panel, string footer, Action<Page> setup = null)
+            {
+                this.Name        = name;
+                this.Setup       = setup;
+                
+                this.headerState = header;
+                this.panelState  = panel;
+                this.FooterState = footer;
+            }
+        }
+        
+        /////////////////////// Flow
+        
+        public bool       IsPageActive      = false; 
+        public Page       CurrentPage       = default;
+        public List<Page> NavigationHistory = new();
+
+        public Step ViewPage(Page page)
+        =>
+            new Step(name   : $"View_{page.Name}_page"
+                    ,action : async (s) =>
+                    {
+                        ///////////////////////// Setup
+                        
+                        page.Setup?.Invoke(page);
+                        
+                        ///////////////////////// Set Sate
+                        
+                        this.HeaderPanelView.State = page.headerState;
+                        this.State                 = page.panelState;
+                        this.FooterPanelView.State = page.FooterState;
+                        
+                        RefreshState();
+                        HeaderPanelView.RefreshState();
+                        FooterPanelView.RefreshState();
+                        
+                        ///////////////////////// Definitions
+                        
+                        IsPageActive = true;
+                        CurrentPage  = page;
+                        NavigationHistory.Add(page);
+                        
+                        ///////////////////////// Await Page
+                        
+                        while (IsPageActive)
+                            await Task.Yield();
+                        
+                        ///////////////////////// Result Helper
+                        
+                        page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Close();
+                        page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Back();
+                        page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
+                        
+                        ///////////////////////// Handle Result
+                        
+                        string pageResult = CurrentPage.PageResult;
+                        Step   nextStep   = page.NavigationMap?[pageResult];
+                        
+                        s.ParentStep.AddChildStep(nextStep);
+                    });
+        
+        public Step UI_Close()
+        =>
+            new Step(name   : $"UI_CLOSE"
+                    ,action : async (s) =>
+                              {
+                                  Close();
+                              });
+        
+        public Step UI_Back()
+        =>
+            new Step(name   : $"UI_Back"
+                    ,action : async (s) =>
+                              {
+                                  var previousPage = NavigationHistory[^2];
+                                  s.ParentStep.AddChildStep(ViewPage(previousPage));
+                              });
+        
+        /////////////////////// UI Events
+        
+        public void On_BackClicked()
+        {
+            OnPageFinishedWithResult(NavigationStates.Close.ToString());
+        }
+        
+        public void On_CloseClicked()
+        {
+            OnPageFinishedWithResult(NavigationStates.Back.ToString());
+        }
+        
+        public void On_SettingsClicked()
+        {
+            OnPageFinishedWithResult(NavigationStates.Settings.ToString());
+        }
+        
+        public static event Action GalleonLogoClicked;
+        public void On_GalleonLogoClicked()
+        {
+            GalleonLogoClicked?.Invoke();
+        }
+        
+        public void OnPageFinishedWithResult(string result)
+        {
+            IsPageActive           = false;
+            CurrentPage.PageResult = result;
+        }
+       
+        void Update()
+        {
+            if (Application.platform == RuntimePlatform.Android 
+            ||  Application.platform == RuntimePlatform.IPhonePlayer  
+            ||  Application.platform == RuntimePlatform.OSXEditor 
+            ||  Application.platform == RuntimePlatform.WindowsEditor)
+            {
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    Debug.Log("EASCAPE");                    
+                    On_CloseClicked();
+                }
+            }
+        }
+        
+        /////////////////////// Pages
+        
+        public Page TestPage            = new Page(name   : "test"
+                                                  ,header : HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                  ,panel  : CheckoutScreenMobile.STATE.test_panel           .ToString()
+                                                  ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString()
+                                                  ,setup  : page =>
+                                                          {
+                                                              page.NavigationMap[TestPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                          }
+                                                   );
+        
+        public Page CheckoutPage        = new Page(name   : "checkout"
+                                                  ,header : HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                  ,panel  : CheckoutScreenMobile.STATE.checkout_panel       .ToString()
+                                                  ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString()
+                                                  ,setup  : page =>
+                                                          {
+                                                              page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = page.screen.ViewPage(page.screen.SuccessPage   );
+                                                              page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                          }
+                                                   );
+        
+        public Page SuccessPage         = new Page(name   : "success"
+                                                  ,header : HeaderPanelView     .STATE.x_button             .ToString()
+                                                  ,panel  : CheckoutScreenMobile.STATE.success_panel        .ToString()
+                                                  ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString());
+        
+        public Page ErrorPage           = new Page(name   : "error"
+                                                  ,header : HeaderPanelView     .STATE.back_and_text        .ToString()
+                                                  ,panel  : CheckoutScreenMobile.STATE.error_panel          .ToString()
+                                                  ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString());
+        
+        public Page CreditCardPage      = new Page(name   : "credit_card"
+                                                  ,header : HeaderPanelView     .STATE.back_and_text        .ToString()
+                                                  ,panel  : CheckoutScreenMobile.STATE.credit_card_panel    .ToString()
+                                                  ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString()
+                                                  ,setup  : page =>
+                                                          {
+                                                              page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SuccessPage   );
+                                                          }
+                                                   );
+        
+        public Page SettingsPage       = new Page(name   : "settings"
+                                                 ,header : HeaderPanelView     .STATE.back_and_text         .ToString()
+                                                 ,panel  : CheckoutScreenMobile.STATE.settings_panel        .ToString()
+                                                 ,footer : FooterPanelView     .STATE.terms_privacy_return  .ToString());
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Steps
         
         public Step ViewTestPanel()
         =>
-            new Step(name   : $"view_checkout_panel" 
+            new Step(name   : $"view_test_panel" 
                     ,action : async (s) =>
                     {
                         DisableAllPanels();
-                        TestPanel.SetActive(true);
-                        await s.CaptureReport();
+                        TestPanelView.gameObject.SetActive(true);
+                        
+                        this.HeaderPanelView.State = HeaderPanelView.STATE.checkout_and_settings.ToString(); 
+                        this.HeaderPanelView.RefreshState();
+
                         await Task.Delay(1000);
-                        TestPanel.SetActive(false);
+                        this.HeaderPanelView.State = HeaderPanelView.STATE.back_and_text.ToString(); 
+                        this.HeaderPanelView.RefreshState();
+
+                        await Task.Delay(1000);
+                        this.HeaderPanelView.State = HeaderPanelView.STATE.x_button.ToString(); 
+                        this.HeaderPanelView.RefreshState();
+
+                        await Task.Delay(1000);
+                        this.FooterPanelView.State = FooterPanelView.STATE.terms_privacy_return.ToString();
+                        this.FooterPanelView.RefreshState();
+                        
+                        await Task.Delay(1000);
+                        this.FooterPanelView.State = FooterPanelView.STATE.long_terms_of_service.ToString();
+                        this.FooterPanelView.RefreshState();
+                        
+                      //TestPanel.SetActive(false);
                     });
         
         
@@ -105,6 +354,20 @@ namespace Galleon.Checkout.UI
         public Step ViewSelectPaymentMethodPanel()
         =>
             new Step(name   : $"view_select_payment_methods_panel"
+                    ,action : async (s) =>
+                    {
+                        DisableAllPanels();
+                        await CreditCardPanel.View().Execute();
+                        
+                        switch (CreditCardPanel.Result)
+                        {
+                            case CreditCardInfoPanelView.ViewResult.Confirm : Close(); break;
+                        }
+                    });
+        
+        public Step ViewCreditCardPanel()
+        =>
+            new Step(name   : $"view_credit_card_panel"
                     ,action : async (s) =>
                     {
                         DisableAllPanels();
@@ -223,18 +486,20 @@ namespace Galleon.Checkout.UI
             SelectCurrencyPanelView     .gameObject.SetActive(false);
             SelectPaymentMethodPanelView.gameObject.SetActive(false);
             SimpleDialogPanelView       .gameObject.SetActive(false);
+            TestPanelView               .gameObject.SetActive(false);
         }
 
-        void Update()
+        public override void RefreshState()
         {
-            // if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.WindowsEditor)
-            // {
-            //     if (Input.GetKeyDown(KeyCode.Escape))
-            //     {
-            //         // Handle back button press
-            //         OnBackClick();
-            //     }
-            // }
+            DisableAllPanels();
+            
+            if      (this.State == STATE.test_panel       .ToString()) TestPanelView    .gameObject.SetActive(true);
+            else if (this.State == STATE.checkout_panel   .ToString()) CheckoutPanel    .gameObject.SetActive(true);
+            else if (this.State == STATE.success_panel    .ToString()) SuccessPanelView .gameObject.SetActive(true);
+            else if (this.State == STATE.error_panel      .ToString()) ErrorPanelView   .gameObject.SetActive(true);
+            else if (this.State == STATE.credit_card_panel.ToString()) CreditCardPanel  .gameObject.SetActive(true);
+            else if (this.State == STATE.settings_panel   .ToString()) SettingsPanelView.gameObject.SetActive(true);
         }
+
     }
 }

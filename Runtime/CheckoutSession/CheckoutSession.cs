@@ -27,19 +27,21 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         await Client.OpenCheckoutScreenMobile();//s.AddChildStep(Client.OpenCheckoutScreenMobile());
+                      //s.AddChildStep(Client.CheckoutScreenMobile.ViewSuccessPanel());
+                        s.AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.TestPage));
+                        return;
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewTestPanel());
                         s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewCheckoutPanel());
+                        s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
+                        s.AddChildStep(Client.CheckoutScreenMobile.ViewCreditCardPanel());
                         s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
                         s.AddChildStep(Client.CurrentUser.RunTestTransaction());
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewSuccessPanel());
                         s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
                         s.AddChildStep(Client.CloseCheckoutScreenMobile());
-                        s.AddChildStep(new Step("Report", action: async (s) =>
-                                                                  {
-                                                                      Report?.Invoke();
-                                                                      await Task.Delay(5000);
-                                                                  }));
+                        
+                      //s.AddChildStep(new Step("Report", action: async (s) => { Report?.Invoke(); await Task.Delay(5000); }));
                         
                     });
     }
