@@ -57,7 +57,7 @@ namespace Galleon.Checkout
             
             await CheckoutClient.Instance.RunCheckoutSession(product: new CheckoutProduct()
                                                                       {
-                                                                          DisplayName = product.id,
+                                                                          DisplayName = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedTitle,
                                                                           PriceText   = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedPriceString
                                                                       });
             

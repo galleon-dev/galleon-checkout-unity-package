@@ -76,6 +76,8 @@ namespace Galleon.Checkout.UI
                     {
                         IsCompleted = false;
                         
+                        Refresh();
+                        
                         this.gameObject.SetActive(true);
                         
                         // TEMP
