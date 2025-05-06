@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.Purchasing.Extension;
@@ -11,6 +12,8 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////// Members
 
         private IStoreCallback callback;
+        
+        public List<ProductDescription> ProductDescriptions = new List<ProductDescription>(); 
         
         //////////////////////////////////////////////////////////////////////////////////////// IStore Methods
         
@@ -33,19 +36,17 @@ namespace Galleon.Checkout
             Debug.Log("===============================");
             ////////////////////////////////////////////////////////////////////////////
             
-            var productDescriptions = new List<ProductDescription>();
-            
             foreach (var product in products)
             {   
-                productDescriptions.Add(new ProductDescription(id       : product.storeSpecificId
-                                                              ,metadata : new ProductMetadata(priceString:    "$9.99"
-                                                                                             ,title:          "My Product"
-                                                                                             ,description:    "My Product Description"
-                                                                                             ,currencyCode:   "USD"
-                                                                                             ,localizedPrice: 9.99m)));
+                this.ProductDescriptions.Add(new ProductDescription(id       : product.storeSpecificId
+                                                                   ,metadata : new ProductMetadata(priceString:    "$9.99"
+                                                                                                  ,title:          "My Product"
+                                                                                                  ,description:    "My Product Description"
+                                                                                                  ,currencyCode:   "USD"
+                                                                                                  ,localizedPrice: 9.99m)));
             }
             
-            this.callback.OnProductsRetrieved(productDescriptions);
+            this.callback.OnProductsRetrieved(this.ProductDescriptions);
         }
 
         public async void Purchase(ProductDefinition product, string developerPayload)
@@ -54,7 +55,11 @@ namespace Galleon.Checkout
             Debug.Log($"IAP - Purchasing {product.id} ({product.type})");
             Debug.Log("===============================");
             
-            await CheckoutClient.Instance.TestUI();
+            await CheckoutClient.Instance.RunCheckoutSession(product: new CheckoutProduct()
+                                                                      {
+                                                                          DisplayName = product.id,
+                                                                          PriceText   = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedPriceString
+                                                                      });
             
             // Simulate a successful purchase
             this.callback.OnPurchaseSucceeded(storeSpecificId       : product.storeSpecificId
