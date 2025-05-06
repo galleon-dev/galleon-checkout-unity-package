@@ -5,11 +5,16 @@ using UnityEngine.UIElements;
 
 namespace Galleon.Checkout
 {
-    public class EntityInspector : VisualElement
+    public class ExplorerItem : VisualElement
     {
         ///// Members
         
         public object Target;
+        
+        public VisualElement ChildrenHolder;
+        public VisualElement InspectorHolder;
+        
+        public ButtonFoldout ButtonFoldout;
         
         ///// Properties
         
@@ -35,25 +40,56 @@ namespace Galleon.Checkout
         
         ///// Lifecycle
         
-        public EntityInspector(object target)
+        public ExplorerItem(object target)
         {
+            // Item Name
+            
             this.Target = target;
             
-            string entityDisplayName = target.GetType().Name;
+            // General
+            InitializeSelf();
+
+            // Nested Inspectors
+            InitializeNestedInspectors();
+
+            // Populate 
+            PopulateChildren();
+        }
+        
+        public void InitializeSelf()
+        {
+            // Name
             
-            if (target is IEntity e)
+            string entityDisplayName = Target.GetType().Name;
+            
+            if (Target is IEntity e)
                 entityDisplayName = e.Node.DisplayName;
             
-            var item  = new ButtonFoldout(); this.Add(item);            
-            item.Text = entityDisplayName;
+            this.ButtonFoldout      = new ButtonFoldout(); this.Add(this.ButtonFoldout);            
+            this.ButtonFoldout.Text = entityDisplayName;
+            
+            ChildrenHolder          = new VisualElement();
+            this.ButtonFoldout.Add(ChildrenHolder);
+            
+            InspectorHolder         = new VisualElement();
+            
+            // On Button Click
+            
+            ButtonFoldout.Button.clicked += () =>
+                                            {
+                                                Explorer.SetSelectedEntity(Target as IEntity);
+                                                this.RefrehseChildren();
+                                            };
 
-            #region NESTED_INSPECTORS
-            ////////////////////////////////////////////////////////////////////////////
-
+        }
+        
+        public void InitializeNestedInspectors()
+        {
+            
             try
             {
                 // Check if the target type has a custom Inspector
-                var targetType = target.GetType();
+                var targetType = Target.GetType();
                 
                 // Look for inspector types directly in the target type as nested classes first
                 var inspectorTypes = targetType.GetNestedTypes()
@@ -66,28 +102,32 @@ namespace Galleon.Checkout
                 
                 if (inspectorTypes.Any())
                 {
+                    // Create Inspector Instance
                     var inspectorType = inspectorTypes.First();
-                    var inspector     = Activator.CreateInstance(inspectorType, target) as Inspector;
+                    var inspector     = Activator.CreateInstance(inspectorType, Target) as Inspector;
                     
-                    if (target is IEntity entity)
+                    // Assign
+                    if (Target is IEntity entity)
                     {
                         entity.Node.Inspector = inspector;
+                        this.InspectorHolder.Clear();
+                        this.InspectorHolder.Add(inspector);
                     }
                     
-                    if (inspector != null)
-                    {
-                        inspector.Target = target;
-                        
-                        VisualElement parentPanel = item;
-                        if (Explorer?.Mode == Explorer.DisplayMode.Horizontal)
-                        {
-                            parentPanel = Explorer.InspectorScrollView;
-                            parentPanel.Clear();
-                        }
-                        
-                        
-                        parentPanel.Add(inspector);
-                    }
+                    // Show
+                    // if (inspector != null)
+                    // {
+                    //     inspector.Target = Target;
+                    //     
+                    //     VisualElement parentPanel = this.ButtonFoldout;
+                    //     if (Explorer?.Mode == Explorer.DisplayMode.Horizontal)
+                    //     {
+                    //         parentPanel = this.InspectorHolder; //Explorer.InspectorScrollView;
+                    //         parentPanel.Clear();
+                    //     }
+                    //     
+                    //     parentPanel.Add(inspector);
+                    // }
                 }
 
             }
@@ -96,32 +136,37 @@ namespace Galleon.Checkout
                 Add(new HelpBox($"error with nested inspectors : \n{ex.ToString()}", HelpBoxMessageType.Error));
             }
             
-            
-            item.Button.clicked += () =>
-                                   {
-                                       Explorer.SetSelectedEntity(target as IEntity);
-                                   };
-            
-            
-            ////////////////////////////////////////////////////////////////////////////
-            #endregion // NESTED_INSPECTORS
+        }
+        
+        public void PopulateChildren()
+        {
             
             // Predefined Child Entities
-            if (target is IEntity e2)
+            if (Target is IEntity e)
             {
-                foreach (var child in e2.Node.Children)
+                foreach (var child in e.Node.Children)
                 {
-                    var childItem = new EntityInspector(child);
+                    var childItem = new ExplorerItem(child);
                     
                     #if UNITY_EDITOR
                     string header = child.Node.editorExtras.HeaderAttributeText;
                     if (header != null)
-                        item.Add(new Label(header));
+                        this.ButtonFoldout.Add(new Label(header));
                     #endif
                     
-                    item.Add(childItem);
+                    this.ChildrenHolder.Add(childItem);
                 }
             }
+        }
+        
+        public void RefrehseChildren()
+        {
+            if (this.ButtonFoldout.Foldout.value == false)
+                return;
+            
+            this.ChildrenHolder.Clear();
+            
+            PopulateChildren();
         }
     }
 }

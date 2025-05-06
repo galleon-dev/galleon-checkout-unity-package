@@ -43,7 +43,7 @@ namespace Galleon.Checkout
                 
                 foreach (var step in Target.Steps)
                 {
-                    var stepInspector = new EntityInspector(step);
+                    var stepInspector = new ExplorerItem(step);
                     stepsContainer.Add(stepInspector);
                 }
             }

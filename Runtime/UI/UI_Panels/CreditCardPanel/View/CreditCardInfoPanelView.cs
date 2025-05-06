@@ -7,6 +7,7 @@ using Galleon.Checkout;
 using Galleon.Checkout.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Galleon.Checkout.UI
 {
@@ -15,6 +16,13 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////// Members
         
         public AdvancedInputField CreditCardNumberField;
+        
+        public Image  CardTypeIcon;
+        public Sprite CardIcon_MasterCard;
+        public Sprite CardIcon_Visa;
+        public Sprite CardIcon_Amex;
+        public Sprite CardIcon_Diners;
+        public Sprite CardIcon_Discover;
 
         //////////////////////////////////////////////////////////////////////////// View Result
             
@@ -65,6 +73,35 @@ namespace Galleon.Checkout.UI
         
         ////////
         
+        void SetCardIcon(CardFormat card)
+        {
+            this.CardTypeIcon.gameObject.SetActive(true);
+            if (card.Name == "MasterCard")
+            {
+                this.CardTypeIcon.sprite = CardIcon_MasterCard;
+            }
+            else if (card.Name == "Visa")
+            {
+                this.CardTypeIcon.sprite = CardIcon_Visa;
+            }
+            else if (card.Name == "Amex")
+            {
+                this.CardTypeIcon.sprite = CardIcon_Amex;
+            }
+            else if (card.Name == "Diners")
+            {
+                this.CardTypeIcon.sprite = CardIcon_Diners;
+            }
+            else if (card.Name == "Discover")
+            {
+                this.CardTypeIcon.sprite = CardIcon_Discover;
+            }
+            else
+            {
+                this.CardTypeIcon.gameObject.SetActive(false); // Hide icon if no match
+            }
+        }
+        
         void FormatInput(string rawInput)
         {
             if (isUpdating) return;
@@ -87,6 +124,10 @@ namespace Galleon.Checkout.UI
             if (digits.Length > format.MaxLength)
                 digits = digits.Substring(0, format.MaxLength);
 
+            ////////////
+            SetCardIcon(format);
+            ////////////
+            
             string formatted = "";
             int digitIndex = 0;
             int newCaretPos = 0;
@@ -182,7 +223,7 @@ namespace Galleon.Checkout.UI
 
             // Diners Club: starts with 36, 38, 39 → 14 digits → 4-6-4
             (d => d.StartsWith("36") || d.StartsWith("38") || d.StartsWith("39"),
-                new CardFormat("Diners Club", 14, new[] { 4, 6, 4 })),
+                new CardFormat("Diners", 14, new[] { 4, 6, 4 })),
 
             // Default fallback
             (_ => true, new CardFormat("Unknown", 16, new[] { 4, 4, 4, 4 }))

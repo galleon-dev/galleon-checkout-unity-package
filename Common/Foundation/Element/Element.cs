@@ -58,12 +58,15 @@ namespace Galleon.Checkout
             }
         }
 
+        private void OnEnable()
+        {
+            this.Node.DisplayName = Name;
+        }
+
         public Element()
         {
             Node = new EntityNode(this);
             Root.Instance.Project.Node.Children.Add(this);
-            
-            this.Node.DisplayName = Name;
         }
     }
 }

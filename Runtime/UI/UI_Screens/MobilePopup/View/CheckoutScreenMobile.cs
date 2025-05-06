@@ -19,6 +19,7 @@ namespace Galleon.Checkout.UI
         
         [Header("Parent Panel")]
         public  ParentPanel                  ParentPanel;
+        public  RectTransform                contentTransform;
         [Header("Header & Footer")]
         public HeaderPanelView               HeaderPanelView;
         public FooterPanelView               FooterPanelView;
@@ -224,6 +225,29 @@ namespace Galleon.Checkout.UI
                     On_CloseClicked();
                 }
             }
+            
+            ParentPanel.TryGetComponent(out RectTransform parentTransform);
+            var targetSize = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + GetKeyboardHeight());
+            parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
+        }
+        
+        float GetKeyboardHeight()
+        {
+            #if UNITY_ANDROID && !UNITY_EDITOR
+            using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            {
+                AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                AndroidJavaObject view = activity.Get<AndroidJavaObject>("mUnityPlayer").Call<AndroidJavaObject>("getView");
+                AndroidJavaObject rect = new AndroidJavaObject("android.graphics.Rect");
+                view.Call("getWindowVisibleDisplayFrame", rect);
+                int visibleHeight = rect.Call<int>("height");
+                return UnityEngine.Screen.height - visibleHeight;
+            }
+            #elif UNITY_IOS && !UNITY_EDITOR
+            return TouchScreenKeyboard.area.height;
+            #else
+            return 0f;
+            #endif
         }
         
         /////////////////////// Pages

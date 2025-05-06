@@ -9,10 +9,10 @@ namespace Galleon.Checkout
     public class Inspector : VisualElement
     {
         //// Members
-        public object Target;
         
-        public bool IsSelected = false;
-
+        public object Target;
+        public bool   IsSelected = false;
+        
         //// Properties
         
         public Explorer Explorer => Explorer.Instance;

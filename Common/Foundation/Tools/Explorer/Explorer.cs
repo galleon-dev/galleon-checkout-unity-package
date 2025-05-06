@@ -68,7 +68,7 @@ namespace Galleon.Checkout
             
             
             // Left 
-            EntityInspector root = new EntityInspector(RootObject); 
+            ExplorerItem root = new ExplorerItem(RootObject); 
             TreeScrollView.Add(root);
             
             // Right

@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Galleon.Checkout.UI
 {
@@ -21,8 +23,47 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////// Members
         
+        [Header("Shop Item")]
         public TextMeshProUGUI ProductTitleText;
         public TextMeshProUGUI PriceText;
+        
+        [Header("Payment Methods")]
+        public GameObject      PaymentMethodsPanel;
+        public GameObject      PaymentMethodItemPrefab;
+        
+        //////////////////////////////////////////////////////////////////////////// Links
+        
+        public IEnumerable<checkoutPanelPaymentMethodItemView> PaymentMethodItemViews => GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
+        
+        //////////////////////////////////////////////////////////////////////////// Initialization
+        
+        public override void Initialize()
+        {
+            // Remove children (if any)
+            foreach (Transform child in PaymentMethodsPanel.transform)
+            {
+                Debug.Log($"-Removing Item {child.gameObject.name}");
+                Destroy(child.gameObject);
+            }
+            
+            // Add children
+            var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
+            foreach (var paymentMethod in paymentMethods)
+            {
+                var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);
+                var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
+                
+                item.Initialize(paymentMethod, this);
+            }
+            
+            
+            // Refresh the layout groups under the PaymentMethodsPanel
+            var layoutGroups = PaymentMethodsPanel.GetComponentsInChildren<UnityEngine.UI.LayoutGroup>();
+            foreach (var group in layoutGroups)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(group.GetComponent<RectTransform>());
+            }
+        }
         
         //////////////////////////////////////////////////////////////////////////// View Flow
         
@@ -39,7 +80,7 @@ namespace Galleon.Checkout.UI
                         
                         // TEMP
                         //await s.CaptureReport();
-                        this.Flow.AddChildStep(Refresh());
+                      //this.Flow.AddChildStep(Refresh());
                         this.Flow.AddChildStep(name:"capture report", s => s.CaptureReport());
                         this.Flow.AddChildStep(name: "wait a second", action: async s => await Task.Delay(5000));
                         
@@ -51,15 +92,25 @@ namespace Galleon.Checkout.UI
                     });
         
         //////////////////////////////////////////////////////////////////////////// Refresh
+
+        public override void RefreshState()
+        {
+            this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
+            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+        }
+
+        //////////////////////////////////////////////////////////////////////////// Radio Buttons
         
-        public Step Refresh()
-        =>
-            new Step(name   : $"Refresh"
-                    ,action : async (s) =>
-                    {
-                        this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
-                        this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
-                    });
+        public void OnRadiobuttonSelected(checkoutPanelPaymentMethodItemView SelectedItem)
+        {
+            foreach (var item in PaymentMethodItemViews)
+            {
+                if (item == SelectedItem)
+                    continue;
+                
+                item.Unselect();
+            }
+        }
         
         //////////////////////////////////////////////////////////////////////////// UI Events
         

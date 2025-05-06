@@ -35,9 +35,16 @@ namespace Galleon.Checkout.UI
             this.Flow = new Step(name: $"{this.GetType().Name}_Flow", tags: new []{"view_flow"});
         }
 
-        private void Awake()
+        public virtual void Awake()
         {
-            this.UI   = new UI(this.gameObject);
+            this.UI = new UI(this.gameObject);
+            
+            Initialize();
+        }
+        
+        public virtual void Initialize()
+        {
+            
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh

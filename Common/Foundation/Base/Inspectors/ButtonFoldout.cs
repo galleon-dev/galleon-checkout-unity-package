@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace Galleon.Checkout
         public Toggle        Toggle;
         public Button        Button;
         public VisualElement Content;
-
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public string Text

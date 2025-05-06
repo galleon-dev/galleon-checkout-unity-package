@@ -6,26 +6,45 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class User
+    public class User : Entity
     {
-        // Members
-        public string                ID     = new Guid().ToString();
-        public string                Name   = "Fake User";
-        public List<CreditCardToken> Tokens = new List<CreditCardToken>();
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+       
+        public string                ID;
+        public string                Name;
         
-        public List<Transaction>     Transactions = new List<Transaction>();
+        public List<PaymentMethod>   PaymentMethods         = new();
+        
+        public List<CreditCardToken> Tokens                 = new();
+        
+        public List<Transaction>     Transactions           = new();
+        
         public Transaction           CurrentTransaction;
         
-        // Properties
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
+        
         public CreditCardToken       MainToken    => Tokens.FirstOrDefault();
         
-        // Methods
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public User()
+        {
+            this.ID   = new Guid().ToString();
+            this.Name = "Fake User";
+            
+            this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.MasterCard.ToString(), DisplayName = "MasterCard - **** - 4587" , IsSelected = false, });
+            this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.GPay      .ToString(), DisplayName = "Google Pay - **** - 7348" , IsSelected = false, });
+            this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.PayPal    .ToString(), DisplayName = "Paypal - **** - 9101" ,     IsSelected = false, });
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Steps
+        
         public Step RunTestTransaction()
         =>
             new Step(name   : $"run_test_transaction"
                     ,action : async (s) =>
                     {
-                        this.CurrentTransaction = new Transaction(user : this, creditCardToken: this.MainToken);
+                        this.CurrentTransaction = new Transaction(user: this, creditCardToken: this.MainToken);
                         this.Transactions.Add(this.CurrentTransaction);
                         
                         // await this.CurrentTransaction.Purchase();
@@ -38,4 +57,3 @@ namespace Galleon.Checkout
                     });
     }
 }
-
