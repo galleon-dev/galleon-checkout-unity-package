@@ -7,7 +7,11 @@ namespace Galleon.Checkout
 {
     public class EntityInspector : VisualElement
     {
+        ///// Members
+        
         public object Target;
+        
+        ///// Properties
         
         public Explorer Explorer
         {
@@ -29,6 +33,7 @@ namespace Galleon.Checkout
             }
         }
         
+        ///// Lifecycle
         
         public EntityInspector(object target)
         {
