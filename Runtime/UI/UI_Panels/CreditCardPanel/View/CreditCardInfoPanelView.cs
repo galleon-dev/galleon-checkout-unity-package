@@ -17,12 +17,16 @@ namespace Galleon.Checkout.UI
         
         public AdvancedInputField CreditCardNumberField;
         
+        public TMP_Text CardNumberErrorText;
+        
         public Image  CardTypeIcon;
         public Sprite CardIcon_MasterCard;
         public Sprite CardIcon_Visa;
         public Sprite CardIcon_Amex;
         public Sprite CardIcon_Diners;
         public Sprite CardIcon_Discover;
+        
+        public CheckboxButton cbx_SaveCardDetails;
 
         //////////////////////////////////////////////////////////////////////////// View Result
             
@@ -52,9 +56,16 @@ namespace Galleon.Checkout.UI
                         this.gameObject.SetActive(false);
                     });
         
+        //////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public override void Initialize()
+        {
+            CardNumberErrorText.gameObject.SetActive(false);
+        }
+
         //////////////////////////////////////////////////////////////////////////// UI Events
         
-        public void OnOkClick()
+        public void On_OkClick()
         {
             this.Result = ViewResult.Confirm;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
@@ -153,7 +164,7 @@ namespace Galleon.Checkout.UI
 
             CreditCardNumberField.Text          = formatted;
             CreditCardNumberField.CaretPosition = newCaretPos;
-
+            
             // Luhn check
             bool valid = IsValidLuhn(digits);
             if (CreditCardNumberField != null)
@@ -163,8 +174,18 @@ namespace Galleon.Checkout.UI
 
             isUpdating = false;
             
-            string mark = valid ? "V" : "X";
-            Debug.Log($"[{mark}] {formatted}");
+
+            if (digits.Length == format.MaxLength)
+            {
+                CardNumberErrorText.gameObject.SetActive(!valid);
+                
+                string mark = valid ? "V" : "X";
+                Debug.Log($"[{mark}] {formatted}");
+            }
+            else
+            {
+                CardNumberErrorText.gameObject.SetActive(false);
+            }
         }
         
         ////////
@@ -217,9 +238,9 @@ namespace Galleon.Checkout.UI
                || (d.Length >= 3 && int.TryParse(d.Substring(0, 3), out var p3) && p3 >= 644 && p3 <= 649),
                 new CardFormat("Discover", 16, new[] { 4, 4, 4, 4 })),
 
-            // JCB: 3528–3589 → 16–19 digits
-            (d => d.Length >= 4 && int.TryParse(d.Substring(0, 4), out var pJcb) && pJcb >= 3528 && pJcb <= 3589,
-                new CardFormat("JCB", 19, new[] { 4, 4, 4, 4, 3 })),
+         // // JCB: 3528–3589 → 16–19 digits
+         // (d => d.Length >= 4 && int.TryParse(d.Substring(0, 4), out var pJcb) && pJcb >= 3528 && pJcb <= 3589,
+         //     new CardFormat("JCB", 19, new[] { 4, 4, 4, 4, 3 })),
 
             // Diners Club: starts with 36, 38, 39 → 14 digits → 4-6-4
             (d => d.StartsWith("36") || d.StartsWith("38") || d.StartsWith("39"),
@@ -250,3 +271,4 @@ namespace Galleon.Checkout.UI
         }
     }
 }
+

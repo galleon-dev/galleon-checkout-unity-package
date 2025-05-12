@@ -30,9 +30,13 @@ namespace Galleon.Checkout.UI
             {
                 LongTermsOfServiceelement.SetActive(true);
             }
-            if (this.State == STATE.terms_privacy_return.ToString())
+            else if (this.State == STATE.terms_privacy_return.ToString())
             {
                 TermsPrivacyReturnElement.SetActive(true);
+            }
+            else if (this.State == STATE.none.ToString())
+            {
+                DisableAllPanels();
             }
         }
         

@@ -12,6 +12,9 @@ namespace Galleon.Checkout
         {
             Visa,
             MasterCard,
+            Amex,
+            Diners,
+            Discover,
             GPay,
             PayPal,
         }

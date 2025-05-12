@@ -21,7 +21,7 @@ namespace Galleon.Checkout.UI
         public Sprite   MasterCardSprite;
         public Sprite   GPaySprite;
         public Sprite   PaypalSprite;
-        
+        public Sprite   AddCardSprite;
         
         //// Properties
         
@@ -41,6 +41,13 @@ namespace Galleon.Checkout.UI
         
         public override void RefreshState()
         {
+            if (CheckoutPanelView == null)
+            {
+                this.Icon.sprite = AddCardSprite;
+                this.Label.text  = "Add Credit Card";
+                return;
+            }
+                
             this.Label.text    = PaymentMethod.DisplayName;
             this.CheckedImage  .gameObject.SetActive( this.PaymentMethod.IsSelected);
             this.UncheckedImage.gameObject.SetActive(!this.PaymentMethod.IsSelected);
@@ -66,14 +73,14 @@ namespace Galleon.Checkout.UI
         
         public void Select()
         {
-            this.PaymentMethod.Select();
+            this.PaymentMethod?.Select();
             this.CheckoutPanelView.OnRadiobuttonSelected(this);
             Refresh();
         }
         
         public void Unselect()
         {
-            this.PaymentMethod.Unselect();
+            this.PaymentMethod?.Unselect();
             Refresh();
         }
     }

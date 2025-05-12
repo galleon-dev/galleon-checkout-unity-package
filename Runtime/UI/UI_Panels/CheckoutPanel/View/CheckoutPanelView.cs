@@ -55,14 +55,6 @@ namespace Galleon.Checkout.UI
                 
                 item.Initialize(paymentMethod, this);
             }
-            
-            
-            // Refresh the layout groups under the PaymentMethodsPanel
-            var layoutGroups = PaymentMethodsPanel.GetComponentsInChildren<UnityEngine.UI.LayoutGroup>();
-            foreach (var group in layoutGroups)
-            {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(group.GetComponent<RectTransform>());
-            }
         }
         
         //////////////////////////////////////////////////////////////////////////// View Flow
@@ -99,6 +91,31 @@ namespace Galleon.Checkout.UI
         {
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
             this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+         
+            ///////////////
+            
+            // Remove children (if any)
+            foreach (Transform child in PaymentMethodsPanel.transform)
+            {
+                Debug.Log($"-Removing Item {child.gameObject.name}");
+                Destroy(child.gameObject);
+            }
+            
+            // Add children
+            var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
+            foreach (var paymentMethod in paymentMethods)
+            {
+                var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);
+                var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
+                
+                item.Initialize(paymentMethod, this);
+            }
+            
+            ///////////////
+            
+            // checkoutPanelPaymentMethodItemView[] methods = this.gameObject.GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
+            // foreach (var method in methods)
+            //     method.Refresh();
         }
 
         //////////////////////////////////////////////////////////////////////////// Radio Buttons

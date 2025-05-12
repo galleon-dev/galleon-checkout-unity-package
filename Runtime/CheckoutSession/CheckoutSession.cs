@@ -10,17 +10,25 @@ namespace Galleon.Checkout
 {
     public class CheckoutSession : Entity
     {
-        // Members
-        public CheckoutProduct SelectedProduct;
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        // Temp
-        public static event Action Report;
+        public CheckoutProduct                    SelectedProduct;
         
-        // Properties
+        public string                             LastDialogRequest     = null;
+        public SimpleDialogPanelView.DialogResult LastDialogResult      = SimpleDialogPanelView.DialogResult.None;
+        public PaymentMethod                      PaymentMethodToDelete = null;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
+        
         public CheckoutClient Client => CheckoutClient.Instance; // TODO : should be : Node.Ancestors().OfType<CheckoutClient>().First();
         public User           User   => Client.CurrentUser;
         
-        // Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
+        
+        public static event Action Report;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Steps
+        
         public Step Flow()
         =>
             new Step(name   : $"checkout_session_flow"

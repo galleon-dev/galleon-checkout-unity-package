@@ -38,7 +38,7 @@ namespace Galleon.Checkout
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Steps
-        
+
         public Step RunTestTransaction()
         =>
             new Step(name   : $"run_test_transaction"
@@ -55,5 +55,23 @@ namespace Galleon.Checkout
                         s.Log("Transaction.ValidateReceipt");
                         await Task.Yield();
                     });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
+        
+        public void SelectPaymentMethod(PaymentMethod paymentMethod)
+        {
+            foreach (var method in this.PaymentMethods)
+                method.Unselect();
+            
+            paymentMethod.Select();
+        }
+        
+        public void RemovePaymentMethod(PaymentMethod paymentMethod)
+        {
+            this.PaymentMethods.Remove(paymentMethod);
+            
+            foreach (var method in this.PaymentMethods)
+                method.Unselect();
+        }
     }
 }
