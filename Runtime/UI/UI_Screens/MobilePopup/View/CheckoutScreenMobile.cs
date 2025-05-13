@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.UI;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Purchasing;
