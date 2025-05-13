@@ -238,8 +238,12 @@ namespace Galleon.Checkout.UI
             ParentPanel.TryGetComponent(out RectTransform parentTransform);
             var targetSize = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + GetKeyboardHeight());
             parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
-            Debug.Log($"content.sizeDelta.y = {contentTransform.sizeDelta.y}, currentSize = {parentTransform.sizeDelta.y}");
+            parentTransform.sizeDelta = targetSize;
+            
+            Debug.Log($"content.sizeDelta.y = {contentTransform.sizeDelta.y}, currentSize = {parentTransform.sizeDelta.y}, keyboardSize = {GetKeyboardHeight()}. {i++}");
         }
+        
+        int i = 1;
         
         float GetKeyboardHeight()
         {
