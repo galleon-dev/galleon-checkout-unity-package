@@ -231,7 +231,7 @@ namespace Galleon.Checkout.UI
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     Debug.Log("EASCAPE");                    
-                    On_CloseClicked();
+                    On_BackClicked();
                 }
             }
             
