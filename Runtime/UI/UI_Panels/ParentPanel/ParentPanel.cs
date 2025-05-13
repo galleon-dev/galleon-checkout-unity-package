@@ -26,6 +26,8 @@ namespace Galleon.Checkout
             Vector2 offsetMax            = this.RectTransform.offsetMax;
             offsetMax.y                  = this.fullscreenHeightAnchorTop;
             this.RectTransform.offsetMax = offsetMax;
+            
+            Debug.Log($"Settings Parent Panel size to {offsetMax}");
         }
     
         [ContextMenu("Set Original Size")]

@@ -235,9 +235,9 @@ namespace Galleon.Checkout.UI
                 }
             }
             
-            ParentPanel.TryGetComponent(out RectTransform parentTransform);
-            var targetSize = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + GetKeyboardHeight());
-            parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
+            // ParentPanel.TryGetComponent(out RectTransform parentTransform);
+            // var targetSize = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + GetKeyboardHeight());
+            // parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
         }
         
         float GetKeyboardHeight()
