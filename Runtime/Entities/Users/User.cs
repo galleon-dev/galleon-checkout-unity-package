@@ -66,6 +66,11 @@ namespace Galleon.Checkout
             paymentMethod.Select();
         }
         
+        public void AddPaymentMethod(PaymentMethod paymentMethod)
+        {
+            this.PaymentMethods.Add(paymentMethod);
+        }
+        
         public void RemovePaymentMethod(PaymentMethod paymentMethod)
         {
             this.PaymentMethods.Remove(paymentMethod);

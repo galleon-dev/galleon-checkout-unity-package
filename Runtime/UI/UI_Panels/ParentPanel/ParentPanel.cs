@@ -17,7 +17,7 @@ namespace Galleon.Checkout
           //this.fullscreenHeightAnchorTop = 0;
             
             // TEMP 
-            SetFullscreenHeight();
+          //SetFullscreenHeight();
         }
 
         [ContextMenu("Set Fullscreen")]

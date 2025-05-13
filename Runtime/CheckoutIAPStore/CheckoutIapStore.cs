@@ -64,7 +64,7 @@ namespace Galleon.Checkout
             // Simulate a successful purchase
             this.callback.OnPurchaseSucceeded(storeSpecificId       : product.storeSpecificId
                                              ,receipt               : "receipt"
-                                             ,transactionIdentifier : "transactionId"
+                                             ,transactionIdentifier : "transactionID"
             );
         }
 

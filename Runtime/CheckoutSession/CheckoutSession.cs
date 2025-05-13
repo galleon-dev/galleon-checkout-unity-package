@@ -36,7 +36,7 @@ namespace Galleon.Checkout
                     {
                         await Client.OpenCheckoutScreenMobile();//s.AddChildStep(Client.OpenCheckoutScreenMobile());
                       //s.AddChildStep(Client.CheckoutScreenMobile.ViewSuccessPanel());
-                        s.AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.TestPage));
+                        s.AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.CheckoutPage));
                         return;
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewTestPanel());
                         s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));

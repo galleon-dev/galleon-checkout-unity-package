@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
@@ -27,6 +28,8 @@ namespace Galleon.Checkout.UI
         public Sprite CardIcon_Discover;
         
         public CheckboxButton cbx_SaveCardDetails;
+        
+        private CardFormat CurrentCardFormat = default;
 
         //////////////////////////////////////////////////////////////////////////// View Result
             
@@ -67,6 +70,15 @@ namespace Galleon.Checkout.UI
         
         public void On_OkClick()
         {
+            PaymentMethod card = new PaymentMethod();
+            
+            card.Type = CurrentCardFormat.Name;
+            card.DisplayName = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
+            
+            CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod(card);
+            CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(card);
+            
+            
             this.Result = ViewResult.Confirm;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
         }
@@ -186,6 +198,10 @@ namespace Galleon.Checkout.UI
             {
                 CardNumberErrorText.gameObject.SetActive(false);
             }
+            
+            /////////////////////////////////
+            
+            this.CurrentCardFormat = format;
         }
         
         ////////

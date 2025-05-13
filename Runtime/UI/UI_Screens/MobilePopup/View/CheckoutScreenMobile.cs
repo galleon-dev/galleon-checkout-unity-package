@@ -5,8 +5,10 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.UI;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Purchasing;
 using UnityEngine.Serialization;
 
 namespace Galleon.Checkout.UI
@@ -536,8 +538,12 @@ namespace Galleon.Checkout.UI
 
         public void Close()
         {
+            CheckoutClient.Instance.IAPStore.FinishTransaction(product        : new ProductDefinition(id   : CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName
+                                                                                                     ,type : ProductType.Consumable)
+                                                               ,transactionId : "transactionID");
+            
             this.gameObject.SetActive(false);
-            Destroy(this.gameObject);
+            Destroy(this.gameObject);   
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper UI Actions
