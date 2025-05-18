@@ -30,7 +30,8 @@ namespace Galleon.Checkout
                 Add(refreshButton);
                 
                 stepsContainer = new VisualElement();
-                Add(stepsContainer);
+                target.Node.ExplorerItem.ChildrenHolder.Add(stepsContainer);
+                
                 
                 Refresh();
             }

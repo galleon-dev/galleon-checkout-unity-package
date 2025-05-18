@@ -141,9 +141,15 @@ namespace Galleon.Checkout
         
         private System.WeakReference<Inspector> _Inspector = new WeakReference<Inspector>(null);
         public  Inspector                       Inspector   {
-                                                                get { _Inspector.TryGetTarget(out var i); return i; } 
+                                                                get { _Inspector.TryGetTarget(out var i); return i;     } 
                                                                 set { _Inspector = new WeakReference<Inspector>(value); }
                                                             }
+        
+        private System.WeakReference<ExplorerItem> _ExplorerItem = new WeakReference<ExplorerItem>(null);
+        public  ExplorerItem                       ExplorerItem   {
+                                                                      get { _ExplorerItem.TryGetTarget(out var e); return e;        } 
+                                                                      set { _ExplorerItem = new WeakReference<ExplorerItem>(value); }
+                                                                  }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Unity Editor
         #if UNITY_EDITOR

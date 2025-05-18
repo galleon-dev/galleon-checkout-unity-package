@@ -67,6 +67,10 @@ namespace Galleon.Checkout
             
             this.ButtonFoldout      = new ButtonFoldout(); this.Add(this.ButtonFoldout);            
             this.ButtonFoldout.Text = entityDisplayName;
+            if (Target is IEntity en)
+            {
+                en.Node.ExplorerItem = this;
+            }
             
             ChildrenHolder          = new VisualElement();
             this.ButtonFoldout.Add(ChildrenHolder);

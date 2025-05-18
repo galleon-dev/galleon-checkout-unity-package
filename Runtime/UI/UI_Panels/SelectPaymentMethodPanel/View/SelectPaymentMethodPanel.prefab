@@ -77,8 +77,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4287993237
+  m_fontColor: {r: 0.5849056, g: 0.5849056, b: 0.5849056, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -390,6 +390,7 @@ MonoBehaviour:
   Style: 
   SelectPaymentMethodItemPrefab: {fileID: 3727052664297547827, guid: 489617f8f9bae4b0b954c835fcbbff30, type: 3}
   SelectPaymentMethodItemsHolder: {fileID: 2693726377236606640}
+  Result: 0
   IsCompleted: 0
 --- !u!114 &4419736909455063622
 MonoBehaviour:
@@ -453,7 +454,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 669099848437721121, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 61.5
+      value: 18.2887
       objectReference: {fileID: 0}
     - target: {fileID: 669099848437721121, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
       propertyPath: m_LocalPosition.x
@@ -506,6 +507,10 @@ PrefabInstance:
     - target: {fileID: 1415656391310666612, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
       propertyPath: m_Name
       value: ui_space
+      objectReference: {fileID: 0}
+    - target: {fileID: 1415656391310666612, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
@@ -931,7 +936,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 669099848437721121, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 61.5
+      value: 24.0502
       objectReference: {fileID: 0}
     - target: {fileID: 669099848437721121, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
       propertyPath: m_LocalPosition.x
@@ -984,6 +989,10 @@ PrefabInstance:
     - target: {fileID: 1415656391310666612, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
       propertyPath: m_Name
       value: ui_space (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1415656391310666612, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}

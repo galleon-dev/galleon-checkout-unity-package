@@ -17,6 +17,9 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////// Members
         
         public AdvancedInputField CreditCardNumberField;
+        public AdvancedInputField NameInputField;
+        public AdvancedInputField DateInputField;
+        public AdvancedInputField CCVField;
         
         public TMP_Text CardNumberErrorText;
         
