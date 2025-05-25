@@ -78,13 +78,15 @@ namespace Galleon.Checkout
             InspectorHolder         = new VisualElement();
             
             // On Button Click
-            
             ButtonFoldout.Button.clicked += () =>
                                             {
                                                 Explorer.SetSelectedEntity(Target as IEntity);
                                                 this.RefrehseChildren();
                                             };
 
+                        
+            // Schedule OnAutoRefresh to be called every second
+            this.schedule.Execute(OnAutoRefresh).Every(1000);
         }
         
         public void InitializeNestedInspectors()
@@ -171,6 +173,14 @@ namespace Galleon.Checkout
             this.ChildrenHolder.Clear();
             
             PopulateChildren();
+        }
+        
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
+        
+        public void OnAutoRefresh()
+        {
+            if (this.Target is IEntity e)
+                this.ButtonFoldout.Text = e.Node.DisplayName;
         }
     }
 }

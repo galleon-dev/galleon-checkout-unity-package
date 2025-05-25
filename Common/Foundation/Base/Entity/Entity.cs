@@ -97,6 +97,17 @@ namespace Galleon.Checkout
                 parent.Node.Children.Add(this.Entity);
         }
 
+        public void AddChild(IEntity child)
+        {
+            this.Children.Add(child);
+            child.Node.SetParent(this.Entity);
+        }
+        
+        public void RemoveChild(IEntity child)
+        {
+            this.Children.Remove(child);
+            child.Node.Parent = null;
+        }
 
         // Static helper methods
         

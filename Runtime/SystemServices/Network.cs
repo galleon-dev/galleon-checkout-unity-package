@@ -19,10 +19,10 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle 
         
-        public Step Initialize 
+        public Step Initialize() 
         => 
             new Step(name   : "initialize_network"
-                    ,tags   : new[] { "init"}
+                    ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
                         

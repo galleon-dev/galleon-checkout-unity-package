@@ -7,11 +7,13 @@ namespace Galleon.Checkout
     {
         public List<CheckoutProduct> products = new();
         
-        public Step Initialize => new Step(name   : "initialize_products_controller"
-                                          ,tags   : new[] { "init"}
-                                          ,action : async s =>
-                                          {
-                                              
-                                          });
+        public Step Initialize() 
+        => 
+            new Step(name   : "initialize_products_controller"
+                    ,tags   : new[] { "init" }
+                    ,action : async s =>
+                    {
+                                    
+                    });
     }
 }

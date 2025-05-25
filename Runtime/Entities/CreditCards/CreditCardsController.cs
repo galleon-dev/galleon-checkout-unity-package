@@ -7,11 +7,13 @@ namespace Galleon.Checkout
     {
         public List<CreditCard> creditCards = new();
         
-        public Step Initialize => new Step(name   : "initialize_credit_cards_controller"
-                                          ,tags   : new[] { "init"}
-                                          ,action : async s =>
-                                          {
-                                              
-                                          });
+        public Step Initialize()
+        => 
+            new Step(name   : "initialize_credit_cards_controller"
+                    ,tags   : new[] { "init" }
+                    ,action : async s =>
+                    {
+                                    
+                    });
     }
 }

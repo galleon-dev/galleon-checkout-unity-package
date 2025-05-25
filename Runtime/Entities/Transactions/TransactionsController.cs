@@ -13,12 +13,14 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public Step Initialize => new Step(name   : "initialize_transactions_controller"
-                                          ,tags   : new[] { "init"}
-                                          ,action : async s =>
-                                          {
-                                              
-                                          });
+        public Step Initialize()
+        => 
+            new Step(name   : "initialize_transactions_controller"
+                    ,tags   : new[] { "init" }
+                    ,action : async s =>
+                    {
+                                    
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         

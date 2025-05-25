@@ -17,10 +17,10 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public Step Initialize 
+        public Step Initialize() 
         => 
             new Step(name   : "initialize_credit_card_tokens_controller"
-                    ,tags   : new[] { "init"}
+                    ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
                         s.AddChildStep(BasisTheory.Initialize);

@@ -34,10 +34,13 @@ namespace Galleon.Checkout
             new Step(name   : $"checkout_session_flow"
                     ,action : async (s) =>
                     {
-                        await Client.OpenCheckoutScreenMobile();//s.AddChildStep(Client.OpenCheckoutScreenMobile());
+                        await CheckoutScreenMobile.OpenCheckoutScreenMobile(); //s.AddChildStep(Client.OpenCheckoutScreenMobile());
+                        
                       //s.AddChildStep(Client.CheckoutScreenMobile.ViewSuccessPanel());
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.CheckoutPage));
+                        
                         return;
+                        
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewTestPanel());
                         s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewCheckoutPanel());
@@ -47,7 +50,7 @@ namespace Galleon.Checkout
                         s.AddChildStep(Client.CurrentUser.RunTestTransaction());
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewSuccessPanel());
                         s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
-                        s.AddChildStep(Client.CloseCheckoutScreenMobile());
+                        s.AddChildStep(CheckoutScreenMobile.CloseCheckoutScreenMobile());
                         
                       //s.AddChildStep(new Step("Report", action: async (s) => { Report?.Invoke(); await Task.Delay(5000); }));
                         

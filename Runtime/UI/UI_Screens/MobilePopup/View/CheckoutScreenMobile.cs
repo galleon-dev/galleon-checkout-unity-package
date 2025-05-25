@@ -21,9 +21,11 @@ namespace Galleon.Checkout.UI
         [Header("Parent Panel")]
         public  ParentPanel                  ParentPanel;
         public  RectTransform                contentTransform;
+        
         [Header("Header & Footer")]
         public HeaderPanelView               HeaderPanelView;
         public FooterPanelView               FooterPanelView;
+        
         [Header("Panels")]
         public  CheckoutPanelView            CheckoutPanel;
         public  CreditCardInfoPanelView      CreditCardPanel;
@@ -33,12 +35,45 @@ namespace Galleon.Checkout.UI
         public  SelectCurrencyPanelView      SelectCurrencyPanelView;
         public  SelectPaymentMethodPanelView SelectPaymentMethodPanelView;
         public  SimpleDialogPanelView        SimpleDialogPanelView;
+        
         [Header("Test")]
         public  TestPanelView                TestPanelView;
 
         // Fields
         
         private bool                         isPending = false;
+
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
+
+        public static Step OpenCheckoutScreenMobile()
+        =>
+            new Step(name   : $"open_checkout_screen_mobile"
+                    ,action : async (s) =>
+                              {
+                                  // Instantiate screen
+                                  var CheckoutScreenMobileGO = GameObject.Instantiate(original : CheckoutClient.Instance.Resources.CheckoutPopupPrefab
+                                                                                     ,position : new Vector3(0,0,9999)
+                                                                                     ,rotation : Quaternion.identity);
+                                  
+                                  // Assign instance
+                                  CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>(); 
+                              });
+        
+        public static Step CloseCheckoutScreenMobile()
+        =>
+            new Step(name   : $"close_checkout_screen_mobile"
+                    ,action : async (s) =>
+                              {   
+                                  if (CheckoutClient.Instance.CheckoutScreenMobile == null)
+                                      return;
+                                  
+                                  await s.CaptureReport();
+                                  
+                                  // Destroy screen
+                                  GameObject.Destroy(CheckoutClient.Instance.CheckoutScreenMobile.gameObject); 
+                              });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -445,63 +480,6 @@ namespace Galleon.Checkout.UI
                             case CreditCardInfoPanelView.ViewResult.Confirm : Close(); break;
                         }
                     });
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events (OLD)
-
-        #region OLD
-        
-        [ContextMenu("Test")]
-        public async void OnPurchaseClick()
-        {
-            if (isPending)
-                return;
-            
-            isPending = true;
-            
-            // fake request 
-            // UnityWebRequest requet = UnityWebRequest.Get("http://localhost:5007/purchase");
-            // var asyncOp = requet.SendWebRequest();
-            // while (!asyncOp.isDone)
-            //     await Task.Yield();
-            // bool isSuccess = asyncOp.webRequest.error == null && asyncOp.webRequest.downloadHandler.text == "true";
-            // if (!isSuccess)
-            // {
-            //     CheckoutPanel.gameObject.SetActive(false);
-            //     ErrorPanel   .gameObject.SetActive(true);
-            //     
-            //     if (asyncOp.webRequest.error != null)
-            //         Debug.LogError(asyncOp.webRequest.error);
-            // }
-            // else
-            // {        
-            //     CheckoutPanel  .gameObject.SetActive(false);
-            //     CreditCardPanel.gameObject.SetActive(true);   
-            // }
-            
-            bool isSuccess = true;
-            isPending      = false;
-            
-            SetCreditCardPanelActive();
-        }
-
-        public void OnCreditCardConfirmClick()
-        {
-            CreditCardPanel .gameObject.SetActive(false);
-            SuccessPanelView.gameObject.SetActive(true);
-        }
-
-        public void OnSuccessConfirmClick()
-        {
-            Close();
-        }
-
-        public void OnErrorConfirmClick()
-        {
-            ErrorPanelView.gameObject.SetActive(false);
-            CheckoutPanel .gameObject.SetActive(true);
-        }
-
-        #endregion // OLD
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
 

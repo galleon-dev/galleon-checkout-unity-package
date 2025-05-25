@@ -35,9 +35,10 @@ namespace Galleon.Checkout
             Node = new EntityNode(this);
         }
         
-        public Step Initialize
+        public Step Initialize()
         =>
             new Step(name   : $"initialize_resources"
+                    ,tags   : new []{ "init" }
                     ,action : async (s) =>
                     {   
                     });
