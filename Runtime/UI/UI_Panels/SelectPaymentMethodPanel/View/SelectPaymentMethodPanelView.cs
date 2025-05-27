@@ -37,6 +37,9 @@ namespace Galleon.Checkout.UI
                 var go   = Instantiate(original : SelectPaymentMethodItemPrefab, parent : SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
                 item.Initialize(paymentMethod:null, SelectPaymentMethodPanelView: this);
+                
+                // Add ui separator
+                Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : SelectPaymentMethodItemsHolder.transform);
             }
             
             // Add children
@@ -47,6 +50,10 @@ namespace Galleon.Checkout.UI
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
                 
                 item.Initialize(paymentMethod, this);
+                
+                
+                // Add ui separator
+                Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : SelectPaymentMethodItemsHolder.transform);
             }
         }
         
@@ -76,6 +83,10 @@ namespace Galleon.Checkout.UI
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
                 
                 item.Initialize(paymentMethod, this);
+                
+                
+                // Add ui separator
+                Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : SelectPaymentMethodItemsHolder.transform);
             }
         }
 

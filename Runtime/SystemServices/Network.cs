@@ -17,6 +17,10 @@ namespace Galleon.Checkout
     
     public class Network : Entity
     {
+        /////////////////////////////////////////////////////////////////////////////////////////////////// Members
+        
+        public string GalleonUserAccessToken = "";
+        
         /////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle 
         
         public Step Initialize() 
@@ -24,19 +28,58 @@ namespace Galleon.Checkout
             new Step(name   : "initialize_network"
                     ,tags   : new[] { "init" }
                     ,action : async s =>
+                    {              
+                        s.ChildSteps.Add(GetUserAccessToken());
+                    });
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////// Steps
+        
+        public Step GetUserAccessToken()
+        =>
+            new Step(name   : "get_user_access_token"
+                    ,action : async s =>
                     {
+                        string appID  = "test.app";
+                        string id     = "app-1";
+                        string device = "local_unity_test_client";
                         
+                        s.Log($"Getting Galleon User Access Token.");
+                        s.Log($"AppID = {appID}");
+                        s.Log($"ID = {id}");
+                        s.Log($"Device = {device}");
+                        
+                        var accessToken = await Post(url  : "https://localhost:4000/authenticate"
+                                                    ,body : new
+                                                          {
+                                                              AppId  = appID,
+                                                              Id     = id,
+                                                              Device = device,
+                                                          });
+                                                          
+                        /// Response Example :
+                        /// {
+                        ///     "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6InBheWVyIiwiaXNzIjoiR2FsbGVvbiIsImF1ZCI6InRlc3QuYXBwIn0.xdg3d7xMIVAhDm_9JpSl5MENnmWAaZDHRjApWUMj-t8",
+                        ///     "appId"       : "test.app",
+                        ///     "id"          : 1,
+                        ///     "externalId"  : "user id 1"
+                        /// }
+                        
+                        var response  = JsonConvert.DeserializeAnonymousType(value               : accessToken.ToString()
+                                                                            ,anonymousTypeObject : new
+                                                                                                 {
+                                                                                                     accessToken = "", 
+                                                                                                     appId       = "", 
+                                                                                                     id          = 0 , 
+                                                                                                     externalId  = "",
+                                                                                                 });
+                        var userAccessToken = response.accessToken;
+                        s.Log($"Retrieved access token: {userAccessToken}");
+                        
+                        this.GalleonUserAccessToken = userAccessToken;
+
                     });
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// API
-        
-        public async Task<object> Get2(string                     url
-                                      ,Dictionary<string, string> headers = null)
-        {
-            var webRequest = new NetworkRequest();
-            
-            return default;
-        }
         
         public async Task<object> Get(string                     url
                                      ,Dictionary<string, string> headers = null)
@@ -130,6 +173,10 @@ namespace Galleon.Checkout
             //string formattedResult = JToken.Parse(result).ToString(Formatting.Indented);
             //Debug.Log($"<<< ({request.responseCode}) {request.url} \n{formattedResult}");
             Debug.Log($"<<<".Color(Color.yellow)+$" ({request.responseCode}) {request.url} \n{result}");
+            
+            if (request.result != UnityWebRequest.Result.Success)
+                throw new Exception($"ERROR FOR NETWORK REQUEST : {url}");
+            
             
             return result;
         }

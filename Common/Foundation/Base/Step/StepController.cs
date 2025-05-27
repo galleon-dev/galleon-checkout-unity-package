@@ -32,7 +32,6 @@ namespace Galleon.Checkout
                 stepsContainer = new VisualElement();
                 target.Node.ExplorerItem.ChildrenHolder.Add(stepsContainer);
                 
-                
                 Refresh();
             }
             
@@ -47,6 +46,8 @@ namespace Galleon.Checkout
                     var stepInspector = new ExplorerItem(step);
                     stepsContainer.Add(stepInspector);
                 }
+                
+                RefreshChildren();
             }
         }
         

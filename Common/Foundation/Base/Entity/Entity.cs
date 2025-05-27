@@ -18,7 +18,7 @@ namespace Galleon.Checkout
     {
         [SerializeField]
         private EntityNode entityNode   =  null;
-        public  EntityNode Node         => entityNode ??= new EntityNode(this);  
+        public  EntityNode Node         => entityNode ??= new EntityNode(this);
     }
 
     public partial class EntityNode
@@ -65,7 +65,7 @@ namespace Galleon.Checkout
                 }
             }
         }
-
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - General
 
         [SerializeReference] [HideInInspector] public IEntity Entity;
@@ -81,9 +81,11 @@ namespace Galleon.Checkout
 
         [SerializeReference] public IEntity       Parent   = null;
         [SerializeReference] public List<IEntity> Children = new List<IEntity>();
+        
+        public List<WeakReference<IEntity>>       LinkedChildren { get; set; } = new();
 
-        public                      IEnumerable<IEntity> Ancestors()   => EnumerateUp  (this.Entity);
-        public                      IEnumerable<IEntity> Descendants() => EnumerateDown(this.Entity);
+        public IEnumerable<IEntity>               Ancestors()   => EnumerateUp  (this.Entity);
+        public IEnumerable<IEntity>               Descendants() => EnumerateDown(this.Entity);
 
 
         public void SetParent(IEntity parent)
@@ -107,6 +109,11 @@ namespace Galleon.Checkout
         {
             this.Children.Remove(child);
             child.Node.Parent = null;
+        }
+        
+        public void AddLinkedChild(IEntity linkedChild)
+        {
+            this.LinkedChildren.Add(new WeakReference<IEntity>(linkedChild));
         }
 
         // Static helper methods

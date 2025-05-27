@@ -7,16 +7,16 @@ namespace Galleon.Checkout
 {
     public class ExplorerItem : VisualElement
     {
-        ///// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public object Target;
+        public object        Target;
         
         public VisualElement ChildrenHolder;
         public VisualElement InspectorHolder;
         
         public ButtonFoldout ButtonFoldout;
         
-        ///// Properties
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public Explorer Explorer
         {
@@ -38,7 +38,7 @@ namespace Galleon.Checkout
             }
         }
         
-        ///// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public ExplorerItem(object target)
         {
@@ -50,7 +50,7 @@ namespace Galleon.Checkout
             InitializeSelf();
 
             // Nested Inspectors
-            InitializeNestedInspectors();
+            InitializeInspector();
 
             // Populate 
             PopulateChildren();
@@ -59,29 +59,32 @@ namespace Galleon.Checkout
         public void InitializeSelf()
         {
             // Name
-            
             string entityDisplayName = Target.GetType().Name;
             
             if (Target is IEntity e)
                 entityDisplayName = e.Node.DisplayName;
             
+            // Button Foldout
             this.ButtonFoldout      = new ButtonFoldout(); this.Add(this.ButtonFoldout);            
             this.ButtonFoldout.Text = entityDisplayName;
+            
             if (Target is IEntity en)
             {
                 en.Node.ExplorerItem = this;
             }
             
+            // Child holder
             ChildrenHolder          = new VisualElement();
             this.ButtonFoldout.Add(ChildrenHolder);
             
+            // Inspector holder
             InspectorHolder         = new VisualElement();
             
             // On Button Click
             ButtonFoldout.Button.clicked += () =>
                                             {
                                                 Explorer.SetSelectedEntity(Target as IEntity);
-                                                this.RefrehseChildren();
+                                                this.RefrehsChildren();
                                             };
 
                         
@@ -89,9 +92,8 @@ namespace Galleon.Checkout
             this.schedule.Execute(OnAutoRefresh).Every(1000);
         }
         
-        public void InitializeNestedInspectors()
+        public void InitializeInspector()
         {
-            
             try
             {
                 // Check if the target type has a custom Inspector
@@ -111,6 +113,8 @@ namespace Galleon.Checkout
                     // Create Inspector Instance
                     var inspectorType = inspectorTypes.First();
                     var inspector     = Activator.CreateInstance(inspectorType, Target) as Inspector;
+                    
+                    inspector.ExplorerItem = this;
                     
                     // Assign
                     if (Target is IEntity entity)
@@ -145,27 +149,38 @@ namespace Galleon.Checkout
         }
         
         public void PopulateChildren()
-        {
-            
-            // Predefined Child Entities
+        {   
             if (Target is IEntity e)
             {
+                // Predefined Child Entities
                 foreach (var child in e.Node.Children)
                 {
                     var childItem = new ExplorerItem(child);
                     
-                    #if UNITY_EDITOR
-                    string header = child.Node.editorExtras.HeaderAttributeText;
-                    if (header != null)
-                        this.ButtonFoldout.Add(new Label(header));
-                    #endif
+                    // #if UNITY_EDITOR
+                    // string header = child.Node.editorExtras.HeaderAttributeText;
+                    // if (header != null)
+                    //     this.ButtonFoldout.Add(new Label(header));
+                    // #endif
                     
                     this.ChildrenHolder.Add(childItem);
                 }
+                
+                // Linked Children
+                foreach (var linkedChild in e.Node.LinkedChildren)
+                {
+                    if (linkedChild.TryGetTarget(out var target))
+                    {
+                        var childItem = new ExplorerItem(target);
+                        childItem.style.backgroundColor = new Color(0.1f, 0.1f, 0.1f);
+                        this.ChildrenHolder.Add(childItem);
+                    }
+                }
             }
+            
         }
         
-        public void RefrehseChildren()
+        public void RefrehsChildren()
         {
             if (this.ButtonFoldout.Foldout.value == false)
                 return;
@@ -175,7 +190,14 @@ namespace Galleon.Checkout
             PopulateChildren();
         }
         
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inspector Events
+        
+        public void OnRefreshChildren()
+        {
+            RefrehsChildren();
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
         
         public void OnAutoRefresh()
         {

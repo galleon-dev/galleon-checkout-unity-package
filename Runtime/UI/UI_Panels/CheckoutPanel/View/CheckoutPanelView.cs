@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Galleon.Checkout.UI
@@ -18,6 +19,7 @@ namespace Galleon.Checkout.UI
             Back,
             Confirm,
             Settings,
+            AddCard,
             OtherPaymentMethods,
         }
         
@@ -30,6 +32,8 @@ namespace Galleon.Checkout.UI
         [Header("Payment Methods")]
         public GameObject      PaymentMethodsPanel;
         public GameObject      PaymentMethodItemPrefab;
+        
+        [FormerlySerializedAs("AddCreditCardButtonElementt")] public GameObject      AddCreditCardButtonElement;
         
         //////////////////////////////////////////////////////////////////////////// Links
         
@@ -50,11 +54,17 @@ namespace Galleon.Checkout.UI
             var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
             foreach (var paymentMethod in paymentMethods)
             {
+                // Instantiate (and Init) Item
                 var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
-                
                 item.Initialize(paymentMethod, this);
+                
+                // Add ui separator
+                Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsPanel.transform);
             }
+
+            // Add defult add card button
+            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count == 0);
         }
         
         //////////////////////////////////////////////////////////////////////////// View Flow
@@ -106,10 +116,15 @@ namespace Galleon.Checkout.UI
             foreach (var paymentMethod in paymentMethods)
             {
                 var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);
-                var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
-                
+                var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();   
                 item.Initialize(paymentMethod, this);
+                
+                // Add ui separator
+                Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsPanel.transform);
             }
+            
+            // Add defult add card button
+            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count == 0);
             
             ///////////////
             
@@ -148,6 +163,12 @@ namespace Galleon.Checkout.UI
         public void OnOtherPaymentMethodsClick()
         {
             this.Result = ViewResult.OtherPaymentMethods;
+            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
+        }
+        
+        public void On_AddCardClicked()
+        {
+            this.Result = ViewResult.AddCard;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
     }

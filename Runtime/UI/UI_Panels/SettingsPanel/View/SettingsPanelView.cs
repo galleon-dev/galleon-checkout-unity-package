@@ -38,8 +38,10 @@ public class SettingsPanelView : View
         {
             var go   = Instantiate(original : SettingsPanelPaymentMethodItemPrefab, parent : PaymentMethodsHolder.transform);
             var item = go.GetComponent<SettingsPanelPaymentMethodItem>();
-            
             item.Initialize(paymentMethod, this);
+            
+            // Add ui separator
+            Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsHolder.transform);
         }
     }
         
@@ -79,8 +81,10 @@ public class SettingsPanelView : View
         {
             var go   = Instantiate(original : SettingsPanelPaymentMethodItemPrefab, parent : PaymentMethodsHolder.transform);
             var item = go.GetComponent<SettingsPanelPaymentMethodItem>();
-            
             item.Initialize(paymentMethod, this);
+            
+            // Add ui separator
+            Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsHolder.transform);
         }
     }
     

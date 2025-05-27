@@ -45,7 +45,10 @@ namespace Galleon.Checkout
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
+        [Header("Screens")]
         public GameObject CheckoutPopupPrefab;
         
+        [Header("UI Elements")]
+        public GameObject UI_Seporator;
     }
 }

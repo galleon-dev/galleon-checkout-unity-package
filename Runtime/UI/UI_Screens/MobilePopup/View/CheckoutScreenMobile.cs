@@ -72,7 +72,7 @@ namespace Galleon.Checkout.UI
                                   await s.CaptureReport();
                                   
                                   // Destroy screen
-                                  GameObject.Destroy(CheckoutClient.Instance.CheckoutScreenMobile.gameObject); 
+                                  CheckoutClient.Instance.CheckoutScreenMobile.Close(); 
                               });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -198,8 +198,8 @@ namespace Galleon.Checkout.UI
                         
                         ///////////////////////// Result Helper
                         
-                        page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Close();
-                        page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Back();
+                        page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
+                        page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
                         page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
                         
                         ///////////////////////// Handle Result
@@ -232,12 +232,12 @@ namespace Galleon.Checkout.UI
         
         public void On_BackClicked()
         {
-            OnPageFinishedWithResult(NavigationStates.Close.ToString());
+            OnPageFinishedWithResult(NavigationStates.Back.ToString());
         }
         
         public void On_CloseClicked()
         {
-            OnPageFinishedWithResult(NavigationStates.Back.ToString());
+            OnPageFinishedWithResult(NavigationStates.Close.ToString());
         }
         
         public void On_SettingsClicked()
@@ -316,6 +316,7 @@ namespace Galleon.Checkout.UI
                                                                   {
                                                                       page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = page.screen.ViewPage(page.screen.SuccessPage             );
                                                                       page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
+                                                                      page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
                                                                   }
                                                            );
         

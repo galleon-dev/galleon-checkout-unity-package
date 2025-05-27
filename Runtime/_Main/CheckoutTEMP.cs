@@ -109,14 +109,14 @@ namespace Galleon.Checkout
                                   ///     "externalId"  : "user id 1"
                                   /// }
                                   
-                                  var response  = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(value              : accessToken.ToString()
-                                                                                                     ,anonymousTypeObject : new
-                                                                                                                          {
-                                                                                                                              accessToken = "", 
-                                                                                                                              appId       = "", 
-                                                                                                                              id          = 0 , 
-                                                                                                                              externalId  = "",
-                                                                                                                          });
+                                  var response  = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(value               : accessToken.ToString()
+                                                                                                      ,anonymousTypeObject : new
+                                                                                                                           {
+                                                                                                                               accessToken = "", 
+                                                                                                                               appId       = "", 
+                                                                                                                               id          = 0 , 
+                                                                                                                               externalId  = "",
+                                                                                                                           });
                                   var userAccessToken = response.accessToken;
                                   s.Log($"Retrieved access token: {userAccessToken}");
 

@@ -16,6 +16,7 @@ namespace Galleon.Checkout
         //// Properties
         
         public Explorer Explorer => Explorer.Instance;
+        public ExplorerItem ExplorerItem { get; set; }
         
         //// UI Members
         
@@ -28,6 +29,11 @@ namespace Galleon.Checkout
             this.Target = target;
             
             TitleLabel = new Label(this.GetType().Name);
+        }
+        
+        public void RefreshChildren()
+        {
+            this.ExplorerItem?.RefrehsChildren();
         }
     }
     

@@ -10,7 +10,7 @@ using StepAction=System.Func<Galleon.Checkout.Step,System.Threading.Tasks.Task>;
 
 namespace Galleon.Checkout
 {
-    public class Step
+    public class Step : Entity
     {
         ////////////////////////////////////////// Members
         
@@ -19,7 +19,7 @@ namespace Galleon.Checkout
         public StepAction   Action;
         
         public List<Step>   ChildSteps = new();
-        public Step         ParentStep = null;
+        public Step         ParentStep { get; set; } = null;
         
         ////////////////////////////////////////// Link
         
@@ -55,7 +55,14 @@ namespace Galleon.Checkout
                 // Log
                 this.Log($"<color=white>[{this.Name}]</color>");
                 
+                // Add to steps
                 StepController.Steps.Add(this);
+                
+                // Add as linked child to step controller
+                Root.Instance.Runtime.StepController.Node.AddLinkedChild(this);
+                
+                // set display name
+                this.Node.DisplayName = $"Step {this.Name}";
                 
                 // Execute
                 if (Action != null)
@@ -121,6 +128,11 @@ namespace Galleon.Checkout
             public StepInspector(Step target) : base(target)
             {
                 TitleLabel.text = $"Step {target.Name}";
+                
+                this.Add(new Label(target.Name));
+                
+                // seporator
+                this.Add(new VisualElement { style = { height = 1, backgroundColor = new StyleColor(Color.gray), marginTop = 4, marginBottom = 4 } });
             }
         }
     }
