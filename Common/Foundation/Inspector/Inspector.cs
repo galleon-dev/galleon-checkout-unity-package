@@ -35,6 +35,18 @@ namespace Galleon.Checkout
         {
             this.ExplorerItem?.RefrehsChildren();
         }
+        
+        //// Events
+        
+        public virtual void OnExplorerItemAutoRefresh()
+        {
+            
+        }
+        
+        public virtual void OnInspectorAutoRefresh()
+        {
+            
+        }
     }
     
     public class Inspector<T> : Inspector

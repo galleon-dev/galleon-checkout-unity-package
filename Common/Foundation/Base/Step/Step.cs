@@ -19,6 +19,7 @@ namespace Galleon.Checkout
         public StepAction   Action;
         
         public List<Step>   ChildSteps = new();
+        public List<Step>   PostSteps  = new();
         public Step         ParentStep { get; set; } = null;
         
         ////////////////////////////////////////// Link
@@ -32,7 +33,6 @@ namespace Galleon.Checkout
             ReportStep?.Invoke(this);
             await Task.Yield();
         }
-        
         
         ////////////////////////////////////////// Lifecycle
 
@@ -52,8 +52,12 @@ namespace Galleon.Checkout
         {
             try
             {   
+                ////////////////////////////////////////////////
+                
                 // Log
                 this.Log($"<color=white>[{this.Name}]</color>");
+                
+                ////////////////////////////////////////////////
                 
                 // Add to steps
                 StepController.Steps.Add(this);
@@ -64,9 +68,20 @@ namespace Galleon.Checkout
                 // set display name
                 this.Node.DisplayName = $"Step {this.Name}";
                 
+                ////////////////////////////////////////////////
+                
                 // Execute
                 if (Action != null)
                     await Action.Invoke(this);
+                
+                //////////////////////////////////////////////// Temp
+                // Capture report
+                if (this.Tags.Contains("report")
+                ||  this.ParentStep != null && this.ParentStep.Tags.Contains("report"))
+                {
+                    await this.CaptureReport();
+                }
+                ////////////////////////////////////////////////
                 
                 // Execute Child Steps
                 for (int i = 0; i < ChildSteps.Count; i++)
@@ -74,6 +89,16 @@ namespace Galleon.Checkout
                     var child = ChildSteps[i];
                     await child.Execute();
                 }
+                
+                ////////////////////////////////////////////////
+                
+                // Execute Post Steps
+                for (int i = 0; i < PostSteps.Count; i++)
+                {
+                    var   postStep = PostSteps[i];
+                    await postStep.Execute();
+                }
+                
             }
             catch (Exception e)
             {
@@ -87,12 +112,29 @@ namespace Galleon.Checkout
         {
             this.ChildSteps.Add(step);
             step.ParentStep = this;
+            this.Node.AddLinkedChild(step);
         }
         public void AddChildStep(string name = "temp", StepAction action = default)
         {
             Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
             this.ChildSteps.Add(tempStep);
         }
+        
+        
+        ////////////////////////////////////////// Post Steps
+        
+        public void AddPostStep(Step step)
+        {
+            this.PostSteps.Add(step);
+            step.ParentStep = this;
+            this.Node.AddLinkedChild(step);
+        }
+        public void AddPostStep(string name = "temp", StepAction action = default)
+        {
+            Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
+            this.PostSteps.Add(tempStep);
+        }
+        
         
         ////////////////////////////////////////// Methods
         
@@ -134,6 +176,13 @@ namespace Galleon.Checkout
                 // seporator
                 this.Add(new VisualElement { style = { height = 1, backgroundColor = new StyleColor(Color.gray), marginTop = 4, marginBottom = 4 } });
             }
+
+            public override void OnExplorerItemAutoRefresh()
+            {
+                var childCoutText               = Target.ChildSteps.Count > 0 ? $"({Target.ChildSteps.Count})" : "";
+                ExplorerItem.ButtonFoldout.Text = TitleLabel.text = $"Step {Target.Name + childCoutText}";
+            }
         }
     }
 }
+

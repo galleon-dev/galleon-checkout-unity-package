@@ -33,7 +33,7 @@ namespace Galleon.Checkout.UI
         public GameObject      PaymentMethodsPanel;
         public GameObject      PaymentMethodItemPrefab;
         
-        [FormerlySerializedAs("AddCreditCardButtonElementt")] public GameObject      AddCreditCardButtonElement;
+        public GameObject      AddCreditCardButtonElement;
         
         //////////////////////////////////////////////////////////////////////////// Links
         

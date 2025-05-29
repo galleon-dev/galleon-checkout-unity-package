@@ -1,6 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -18,8 +23,10 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init"}
                     ,action : async s =>
                               {
+                                  await CheckoutClient.Instance.RunCheckoutSession(new CheckoutProduct() { DisplayName = "Test Product", PriceText = "$4.99"});
+                                  
                                   // Test
-                                  s.AddChildStep(this.SetupTest());
+                                  // s.AddChildStep(this.SetupTest());
                                   //s.AddChildStep(this.TestRealServer);
                                   //s.AddChildStep(this.TestConfig);
                                   //s.AddChildStep(this.TestToken);
@@ -254,7 +261,7 @@ namespace Galleon.Checkout
                                                                                             }
                                                                                   ,body     : new
                                                                                             {
-                                                                                                Sku      = "sku-1",
+                                                                                                    Sku      = "sku-1",
                                                                                                 Quantity = 1,
                                                                                                 Amount   = 100,
                                                                                                 Currency = "USD",
@@ -278,5 +285,86 @@ namespace Galleon.Checkout
                               });
         
         #endregion // TEST STEPS
+        
+        #region Socket Tests
+        
+        public Step Socket_Server()
+        =>
+            new Step(name   : $"Socket_Server"
+                    ,action : async (s) =>
+                    {   
+                        // Create a generic server socket that listens on port 1234
+                        using (var serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+                        {
+                            try
+                            {
+                                serverSocket.Bind(new IPEndPoint(IPAddress.Any, 12345));
+                                serverSocket.Listen(10); // Allow a queue of up to 10 pending connections
+                                
+                                s.Log("Server is listening on port 1234...");
+                                
+                                while (true) // Accept multiple connections
+                                {
+                                    // Accept a connection
+                                    Socket clientSocket = await Task.Factory.FromAsync(serverSocket.BeginAccept, serverSocket.EndAccept, null);
+                                    s.Log("Client connected.");
+                                    
+                                    // Read message
+                                    var    buffer   = new byte[1024]; // Buffer for receiving messages
+                                    int    received = await clientSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+                                    string message  = Encoding.UTF8.GetString(buffer, 0, received);
+                                    s.Log("Received message: " + message);
+                                    
+                                    // Close the client connection
+                                    clientSocket.Close(); 
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.LogError("Server socket error: " + ex.Message);
+                            }
+                            finally
+                            {
+                                serverSocket.Close();
+                            }
+                        }
+                    });
+        
+        public Step Socket_Client()
+        =>
+            new Step(name   : $"Socket_Client"
+                    ,action : async (s) =>
+                    {                                        
+                        // Create a generic socket connection to localhost:1234
+                        using (var clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+                        {
+                            try
+                            {
+                                await Task.Factory.FromAsync(clientSocket.BeginConnect, clientSocket.EndConnect, "212.199.63.18", 12345, null);
+                                
+                                if (clientSocket.Connected)
+                                {
+                                    s.Log("Connected to the server.");
+
+                                    // Send "hello world" to the server
+                                    var message      = "hello world";
+                                    var messageBytes = Encoding.UTF8.GetBytes(message);
+                                    await clientSocket.SendAsync(new ArraySegment<byte>(messageBytes), SocketFlags.None);
+                                    
+                                    s.Log("Message sent: " + message);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.LogError("Socket connection failed: " + ex.Message);
+                            }
+                            finally
+                            {
+                                clientSocket.Close();
+                            }
+                        }
+                    });
+        
+        #endregion
     }
 }

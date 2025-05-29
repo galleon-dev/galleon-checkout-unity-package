@@ -107,7 +107,7 @@ namespace Galleon.Checkout
                                                       //&& t.BaseType.GetGenericArguments()[0] == targetType)
                                                       )
                                                .ToList();
-                
+
                 if (inspectorTypes.Any())
                 {
                     // Create Inspector Instance
@@ -139,7 +139,7 @@ namespace Galleon.Checkout
                     //     parentPanel.Add(inspector);
                     // }
                 }
-
+                
             }
             catch (Exception ex)
             {
@@ -202,7 +202,13 @@ namespace Galleon.Checkout
         public void OnAutoRefresh()
         {
             if (this.Target is IEntity e)
+            {
                 this.ButtonFoldout.Text = e.Node.DisplayName;
+                
+                e.Node.Inspector?.OnExplorerItemAutoRefresh();
+            }
+            
+            
         }
     }
 }

@@ -1,14 +1,22 @@
 using System.Threading.Tasks;
+using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
 using Galleon.Checkout.UI;
+using TMPro;
 using UnityEngine;
 
 public class SettingsPanelView : View
 {
     //////////////////////////////////////////////////////////////////////////// Members
     
-    public GameObject SettingsPanelPaymentMethodItemPrefab;
-    public GameObject PaymentMethodsHolder;
+    [Header("Email")]
+    public TMP_Text           EmailLabel;
+    public AdvancedInputField EmailInputField;
+    
+    [Header("Payment Methods")]
+    public GameObject     SettingsPanelPaymentMethodItemPrefab;
+    public GameObject     PaymentMethodsHolder;
+    public bool           IsEditingEmail = false;
     
     //////////////////////////////////////////////////////////////////////////// View Result
     
@@ -71,7 +79,7 @@ public class SettingsPanelView : View
         // Remove children (if any)
         foreach (Transform child in PaymentMethodsHolder.transform)
         {
-            Debug.Log($"-Removing Item {child.gameObject.name}");
+            //Debug.Log($"-Removing Item {child.gameObject.name}");
             Destroy(child.gameObject);
         }
         
@@ -88,10 +96,43 @@ public class SettingsPanelView : View
         }
     }
     
+    //////////////////////////////////////////////////////////////////////////// UI Events
+    
+    public void On_EditEmailClicked()
+    {
+        if (!IsEditingEmail)
+        {
+            EmailLabel     .gameObject.SetActive(false);
+            EmailInputField.gameObject.SetActive(true);
+            IsEditingEmail = true;
+        }
+        else
+        {
+            EmailLabel     .gameObject.SetActive(true);
+            EmailInputField.gameObject.SetActive(false);
+            IsEditingEmail = false;
+        }
+    }
+    
+    public void On_FinishedEditingEmail(string str, EndEditReason reason)
+    {
+        Debug.Log($"str = {str}");
+        Debug.Log($"reason = {reason}");
+        
+        EmailLabel     .gameObject.SetActive(true);
+        EmailInputField.gameObject.SetActive(false);
+        IsEditingEmail = false;
+        
+        this.EmailLabel.text = str;
+    }
+    
     //////////////////////////////////////////////////////////////////////////// Events
     
     public void DeletePaymentMethod(PaymentMethod paymentMethod)
     {
+        if (IsEditingEmail)
+            return;
+        
         CheckoutClient.Instance.CurrentSession.LastDialogRequest     = "delete_payment_method";
         CheckoutClient.Instance.CurrentSession.PaymentMethodToDelete = paymentMethod;
         

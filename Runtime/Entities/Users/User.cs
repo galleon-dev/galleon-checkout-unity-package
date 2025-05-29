@@ -36,27 +36,10 @@ namespace Galleon.Checkout
             this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.GPay      .ToString(), DisplayName = "Google Pay - **** - 7348" , IsSelected = false, });
             this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.PayPal    .ToString(), DisplayName = "Paypal - **** - 9101" ,     IsSelected = false, });
         }
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Steps
 
-        public Step RunTestTransaction()
-        =>
-            new Step(name   : $"run_test_transaction"
-                    ,action : async (s) =>
-                    {
-                        this.CurrentTransaction = new Transaction(user: this, creditCardToken: this.MainToken);
-                        this.Transactions.Add(this.CurrentTransaction);
-                        
-                        // await this.CurrentTransaction.Purchase();
-                        
-                        await Task.Yield();
-                        s.Log("Transaction.Purchase");
-                        await Task.Yield();
-                        s.Log("Transaction.ValidateReceipt");
-                        await Task.Yield();
-                    });
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
+        
+        public PaymentMethod SelectedPaymentMethod => PaymentMethods.FirstOrDefault(x => x.IsSelected);
         
         public void SelectPaymentMethod(PaymentMethod paymentMethod)
         {

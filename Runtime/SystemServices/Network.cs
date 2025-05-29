@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,6 +18,10 @@ namespace Galleon.Checkout
     
     public class Network : Entity
     {
+        /////////////////////////////////////////////////////////////////////////////////////////////////// Consts
+        
+        public string SERVER_BASE_URL = "https://localhost:4000";
+        
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public string GalleonUserAccessToken = "";
@@ -48,7 +53,7 @@ namespace Galleon.Checkout
                         s.Log($"ID = {id}");
                         s.Log($"Device = {device}");
                         
-                        var accessToken = await Post(url  : "https://localhost:4000/authenticate"
+                        var accessToken = await Post(url  : $"{SERVER_BASE_URL}/authenticate"
                                                     ,body : new
                                                           {
                                                               AppId  = appID,
@@ -131,11 +136,18 @@ namespace Galleon.Checkout
                 
                 #if UNITY_6000_0_OR_NEWER
                 request = UnityWebRequest.Post(uri        : url
-                                             ,postData    : jsonBody
-                                             ,contentType : "application/json");
+                                              ,postData    : jsonBody
+                                              ,contentType : "application/json");
                 #else
-                request = UnityWebRequest.Post(uri        : url
-                                             ,postData    : jsonBody);
+              //request = UnityWebRequest.Post(uri        : url
+              //                              ,postData    : jsonBody);
+                
+                request                 = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
+                byte[] jsonToSend       = Encoding.UTF8.GetBytes(jsonBody);
+                request.uploadHandler   = new UploadHandlerRaw(jsonToSend);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
+
                 #endif
             }
             else if (encodingType == RequestEncodingType.FormUrlEncoded)
@@ -153,6 +165,7 @@ namespace Galleon.Checkout
                 foreach (var header in headers)
                     request.SetRequestHeader(header.Key, header.Value.ToString());
             
+            
             // Send Request
             //string formattedRequest = JToken.Parse(jsonBody).ToString(Formatting.Indented);
             //Debug.Log($">>> ({request.method}){request.url}\n{formattedRequest}");
@@ -169,16 +182,52 @@ namespace Galleon.Checkout
                 await Task.Yield();
             }
             // Return result
-            string result          = request.downloadHandler.text;
+            string result = request.downloadHandler.text;
             //string formattedResult = JToken.Parse(result).ToString(Formatting.Indented);
             //Debug.Log($"<<< ({request.responseCode}) {request.url} \n{formattedResult}");
             Debug.Log($"<<<".Color(Color.yellow)+$" ({request.responseCode}) {request.url} \n{result}");
             
+            if (!request.error.IsNullOrEmpty())
+                Debug.LogError(request.error);
             if (request.result != UnityWebRequest.Result.Success)
                 throw new Exception($"ERROR FOR NETWORK REQUEST : {url}");
             
-            
             return result;
         }
+        
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public class NetworkRequest : Entity
+    {
+        public string URL;
+        public string Method;
+        
+        public Dictionary<string, string> Headers;
+        
+        public string Result;
+        
+        public string Error;       
+        public float  Timeout = 5f;
+    }
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public class Endpoint : Entity
+    {
+        public string       URL;
+        public string       Method;
+        public List<string> Headers;
+        
+        public List<string> InputsHistory;
+        public List<string> OutputsHistory;
+        
     }
 } 
+

@@ -109,11 +109,17 @@ namespace Galleon.Checkout
             {
                 this.InspectorScrollView.Clear();
                 this.InspectorScrollView.Add(new Label($"Selected : {SelectedEntity}"));
-                return;
+            }
+            else
+            {
+                this.InspectorScrollView.Clear();
+                this.InspectorScrollView.Add(inspectorUI);
             }
             
-            this.InspectorScrollView.Clear();
-            this.InspectorScrollView.Add(inspectorUI);
+            
+            var genericInspector = new GenericInspector(target:SelectedEntity);
+            this.InspectorScrollView.Add(genericInspector);
         }
     }
 }
+

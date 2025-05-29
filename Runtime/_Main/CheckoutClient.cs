@@ -18,40 +18,47 @@ namespace Galleon.Checkout
         
         // Services
         [Header("Services")]
-        public Logger                   Logger              = new();
-        public Network                  Network             = new();
-        public Config                   Config              = new();
-        public Analytics                Analytics           = new();
+        public Logger                   Logger                      = new();
+        public Network                  Network                     = new();
+        public Config                   Config                      = new();
+        public Analytics                Analytics                   = new();
         
         // APIs
-        public CheckoutAPI              CheckoutAPI         = new();
-        public CheckoutIAPStore         IAPStore            = new();
-      //public CheckoutIapStoreListener IapStoreListener    = new(); // for testing
-        
+        public CheckoutAPI              CheckoutAPI                 = new();
+        public CheckoutIAPStore         IAPStore                    = new();
+      //public CheckoutIapStoreListener IapStoreListener            = new(); // for testing
+      
         // Resources
         [Header("Resources")]
         public CheckoutResources        Resources;
         
+        // Controllers
+        [Header("Controllers")]
+        public CreditCardController     CreditCardController        = new(); 
+        public PaypalController         PaypalController            = new();
+        public GooglePayController      GooglePayController         = new();
+        public GenericPaymentController GenericPaymentController    = new();
+        
         // Entities
         [Header("Entities")]
-        public ProductsController       Products            = new();
-        public CreditCardsController    CreditCards         = new();
-        public TokensController         Tokens              = new();
-        public UsersController          Users               = new();
-        public User                     CurrentUser         = new();
-        public TransactionsController   Transactions        = new();
+        public ProductsController       Products                    = new();
+        public CreditCardsController    CreditCards                 = new();
+        public TokensController         Tokens                      = new();
+        public UsersController          Users                       = new();
+        public User                     CurrentUser                 = new();
+        public TransactionsController   Transactions                = new();
         
         // Sessions
         public CheckoutSession          CurrentSession;
-        public List<CheckoutSession>    CheckoutSessions    = new List<CheckoutSession>();
+        public List<CheckoutSession>    CheckoutSessions            = new List<CheckoutSession>();
         
         // UI
         [Header("UI")]
         public CheckoutScreenMobile     CheckoutScreenMobile; 
         
         // TEMP - testing/debug/wip/etc...
-        CheckoutTEMP                    Temp                = new();
-        
+        [Header("Temp")]
+        public CheckoutTEMP             Temp                        = new();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Entry Point
         
@@ -63,24 +70,33 @@ namespace Galleon.Checkout
             
             Root.Instance.Runtime.Node.Children.Add(Instance);
             
-            await Instance.Initialize();
-            await Instance.Temp.TEST_FLOW();
+            await Instance.SystemInitFlow();
+            
+            if (CHECKOUT.IsTest)
+                await Instance.Temp.TEST_FLOW();
+                
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public Step Initialize() 
+        public Step SystemInitFlow() 
         => 
-            new Step(name   : "initialize_checkout_client"
+            new Step(name   : "checkout_init_flow"
                     ,tags   : new[] { "init" }
                     ,action : async s =>
-                              {
+                              {   
                                   // Services
                                   s.AddChildStep(Logger   .Initialize());
                                   s.AddChildStep(Network  .Initialize());
                                   s.AddChildStep(Config   .Initialize());
                                   s.AddChildStep(Analytics.Initialize());
                         
+                                  // Controllers
+                                  s.AddChildStep(CreditCardController    .Initialize());
+                                  s.AddChildStep(PaypalController        .Initialize());
+                                  s.AddChildStep(GooglePayController     .Initialize());
+                                  s.AddChildStep(GenericPaymentController.Initialize());
+                                  
                                   // Resources
                                   this.Resources = CheckoutResources.Instance;
                                   s.AddChildStep(Resources.Initialize());
@@ -133,6 +149,8 @@ namespace Galleon.Checkout
         public static User                   User           => CheckoutClient.Instance.CurrentUser;
         public static TransactionsController Transactions   => CheckoutClient.Instance.Transactions;
         public static Transaction            Transaction    => User.CurrentTransaction;
+        
+        public static bool                   IsTest         => true;
     }   
 }
 

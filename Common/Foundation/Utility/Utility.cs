@@ -25,5 +25,13 @@ namespace Galleon.Checkout
         {
             return string.IsNullOrEmpty(text);
         }
+        
+        public static string ToSafeString(this object target)
+        {
+            if (target == null)
+                return "";
+            
+            return target.ToString();
+        }
     }
 }
