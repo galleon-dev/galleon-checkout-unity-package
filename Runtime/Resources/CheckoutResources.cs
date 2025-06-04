@@ -68,6 +68,8 @@ namespace Galleon.Checkout
         static CheckoutResourcesPreBuild()
         {
             CheckoutResources.Instance.IsTest = true;
+            EditorUtility.SetDirty(CheckoutResources.Instance);
+            AssetDatabase.SaveAssets();
         }
     }
     #endif
