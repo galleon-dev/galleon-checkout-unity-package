@@ -18,6 +18,11 @@ namespace Galleon.Checkout
         public bool         IsSuccess  { get; set; }
         public bool         IsCanceled { get; set; }
         public bool         IsError    { get; set; }
-        public List<string> Errors     { get; set; } 
+        public List<string> Errors     { get; set; }
+
+        public override string ToString()
+        {
+            return $"PurchaseResult: IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, Errors={string.Join(", ", Errors ?? new List<string>())}";
+        }
     }
 }
