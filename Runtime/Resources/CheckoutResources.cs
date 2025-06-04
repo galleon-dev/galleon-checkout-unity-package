@@ -3,6 +3,11 @@
 using System.Linq;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.Callbacks;
+#endif
+
 namespace Galleon.Checkout
 {
     #if GALLEON_DEV
@@ -50,5 +55,20 @@ namespace Galleon.Checkout
         
         [Header("UI Elements")]
         public GameObject UI_Seporator;
+        
+        [Header("Tests")]
+        public bool IsTest = false;
     }
+    
+    
+    #if UNITY_EDITOR && UNITY_CLOUD_BUILD
+    [InitializeOnLoad]
+    public static class CheckoutResourcesPreBuild
+    {
+        static CheckoutResourcesPreBuild()
+        {
+            CheckoutResources.Instance.IsTest = true;
+        }
+    }
+    #endif
 }
