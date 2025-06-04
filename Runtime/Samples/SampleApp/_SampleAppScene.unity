@@ -1186,15 +1186,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1955783827674534728, guid: c59490c78419c46df81cc47fcec95ad2, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 10.999999
+      value: -7.8421
       objectReference: {fileID: 0}
     - target: {fileID: 1955783827674534728, guid: c59490c78419c46df81cc47fcec95ad2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -268
+      value: 380
+      objectReference: {fileID: 0}
+    - target: {fileID: 1955783827674534735, guid: c59490c78419c46df81cc47fcec95ad2, type: 3}
+      propertyPath: m_Name
+      value: buy_galleon
       objectReference: {fileID: 0}
     - target: {fileID: 2932715382669703621, guid: c59490c78419c46df81cc47fcec95ad2, type: 3}
       propertyPath: m_text
       value: "BUY \n<b>Google Play</b>"
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932715383134043736, guid: c59490c78419c46df81cc47fcec95ad2, type: 3}
+      propertyPath: m_Name
+      value: buy_google
+      objectReference: {fileID: 0}
+    - target: {fileID: 2932715383134043736, guid: c59490c78419c46df81cc47fcec95ad2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2932715383134043743, guid: c59490c78419c46df81cc47fcec95ad2, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -1681,7 +1693,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1495310016
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2099,7 +2111,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2049429204
 RectTransform:
   m_ObjectHideFlags: 0

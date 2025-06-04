@@ -150,7 +150,7 @@ namespace Galleon.Checkout
         public static TransactionsController Transactions   => CheckoutClient.Instance.Transactions;
         public static Transaction            Transaction    => User.CurrentTransaction;
         
-        public static bool                   IsTest         => true;
+        public static bool                   IsTest         => false;
     }   
 }
 
