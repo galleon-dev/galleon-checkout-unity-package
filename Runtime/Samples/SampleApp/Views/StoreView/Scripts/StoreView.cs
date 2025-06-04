@@ -47,11 +47,13 @@ namespace Galleon.Checkout.Samples
         
         public async void PurchaseGalleon()
         {
-            await CheckoutAPI.Purchase(new CheckoutProduct
+            var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                        { 
                                            DisplayName = "fake_product_2",
                                            PriceText   = "$24.99",
                                        });
+            
+            Debug.LogError("Purchase Result: " + result);
         }   
         
         
