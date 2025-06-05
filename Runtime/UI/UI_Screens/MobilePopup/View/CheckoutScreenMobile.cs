@@ -42,7 +42,10 @@ namespace Galleon.Checkout.UI
 
         // Fields
         
-        private bool                         isPending = false;
+        private bool                         isPending                = false;
+        private float?                       overrideContentSize      = null; 
+        public int                           CloseAnimationDurationMS = 300;
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
 
@@ -58,6 +61,7 @@ namespace Galleon.Checkout.UI
                                   
                                   // Assign instance
                                   CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>(); 
+                                  CheckoutClient.Instance.CheckoutScreenMobile.overrideContentSize = null;
                               });
         
         public static Step CloseCheckoutScreenMobile()
@@ -291,6 +295,8 @@ namespace Galleon.Checkout.UI
             ParentPanel.TryGetComponent(out RectTransform parentTransform);
             var keyboardHeight         = Math.Max(0, GetKeyboardHeight());
             var targetSize             = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + keyboardHeight);
+            if (overrideContentSize.HasValue)
+                targetSize = new Vector2(parentTransform.sizeDelta.x, overrideContentSize.Value + keyboardHeight);
             parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
         }
         
@@ -550,16 +556,20 @@ namespace Galleon.Checkout.UI
             SuccessPanelView.gameObject.SetActive(true);
         }
 
-        public void Close()
+        public async void Close()
         {
             CheckoutClient.Instance.IAPStore.FinishTransaction(product        : new ProductDefinition(id   : CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName
                                                                                                      ,type : ProductType.Consumable)
                                                                ,transactionId : "transactionID");
             
+            // Close animation
+            overrideContentSize = 0f;
+            await Task.Delay(CloseAnimationDurationMS);
+            
             this.gameObject.SetActive(false);
             Destroy(this.gameObject);   
         }
-
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper UI Actions
 
         private void DisableAllPanels()

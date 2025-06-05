@@ -35,43 +35,30 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////// Lifecycle
         
         public Explorer()
-        {
+        {            
             Instance = this;
             
             // Make the root element fill its container
             this.style.flexGrow                     = 1;
             this.style.height                       = Length.Percent(100);
             
-            splitView                               = new TwoPaneSplitView(0, 300, TwoPaneSplitViewOrientation.Horizontal); this.Add(splitView);
-            splitView.style.flexGrow                = 1;
-            splitView.style.height                  = Length.Percent(100);
+            splitView                               = new TwoPaneSplitView(0 ,300 ,TwoPaneSplitViewOrientation.Horizontal); this.Add(splitView);
             
+            TreePanel                               = new VisualElement(); this.splitView.Add(TreePanel);
             
-            TreePanel                               = new VisualElement(); splitView.Add(TreePanel);
-            TreePanel.style.flexGrow                = 1;
-            TreePanel.style.height                  = Length.Percent(100);
+            TreeScrollView                          = new ScrollView(); this.TreePanel.Add(TreeScrollView);          
+            TreeScrollView.mode                     = ScrollViewMode.VerticalAndHorizontal;
             
+            InspectorPanel                          = new VisualElement(); this.splitView.Add(InspectorPanel);
             
-            TreeScrollView                          = new ScrollView(); TreePanel.Add(TreeScrollView);          
-            TreeScrollView.style.flexGrow           = 1;
-            TreeScrollView.style.height             = Length.Percent(100);
+            InspectorScrollView                     = new ScrollView(); this.InspectorPanel.Add(InspectorScrollView);
+            InspectorScrollView.mode                = ScrollViewMode.VerticalAndHorizontal;
             
-            
-            InspectorPanel                          = new VisualElement(); splitView.Add(InspectorPanel);
-            InspectorPanel.style.flexGrow           = 1;
-            InspectorPanel.style.height             = Length.Percent(100);
-            
-            
-            InspectorScrollView                     = new ScrollView(); InspectorPanel.Add(InspectorScrollView);
-            InspectorScrollView.style.flexGrow      = 1;
-            InspectorScrollView.style.height        = Length.Percent(100);
-            
-            
-            // Left 
+            // Tree View 
             ExplorerItem root = new ExplorerItem(RootObject); 
             TreeScrollView.Add(root);
             
-            // Right
+            // Inspector View
             SetSelectedInspectorUI(SelectedEntity.Node.Inspector);
             
             RefreshMode();
@@ -84,7 +71,10 @@ namespace Galleon.Checkout
             if (Mode == DisplayMode.Horizontal)
             {
                 splitView.orientation = TwoPaneSplitViewOrientation.Horizontal;
-                //splitView.fixedPaneInitialDimension = 300;
+            }
+            else if (Mode == DisplayMode.Mobile)
+            {
+                splitView.orientation = TwoPaneSplitViewOrientation.Vertical;
             }
         }
         

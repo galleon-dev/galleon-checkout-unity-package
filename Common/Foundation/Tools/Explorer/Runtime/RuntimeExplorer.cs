@@ -28,24 +28,17 @@ namespace Galleon.Checkout
                 // Scroll view
                 var scrollView            = new ScrollView(); root.Add(scrollView);
                 scrollView.mode           = ScrollViewMode.VerticalAndHorizontal;
-                
-                // scrollView.style.flexGrow = 1;
-                
-                // Create Panel
-                // var panel                   = new VisualElement(); scrollView.Add(panel);
-                // panel.style.flexBasis       = new StyleLength(new Length(100, LengthUnit.Percent));
-                // panel.style.flexGrow        = 1;
-                // panel.style.flexDirection   = FlexDirection.Column;
-                // panel.pickingMode           = PickingMode.Ignore;
-              
-                // scrollView.Add(new Label(""));
-                // scrollView.Add(new Label(""));
+                scrollView.style.flexGrow = 1;
                 
                 try
                 {
                     scrollView.Add(new Label("Runtime Explorer"));   
                     scrollView.Add(new Divider());   
-                    scrollView.Add(new Explorer());   
+                    
+                    var explorer = new Explorer();
+                    explorer.Mode = Explorer.DisplayMode.Mobile;
+                    explorer.RefreshMode();
+                    scrollView.Add(explorer);   
                 }
                 catch (Exception ex) { Debug.LogException(ex); }
                 
