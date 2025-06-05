@@ -70,10 +70,10 @@ namespace Galleon.Checkout
             
             Root.Instance.Runtime.Node.Children.Add(Instance);
             
-            await Instance.SystemInitFlow();
-            
-            if (CHECKOUT.IsTest)
-                await Instance.Temp.TEST_FLOW();
+          //await Instance.SystemInitFlow();
+          //
+          //if (CHECKOUT.IsTest)
+          //    await Instance.Temp.TEST_FLOW();
                 
         }
         
