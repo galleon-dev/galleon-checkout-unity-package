@@ -65,21 +65,6 @@ namespace Galleon.Checkout
                         
                         s.AddPostStep("close", async x => CheckoutScreenMobile.CloseCheckoutScreenMobile());
                         
-                        return;
-                        
-                        s.AddChildStep(Client.CheckoutScreenMobile.ViewTestPanel());
-                        s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
-                        s.AddChildStep(Client.CheckoutScreenMobile.ViewCheckoutPanel());
-                        s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
-                        s.AddChildStep(Client.CheckoutScreenMobile.ViewCreditCardPanel());
-                        s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
-                        s.AddChildStep(RunTransaction());
-                        s.AddChildStep(Client.CheckoutScreenMobile.ViewSuccessPanel());
-                        s.AddChildStep(new Step("wait a second", action: async (s) => {await Task.Delay(1000);}));
-                        s.AddChildStep(CheckoutScreenMobile.CloseCheckoutScreenMobile());
-                        
-                      //s.AddChildStep(new Step("Report", action: async (s) => { Report?.Invoke(); await Task.Delay(5000); }));
-                        
                     });
         
         

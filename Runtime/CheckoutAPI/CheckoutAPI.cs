@@ -8,7 +8,6 @@ namespace Galleon.Checkout
     {   
         public static async Task<PurchaseResult> Purchase(CheckoutProduct product)
         {
-            // NEW ROW
             await  CheckoutClient.Instance.RunCheckoutSession(product);
             return CheckoutClient.Instance.CurrentSession.PurchaseResult;
         }
