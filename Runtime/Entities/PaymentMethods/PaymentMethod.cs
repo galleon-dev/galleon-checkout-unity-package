@@ -25,7 +25,7 @@ namespace Galleon.Checkout
         public string DisplayName;
         public bool   IsSelected;
         
-        //// Actions
+        //// UI Actions
         
         public void Select()
         {
@@ -36,5 +36,6 @@ namespace Galleon.Checkout
         {
             this.IsSelected = false;
         }
+        
     }
 }

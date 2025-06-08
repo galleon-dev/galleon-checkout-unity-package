@@ -48,22 +48,20 @@ namespace Galleon.Checkout
                     ,tags   : new [] { "report"}
                     ,action : async (s) =>
                     {
-                        await CheckoutScreenMobile.OpenCheckoutScreenMobile(); //s.AddChildStep(Client.OpenCheckoutScreenMobile());
+                        // Open Screen
+                        await CheckoutScreenMobile.OpenCheckoutScreenMobile();
                         
-                        foreach (var paymentMethod in User.PaymentMethods)
-                            paymentMethod.Unselect();
-                        if (User.PaymentMethods.Count > 0)
-                            User.PaymentMethods.First().Select();
-                        
+                        // View CheckoutPage
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.CheckoutPage));
                         
-                                                
-                        _flow.AddPostStep("report", async x =>
-                                                    {
-                                                        Report?.Invoke();
-                                                    });
+                        // Report
+                        s.AddPostStep("report", async x =>
+                                               {
+                                                   Report?.Invoke();
+                                               });
                         
-                        s.AddPostStep("close", async x => CheckoutScreenMobile.CloseCheckoutScreenMobile());
+                        // Close
+                        s.AddPostStep(CheckoutScreenMobile.CloseCheckoutScreenMobile());
                         
                     });
         

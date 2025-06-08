@@ -47,15 +47,19 @@ namespace Galleon.Checkout
                          ,[CallerLineNumber] int    callerLine     = 0
                          ,[CallerFilePath  ] string callerPath     = "")
         {
+            #if UNITY_EDITOR
+            return;
+            #endif
+           
             this.MemberName            = memberName;
-            this.LineNumber            = lineNumber;
-            this.SourceFilePath        = sourceFilePath;
-            this.RealTimeSienceStartup = Time.realtimeSinceStartupAsDouble;
-            this.DateTime              = DateTime.Now;
-            this.FrameCount            = Time.frameCount;
-            this.RenderedFrameCount    = Time.renderedFrameCount;
-            this.Note                  = note;
-            this.DisplayName           = displayName;
+           this.LineNumber            = lineNumber;
+           this.SourceFilePath        = sourceFilePath;
+           this.RealTimeSienceStartup = Time.realtimeSinceStartupAsDouble;
+           this.DateTime              = DateTime.Now;
+           this.FrameCount            = Time.frameCount;
+           this.RenderedFrameCount    = Time.renderedFrameCount;
+           this.Note                  = note;
+           this.DisplayName           = displayName;
             
             this.InternalMemberName    = callerMember;
             this.InternalLineNumber    = callerLine;

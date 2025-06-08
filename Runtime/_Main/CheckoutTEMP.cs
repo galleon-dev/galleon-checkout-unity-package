@@ -61,9 +61,9 @@ namespace Galleon.Checkout
             new Step(name   : $"test_token"
                     ,action : async (s) =>
                               {
-                                  var token = await CheckoutClient.Instance.Tokens.CreateCreditCardToken();
-                                  var user  = CheckoutClient.Instance.Users.Users.FirstOrDefault();
-                                  user.Tokens.Add(token);
+                                //var token = await CheckoutClient.Instance.Tokens.CreateCreditCardToken();
+                                //var user  = CheckoutClient.Instance.Users.Users.FirstOrDefault();
+                                //user.Tokens.Add(token);
                               });
 
         public Step TestTransaction()
@@ -71,8 +71,8 @@ namespace Galleon.Checkout
             new Step(name   : $"test_transaction"
                     ,action : async (s) =>
                               {
-                                  var transaction = await CheckoutClient.Instance.Transactions.CreateTestTransaction();
-                                  s.AddChildStep(transaction.Purchase());
+                                //var transaction = await CheckoutClient.Instance.Transactions.CreateTestTransaction();
+                                //s.AddChildStep(transaction.Purchase());
                               });
 
         public Step TestUI()
@@ -285,6 +285,16 @@ namespace Galleon.Checkout
                               });
         
         #endregion // TEST STEPS
+        
+        #region OLD_CODE
+        /// public async Task<CreditCardToken> CreateCreditCardToken()
+        /// {
+        ///     var token = await BasisTheoryAPI.CreateCreditCardToken();
+        /// 
+        ///     this.tokens.Add(token);
+        ///     return token;
+        /// }
+        #endregion
         
         #region Socket Tests
         

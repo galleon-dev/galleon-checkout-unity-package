@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Galleon.Checkout;
@@ -61,7 +62,6 @@ namespace Galleon.Checkout.UI
                                   
                                   // Assign instance
                                   CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>(); 
-                                  CheckoutClient.Instance.CheckoutScreenMobile.overrideContentSize = null;
                               });
         
         public static Step CloseCheckoutScreenMobile()
@@ -71,8 +71,6 @@ namespace Galleon.Checkout.UI
                               {   
                                   if (CheckoutClient.Instance.CheckoutScreenMobile == null)
                                       return;
-                                  
-                                  await s.CaptureReport();
                                   
                                   // Destroy screen
                                   CheckoutClient.Instance.CheckoutScreenMobile.Close(); 
@@ -84,7 +82,23 @@ namespace Galleon.Checkout.UI
         {
             this.Node.SetParent(CheckoutClient.Instance);
         }
-        
+
+        public void OnEnable()
+        {
+            overrideContentSize = null;
+            
+            var user = CheckoutClient.Instance.CurrentSession.User;
+            
+            // Deselect Payment Method
+            foreach (var paymentMethod in user.PaymentMethods)
+                paymentMethod.Unselect();
+            
+            // Select First payment method by default
+            if (user.PaymentMethods.Count > 0)
+                user.PaymentMethods.First().Select();
+            
+        }
+
         private async void Start()
         {
             // Start "closed"

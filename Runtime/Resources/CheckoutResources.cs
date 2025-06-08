@@ -45,7 +45,7 @@ namespace Galleon.Checkout
             new Step(name   : $"initialize_resources"
                     ,tags   : new []{ "init" }
                     ,action : async (s) =>
-                    {   
+                    {
                     });
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members

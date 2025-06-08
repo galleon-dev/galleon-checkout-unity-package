@@ -29,8 +29,7 @@ namespace Galleon.Checkout
       //public CheckoutIapStoreListener IapStoreListener            = new(); // for testing
       
         // Resources
-        [Header("Resources")]
-        public CheckoutResources        Resources;
+        public CheckoutResources        Resources                   => CheckoutResources.Instance;
         
         // Controllers
         [Header("Controllers")]
@@ -42,11 +41,8 @@ namespace Galleon.Checkout
         // Entities
         [Header("Entities")]
         public ProductsController       Products                    = new();
-        public CreditCardsController    CreditCards                 = new();
-        public TokensController         Tokens                      = new();
         public UsersController          Users                       = new();
         public User                     CurrentUser                 = new();
-        public TransactionsController   Transactions                = new();
         
         // Sessions
         public CheckoutSession          CurrentSession;
@@ -86,27 +82,23 @@ namespace Galleon.Checkout
                     ,action : async s =>
                               {   
                                   // Services
-                                  s.AddChildStep(Logger   .Initialize());
-                                  s.AddChildStep(Network  .Initialize());
-                                  s.AddChildStep(Config   .Initialize());
-                                  s.AddChildStep(Analytics.Initialize());
+                                  s.AddChildStep(Logger                         .Initialize());
+                                  s.AddChildStep(Network                        .Initialize());
+                                  s.AddChildStep(Config                         .Initialize());
+                                  s.AddChildStep(Analytics                      .Initialize());
                         
                                   // Controllers
-                                  s.AddChildStep(CreditCardController    .Initialize());
-                                  s.AddChildStep(PaypalController        .Initialize());
-                                  s.AddChildStep(GooglePayController     .Initialize());
-                                  s.AddChildStep(GenericPaymentController.Initialize());
+                                  s.AddChildStep(CreditCardController           .Initialize());
+                                  s.AddChildStep(PaypalController               .Initialize());
+                                  s.AddChildStep(GooglePayController            .Initialize());
+                                  s.AddChildStep(GenericPaymentController       .Initialize());
                                   
                                   // Resources
-                                  this.Resources = CheckoutResources.Instance;
-                                  s.AddChildStep(Resources.Initialize());
+                                  s.AddChildStep(Resources                      .Initialize());
                         
                                   // Entities
-                                  s.AddChildStep(Products    .Initialize());
-                                  s.AddChildStep(CreditCards .Initialize());
-                                  s.AddChildStep(Tokens      .Initialize());
-                                  s.AddChildStep(Users       .Initialize());
-                                  s.AddChildStep(Transactions.Initialize());
+                                  s.AddChildStep(Products                       .Initialize());
+                                  s.AddChildStep(Users                          .Initialize());
                               });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow Steps
@@ -143,11 +135,8 @@ namespace Galleon.Checkout
         public static CheckoutResources      Resources      => CheckoutClient.Instance.Resources;
         
         public static ProductsController     Products       => CheckoutClient.Instance.Products;
-        public static CreditCardsController  CreditCards    => CheckoutClient.Instance.CreditCards;
-        public static TokensController       Tokens         => CheckoutClient.Instance.Tokens;
         public static UsersController        Users          => CheckoutClient.Instance.Users;
         public static User                   User           => CheckoutClient.Instance.CurrentUser;
-        public static TransactionsController Transactions   => CheckoutClient.Instance.Transactions;
         public static Transaction            Transaction    => User.CurrentTransaction;
         
         public static bool                   IsTest         => Resources.IsTest;
