@@ -206,22 +206,26 @@ namespace Galleon.Checkout
                     public List<PaymentAction> transaction_actions = new();
                 }
                 
-                    public class PaymentAction
+                    public class CardPaymentMethodData : PaymentMethodData
                     {
-                        public string action;
+                        public string[] card_types;
+                    }
+                    public class GPayPaymentMethodData : PaymentMethodData
+                    {
+                    }
+                    public class PaypalPaymentMethodData : PaymentMethodData
+                    {
                     }
                     
-                public class CardPaymentMethodData : PaymentMethodData
+                public class PaymentAction
                 {
-                    public string[] card_types;
-                }
-                public class GPayPaymentMethodData : PaymentMethodData
-                {
-                }
-                public class PaypalPaymentMethodData : PaymentMethodData
-                {
+                    public string action;
                 }
                 
+                    public class PaypalPaymentAction : PaymentAction
+                    {
+                        
+                    }
                 
             /// /initialize response
             /// {
