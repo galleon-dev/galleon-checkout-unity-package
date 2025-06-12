@@ -83,7 +83,7 @@ namespace Galleon.Checkout
                                   GameObject.Instantiate(CheckoutClient.Instance.Resources.CheckoutPopupPrefab, position: new Vector3(0,0,9999), rotation: Quaternion.identity);
                               });
         
-        public Step TestRealServer()
+        public Step     TestRealServer()
         =>
             new Step(name   : $"test_real_server"
                     ,action : async (s) =>
@@ -261,7 +261,7 @@ namespace Galleon.Checkout
                                                                                             }
                                                                                   ,body     : new
                                                                                             {
-                                                                                                    Sku      = "sku-1",
+                                                                                                Sku      = "sku-1",
                                                                                                 Quantity = 1,
                                                                                                 Amount   = 100,
                                                                                                 Currency = "USD",

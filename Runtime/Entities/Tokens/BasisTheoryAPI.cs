@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
+    ///THIS IS FOR LOCAL TESTS, NOT USED IN PRODUCTION
     public class BasisTheoryAPI 
     {
         ///////////////////////////////////////////////////////////////////////////////////// Members

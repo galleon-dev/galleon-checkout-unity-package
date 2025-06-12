@@ -167,7 +167,6 @@ namespace Galleon.Checkout
                         string tokenID    = jsonObject["id"]?.ToString();
                         this.TokenID      = tokenID;
                         s.Log($"Token ID: {tokenID}".Color(Color.green));
-
                     });
 
         ///////////////////////

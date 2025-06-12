@@ -17,7 +17,7 @@ namespace Galleon.Checkout
                                     
                     });
         
-        public bool IsGPayAvailable;
+        public bool IsGPayAvailable = false;
         
         public Step CheckIsGPayAvailable()
         =>
@@ -40,7 +40,7 @@ namespace Galleon.Checkout
                         
                         #else
                         
-                        ISGPayAvailable = false;
+                        // ISGPayAvailable = false;
                         
                         #endif
                     });

@@ -34,9 +34,11 @@ namespace Galleon.Checkout
         // Controllers
         [Header("Controllers")]
         public CreditCardController     CreditCardController        = new(); 
+        public TokenizerController      TokenizerController         = new(); 
         public PaypalController         PaypalController            = new();
         public GooglePayController      GooglePayController         = new();
         public GenericPaymentController GenericPaymentController    = new();
+        public TaxController            TaxController               = new();  
         
         // Entities
         [Header("Entities")]
@@ -89,9 +91,11 @@ namespace Galleon.Checkout
                         
                                   // Controllers
                                   s.AddChildStep(CreditCardController           .Initialize());
+                                  s.AddChildStep(TokenizerController            .Initialize());
                                   s.AddChildStep(PaypalController               .Initialize());
                                   s.AddChildStep(GooglePayController            .Initialize());
                                   s.AddChildStep(GenericPaymentController       .Initialize());
+                                  s.AddChildStep(TaxController                  .Initialize());
                                   
                                   // Resources
                                   s.AddChildStep(Resources                      .Initialize());
@@ -99,6 +103,9 @@ namespace Galleon.Checkout
                                   // Entities
                                   s.AddChildStep(Products                       .Initialize());
                                   s.AddChildStep(Users                          .Initialize());
+                                  
+                                  // UI
+                                  s.AddChildStep(CheckoutScreenMobile.InitializeCheckoutScreenMobile());
                               });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow Steps

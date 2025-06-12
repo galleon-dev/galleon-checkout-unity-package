@@ -37,5 +37,9 @@ namespace Galleon.Checkout
             this.IsSelected = false;
         }
         
+        //// Transaction Steps
+        
+        public List<Step> VaultingSteps    = new List<Step>();
+        public List<Step> TransactionSteps = new List<Step>();
     }
 }

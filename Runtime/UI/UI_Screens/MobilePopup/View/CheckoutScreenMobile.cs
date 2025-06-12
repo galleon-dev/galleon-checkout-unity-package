@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Codice.CM.Common.Merge;
 using Galleon.Checkout;
 using Galleon.Checkout.UI;
 using UnityEngine;
@@ -50,7 +51,7 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
 
-        public static Step OpenCheckoutScreenMobile()
+        public static Step InitializeCheckoutScreenMobile()
         =>
             new Step(name   : $"open_checkout_screen_mobile"
                     ,action : async (s) =>
@@ -60,8 +61,28 @@ namespace Galleon.Checkout.UI
                                                                                      ,position : new Vector3(0,0,9999)
                                                                                      ,rotation : Quaternion.identity);
                                   
+                                  CheckoutScreenMobileGO.SetActive(false);
+                                  DontDestroyOnLoad(CheckoutScreenMobileGO);
+                                  
                                   // Assign instance
                                   CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>(); 
+                              });
+        
+        
+        public static Step OpenCheckoutScreenMobile()
+        =>
+            new Step(name   : $"open_checkout_screen_mobile"
+                    ,action : async (s) =>
+                              {
+                                  if (CheckoutClient.Instance.CheckoutScreenMobile is null)
+                                  {
+                                      Debug.LogError("CheckoutClient.Instance.CheckoutScreenMobile is NULL");
+                                      return;
+                                  }
+                                  
+                                  CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(true);
+                                  CheckoutClient.Instance.CheckoutScreenMobile.ResetState();
+                                  CheckoutClient.Instance.CheckoutScreenMobile.SetPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage).Execute();
                               });
         
         public static Step CloseCheckoutScreenMobile()
@@ -72,8 +93,7 @@ namespace Galleon.Checkout.UI
                                   if (CheckoutClient.Instance.CheckoutScreenMobile == null)
                                       return;
                                   
-                                  // Destroy screen
-                                  CheckoutClient.Instance.CheckoutScreenMobile.Close(); 
+                                  CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(false); 
                               });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -85,8 +105,18 @@ namespace Galleon.Checkout.UI
 
         public void OnEnable()
         {
-            overrideContentSize = null;
-            
+            overrideContentSize = null;   
+        }
+
+        private async void Start()
+        {
+            // Start "closed"
+            RectTransform parentTransform = ParentPanel.transform as RectTransform;
+            parentTransform.sizeDelta = new Vector2(parentTransform.sizeDelta.x, 0);
+        }
+        
+        public void ResetState()
+        {
             var user = CheckoutClient.Instance.CurrentSession.User;
             
             // Deselect Payment Method
@@ -97,13 +127,6 @@ namespace Galleon.Checkout.UI
             if (user.PaymentMethods.Count > 0)
                 user.PaymentMethods.First().Select();
             
-        }
-
-        private async void Start()
-        {
-            // Start "closed"
-            RectTransform parentTransform = ParentPanel.transform as RectTransform;
-            parentTransform.sizeDelta = new Vector2(parentTransform.sizeDelta.x, 0);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Navigation
@@ -180,6 +203,7 @@ namespace Galleon.Checkout.UI
         public bool       IsPageActive      = false; 
         public Page       CurrentPage       = default;
         public List<Page> NavigationHistory = new();
+        public string     NavigationNext = "";
 
         public Step ViewPage(Page page)
         =>
@@ -234,16 +258,76 @@ namespace Galleon.Checkout.UI
                         
                         ///////////////////////// Handle Result
                         
-                        string pageResult = CurrentPage.PageResult;
+                        string pageResult   = CurrentPage.PageResult;
+                        this.NavigationNext = pageResult;
                         
-                        if (page.NavigationMap.ContainsKey(pageResult))
+                        if (page.NavigationMap.ContainsKey(NavigationNext))
                         {
-                            Step nextStep = page.NavigationMap?[pageResult];
+                            Step nextStep = page.NavigationMap?[NavigationNext];
                             
                             if (s.ParentStep != null)
                                 s.ParentStep.AddChildStep(nextStep);
                         }
                     });
+        
+        public Step SetPage(Page page)
+        =>
+            new Step(name   : $"set_{page.Name}_page"
+                    ,action : async (s) =>
+                    {
+                        ///////////////////////// Setup
+                        
+                        page.Setup?.Invoke(page);
+                        
+                        ///////////////////////// Set Sate
+                        
+                        this.HeaderPanelView.State = page.headerState;
+                        this.State                 = page.panelState;
+                        this.FooterPanelView.State = page.FooterState;
+                        
+                        ///////////////////////// Refresh
+                        
+                        RefreshState();
+                        HeaderPanelView.RefreshState();
+                        FooterPanelView.RefreshState();
+                        
+                        View[] views = this.GetComponentsInChildren<View>();
+                        foreach (var view in views)
+                            view.Refresh();
+                        
+                        ///////////////////////// Definitions
+                        
+                        IsPageActive = true;
+                        CurrentPage  = page;
+                        NavigationHistory.Add(page);
+                    });
+        
+        
+        public Step Navigate()
+        =>
+            new Step(name   : $"navigate"
+                    ,action : async (s) =>
+                    {
+                        Page page = NavigationHistory.Last();
+                        
+                        ///////////////////////// Result Helper
+                        
+                        page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
+                        page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
+                        page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
+                        
+                        ///////////////////////// Handle Navigation Next
+                        
+                        if (page.NavigationMap.ContainsKey(NavigationNext))
+                        {
+                            Step nextStep = page.NavigationMap?[NavigationNext];
+                            
+                            if (s.ParentStep != null)
+                                s.ParentStep.AddChildStep(nextStep);
+                        }
+                    });
+        
+        ///////////////////////////////////////////////
         
         public Step UI_Close()
         =>
@@ -581,7 +665,7 @@ namespace Galleon.Checkout.UI
             await Task.Delay(CloseAnimationDurationMS);
             
             this.gameObject.SetActive(false);
-            Destroy(this.gameObject);   
+          //Destroy(this.gameObject);   
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper UI Actions
