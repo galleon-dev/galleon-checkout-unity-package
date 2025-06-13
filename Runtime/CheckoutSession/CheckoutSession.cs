@@ -77,6 +77,11 @@ namespace Galleon.Checkout
                         // Show Loading Screen
                         s.AddChildStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.LoadingPage));
                         
+                        // Start Transaction
+                        s.AddChildStep("start_transaction"
+                                      ,async x => CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/start_transaction"));
+                        
+                        
                         // Setup Transaction Steps
                         User.CurrentTransaction = new Transaction();
                         User.CurrentTransaction.TransactionSteps.AddRange(User.SelectedPaymentMethod.TransactionSteps);
@@ -86,6 +91,11 @@ namespace Galleon.Checkout
                         {
                             s.AddChildStep(transactionStep);
                         }
+                        
+                        
+                        s.AddChildStep("get_transaction_result"
+                                      ,async x => CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/transaction_result"));
+                        
                         
                         // Navigate
                         s.AddChildStep("wait",        async x => await Task.Delay(1000));
@@ -173,7 +183,7 @@ namespace Galleon.Checkout
             }
             /// /authenticate Response :
             /// {
-            ///     "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6InBheWVyIiwiaXNzIjoiR2FsbGVvbiIsImF1ZCI6InRlc3QuYXBwIn0.xdg3d7xMIVAhDm_9JpSl5MENnmWAaZDHRjApWUMj-t8",
+            ///     "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX......xdg3d7xMIVAhDm_9JpSl5MENnmWAaZDHRjApWUMj-t8",
             ///     "appId"       : "test.app",
             ///     "id"          : 1,
             ///     "externalId"  : "user id 1"

@@ -35,6 +35,7 @@ namespace Galleon.Checkout
         [Header("Controllers")]
         public CreditCardController     CreditCardController        = new(); 
         public TokenizerController      TokenizerController         = new(); 
+        public PaymentMethodsController PaymentMethodsController    = new();
         public PaypalController         PaypalController            = new();
         public GooglePayController      GooglePayController         = new();
         public GenericPaymentController GenericPaymentController    = new();
@@ -92,6 +93,7 @@ namespace Galleon.Checkout
                                   // Controllers
                                   s.AddChildStep(CreditCardController           .Initialize());
                                   s.AddChildStep(TokenizerController            .Initialize());
+                                  s.AddChildStep(PaymentMethodsController       .Initialize());
                                   s.AddChildStep(PaypalController               .Initialize());
                                   s.AddChildStep(GooglePayController            .Initialize());
                                   s.AddChildStep(GenericPaymentController       .Initialize());
