@@ -1,5 +1,8 @@
 using System.Collections.Generic;
-using Unity.Plastic.Newtonsoft.Json;
+using System.Linq;
+using Galleon.Checkout.Shared;
+using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Galleon.Checkout
 {
@@ -17,8 +20,13 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
-                        var response = await CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/payment-methods-test");
+                        var result   = await CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/payment-methods-test");
+                        var response = JsonConvert.DeserializeObject<PaymentMethodsResponse>(result.ToString());
+                        var methods  = response.payment_methods;
                         
+                        Debug.Log($"payment methods count: {methods.Count()}");
+                        foreach (var method in methods)
+                            Debug.Log($"payment method : {method.type}");
                         
                         this.PaymentMethods.Add(new CreditCardPaymentMethod());
                         this.PaymentMethods.Add(new PayPalPaymentMethod());
