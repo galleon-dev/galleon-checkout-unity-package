@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Galleon.Checkout.Shared;
 using Galleon.Checkout.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -34,6 +35,11 @@ namespace Galleon.Checkout
         public CheckoutClient                     Client                => CheckoutClient.Instance;
         public User                               User                  => Client.CurrentUser;
         public Transaction                        CurrentTransaction    => User.CurrentTransaction;
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
+        
+        public TransactionResultData lastTransactionResult;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
         
@@ -67,7 +73,7 @@ namespace Galleon.Checkout
         
         
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// transaction Steps
         
         public Step RunTransaction()
         =>
@@ -101,9 +107,22 @@ namespace Galleon.Checkout
                         s.AddChildStep("wait",        async x => await Task.Delay(1000));
                         s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.NavigationNext = "Success");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
+                        
+                        s.AddPostStep(HandleTransactionResult());
+                    });
+        
+        public Step HandleTransactionResult()
+        =>
+            new Step(name   : $"handle_transaction_result"
+                    ,action : async (s) =>
+                    {
+                        var result = this.lastTransactionResult;
+                        
+                        
                     });
 
-        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Credit Card Vaulting Flow
+
         public Step AddCard()
         =>
             new Step(name   : $"add_card"
@@ -114,8 +133,6 @@ namespace Galleon.Checkout
                             s.AddChildStep(vaultingStep);
                         }
                     });
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Credit Card Vaulting Flow
         
         public Step ViewPage()
         =>
