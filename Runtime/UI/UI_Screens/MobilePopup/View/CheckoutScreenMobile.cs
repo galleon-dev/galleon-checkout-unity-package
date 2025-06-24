@@ -84,9 +84,9 @@ namespace Galleon.Checkout.UI
                                   CheckoutClient.Instance.CheckoutScreenMobile.SetPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage).Execute();
                               });
         
-        public static Step CloseCheckoutScreenMobile()
+        public static Step EndCheckoutScreenMobile()
         =>
-            new Step(name   : $"close_checkout_screen_mobile"
+            new Step(name   : $"end_checkout_screen_mobile"
                     ,action : async (s) =>
                               {   
                                   if (CheckoutClient.Instance.CheckoutScreenMobile == null)
@@ -333,7 +333,7 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"UI_CLOSE"
                     ,action : async (s) =>
                               {
-                                  Close();
+                                  await Close();
                               });
         
         public Step UI_Back()
@@ -628,11 +628,6 @@ namespace Galleon.Checkout.UI
             Close();
         }
 
-        public void OnBackClick()
-        {
-            Close();
-        }
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
 
         public void SetCheckoutPanelActive()
@@ -653,18 +648,14 @@ namespace Galleon.Checkout.UI
             SuccessPanelView.gameObject.SetActive(true);
         }
 
-        public async void Close()
+        public async Task Close()
         {
-            CheckoutClient.Instance.IAPStore.FinishTransaction(product        : new ProductDefinition(id   : CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName
-                                                                                                     ,type : ProductType.Consumable)
-                                                               ,transactionId : "transactionID");
-            
             // Close animation
-            overrideContentSize = 0f;
-            await Task.Delay(CloseAnimationDurationMS);
+            overrideContentSize = 0f; // set the target height to zero
+            
+            await Task.Delay(CloseAnimationDurationMS); // wait for the screen height to reach 0 (in update) 
             
             this.gameObject.SetActive(false);
-          //Destroy(this.gameObject);   
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper UI Actions

@@ -10,7 +10,7 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////////////////// Members
         
-        public List<PaymentMethod> PaymentMethods { get; set; } = new ();
+        public List<PaymentMethodDefinition> PaymentMethodsDefinitions { get; set; } = new ();
         
         /////////////////////////////////////////////////////////////// Lifecycle
         
@@ -28,9 +28,35 @@ namespace Galleon.Checkout
                         foreach (var method in methods)
                             Debug.Log($"payment method : {method.type}");
                         
-                        this.PaymentMethods.Add(new CreditCardPaymentMethod());
-                        this.PaymentMethods.Add(new PayPalPaymentMethod());
-                        this.PaymentMethods.Add(new GPayPaymentMethod());
+                        this.PaymentMethodsDefinitions.Add(new PaymentMethodDefinition()
+                                                           {
+                                                               Type             = "credit_card",
+                                                               VaultingSteps    = { "get_tokenizer", "tokenize" },
+                                                               TransactionSteps = { "charge" },
+                                                           });
+                        
+                        this.PaymentMethodsDefinitions.Add(new PaymentMethodDefinition()
+                                                           {
+                                                               Type                = "paypal",
+                                                               InitializationSteps = { "check_availability" },
+                                                               TransactionSteps    =
+                                                                                   {
+                                                                                        "create_order",
+                                                                                        "open_url",
+                                                                                   },
+                                                           });
+                        
+                        this.PaymentMethodsDefinitions.Add(new PaymentMethodDefinition()
+                                                           {
+                                                               Type                = "google_pay",
+                                                               InitializationSteps = { "check_availability" },
+                                                               TransactionSteps    =
+                                                                                   {
+                                                                                        "create_order",
+                                                                                        "open_url",
+                                                                                   },
+                                                           });
                     });
     }
 }
+

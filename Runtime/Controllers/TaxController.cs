@@ -22,7 +22,7 @@ namespace Galleon.Checkout
                     ,action : async s =>
                               {
                                   var response = await CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/tax");
-                                  var tax      = JsonConvert.DeserializeObject<CheckoutSession.TaxDataResponse>(response.ToString());
+                                  var tax      = JsonConvert.DeserializeObject<Shared.TaxData>(response.ToString());
                                   
                                   s.Log($"tax.should_display_full_price : {tax.should_display_price_including_tax}");
                                   s.Log($"tax.taxes({tax.taxes.Count}) : ");

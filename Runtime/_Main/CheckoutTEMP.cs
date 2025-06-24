@@ -13,6 +13,17 @@ namespace Galleon.Checkout
 {
     public class CheckoutTEMP : Entity
     {
+        ///         Session Start
+        ///             Transaction Start
+        ///                 payment_method_transaction_action
+        ///                 payment_method_transaction_action
+        ///                 payment_method_transaction_action
+        ///                 final_action_updates_result_or_error
+        ///             Transaction End
+        ///         Session End
+        ///
+        
+        
         #region TEST STEPS
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
@@ -83,7 +94,7 @@ namespace Galleon.Checkout
                                   GameObject.Instantiate(CheckoutClient.Instance.Resources.CheckoutPopupPrefab, position: new Vector3(0,0,9999), rotation: Quaternion.identity);
                               });
         
-        public Step     TestRealServer()
+        public Step TestRealServer()
         =>
             new Step(name   : $"test_real_server"
                     ,action : async (s) =>

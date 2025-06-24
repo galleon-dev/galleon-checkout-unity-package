@@ -1,11 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace Galleon.Checkout
 {
     public class CreditCardPaymentMethod : PaymentMethod
     {
-        //// Types
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
         
         public enum CREDIT_CARD_TYPE
         {
@@ -16,7 +23,7 @@ namespace Galleon.Checkout
             Discover,
         }
         
-        //// Members
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         public string CreditCardType; 
         
@@ -28,7 +35,18 @@ namespace Galleon.Checkout
         
         public string TokenID;
         
-        //// Vaulting Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Initialization
+
+        public CreditCardPaymentMethod()
+        {
+            this.TransactionSteps = new()
+                                    {
+                                        Charge,
+                                        AwaitSocket
+                                    };
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Vaulting Steps
         
         public Step GetTokenizer()
         =>
@@ -137,14 +155,15 @@ namespace Galleon.Checkout
 
         
         
-        //// Transaction Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
         public Step Charge()
         =>
             new Step(name   : $"charge"
                     ,action : async (s) =>
                     {                                               
-                        var chargeResponse = await CHECKOUT.Network.Post(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
+                      //var chargeResponse = await CHECKOUT.Network.Post(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
+                        var chargeResponse = await CHECKOUT.Network.Post(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/test_charge"
                                                                         ,headers  : new ()
                                                                                   {
                                                                                       { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
@@ -163,7 +182,108 @@ namespace Galleon.Checkout
                                                                                                    Cvc      = TokenID,
                                                                                                }
                                                                                   });
+                        
+                        var json = chargeResponse.ToString();
+                        
+                        ChargeResponse response = JsonConvert.DeserializeObject<ChargeResponse>(json);
+                        
+                        if (response.transaction_result != null)
+                        {
+                            CheckoutClient.Instance.CurrentSession.lastTransactionResult = response.transaction_result;
+                        }
+                        else if (response.NextActions != null)
+                        {
+                            var        flow        = s.ParentStep;
+                            List<Step> nextActions = new();
+
+                            foreach (var step in nextActions)
+                            {
+                                flow.AddChildStep(step);
+                            }
+                        }
+                        else
+                        {
+                            // NO TRANSACTION RESULT AND NO NEXT ACTION . ERROR .
+                        }
                     });   
         
+        
+        public Step AwaitSocket()
+        =>
+            new Step(name   : $"await_socket"
+                    ,action : async (s) =>
+                    {
+                        //// Definitions
+                        
+                        string action     = "next_action";
+                        string socketIP   = "127.0.0.1";
+                        int    socketPort = 12345;
+                        
+                        //// Socket
+                        
+                        using (var clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+                        {
+                            try
+                            {
+                                await Task.Factory.FromAsync(clientSocket.BeginConnect, clientSocket.EndConnect, socketIP, socketPort, null);
+                                
+                                if (clientSocket.Connected)
+                                {
+                                    s.Log("Connected to the server.");
+
+                                    /////// Test
+                                    
+                                    // Send action name to the server
+                                    var message      = action;
+                                    var messageBytes = Encoding.UTF8.GetBytes(message);
+                                    await clientSocket.SendAsync(new ArraySegment<byte>(messageBytes), SocketFlags.None);
+                                    
+                                    s.Log("Message sent: " + message);
+                                    
+                                    /////// Read incoming
+                                    
+                                    // Buffer for incoming data.
+                                    var buffer          = new byte[1024];
+                                    var receivedMessage = new List<string>();
+
+                                    // Receive data from the server in a loop.
+                                    while (clientSocket.Connected)
+                                    {
+                                        try
+                                        {
+                                            int receivedBytes = await clientSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+                                            if (receivedBytes > 0)
+                                            {
+                                                var incomingMessage = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                                                receivedMessage.Add(incomingMessage);
+                                                s.Log("Message received: " + incomingMessage);
+                                            }
+                                            else
+                                            {
+                                                break; // Connection closed by the server.
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            s.Log("Error receiving message: " + ex.Message);
+                                            break;
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.LogError("Socket connection failed: " + ex.Message);
+                            }
+                            finally
+                            {
+                                clientSocket.Close();
+                            }
+                        }
+                        
+                    });
     }
 }
+
+

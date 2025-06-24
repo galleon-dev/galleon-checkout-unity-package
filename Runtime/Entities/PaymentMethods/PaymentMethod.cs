@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,7 +40,9 @@ namespace Galleon.Checkout
         
         //// Transaction Steps
         
-        public List<Step> VaultingSteps    = new List<Step>();
-        public List<Step> TransactionSteps = new List<Step>();
+        public List<Func<Step>> InitializationSteps  = new ();
+        public List<Func<Step>> VaultingSteps        = new ();
+        public List<Func<Step>> TransactionSteps     = new ();
+        public List<Func<Step>> PostTransactionSteps = new ();
     }
 }

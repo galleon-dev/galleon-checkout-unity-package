@@ -54,11 +54,18 @@ namespace Galleon.Checkout
                     ,tags   : new [] { "report"}
                     ,action : async (s) =>
                     {
+                        
+                        /////////////////////////////////////// Pre Steps
+                        
                         // Open Screen
                         s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
                         
+                        /////////////////////////////////////// Steps
+                        
                         // View CheckoutPage
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.CheckoutPage));
+                        
+                        /////////////////////////////////////// Post Steps
                         
                         // Report
                         s.AddPostStep("report", async x =>
@@ -67,10 +74,9 @@ namespace Galleon.Checkout
                                                });
                         
                         // Close
-                        s.AddPostStep(CheckoutScreenMobile.CloseCheckoutScreenMobile());
+                        s.AddPostStep(CheckoutScreenMobile.EndCheckoutScreenMobile());
 
                     });
-        
         
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// transaction Steps
@@ -80,21 +86,31 @@ namespace Galleon.Checkout
             new Step(name   : $"run_transaction"
                     ,action : async (s) =>
                     {
+                        ////////////////////////////////////////////////////////////// Pre Steps
+                        
                         // Show Loading Screen
-                        s.AddChildStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.LoadingPage));
+                        s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.LoadingPage));
                         
                         // Start Transaction
-                        s.AddChildStep("start_transaction"
+                        s.AddPreStep("start_transaction"
                                       ,async x => CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/start_transaction"));
                         
                         
                         // Setup Transaction Steps
                         User.CurrentTransaction = new Transaction();
-                        User.CurrentTransaction.TransactionSteps.AddRange(User.SelectedPaymentMethod.TransactionSteps);
+                        foreach (var stepFunc in User.SelectedPaymentMethod.TransactionSteps)
+                        {
+                            var step = stepFunc?.Invoke();
+                            s.Log($"adding transaction step : {step.Name}");
+                            User.CurrentTransaction.TransactionSteps.Add(step);
+                        }
+                        
+                        ////////////////////////////////////////////////////////////// Steps
                         
                         // Run Transaction Steps
                         foreach (var transactionStep in User.CurrentTransaction.TransactionSteps)
                         {
+                            s.Log($"scheduling transaction step : {transactionStep.Name}");
                             s.AddChildStep(transactionStep);
                         }
                         
@@ -107,7 +123,15 @@ namespace Galleon.Checkout
                         s.AddChildStep("wait",        async x => await Task.Delay(1000));
                         s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.NavigationNext = "Success");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
+                       
+                        ////////////////////////////////////////////////////////////// Post Steps
                         
+          //            CheckoutClient.Instance.IAPStore.FinishTransaction(product        : new ProductDefinition(id   : CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName
+          //                                                                                         ,type : ProductType.Consumable)
+          //                                                   ,transactionId : "transactionID");
+          //
+                        
+                        // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());
                     });
         
@@ -115,10 +139,25 @@ namespace Galleon.Checkout
         =>
             new Step(name   : $"handle_transaction_result"
                     ,action : async (s) =>
-                    {
+                    { 
+                        ///////// TEMP
+                        this.lastTransactionResult = new TransactionResultData()
+                                                     {
+                                                        isSuccess         = true,
+                                                        errors            = null,
+                                                        isCanceled        = false,
+                                                        transaction_id    = "test_transaction",
+                                                     };
+                        
                         var result = this.lastTransactionResult;
                         
-                        
+                        this.PurchaseResult = new PurchaseResult()
+                                              {
+                                                  IsSuccess   = result.isSuccess,
+                                                  IsCanceled  = result.isSuccess,
+                                                  Errors      = result.errors?.ToList(),
+                                                  IsError     = result.errors?.Length > 0,
+                                              };
                     });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Credit Card Vaulting Flow
@@ -128,9 +167,10 @@ namespace Galleon.Checkout
             new Step(name   : $"add_card"
                     ,action : async (s) =>
                     {
-                        foreach (var vaultingStep in User.SelectedPaymentMethod.VaultingSteps)
+                        foreach (var vaultingStepFunc in User.SelectedPaymentMethod.VaultingSteps)
                         {
-                            s.AddChildStep(vaultingStep);
+                            var step = vaultingStepFunc?.Invoke();
+                            s.AddChildStep(step);
                         }
                     });
         
@@ -174,379 +214,6 @@ namespace Galleon.Checkout
                 
             }
             
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Json
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Json
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Json
-
-        public class AuthenticateRequest
-        {
-            public string AppID;
-            public string ID;
-            public string Device;
-        }
-        /// /authenticate
-        /// {
-        ///     AppID  : "test.app"
-        ///     ID     : "test_ID"
-        ///     Device : "test_device"
-        /// }
-        
-            public class AuthenticateResponse
-            {
-                public string accessToken;
-                public string appID;
-                public string id;
-                public string externalId;
-            }
-            /// /authenticate Response :
-            /// {
-            ///     "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX......xdg3d7xMIVAhDm_9JpSl5MENnmWAaZDHRjApWUMj-t8",
-            ///     "appId"       : "test.app",
-            ///     "id"          : 1,
-            ///     "externalId"  : "user id 1"
-            /// }
-
-        ////////////////////////////////
-        
-        public class InitializeRequest
-        {
-            public string AccessToken;
-        }
-        /// /initialize
-        /// {
-        ///     accessToken : "..."
-        /// }
-            
-            public class InitializeResponse
-            {
-                public ConfigData ConfigData;
-            }   
-                public class ConfigData
-                {
-                    
-                }
-                
-                public class PaymentMethodData
-                {
-                    public string              type;
-                    public List<PaymentAction> vaulting_actions    = new();
-                    public List<PaymentAction> transaction_actions = new();
-                }
-                
-                    public class CardPaymentMethodData : PaymentMethodData
-                    {
-                        public string[] card_types;
-                    }
-                    public class GPayPaymentMethodData : PaymentMethodData
-                    {
-                    }
-                    public class PaypalPaymentMethodData : PaymentMethodData
-                    {
-                    }
-                    
-                public class PaymentAction
-                {
-                    public string action;
-                }
-                
-                    public class PaypalPaymentAction : PaymentAction
-                    {
-                        
-                    }
-                
-            /// /initialize response
-            /// {
-            ///     config :
-            ///            {
-            ///                 ...
-            ///            }
-            ///
-            ///     payment_methods:
-            ///     [
-            ///         {
-            ///             type                : "credit_card",
-            ///             card_types          :
-            ///                                 [
-            ///                                     "mastercard",
-            ///                                     "visa",
-            ///                                 ],
-            ///             vaulting_actions    : 
-            ///                                 [
-            ///                                    {
-            ///                                        action : "get_tokenizer",
-            ///                                        url    : "https://tokenizer_url",
-            ///                                    },
-            ///                                    {
-            ///                                        action : "tokenize"
-            ///                                    },
-            ///                                 ],
-            ///             transaction_actions :
-            ///                                 [
-            ///                                     {
-            ///                                         action : "charge"
-            ///                                     }
-            ///                                 ]
-            ///         },
-            ///         {
-            ///             type                : "gpay",
-            ///             vaulting_actions    : 
-            ///                                 [
-            ///                                    {
-            ///                                        action : "check_gpay_availability"
-            ///                                    }
-            ///                                 ],
-            ///             transaction_actions :
-            ///                                 [
-            ///                                     {
-            ///                                         action : "create_gpay_order"
-            ///                                     },
-            ///                                     {
-            ///                                         action         : "open_url",
-            ///                                         url            : "https://galleon/gpay_url",
-            ///                                         deep_link_path : "gpay_redirect",
-            ///                                         socket_info    : "bla_bal"
-            ///                                     },
-            ///                                     {
-            ///                                         action : "get_result"
-            ///                                     },
-            ///                                 ]
-            ///         },
-            ///         {
-            ///             type                : "paypal",
-            ///             vaulting_actions    : 
-            ///                                 [
-            ///                                    {
-            ///                                        action : "check__paypal_availability"
-            ///                                    }
-            ///                                 ],
-            ///             transaction_actions :
-            ///                                 [
-            ///                                     {
-            ///                                         action : "create_paypal_order"
-            ///                                     },
-            ///                                     {
-            ///                                         action         : "open_url",
-            ///                                         url            : "https://galleon/paypal_url",
-            ///                                         deep_link_path : "paypal_redirect",
-            ///                                         socket_info    : "bla_bal",
-            ///                                     },
-            ///                                     {
-            ///                                         action : "get_result"
-            ///                                     },
-            ///                                 ]
-            ///         },
-            ///     ]
-            ///     
-            /// }
-            
-        ////////////////////////
-        
-        public class TaxDataRequest
-        {
-            public string location;
-        }
-        /// /Tax
-        /// {
-        ///     location : "isr"
-        /// }
-        
-            public class TaxDataResponse
-            {
-                public bool                      should_display_price_including_tax;
-                public Dictionary<string, float> taxes;
-            }
-            /// /Tax
-            /// {
-            ///     location : "isr"
-            /// }
-            
-        
-        ////////////////////////
-        
-        public class AddCardRequest
-        {
-            public string cardToken;
-        }
-        /// /add_card
-        /// {
-        ///     card_token : "..."
-        /// }
-            
-            public class AddCardResponse
-            {
-                public string result;
-            }
-            /// /add_card response
-            /// {
-            ///     result : "ok"
-            /// }
-         
-        public class RemoveCardRequest
-        {
-            public string  cardToken;
-        }
-        /// /remove_card
-        /// {
-        ///     card_token : "..."
-        /// }
-            
-            public class RemoveCardResponse
-            {
-                public string result;
-            }
-            /// /remove_card response
-            /// {
-            ///     result : "ok"
-            /// }
-            
-            
-        ////////////////////////
-        
-        public class StartTransactionRequest
-        {
-            public string selected_payment_method_type;
-            public string payment_method_id;
-        }
-        /// /start_transaction
-        /// {
-        ///     selected_payment_method_type : "card_1234"
-        ///     payment_method_id            : "...token..."
-        /// }
-        
-            public class StartTransactionResponse
-            {
-                public string transaction_id;
-            }
-            /// /start_transaction response
-            /// {
-            ///     transaction_id : "12345"
-            /// }
-        
-        public class ValidateRequest
-        {
-            public string transaction_id;
-            public string recipt_data;
-            public string date_time_utc;
-        }
-        /// /validate_recipt
-        /// {
-        ///     transaction_id : "12345"
-        ///     recipt_data    : "12345"
-        ///     date_time_utc  : "2025-01-01T12:34"
-        /// }
-            
-            public class ValidateResponse
-            {
-                public string result;
-            }
-            /// /validate_recipt
-            /// {
-            ///     result : "valid"
-            /// }
-            
-        public class TransactionResultRequest
-        {
-            public string transaction_id;
-        }
-        /// /transaction_result
-        /// {
-        ///     transaction_id : "12345"
-        /// }
-        
-            public class TransactionResultResponse
-            {
-                public bool is_success;
-            }
-            /// /transaction_result
-            /// {
-            ///     is_success : "true"
-            /// }
-        
-        ////////////////////////
-        
-        public class UpdateEmailRequest
-        {
-            public string user_id;
-            public string email;
-        }
-        /// /update_email
-        /// {
-        ///     user_id : "12345"
-        ///     email   : "email.email@email.com"
-        /// }
-        
-            public class UpdateEmailResponse
-            {
-                public string result;
-            }
-            /// /update_email
-            /// {
-            ///     result : "ok"
-            /// }
-        
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Data
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Data
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Data
-        
-        
-        public class CheckoutInputData
-        {
-            public string AppID;
-            public string ID;
-            public String Device;
-        }
-        
-        // Actual class in CheckoutAPI
-        public class PurchaseResultData
-        {
-            public bool         IsSuccess  { get; set; }
-            public bool         IsCanceled { get; set; }
-            public bool         IsError    { get; set; }
-            public List<string> Errors     { get; set; } 
-        }
-        
-        ////////////////////
-        
-      //public class PaymentMethodData
-      //{
-      //    public string ID;
-      //    public string Type;
-      //    public string DisplayName;
-      //    
-      //    public string[] actions = new[]
-      //                              {
-      //                                  // Generic
-      //                                  "start    https://www.galleon.com/start_url",
-      //                                  "open_url https://www.galleon.com/web_url",
-      //                                  "result   https://www.galleon.com/result_url",
-      //                              };
-      //}
-        
-      //public class CreditCardFlowData
-      //{
-      //    public string TokenizerURL;
-      //    public string ChargeURL;
-      //}
-        
-        ////////////////////
-        
-      //public class ConfigData
-      //{
-      //    public bool IsCalifornia;
-      //    
-      //    public Dictionary<string, string> GenericConfigValues;
-      //}
-        
-        ////////////////////
-        
-      //public class TaxData
-      //{
-      //    public Dictionary<string, float> taxes = new();
-      //}
-        
-        
-        
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }
