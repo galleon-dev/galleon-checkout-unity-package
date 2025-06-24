@@ -218,9 +218,9 @@ namespace Galleon.Checkout.UI
                         this.HeaderPanelView.State = page.headerState;
                         this.State                 = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
-                        
+
                         ///////////////////////// Refresh
-                        
+                        Debug.Log("Page Name: " + page.Name);
                         RefreshState();
                         HeaderPanelView.RefreshState();
                         FooterPanelView.RefreshState();
@@ -345,9 +345,22 @@ namespace Galleon.Checkout.UI
                                   //s.ParentStep.AddChildStep(ViewPage(previousPage));
                                   s.ParentStep.AddChildStep(ViewPage(CheckoutPage));
                               });
-        
+
+        public Step UI_PaymentMethods()
+       =>
+           new Step(name: $"UI_PaymentMethods"
+                   , action: async (s) =>
+                   {
+                        s.ParentStep.AddChildStep(ViewPage(SelectPaymentMethodsPage));
+                   });
+
         /////////////////////// UI Events
-        
+
+        public void On_BackFromCreditCardInfo()
+        {
+            OnPageFinishedWithResult(NavigationStates.Back.ToString());
+        }
+
         public void On_BackClicked()
         {
             OnPageFinishedWithResult(NavigationStates.Back.ToString());
@@ -453,13 +466,13 @@ namespace Galleon.Checkout.UI
                                                           ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString());
         
         public Page CreditCardPage              = new Page(name   : "credit_card"
-                                                          ,header : HeaderPanelView     .STATE.back_and_text        .ToString()
+                                                          ,header : HeaderPanelView     .STATE.credit_card_info        .ToString()
                                                           ,panel  : CheckoutScreenMobile.STATE.credit_card_panel    .ToString()
                                                           ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString()
                                                           ,setup  : page =>
                                                                   {
-                                                                      page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                      page.NavigationMap["test"]                                                = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                      page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
+                                                                      page.NavigationMap["test"]                                                = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
                                                                   }
                                                            );
         

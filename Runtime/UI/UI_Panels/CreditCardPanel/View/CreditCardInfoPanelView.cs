@@ -172,7 +172,7 @@ namespace Galleon.Checkout.UI
 
                 if (digitIndex < digits.Length)
                 {
-                    formatted += " ";
+                    formatted += " "; //" - "
                     if (digitIndex < caretInDigits)
                         newCaretPos++;
                 }
