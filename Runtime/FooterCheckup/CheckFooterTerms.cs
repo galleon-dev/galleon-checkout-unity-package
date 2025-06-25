@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace Galleon.Footer
 {
-    public class CheckFooter : MonoBehaviour
+    public class CheckFooterTerms : MonoBehaviour
     {
         public FooterPanelView FooterPanelView;
         private void OnEnable()
         {
             if (FooterPanelView)
             {
-                FooterPanelView.ShowViewPaymentMethods(true);
+                FooterPanelView.ShowTermsOfService(false);
             }
         }
 
@@ -18,7 +18,7 @@ namespace Galleon.Footer
         {
             if (FooterPanelView)
             {
-                FooterPanelView.ShowViewPaymentMethods(false);
+                FooterPanelView.ShowTermsOfService(true);
             }
         }
     }
