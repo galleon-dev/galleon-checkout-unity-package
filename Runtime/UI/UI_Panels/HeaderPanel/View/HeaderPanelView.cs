@@ -29,9 +29,15 @@ namespace Galleon.Checkout.UI
         {
             CheckoutClient.Instance.CheckoutScreenMobile.On_BackClicked();
         }
-        
+
+        public async void OnAddPaymentMethodClicked()
+        {
+          //  CheckoutClient.Instance.CheckoutScreenMobile.UI_PaymentMethods();
+            CheckoutClient.Instance.CheckoutScreenMobile.On_BackFromCreditCardInfo();
+        }
+
         /////////////////////////////////////////////////////// Steps
-        
+
         public Step OpenCheckoutSettingsView()
         =>
             new Step(name   : $"open_checkout_settings_view"
@@ -48,6 +54,7 @@ namespace Galleon.Checkout.UI
             checkout_and_settings,
             back_and_text,
             x_button,
+            credit_card_info
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
@@ -55,11 +62,12 @@ namespace Galleon.Checkout.UI
         public GameObject CheckoutAndSettingsPanel; 
         public GameObject BackAndTitlePanel;
         public GameObject XButtonPanel;
-        
+        public GameObject PaymentMethodPanel;
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
         {
+            Debug.Log("HEADER - RefreshState: " + this.State);
             DisableAllPanels();
 
             if (this.State == STATE.checkout_and_settings.ToString())
@@ -74,6 +82,10 @@ namespace Galleon.Checkout.UI
             {
                 XButtonPanel.SetActive(true);
             }
+            if (this.State == STATE.credit_card_info.ToString())
+            {
+                PaymentMethodPanel.SetActive(true);
+            }
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
@@ -83,6 +95,7 @@ namespace Galleon.Checkout.UI
             this.CheckoutAndSettingsPanel.SetActive(false);
             this.BackAndTitlePanel       .SetActive(false);
             this.XButtonPanel            .SetActive(false);
+            this.PaymentMethodPanel      .SetActive(false);
         }
     }
 }

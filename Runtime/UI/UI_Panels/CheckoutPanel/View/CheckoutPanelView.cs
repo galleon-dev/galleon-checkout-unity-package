@@ -34,13 +34,18 @@ namespace Galleon.Checkout.UI
         public GameObject      PaymentMethodItemPrefab;
         
         public GameObject      AddCreditCardButtonElement;
-        
+
+
+        [Header("Payment Buttons")]
+        public GameObject PurchaseButton;
+        public GameObject GooglePayButton;
+
         //////////////////////////////////////////////////////////////////////////// Links
-        
+
         public IEnumerable<checkoutPanelPaymentMethodItemView> PaymentMethodItemViews => GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
-        
+
         //////////////////////////////////////////////////////////////////////////// Initialization
-        
+
         public override void Initialize()
         {
             // Remove children (if any)
@@ -52,13 +57,15 @@ namespace Galleon.Checkout.UI
             
             // Add children
             var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
+
+            Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
+            
             foreach (var paymentMethod in paymentMethods)
             {
-                // Instantiate (and Init) Item
                 var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
                 item.Initialize(paymentMethod, this);
-                
+
                 // Add ui separator
                 Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsPanel.transform);
             }
@@ -170,6 +177,18 @@ namespace Galleon.Checkout.UI
         {
             this.Result = ViewResult.AddCard;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
+        }
+
+        public void ShowPurchaseButton()
+        {
+            GooglePayButton.SetActive(false);
+            PurchaseButton.SetActive(true);
+        }
+
+        public void ShowGooglePlayButton()
+        {
+            GooglePayButton.SetActive(true);
+            PurchaseButton.SetActive(false);
         }
     }
 }
