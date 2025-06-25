@@ -58,7 +58,7 @@ namespace Galleon.Checkout.UI
             // Add children
             var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
 
-            Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
+           // Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
             
             foreach (var paymentMethod in paymentMethods)
             {

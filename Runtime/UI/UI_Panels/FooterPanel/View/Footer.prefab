@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8991274865562195313}
   - component: {fileID: 6154883344180093389}
   - component: {fileID: 2331157281414728608}
-  - component: {fileID: 4576651634167925337}
   m_Layer: 5
   m_Name: Footer
   m_TagString: Untagged
@@ -59,6 +58,8 @@ MonoBehaviour:
   Style: 
   TermsPrivacyReturnElement: {fileID: 8201862792487850937}
   LongTermsOfServiceelement: {fileID: 3357786509978160833}
+  ViewPaymentMethodsPanel: {fileID: 4261314521622037146}
+  TermsOfServicePanel: {fileID: 7101738639298576076}
 --- !u!114 &2331157281414728608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,20 +81,6 @@ MonoBehaviour:
   spacing: 10
   isVertical: 1
   centerChildren: 1
---- !u!114 &4576651634167925337
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3780998917363622557}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d271a9dfa5d07b45a257a58603975c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ViewPaymentMethodsPanel: {fileID: 4261314521622037146}
-  TermsOfServicePanel: {fileID: 7101738639298576076}
 --- !u!1001 &1246875528672720399
 PrefabInstance:
   m_ObjectHideFlags: 0

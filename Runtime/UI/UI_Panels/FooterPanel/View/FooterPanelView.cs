@@ -19,7 +19,9 @@ namespace Galleon.Checkout.UI
         
         public GameObject TermsPrivacyReturnElement; 
         public GameObject LongTermsOfServiceelement;
-        
+
+        public GameObject ViewPaymentMethodsPanel;
+        public GameObject TermsOfServicePanel;
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
@@ -46,6 +48,18 @@ namespace Galleon.Checkout.UI
         {
             this.TermsPrivacyReturnElement.SetActive(false);
             this.LongTermsOfServiceelement.SetActive(false);
+        }
+
+        public void ShowViewPaymentMethods(bool _Status)
+        {
+            // Debug.Log("Show View Payment Methods Panel: " + _Status);
+            ViewPaymentMethodsPanel.SetActive(_Status);
+        }
+
+        public void ShowTermsOfService(bool _Status)
+        {
+            // Debug.Log("Show Terms Of Service Panel: " + _Status);
+            TermsOfServicePanel.SetActive(_Status);
         }
     }
 }
