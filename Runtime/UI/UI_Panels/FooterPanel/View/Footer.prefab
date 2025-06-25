@@ -92,7 +92,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d271a9dfa5d07b45a257a58603975c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ViewPayemtnMethodsPanel: {fileID: 4261314521622037146}
+  ViewPaymentMethodsPanel: {fileID: 4261314521622037146}
+  TermsOfServicePanel: {fileID: 7101738639298576076}
 --- !u!1001 &1246875528672720399
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -378,6 +379,11 @@ GameObject:
 --- !u!224 &5150087776770085459 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7646991259399839799, guid: 0e46c9e518fd2473bb556d72f0a28ad4, type: 3}
+  m_PrefabInstance: {fileID: 3271684272531780196}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7101738639298576076 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5758179956072090792, guid: 0e46c9e518fd2473bb556d72f0a28ad4, type: 3}
   m_PrefabInstance: {fileID: 3271684272531780196}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &8201862792487850937 stripped
