@@ -23,6 +23,7 @@ namespace Galleon.Checkout
         public Runtime  Runtime  = new Runtime();
         public Project  Project  = new Project();
         public Assets   Assets   = new Assets();
+        public Core     Core     = new Core();
         
         ////////////////////////////////////////////////////// Lifecycle
         

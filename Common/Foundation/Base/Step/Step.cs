@@ -151,7 +151,7 @@ namespace Galleon.Checkout
             }
             catch (Exception e)
             {
-                Debug.LogError(e.ToString());
+                Debug.Log($"<color=red>[HANDLED-ERROR]</color> {e.ToString()}");
             }
         }
         

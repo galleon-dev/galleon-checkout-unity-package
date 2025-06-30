@@ -23,7 +23,7 @@ namespace Galleon.Checkout
         
         // Purchase data
         public CheckoutProduct                    SelectedProduct;
-        public PurchaseResult                     PurchaseResult        = new PurchaseResult();
+        public PurchaseResult                     PurchaseResult        = default;
         
         // Simple Dialog Panel data
         public string                             LastDialogRequest     = null;
@@ -35,7 +35,6 @@ namespace Galleon.Checkout
         public CheckoutClient                     Client                => CheckoutClient.Instance;
         public User                               User                  => Client.CurrentUser;
         public Transaction                        CurrentTransaction    => User.CurrentTransaction;
-        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
         
@@ -75,9 +74,27 @@ namespace Galleon.Checkout
                         
                         // Close
                         s.AddPostStep(CheckoutScreenMobile.EndCheckoutScreenMobile());
+                        s.AddPostStep(EndCheckoutSession());
 
                     });
         
+        
+        public Step EndCheckoutSession()
+        =>
+            new Step(name   : $"end_checkout_session"
+                    ,action : async (s) =>
+                    {
+                        if (PurchaseResult == null)
+                        {
+                            this.PurchaseResult = new PurchaseResult()
+                                                  {
+                                                      IsSuccess  = false,
+                                                      IsCanceled = true,
+                                                      IsError    = false,
+                                                      Errors     = new(),
+                                                  };
+                        }
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// transaction Steps
         
@@ -154,7 +171,7 @@ namespace Galleon.Checkout
                         this.PurchaseResult = new PurchaseResult()
                                               {
                                                   IsSuccess   = result.isSuccess,
-                                                  IsCanceled  = result.isSuccess,
+                                                  IsCanceled  = result.isCanceled,
                                                   Errors      = result.errors?.ToList(),
                                                   IsError     = result.errors?.Length > 0,
                                               };

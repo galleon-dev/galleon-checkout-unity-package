@@ -241,6 +241,9 @@ namespace Galleon.Checkout.UI
                         {
                             await Task.Yield();
                             
+                            if (!gameObject.activeSelf)
+                                return;
+                            
                             if (CHECKOUT.IsTest)
                             {
                                 await Task.Delay(1000);

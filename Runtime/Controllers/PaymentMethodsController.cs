@@ -20,8 +20,16 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
+                        var _result   = await CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions-test");
+                        var _response = JsonConvert.DeserializeObject<PaymentMethodDefinitionsResponse>(value : _result.ToString(), settings: PaymentMethodsJsonHelper.JsonSettings);
+                        var _methods  = _response.payment_method_definitions;
+                        
+                        Debug.Log("=====================");
+                        Debug.Log($"{_result}");
+                        Debug.Log("=====================");
+                        
                         var result   = await CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/payment-methods-test");
-                        var response = JsonConvert.DeserializeObject<PaymentMethodsResponse>(result.ToString());
+                        var response = JsonConvert.DeserializeObject<PaymentMethodsResponse>(value : result.ToString(), settings: PaymentMethodsJsonHelper.JsonSettings);
                         var methods  = response.payment_methods;
                         
                         Debug.Log($"payment methods count: {methods.Count()}");
@@ -57,6 +65,6 @@ namespace Galleon.Checkout
                                                                                    },
                                                            });
                     });
+        
     }
 }
-
