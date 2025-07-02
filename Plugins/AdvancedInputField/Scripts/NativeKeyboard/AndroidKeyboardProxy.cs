@@ -22,6 +22,7 @@ namespace AdvancedInputFieldPlugin
 
 		public void OnAutofillUpdate(string text, int autofillType)
 		{
+			Debug.Log("OnAutofillUpdate (AndroidKeyboardProxy): " + text);
 			ThreadHelper.ScheduleActionOnUnityThread(() => { keyboard.OnAutofillUpdate(text, (AutofillType)autofillType); });
 		}
 

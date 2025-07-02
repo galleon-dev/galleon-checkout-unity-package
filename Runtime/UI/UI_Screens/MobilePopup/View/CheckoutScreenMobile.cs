@@ -486,7 +486,7 @@ namespace Galleon.Checkout.UI
         IEnumerator SetInputFieldRectDelay(RectTransform _RectTransform)
         {
             yield return new WaitForSeconds(0.02f);
-            Debug.Log("SetInputFieldRect: " + _RectTransform.name);
+           // Debug.Log("SetInputFieldRect: " + _RectTransform.name);
             InputFieldRect = _RectTransform;
             SafeAreaHeight = 0;
         }
@@ -495,7 +495,7 @@ namespace Galleon.Checkout.UI
         {
             if (InputFieldRect)
             {
-                Debug.Log("ResetSafeAreaHeight: " + InputFieldRect.name);
+              //  Debug.Log("ResetSafeAreaHeight: " + InputFieldRect.name);
                 InputFieldRect = null;
                 SafeAreaHeight = 0;
             }

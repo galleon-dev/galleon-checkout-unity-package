@@ -110,6 +110,7 @@ namespace AdvancedInputFieldPlugin
 			}
 		}
 
+
 		#region UNITY
 		private void Awake()
 		{
@@ -154,6 +155,7 @@ namespace AdvancedInputFieldPlugin
 			emojiEngine = gameObject.AddComponent<EmojiEngine>();
 			richTextBindingEngine = gameObject.AddComponent<RichTextBindingEngine>();
 		}
+
 
 #if UNITY_EDITOR
 		private void OnEnable()
@@ -311,6 +313,7 @@ namespace AdvancedInputFieldPlugin
 		public static void ResetAutofill()
 		{
 			if(!ValidateInstance()) { return; }
+			Debug.Log("Keyboard.ResetAutofill();");
 			Keyboard.ResetAutofill();
 		}
 

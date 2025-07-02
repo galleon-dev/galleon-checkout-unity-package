@@ -55,7 +55,7 @@ namespace Galleon.Checkout.UI
         public void Refresh()
         {
             RefreshState();
-            RefreshUI();
+           // RefreshUI();
         }
         
         
@@ -64,6 +64,7 @@ namespace Galleon.Checkout.UI
         public void RefreshUI()
         {
             // Style
+            
             var style = this.Style;
             var rules = CSS.ParseCSS(style);
             

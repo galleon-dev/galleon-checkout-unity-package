@@ -101,7 +101,8 @@ namespace AdvancedInputFieldSamples
 
 		public void OnKeyboardHeightChanged(int keyboardHeight)
 		{
-			Debug.Log("OnKeyboardHeightChanged: " + keyboardHeight);
+			Debug.Log("OnKeyboardHeightChanged__: " + keyboardHeight);
+
 			this.keyboardHeight = keyboardHeight;
 
 			if(resizeVerticalInputField.Selected)
