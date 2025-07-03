@@ -34,9 +34,9 @@ namespace Galleon.Checkout.Foundation
         {
             public Inspector(Core target) : base(target)
             {
-                this.Add(new Button(async () => await target.Do_P_1()) { text = "P 1" });
-                this.Add(new Button(async () => await target.Do_P_2()) { text = "P 2" });
-                this.Add(new Button(async () => await target.Do_P_3()) { text = "P 3" });
+                this.Add(new Button(async () => await target.Do_P_1().Execute()) { text = "P 1" });
+                this.Add(new Button(async () => await target.Do_P_2().Execute()) { text = "P 2" });
+                this.Add(new Button(async () => await target.Do_P_3().Execute()) { text = "P 3" });
             }
         }
         

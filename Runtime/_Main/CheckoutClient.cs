@@ -128,7 +128,7 @@ namespace Galleon.Checkout
                                   CurrentSession.SelectedProduct = product;
                                   
                                   // Start Session
-                                  await CurrentSession.Flow();
+                                  await CurrentSession.Flow().Execute();
                               });
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

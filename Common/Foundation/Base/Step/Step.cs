@@ -46,9 +46,9 @@ namespace Galleon.Checkout
         
         ////////////////////////////////////////// Lifecycle
 
-        public Step(string                     name   = null
-                    ,IEnumerable<string>       tags   = default
-                    ,StepAction                action = null
+        public Step(string                     name             = null
+                    ,IEnumerable<string>       tags             = default
+                    ,StepAction                action           = null
                     ,[CallerMemberName] string CallerMemberName = ""
                     ,[CallerLineNumber] int    CallerLineNumber = 0
                     ,[CallerFilePath  ] string CallerFilePath   = "")
@@ -95,7 +95,10 @@ namespace Galleon.Checkout
                 StepController.Steps.Add(this);
                 
                 // Add as linked child to step controller
-                Root.Instance.Runtime.StepController.Node.AddLinkedChild(this);
+                if (this.ParentStep == null)
+                    Root.Instance.Runtime.StepController.Node.AddLinkedChild(this);
+              //else
+              //    this.ParentStep.Node.AddLinkedChild(this);
                 
                 // set display name
                 this.Node.DisplayName = $"Step {this.Name}";
@@ -166,7 +169,7 @@ namespace Galleon.Checkout
         public void AddChildStep(string name = "temp", StepAction action = default)
         {
             Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
-            this.ChildSteps.Add(tempStep);
+            AddChildStep(tempStep);
         }
         
         
@@ -181,7 +184,7 @@ namespace Galleon.Checkout
         public void AddPreStep(string name = "temp", StepAction action = default)
         {
             Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
-            this.PreSteps.Add(tempStep);
+            AddChildStep(tempStep);
         }
         
         
@@ -196,7 +199,7 @@ namespace Galleon.Checkout
         public void AddPostStep(string name = "temp", StepAction action = default)
         {
             Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
-            this.PostSteps.Add(tempStep);
+            AddChildStep(tempStep);
         }
         
         
@@ -220,31 +223,37 @@ namespace Galleon.Checkout
             Debug.Log($"{prefix}{message}");
         }
 
-        ////////////////////////////////////////// Awaitable Implementation
-        
-        public TaskAwaiter GetAwaiter()
-        {
-            return Execute().GetAwaiter();
-        }
-        
         ////////////////////////////////////////// Inspector
         
         public class StepInspector : Inspector<Step>
         {
+            public Foldout breadcrumbsFolderout;
+            
             public StepInspector(Step target) : base(target)
             {
                 TitleLabel.text = $"Step {target.Name}";
                 
+                // NameLabel
                 this.Add(new Label(target.Name));
                 
-                // seporator
+                // Seperator
                 this.Add(new VisualElement { style = { height = 1, backgroundColor = new StyleColor(Color.gray), marginTop = 4, marginBottom = 4 } });
+                
+                // Breadcrumbs
+                breadcrumbsFolderout = new Foldout() { text = "Breadcrumbs", value = true }; this.Add(breadcrumbsFolderout);
+                breadcrumbsFolderout?.Clear();
+                foreach (var breadcrumb in Target.Breadcrumbs)
+                {
+                    var breadcrumbInspector = new Breadcrumb.Inspector(breadcrumb, breadcrumb.DisplayName);
+                    breadcrumbsFolderout.Add(breadcrumbInspector);
+                }
             }
 
             public override void OnExplorerItemAutoRefresh()
             {
                 var childCoutText               = Target.ChildSteps.Count > 0 ? $"({Target.ChildSteps.Count})" : "";
                 ExplorerItem.ButtonFoldout.Text = TitleLabel.text = $"Step {Target.Name + childCoutText}";
+                
             }
         }
     }

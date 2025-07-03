@@ -53,7 +53,7 @@ namespace Galleon.Checkout
             new Step(name   : $"get_tokenizer"
                     ,action : async (s) =>
                     {
-                        await CheckoutClient.Instance.TokenizerController.GetTokenizer();                        
+                        await CheckoutClient.Instance.TokenizerController.GetTokenizer().Execute();                        
                     });
         
         public Step Tokenize()

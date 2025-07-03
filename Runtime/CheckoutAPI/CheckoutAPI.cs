@@ -8,13 +8,13 @@ namespace Galleon.Checkout
     {   
         public static async Task<InitializationResult> Initialize()
         {
-            await CheckoutClient.Instance.SystemInitFlow();
+            await CheckoutClient.Instance.SystemInitFlow().Execute();
             return new InitializationResult() { IsSuccess = true };
         }
         
         public static async Task<PurchaseResult> Purchase(CheckoutProduct product)
         {
-            await  CheckoutClient.Instance.RunCheckoutSession(product);
+            await  CheckoutClient.Instance.RunCheckoutSession(product).Execute();
             return CheckoutClient.Instance.CurrentSession.PurchaseResult;
         }
     }

@@ -68,6 +68,7 @@ namespace Galleon.Checkout.UI
         public override void Initialize()
         {
             CardNumberErrorText.gameObject.SetActive(false);
+            NativeKeyboardManager.ResetAutofill();
         }
 
         //////////////////////////////////////////////////////////////////////////// UI Events

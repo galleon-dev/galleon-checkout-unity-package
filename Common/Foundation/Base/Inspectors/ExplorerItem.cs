@@ -12,6 +12,7 @@ namespace Galleon.Checkout
         public object        Target;
         
         public VisualElement ChildrenHolder;
+        public VisualElement LinkedChildrenHolder;
         public VisualElement InspectorHolder;
         
         public ButtonFoldout ButtonFoldout;
@@ -74,8 +75,11 @@ namespace Galleon.Checkout
             }
             
             // Child holder
-            ChildrenHolder          = new VisualElement();
-            this.ButtonFoldout.Add(ChildrenHolder);
+            ChildrenHolder          = new VisualElement(); this.ButtonFoldout.Add(ChildrenHolder);
+            
+            // Linked-Children holder
+            LinkedChildrenHolder    = new VisualElement(); this.ButtonFoldout.Add(LinkedChildrenHolder);
+          //LinkedChildrenHolder.style.backgroundColor = ChildrenHolder.resolvedStyle.backgroundColor * 0.9f;
             
             // Inspector holder
             InspectorHolder         = new VisualElement();
@@ -172,8 +176,9 @@ namespace Galleon.Checkout
                     if (linkedChild.TryGetTarget(out var target))
                     {
                         var childItem = new ExplorerItem(target);
-                        childItem.style.backgroundColor = new Color(0.1f, 0.1f, 0.1f);
-                        this.ChildrenHolder.Add(childItem);
+                      //childItem.style.backgroundColor = new Color(0.1f, 0.1f, 0.1f);
+                        
+                        this.LinkedChildrenHolder.Add(childItem);
                     }
                 }
             }
@@ -186,6 +191,7 @@ namespace Galleon.Checkout
                 return;
             
             this.ChildrenHolder.Clear();
+            this.LinkedChildrenHolder.Clear();
             
             PopulateChildren();
         }

@@ -53,7 +53,9 @@ namespace Galleon.Checkout.Samples
                                                PriceText   = "$24.99",
                                            });
             
+            Debug.Log("==========================================");
             Debug.Log("Purchase Result: " + result);
+            Debug.Log("==========================================");
         }   
         
         

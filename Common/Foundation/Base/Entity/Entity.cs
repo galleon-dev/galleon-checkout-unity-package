@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -153,21 +155,88 @@ namespace Galleon.Checkout
             }
 
             yield break;
+            
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Reflection
+        
+        public        EntityReflection Reflection => new(Entity);
+        public struct EntityReflection
+        {
+            private IEntity Entity;
+            public EntityReflection(IEntity entity) => Entity = entity;
+            
+            public IEnumerable<Step> Steps()
+            {
+                var type = this.Entity.GetType();
+                
+                // Retrieve all methods in the type that have a return type of Step
+                var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                  .Where(m => m.GetParameters().Length == 0)
+                                  .Where(m => m.ReturnType == typeof(Step));
+                
+                foreach (var method in methods)
+                {
+                    yield return (Step)method.Invoke(this.Entity, null);
+                }
+                
+                yield break;
+            }
+            
+                        
+            public IEnumerable<Step> Steps(object parameterObject)
+            {
+                var type = this.Entity.GetType();
+                
+                // Retrieve all methods in the type
+                var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                  .Where(m => m.GetParameters().Length > 0)
+                                  .Where(m => m.ReturnType == typeof(Step));
+                
+                foreach (var method in methods)
+                {
+                    var parameters          = method.GetParameters();
+                    var parameterObjectType = parameterObject.GetType();
+                    
+                    // Check if all parameters in the method can be matched by the members of the parameterObject
+                    bool parametersMatch = parameters.All(p =>
+                                                          {
+                                                              var    member    = (MemberInfo)parameterObjectType.GetProperty(p.Name) ?? parameterObjectType.GetField(p.Name);
+                                                              var    fieldType = member is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)member).FieldType;
+                                                              return member != null && fieldType == p.ParameterType;
+                                                          });
+
+                    if (parametersMatch)
+                    {
+                        // Prepare the arguments by retrieving values from the parameterObject
+                        var arguments = parameters.Select(p =>
+                                                          {
+                                                              var    member = (MemberInfo)parameterObjectType.GetProperty(p.Name) ?? (MemberInfo)parameterObjectType.GetField(p.Name);
+                                                              return member is PropertyInfo property ? property.GetValue(parameterObject) : ((FieldInfo)member)?.GetValue(parameterObject);
+                                                          }).ToArray();
+                        
+                        yield return (Step)method.Invoke(this.Entity, arguments);
+                    }
+                }
+                
+                yield break;
+            }
+        }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Inspector
         
-        private System.WeakReference<Inspector> _Inspector = new WeakReference<Inspector>(null);
-        public  Inspector                       Inspector   {
-                                                                get { _Inspector.TryGetTarget(out var i); return i;     } 
-                                                                set { _Inspector = new WeakReference<Inspector>(value); }
-                                                            }
+        private System.WeakReference<Inspector>    _Inspector    = new WeakReference<Inspector>(null);
+        public  Inspector                          Inspector     {
+                                                                     get { _Inspector.TryGetTarget(out var i); return i;     } 
+                                                                     set { _Inspector = new WeakReference<Inspector>(value); }
+                                                                 }
         
         private System.WeakReference<ExplorerItem> _ExplorerItem = new WeakReference<ExplorerItem>(null);
-        public  ExplorerItem                       ExplorerItem   {
-                                                                      get { _ExplorerItem.TryGetTarget(out var e); return e;        } 
-                                                                      set { _ExplorerItem = new WeakReference<ExplorerItem>(value); }
-                                                                  }
+        public  ExplorerItem                       ExplorerItem  {
+                                                                     get { _ExplorerItem.TryGetTarget(out var e); return e;        } 
+                                                                     set { _ExplorerItem = new WeakReference<ExplorerItem>(value); }
+                                                                 }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Unity Editor
         #if UNITY_EDITOR

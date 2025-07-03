@@ -9,10 +9,38 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Galleon.Checkout
 {
     public class CheckoutTEMP : Entity
     {
+        /// Init/Payment_Method_Definitions
+        ///     Credit_Card
+        ///     {
+        ///         Supported Cards
+        ///         Button Text
+        ///         Image
+        ///     }
+        ///
+        /// Init/Payment_Methods (Data)
+        ///     Credit Card - Amex - **** - 1234
+        ///     {
+        ///         Data
+        ///             Token
+        ///         Actions
+        ///             Charge
+        ///             3DS
+        ///     }
+        ///
+        /// Payment_Method_Entity
+        /// =
+        ///     Definition
+        ///     Data
+        ///     Actions
+        
         ///         Session Start
         ///             Transaction Start
         ///                 payment_method_transaction_action
@@ -23,6 +51,33 @@ namespace Galleon.Checkout
         ///         Session End
         ///
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
+        
+        struct temp
+        {
+            public int number;
+        }
+        #if UNITY_EDITOR
+        [MenuItem("Tools/Test Temporary Method")]
+        private static void TestTemporaryMethod()
+        {
+          var list = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps(new temp()));
+          //var list = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps());
+
+            foreach (var step in list)
+            {
+                Debug.Log(step.Name);
+            }        
+        }
+        #endif
+        
+        public Step MyStep(int number)
+            =>
+            new Step(name   : $"MyStep"
+                    ,action : async (s) =>
+                              {
+                                  
+                              });
         
         #region TEST STEPS
         
@@ -34,7 +89,8 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init"}
                     ,action : async s =>
                               {
-                                  await CheckoutClient.Instance.RunCheckoutSession(new CheckoutProduct() { DisplayName = "Test Product", PriceText = "$4.99"});
+                                  await CheckoutClient.Instance.RunCheckoutSession(new CheckoutProduct() { DisplayName = "Test Product", PriceText = "$4.99"})
+                                                               .Execute();
                                   
                                   // Test
                                   // s.AddChildStep(this.SetupTest());

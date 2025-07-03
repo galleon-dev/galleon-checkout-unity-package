@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using Galleon.Checkout.Shared;
 using Galleon.Checkout.UI;
 using Newtonsoft.Json;
@@ -110,8 +109,7 @@ namespace Galleon.Checkout
                         
                         // Start Transaction
                         s.AddPreStep("start_transaction"
-                                      ,async x => CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/start_transaction"));
-                        
+                                    ,async x => CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/start_transaction"));
                         
                         // Setup Transaction Steps
                         User.CurrentTransaction = new Transaction();
@@ -124,17 +122,12 @@ namespace Galleon.Checkout
                         
                         ////////////////////////////////////////////////////////////// Steps
                         
-                        // Run Transaction Steps
+                        // Add Child Transaction Steps
                         foreach (var transactionStep in User.CurrentTransaction.TransactionSteps)
                         {
                             s.Log($"scheduling transaction step : {transactionStep.Name}");
                             s.AddChildStep(transactionStep);
                         }
-                        
-                        
-                        s.AddChildStep("get_transaction_result"
-                                      ,async x => CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/transaction_result"));
-                        
                         
                         // Navigate
                         s.AddChildStep("wait",        async x => await Task.Delay(1000));
@@ -143,20 +136,7 @@ namespace Galleon.Checkout
                        
                         ////////////////////////////////////////////////////////////// Post Steps
                         
-          //            CheckoutClient.Instance.IAPStore.FinishTransaction(product        : new ProductDefinition(id   : CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName
-          //                                                                                         ,type : ProductType.Consumable)
-          //                                                   ,transactionId : "transactionID");
-          //
-                        
-                        // Finally, handle transaction result
-                        s.AddPostStep(HandleTransactionResult());
-                    });
-        
-        public Step HandleTransactionResult()
-        =>
-            new Step(name   : $"handle_transaction_result"
-                    ,action : async (s) =>
-                    { 
+                                                
                         ///////// TEMP
                         this.lastTransactionResult = new TransactionResultData()
                                                      {
@@ -166,6 +146,20 @@ namespace Galleon.Checkout
                                                         transaction_id    = "test_transaction",
                                                      };
                         
+                        // Finally, handle transaction result
+                        s.AddPostStep(HandleTransactionResult());
+                    });
+        
+        public Step HandleTransactionResult()
+        =>
+            new Step(name   : $"handle_transaction_result"
+                    ,action : async (s) =>
+                    {
+                        ///////// IAP
+                        // CheckoutClient.Instance.IAPStore.FinishTransaction(product        : new ProductDefinition(id   : CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName
+                        //                                                                                          ,type : ProductType.Consumable)
+                        //                                                   ,transactionId : "transactionID");
+
                         var result = this.lastTransactionResult;
                         
                         this.PurchaseResult = new PurchaseResult()
@@ -177,29 +171,352 @@ namespace Galleon.Checkout
                                               };
                     });
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Credit Card Vaulting Flow
-
-        public Step AddCard()
-        =>
-            new Step(name   : $"add_card"
-                    ,action : async (s) =>
-                    {
-                        foreach (var vaultingStepFunc in User.SelectedPaymentMethod.VaultingSteps)
-                        {
-                            var step = vaultingStepFunc?.Invoke();
-                            s.AddChildStep(step);
-                        }
-                    });
         
-        public Step ViewPage()
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// TEMP FLOW
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// TEMP FLOW
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// TEMP FLOW
+        
+        
+        public Step Temp_Flow()
         =>
-            new Step(name   : $"view_page"
-                    ,action : async (s) =>
+            new Step(name   : $"Temp_Flow"
+                    ,action : async (flow) =>
                     {
+                        GetPaymentMethodsResponse PamentMethodDefinitions = default;
+                        PaymentMethodsResponse    PaymentMethods          = default;
+                        
+                        CreditCardPaymentMethod   firstCard;
+                        
+                        PaymentInitiationResponse paymentInitiation = default;
+                        
+                        
+                        string sku       = "sku-1";
+                        int    quantity  = 1;
+                        int    amount    = 100;
+                        string currency  = "USD";
+                        
+                        string cardToken = "asdf";
+                         
+                        
+                        flow.AddChildStep("get_payment_method_definitions"
+                                         ,async x =>
+                                         {
+                                             PamentMethodDefinitions = await CHECKOUT.Network.Get<GetPaymentMethodsResponse>($"{CHECKOUT.Network.SERVER_BASE_URL}/available_payment_methods");
+     
+                                             foreach (var definition in PamentMethodDefinitions.paymentMethods)
+                                                 x.Log($"- {definition.name}, {definition.type}");
+                                         });
+                        
+                        
+                        
+                        flow.AddChildStep("remove_card"
+                                         ,async x =>
+                                         {
+                                             var response = await CHECKOUT.Network.Post<RemoveCardResponse>(url  : $"{CHECKOUT.Network.SERVER_BASE_URL}/remove_card"
+                                                                                                           ,body : new RemoveCardRequest()
+                                                                                                           {
+                                                                                                              credit_card_token = cardToken,
+                                                                                                           });
+
+                                             x.Log($"- {response.ToString()}");
+                                         });
+                        
+                        flow.AddChildStep("add_new_card"
+                                         ,async x =>
+                                         {
+                                             var response = await CHECKOUT.Network.Post<AddCardResponse>(url  : $"{CHECKOUT.Network.SERVER_BASE_URL}/add_card"
+                                                                                                        ,body : new AddCardRequest()
+                                                                                                        {
+                                                                                                           
+                                                                                                        });
+
+                                             x.Log($"- {response.ToString()}");
+                                         });
+                        
+                        
+                        flow.AddChildStep("get_user_payment_methods"
+                                         ,async x =>
+                                         {
+                                             PaymentMethods = await CHECKOUT.Network.Get<PaymentMethodsResponse>($"{CHECKOUT.Network.SERVER_BASE_URL}/payment_methods");
+   
+                                             foreach (var paymentMethod in PaymentMethods.payment_methods)
+                                                 x.Log($"- {paymentMethod.type}");
+                                         });
+                        
+                        
+                        flow.AddChildStep("get_first_card"
+                                         ,async x =>
+                                         {
+                                             var card = PaymentMethods.payment_methods.FirstOrDefault(x => x.type == "card") as CreditCardPaymentMethodData;
+                                             
+                                             firstCard = new CreditCardPaymentMethod()
+                                                         {
+                                                           Type = card.type,
+                                                         };
+                                             
+                                             x.Log($"first card : {firstCard.Type}");
+                                         });
+                                             
+                        
+                        flow.AddChildStep("transaction_1_credit_card"
+                                         ,async transaction_1 =>
+                                         {
+                                             
+                                             transaction_1.AddChildStep("start_transaction_1"
+                                                                       ,async x =>
+                                                                       {
+                                                                           paymentInitiation = await CHECKOUT.Network.Post<PaymentInitiationResponse>(url  : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment_initiation"
+                                                                                                                                                     ,body : new PaymentInitiationRequest
+                                                                                                                                                     {
+                                                                                                                                                         method    = new PaymentMethodDetails
+                                                                                                                                                                   {
+                                                                                                                                                                       id   = "stripe",
+                                                                                                                                                                       data = new Dictionary<string, object>
+                                                                                                                                                                            {
+                                                                                                                                                                                { "Number",   cardToken },
+                                                                                                                                                                                { "ExpMonth", cardToken },
+                                                                                                                                                                                { "ExpYear",  cardToken },
+                                                                                                                                                                                { "Cvc",      cardToken }
+                                                                                                                                                                            }
+                                                                                                                                                                   },
+                                                                                                                                                         order     = new OrderDetails
+                                                                                                                                                                   {
+                                                                                                                                                                       sku      = sku,
+                                                                                                                                                                       quantity = quantity,
+                                                                                                                                                                       amount   = amount,
+                                                                                                                                                                       currency = currency
+                                                                                                                                                                   },
+                                                                                                                                                         expiresAt = DateTime.UtcNow.AddDays(1),
+                                                                                                                                                         metadata  = new Dictionary<string, string>
+                                                                                                                                                                   {
+                                                                                                                                                                     { "TransactionId", Guid.NewGuid().ToString() }
+                                                                                                                                                                   }
+                                                                                                                                                     });
+                                                                           
+                                                                           x.Log($"- is success     : {paymentInitiation.success}");
+                                                                           x.Log($"- order ID       : {paymentInitiation.orderId}");
+                                                                           x.Log($"- transaction ID : {paymentInitiation.transactionId}");
+                                                                       });
+                                             
+                                             transaction_1.AddChildStep("charge"
+                                                                       ,async x =>
+                                                                       {   
+                                                                           var chargeResponse = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
+                                                                                                                                           ,headers  : new ()
+                                                                                                                                                     {
+                                                                                                                                                         { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                                                                                     }
+                                                                                                                                           ,body     : new ChargeRequest()
+                                                                                                                                                     {
+                                                                                                                                                         sku      = "sku-1",
+                                                                                                                                                         quantity = 1,
+                                                                                                                                                         amount   = 100,
+                                                                                                                                                         currency = "USD",
+                                                                                                                                                         card     = new()
+                                                                                                                                                                  {
+                                                                                                                                                                      number   = cardToken,
+                                                                                                                                                                      expMonth = cardToken,
+                                                                                                                                                                      expYear  = cardToken,
+                                                                                                                                                                      cvc      = cardToken,
+                                                                                                                                                                  }
+                                                                                                                                                     });
+                                                                           
+                                                                           x.Log($"- is success : {chargeResponse.transaction_result.isSuccess}");
+                                                                           x.Log($"- payment ID : {chargeResponse.PaymentId}");
+                                                                       });
+                                             
+                                             transaction_1.AddChildStep("validate"
+                                                                       ,async x =>
+                                                                       {
+                                                                           var isValid = CHECKOUT.Network.Post<bool>(url  : $"{CHECKOUT.Network.SERVER_BASE_URL}/validate"
+                                                                                                                    ,body : new // Validate Request
+                                                                                                                    {
+                                                                                                                        PaymentId = 2.ToString(),
+                                                                                                                        Sku       = sku,
+                                                                                                                        Quantity  = quantity,
+                                                                                                                        Amount    = amount,
+                                                                                                                        Currency  = currency
+                                                                                                                    });
+                                                                           
+                                                                           x.Log($"- is valid : {isValid}");
+                                                                       });
+                                         });
+                        
+                        
+                        flow.AddChildStep("transaction_2_google_pay"
+                                         ,async transaction_2 =>
+                                         {
+                                             transaction_2.AddChildStep("start_transaction_2"
+                                                                       ,async x =>
+                                                                       {
+                                                                           paymentInitiation = await CHECKOUT.Network.Post<PaymentInitiationResponse>(url  : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment_initiation"
+                                                                                                                                                     ,body : new PaymentInitiationRequest
+                                                                                                                                                     {
+                                                                                                                                                         method    = new PaymentMethodDetails
+                                                                                                                                                                   {
+                                                                                                                                                                       id   = "google_pay",
+                                                                                                                                                                     //data = new Dictionary<string, object>
+                                                                                                                                                                     //     {
+                                                                                                                                                                     //         { "Number",   cardToken },
+                                                                                                                                                                     //         { "ExpMonth", cardToken },
+                                                                                                                                                                     //         { "ExpYear",  cardToken },
+                                                                                                                                                                     //         { "Cvc",      cardToken }
+                                                                                                                                                                     //     }
+                                                                                                                                                                   },
+                                                                                                                                                         order     = new OrderDetails
+                                                                                                                                                                   {
+                                                                                                                                                                       sku      = sku,
+                                                                                                                                                                       quantity = quantity,
+                                                                                                                                                                       amount   = amount,
+                                                                                                                                                                       currency = currency
+                                                                                                                                                                   },
+                                                                                                                                                         expiresAt = DateTime.UtcNow.AddDays(1),
+                                                                                                                                                         metadata  = new Dictionary<string, string>
+                                                                                                                                                                   {
+                                                                                                                                                                       { "TransactionId", Guid.NewGuid().ToString() }
+                                                                                                                                                                   }
+                                                                                                                                                     });
+                                                                           
+                                                                           x.Log($"- is success     : {paymentInitiation.success}");
+                                                                           x.Log($"- order ID       : {paymentInitiation.orderId}");
+                                                                           x.Log($"- transaction ID : {paymentInitiation.transactionId}");
+                                                                       });
+                                             
+                                             transaction_2.AddChildStep("open_url_await_socket"
+                                                                       ,async x =>
+                                                                       {
+                                                                           //var url = "http://www.google.com";
+                                                                           //Application.OpenURL(url);
+                                                                           
+                                                                           NetworkSocket socket = new NetworkSocket();
+                                                                           socket.socketIP      = "127.0.0.1";
+                                                                           socket.socketPort    = 12345;
+                                                                           socket.Timeout       = TimeSpan.FromSeconds(5);
+                                                                           
+                                                                           await socket.Listen().Execute();
+
+                                                                           foreach (var message in socket.IncomingMessages)
+                                                                               x.Log($"> {message}");
+                                                                       });
+                                         });
+                        
+                        
+                        flow.AddChildStep("transaction_3_pay_pal"
+                                         ,async transaction_2 =>
+                                         {
+                                             transaction_2.AddChildStep("start_transaction_3"
+                                                                       ,async x =>
+                                                                       {
+                                                                           paymentInitiation = await CHECKOUT.Network.Post<PaymentInitiationResponse>(url  : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment_initiation"
+                                                                                                                                                     ,body : new PaymentInitiationRequest
+                                                                                                                                                     {
+                                                                                                                                                         method    = new PaymentMethodDetails
+                                                                                                                                                                   {
+                                                                                                                                                                       id   = "paypal",
+                                                                                                                                                                     //data = new Dictionary<string, object>
+                                                                                                                                                                     //     {
+                                                                                                                                                                     //         { "Number",   cardToken },
+                                                                                                                                                                     //         { "ExpMonth", cardToken },
+                                                                                                                                                                     //         { "ExpYear",  cardToken },
+                                                                                                                                                                     //         { "Cvc",      cardToken }
+                                                                                                                                                                     //     }
+                                                                                                                                                                   },
+                                                                                                                                                         order     = new OrderDetails
+                                                                                                                                                                   {
+                                                                                                                                                                       sku      = sku,
+                                                                                                                                                                       quantity = quantity,
+                                                                                                                                                                       amount   = amount,
+                                                                                                                                                                       currency = currency
+                                                                                                                                                                   },
+                                                                                                                                                         expiresAt = DateTime.UtcNow.AddDays(1),
+                                                                                                                                                         metadata  = new Dictionary<string, string>
+                                                                                                                                                                   {
+                                                                                                                                                                       { "TransactionId", Guid.NewGuid().ToString() }
+                                                                                                                                                                   }
+                                                                                                                                                     });
+                                                                           
+                                                                           x.Log($"- is success     : {paymentInitiation.success}");
+                                                                           x.Log($"- order ID       : {paymentInitiation.orderId}");
+                                                                           x.Log($"- transaction ID : {paymentInitiation.transactionId}");
+                                                                       });
+                                         });
+                        
                         
                     });
         
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// PM
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// PM
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// PM
                                   
+        
+        public class Payment_Method : Entity
+        {
+            public PaymentMethodDefinition PaymentMethodDefinition;
+            public PaymentMethodData       PaymentMethodData;
+            public List<Step>              Actions;
+        }
+        
+        public class CreditCard_Payment_Method : Payment_Method
+        {
+            public new CreditCardPaymentMethodDefinition PaymentMethodDefinition => (CreditCardPaymentMethodDefinition) base.PaymentMethodDefinition;
+            public new CreditCardPaymentMethodData       PaymentMethodData       => (CreditCardPaymentMethodData)       base.PaymentMethodData;
+        }
+        
+        public class GPay_Payment_Method : Payment_Method
+        {
+            public new GPayPaymentMethodDefinition PaymentMethodDefinition => (GPayPaymentMethodDefinition) base.PaymentMethodDefinition;
+            public new GooglePayPaymentMethodData  PaymentMethodData       => (GooglePayPaymentMethodData)  base.PaymentMethodData;
+        }
+        
+        public class Paypal_Payment_Method : Payment_Method
+        {
+            public new PayPalPaymentMethodDefinition PaymentMethodDefinition => (PayPalPaymentMethodDefinition) base.PaymentMethodDefinition;
+            public new PaypalPaymentMethodData       PaymentMethodData       => (PaypalPaymentMethodData)       base.PaymentMethodData;
+        }
+        
+        ///
+        ///
+        /// 
+        public class TransactionActions : Entity
+        {
+            public Step Charge()        => new Step(name   : $"Charge"
+                                                   ,action : async (s) =>
+                                                   {
+                                                       
+                                                   });
+            
+            public Step Do_3DS()        => new Step(name   : $"Do_3DS"
+                                                   ,action : async (s) =>
+                                                   {
+                                                       
+                                                   });
+            
+            public Step OpenURL()       => new Step(name   : $"OpenURL"
+                                                   ,action : async (s) =>
+                                                   {
+                                                       
+                                                   });
+        }
+        
+        ///
+        ///
+        /// 
+        public class VaultingActions
+        {
+            public Step GetTokenizer() => new Step(name   : $"get_tokenizer"
+                                                  ,action : async (s) =>
+                                                  {
+                                                      
+                                                  });
+            
+            public Step Tokenize()     => new Step(name   : $"tokenize"
+                                                  ,action : async (s) =>
+                                                  {
+                                                      
+                                                  });
+            
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Nav
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Nav

@@ -59,7 +59,8 @@ namespace Galleon.Checkout
                                                                       {
                                                                           DisplayName = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedTitle,
                                                                           PriceText   = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedPriceString
-                                                                      });
+                                                                      })
+                                                                      .Execute();
             
             // Simulate a successful purchase
             this.callback.OnPurchaseSucceeded(storeSpecificId       : product.storeSpecificId

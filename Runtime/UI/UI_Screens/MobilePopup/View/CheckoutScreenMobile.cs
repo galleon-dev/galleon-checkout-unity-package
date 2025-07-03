@@ -558,7 +558,7 @@ namespace Galleon.Checkout.UI
                     ,action : async (s) =>
                     {
                         DisableAllPanels();
-                        await CheckoutPanel.View();
+                        await CheckoutPanel.View().Execute();
 
                         switch (CheckoutPanel.Result)
                         {
@@ -574,7 +574,7 @@ namespace Galleon.Checkout.UI
                     ,action : async (s) =>
                     {
                         DisableAllPanels();
-                        await SuccessPanelView.View();
+                        await SuccessPanelView.View().Execute();
 
                         // switch (SuccessPanelView.Result)
                         // {

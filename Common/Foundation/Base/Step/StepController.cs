@@ -24,15 +24,14 @@ namespace Galleon.Checkout
             //// Lifecycle
             
             public Inspector(StepController target) : base(target)
-            {
-                
+            {   
                 var refreshButton = new Button(Refresh) { text = "Refresh" };
                 Add(refreshButton);
                 
-                stepsContainer = new VisualElement();
-                target.Node.ExplorerItem.ChildrenHolder.Add(stepsContainer);
+                // stepsContainer = new VisualElement();
+                // target.Node.ExplorerItem.ChildrenHolder.Add(stepsContainer);
                 
-                Refresh();
+                // Refresh();
             }
             
             //// Refresh

@@ -32,9 +32,9 @@ namespace Galleon.Checkout
             this.ID   = new Guid().ToString();
             this.Name = "Fake User";
             
-            this.PaymentMethods.Add(new CreditCardPaymentMethod() { Type = PaymentMethod.PaymentMethodType.MasterCard.ToString(), DisplayName = "MasterCard - **** - 4587" , IsSelected = false, });
-            this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.GPay      .ToString(), DisplayName = "Google Pay - **** - 7348" , IsSelected = false, });
-            this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.PayPal    .ToString(), DisplayName = "Paypal - **** - 9101" ,     IsSelected = false, });
+            //this.PaymentMethods.Add(new CreditCardPaymentMethod() { Type = PaymentMethod.PaymentMethodType.MasterCard.ToString(), DisplayName = "MasterCard - **** - 4587" , IsSelected = false, });
+            //this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.GPay      .ToString(), DisplayName = "Google Pay - **** - 7348" , IsSelected = false, });
+            //this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.PayPal    .ToString(), DisplayName = "Paypal - **** - 9101" ,     IsSelected = false, });
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods

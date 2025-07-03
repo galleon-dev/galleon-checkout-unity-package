@@ -88,7 +88,7 @@ namespace Galleon.Checkout.UI
                         this.Flow.AddChildStep(name:"capture report", s => s.CaptureReport());
                         this.Flow.AddChildStep(name: "wait a second", action: async s => await Task.Delay(5000));
                         
-                        await this.Flow;
+                        await this.Flow.Execute();
                         //while (!IsCompleted)
                         //    await Task.Yield();
                         

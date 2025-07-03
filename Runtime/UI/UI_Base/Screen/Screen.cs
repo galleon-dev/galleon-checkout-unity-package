@@ -42,9 +42,9 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"view"
                     ,action : async (s) =>
                     {
-                        s.ChildSteps.Add(Open());
-                        s.ChildSteps.Add(Active());
-                        s.ChildSteps.Add(Close());
+                        s.AddChildStep(Open());
+                        s.AddChildStep(Active());
+                        s.AddChildStep(Close());
                     });
         
         public Step Open()
