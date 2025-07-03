@@ -86,7 +86,8 @@ namespace AdvancedInputFieldPlugin
 		TELEPHONE_NUMBER,
         CREDIT_CARD_NUMBER,
         CREDIT_CARD_DATE,
-        CREDIT_CARD_CCV
+        CREDIT_CARD_CCV,
+		CREDIT_CARD_NAME
 	}
 
 	/// <summary>The type of return key to display on mobile</summary>
@@ -1639,6 +1640,22 @@ namespace AdvancedInputFieldPlugin
 			else if(initialized)
 			{
 				Engine.ManualSelect(beginEditReason);
+			}
+			else
+			{
+				Debug.LogWarningFormat("Couldn't select input field, the input field is not initialized yet");
+			}
+		}
+
+		public void SelectionRefresh(BeginEditReason beginEditReason = BeginEditReason.PROGRAMMATIC_SELECT)
+		{
+			if (!interactable)
+			{
+				Debug.LogWarningFormat("InputField is not interactable, it won't be selected");
+			}
+			else if (initialized)
+			{
+				Engine.SelectionRefresh(beginEditReason);
 			}
 			else
 			{
