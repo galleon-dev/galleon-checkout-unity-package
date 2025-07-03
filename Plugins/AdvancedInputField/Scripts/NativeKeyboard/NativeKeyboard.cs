@@ -156,7 +156,7 @@ namespace AdvancedInputFieldPlugin
                     EnableUpdates();
                     if (Settings.MobileKeyboardBehaviour == MobileKeyboardBehaviour.USE_HARDWARE_KEYBOARD_WHEN_AVAILABLE)
                     {
-                        //	EnableHardwareKeyboardUpdates();
+                        EnableHardwareKeyboardUpdates();
                     }
                 }
                 else
@@ -228,7 +228,7 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Event callback when the keyboard gets shown</summary>
         public void OnKeyboardShow()
         {
-            Debug.Log("OnKeyboardShow: " + IgnoreHeight);
+            Debug.Log("1. OnKeyboardShow: " + IgnoreHeight);
             if (IgnoreHeight)
                 return;
 
@@ -300,7 +300,7 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Event callback when the height of the keyboard has changed</summary>
         public void OnKeyboardHeightChanged(int height)
         {
-            Debug.Log("onKeyboardHeightChanged: " + height + "  Ignore Height: " + IgnoreHeight);
+            Debug.Log("2. onKeyboardHeightChanged: " + height + "  Ignore Height: " + IgnoreHeight);
             if (IgnoreHeight == false)
             {
                 if (onKeyboardHeightChanged != null)

@@ -1569,7 +1569,7 @@ namespace AdvancedInputFieldPlugin
 
         public void LoadKeyboard(bool Status = true)
         {
-            Debug.Log("LoadKeyboard()");
+            //Debug.Log("LoadKeyboard()");
             if (InputField.ReadOnly) { return; }
 
             string text = InputField.Text;
@@ -1639,7 +1639,7 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Enables text editing</summary>
         internal void BeginEditMode()
         {
-            Debug.Log("BeginEditMode");
+            //Debug.Log("BeginEditMode");
             editMode = true;
             if (InputField.CanUseActionBar)
             {
