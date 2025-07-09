@@ -39,6 +39,8 @@ namespace Galleon.Checkout.UI
         [Header("Payment Buttons")]
         public GameObject PurchaseButton;
         public GameObject GooglePayButton;
+        public GameObject PaypalPayButton;
+        public GameObject ApplePayButton;
 
         //////////////////////////////////////////////////////////////////////////// Links
 
@@ -81,6 +83,7 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"View"
                     ,action : async (s) =>
                     {
+                        Debug.Log("<color=green>VIEW</color>");
                         IsCompleted = false;
                         
                         Refresh();
@@ -99,7 +102,7 @@ namespace Galleon.Checkout.UI
                         
                         this.gameObject.SetActive(false);
                     });
-        
+
         //////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
@@ -132,10 +135,11 @@ namespace Galleon.Checkout.UI
             this.AddCreditCardButtonElement.SetActive(paymentMethods.Count == 0);
             
             ///////////////
-            
             // checkoutPanelPaymentMethodItemView[] methods = this.gameObject.GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
             // foreach (var method in methods)
             //     method.Refresh();
+
+            CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
         }
 
         //////////////////////////////////////////////////////////////////////////// Radio Buttons
@@ -179,14 +183,38 @@ namespace Galleon.Checkout.UI
 
         public void ShowPurchaseButton()
         {
+            Debug.Log("ShowPurchaseButton()");
             GooglePayButton.SetActive(false);
             PurchaseButton.SetActive(true);
+            PaypalPayButton.SetActive(false);
+            ApplePayButton.SetActive(false);
         }
 
-        public void ShowGooglePlayButton()
+        public void ShowGooglePayButton()
         {
+            Debug.Log("ShowGooglePayButton()");
             GooglePayButton.SetActive(true);
             PurchaseButton.SetActive(false);
+            PaypalPayButton.SetActive(false);
+            ApplePayButton.SetActive(false);
+        }
+
+        public void ShowPaypalPayButton()
+        {
+            Debug.Log("ShowPaypalPayButton()");
+            GooglePayButton.SetActive(false);
+            PurchaseButton.SetActive(false);
+            PaypalPayButton.SetActive(true);
+            ApplePayButton.SetActive(false);
+        }
+
+        public void ShowApplePayButton()
+        {
+            Debug.Log("ShowApplePayButton()");
+            GooglePayButton.SetActive(false);
+            PurchaseButton.SetActive(false);
+            PaypalPayButton.SetActive(false);
+            ApplePayButton.SetActive(true);
         }
     }
 }

@@ -38,6 +38,7 @@ namespace Galleon.Checkout.UI
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView;
         public SimpleDialogPanelView SimpleDialogPanelView;
         public LoadingPanelView LoadingPanelView;
+        public CheckoutLoadingPanelView CheckoutLoadingPanelView;
 
         [HideInInspector]
         RectTransform InputFieldRect;// SafeArea related
@@ -53,6 +54,26 @@ namespace Galleon.Checkout.UI
         public float SafeAreaHeight = 0f;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
+        bool ShowLoaderOnce = true;
+
+        public void ShowInitialCheckoutPanelLoader()
+        {
+            StopAllCoroutines();
+            if (ShowLoaderOnce)
+            {
+                CheckoutLoadingPanelView.gameObject.SetActive(true);
+                CheckoutPanel.gameObject.SetActive(false);
+                StartCoroutine(DisableInitialLoader(1f));
+            }
+        }
+
+        IEnumerator DisableInitialLoader(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            CheckoutLoadingPanelView.gameObject.SetActive(false);
+            CheckoutPanel.gameObject.SetActive(true);
+            ShowLoaderOnce = false;
+        }
 
         public static Step InitializeCheckoutScreenMobile()
         =>
@@ -74,9 +95,11 @@ namespace Galleon.Checkout.UI
 
         public static Step OpenCheckoutScreenMobile()
         =>
+
             new Step(name: $"open_checkout_screen_mobile"
                     , action: async (s) =>
                               {
+                                  Debug.Log("<color=green>OpenCheckoutScreenMobile()</color>");
                                   if (CheckoutClient.Instance.CheckoutScreenMobile is null)
                                   {
                                       Debug.LogError("CheckoutClient.Instance.CheckoutScreenMobile is NULL");
@@ -93,6 +116,7 @@ namespace Galleon.Checkout.UI
             new Step(name: $"close_checkout_screen_mobile"
                     , action: async (s) =>
                               {
+                                  Debug.Log("CloseCheckoutScreenMobile()");
                                   if (CheckoutClient.Instance.CheckoutScreenMobile == null)
                                       return;
 
@@ -162,6 +186,7 @@ namespace Galleon.Checkout.UI
             settings_panel,
             simple_dialog_panel,
             loading_panel,
+            checkout_loading_panel,
         }
 
         public enum NavigationStates
@@ -386,6 +411,8 @@ namespace Galleon.Checkout.UI
             GalleonLogoClicked?.Invoke();
         }
 
+
+
         public void OnPageFinishedWithResult(string result)
         {
             IsPageActive = false;
@@ -486,7 +513,7 @@ namespace Galleon.Checkout.UI
         IEnumerator SetInputFieldRectDelay(RectTransform _RectTransform)
         {
             yield return new WaitForSeconds(0.02f);
-           // Debug.Log("SetInputFieldRect: " + _RectTransform.name);
+            // Debug.Log("SetInputFieldRect: " + _RectTransform.name);
             InputFieldRect = _RectTransform;
             SafeAreaHeight = 0;
         }
@@ -495,7 +522,7 @@ namespace Galleon.Checkout.UI
         {
             if (InputFieldRect)
             {
-              //  Debug.Log("ResetSafeAreaHeight: " + InputFieldRect.name);
+                //  Debug.Log("ResetSafeAreaHeight: " + InputFieldRect.name);
                 InputFieldRect = null;
                 SafeAreaHeight = 0;
             }
@@ -544,8 +571,8 @@ namespace Galleon.Checkout.UI
                                                           , setup: page =>
                                                                  {
                                                                      page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
-                                                                      page.NavigationMap["test"] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
-                                                                  }
+                                                                     page.NavigationMap["test"] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
+                                                                 }
                                                            );
 
         public Page SelectPaymentMethodsPage = new Page(name: "select_payment_methods"
@@ -600,6 +627,7 @@ namespace Galleon.Checkout.UI
                                                                      page.NavigationMap["test"] = page.screen.ViewPage(page.screen.SuccessPage);
                                                                  }
                                                            );
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Steps
 
@@ -766,6 +794,7 @@ namespace Galleon.Checkout.UI
             SimpleDialogPanelView.gameObject.SetActive(false);
             TestPanelView.gameObject.SetActive(false);
             LoadingPanelView.gameObject.SetActive(false);
+            CheckoutLoadingPanelView.gameObject.SetActive(false);
         }
 
         public override void RefreshState()
@@ -781,6 +810,7 @@ namespace Galleon.Checkout.UI
             else if (this.State == STATE.select_payment_method_panel.ToString()) SelectPaymentMethodPanelView.gameObject.SetActive(true);
             else if (this.State == STATE.simple_dialog_panel.ToString()) SimpleDialogPanelView.gameObject.SetActive(true);
             else if (this.State == STATE.loading_panel.ToString()) LoadingPanelView.gameObject.SetActive(true);
+            else if (this.State == STATE.checkout_loading_panel.ToString()) CheckoutLoadingPanelView.gameObject.SetActive(true);
         }
     }
 }

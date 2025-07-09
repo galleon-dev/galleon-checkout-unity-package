@@ -23,9 +23,9 @@ namespace Galleon.Checkout.UI
         public Sprite   DiscoverSprite;
         public Sprite   GPaySprite;
         public Sprite   PaypalSprite;
-        
+        public Sprite   AppleSprite;
         //// Properties
-        
+
         public PaymentMethod                PaymentMethod                { get; set; }
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView { get; set; }
         
@@ -65,6 +65,8 @@ namespace Galleon.Checkout.UI
                 this.Icon.sprite = GPaySprite;
             else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.PayPal.ToString())
                 this.Icon.sprite = PaypalSprite;
+            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.Apple.ToString())
+                this.Icon.sprite = AppleSprite;
         }
         
         //// UI Events
