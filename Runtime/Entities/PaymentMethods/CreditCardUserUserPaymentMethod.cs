@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class CreditCardPaymentMethod : PaymentMethod
+    public class CreditCardUserPaymentMethod : PaymentMethod
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
         
@@ -37,7 +37,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Initialization
 
-        public CreditCardPaymentMethod()
+        public CreditCardUserPaymentMethod()
         {
             this.TransactionSteps = new()
                                     {

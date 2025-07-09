@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -7,17 +8,10 @@ namespace Galleon.Checkout
 {
     public class PaymentMethodDefinition
     {
-        //     Visa,
-        //     MasterCard,
-        //     Amex,
-        //     Diners,
-        //     Discover,
-        //     GPay,
-        //     PayPal,
-        
         //// Members
         
-        public string Type; 
+        public string                         Type;
+        public Shared.PaymentMethodDefinitionData Data;
         
         //// Transaction Steps
         

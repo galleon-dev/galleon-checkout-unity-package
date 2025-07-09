@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -27,6 +28,8 @@ namespace Galleon.Checkout
         public string Type; 
         public string DisplayName;
         public bool   IsSelected;
+        
+        public UserPaymentMethodData Data;
         
         //// UI Actions
         

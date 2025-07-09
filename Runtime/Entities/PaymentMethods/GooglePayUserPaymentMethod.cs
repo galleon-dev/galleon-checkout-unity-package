@@ -1,6 +1,6 @@
 namespace Galleon.Checkout
 {
-    public class GPayPaymentMethod : PaymentMethod
+    public class GooglePayUserUserPaymentMethod : UserPaymentMethod
     {
         public Step CheckIfGPayIsAvailable()
         =>
