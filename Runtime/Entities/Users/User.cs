@@ -13,7 +13,7 @@ namespace Galleon.Checkout
         public string                ID;
         public string                Name;
         
-        public List<PaymentMethod>   PaymentMethods         = new();
+        public List<UserPaymentMethod>   PaymentMethods         = new();
         
         public List<CreditCardToken> Tokens                 = new();
         
@@ -32,31 +32,31 @@ namespace Galleon.Checkout
             this.ID   = new Guid().ToString();
             this.Name = "Fake User";
             
-            //this.PaymentMethods.Add(new CreditCardPaymentMethod() { Type = PaymentMethod.PaymentMethodType.MasterCard.ToString(), DisplayName = "MasterCard - **** - 4587" , IsSelected = false, });
-            //this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.GPay      .ToString(), DisplayName = "Google Pay - **** - 7348" , IsSelected = false, });
-            //this.PaymentMethods.Add(new() { Type = PaymentMethod.PaymentMethodType.PayPal    .ToString(), DisplayName = "Paypal - **** - 9101" ,     IsSelected = false, });
+            this.PaymentMethods.Add(new CreditCardUserUserPaymentMethod() { Type = UserPaymentMethod.PaymentMethodType.MasterCard.ToString(), DisplayName = "MasterCard - **** - 4587" , IsSelected = false, });
+            this.PaymentMethods.Add(new() { Type = UserPaymentMethod.PaymentMethodType.GPay      .ToString(), DisplayName = "Google Pay - **** - 7348" , IsSelected = false, });
+            this.PaymentMethods.Add(new() { Type = UserPaymentMethod.PaymentMethodType.PayPal    .ToString(), DisplayName = "Paypal - **** - 9101" ,     IsSelected = false, });
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
         
-        public PaymentMethod SelectedPaymentMethod => PaymentMethods.FirstOrDefault(x => x.IsSelected);
+        public UserPaymentMethod SelectedUserPaymentMethod => PaymentMethods.FirstOrDefault(x => x.IsSelected);
         
-        public void SelectPaymentMethod(PaymentMethod paymentMethod)
+        public void SelectPaymentMethod(UserPaymentMethod userPaymentMethod)
         {
             foreach (var method in this.PaymentMethods)
                 method.Unselect();
             
-            paymentMethod.Select();
+            userPaymentMethod.Select();
         }
         
-        public void AddPaymentMethod(PaymentMethod paymentMethod)
+        public void AddPaymentMethod(UserPaymentMethod userPaymentMethod)
         {
-            this.PaymentMethods.Add(paymentMethod);
+            this.PaymentMethods.Add(userPaymentMethod);
         }
         
-        public void RemovePaymentMethod(PaymentMethod paymentMethod)
+        public void RemovePaymentMethod(UserPaymentMethod userPaymentMethod)
         {
-            this.PaymentMethods.Remove(paymentMethod);
+            this.PaymentMethods.Remove(userPaymentMethod);
             
             foreach (var method in this.PaymentMethods)
                 method.Unselect();

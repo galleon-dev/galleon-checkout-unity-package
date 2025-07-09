@@ -33,12 +33,12 @@ namespace Galleon.Checkout
         
         // Controllers
         [Header("Controllers")]
-        public CreditCardController     CreditCardController        = new(); 
         public TokenizerController      TokenizerController         = new(); 
         public PaymentMethodsController PaymentMethodsController    = new();
-        public PaypalController         PaypalController            = new();
-        public GooglePayController      GooglePayController         = new();
-        public GenericPaymentController GenericPaymentController    = new();
+      //public CreditCardController     CreditCardController        = new(); 
+      //public PaypalController         PaypalController            = new();
+      //public GooglePayController      GooglePayController         = new();
+      //public GenericPaymentController GenericPaymentController    = new();
         public TaxController            TaxController               = new();  
         
         // Entities
@@ -91,12 +91,12 @@ namespace Galleon.Checkout
                                   s.AddChildStep(Analytics                      .Initialize());
                         
                                   // Controllers
-                                  s.AddChildStep(CreditCardController           .Initialize());
                                   s.AddChildStep(TokenizerController            .Initialize());
                                   s.AddChildStep(PaymentMethodsController       .Initialize());
-                                  s.AddChildStep(PaypalController               .Initialize());
-                                  s.AddChildStep(GooglePayController            .Initialize());
-                                  s.AddChildStep(GenericPaymentController       .Initialize());
+                                //s.AddChildStep(CreditCardController           .Initialize());
+                                //s.AddChildStep(PaypalController               .Initialize());
+                                //s.AddChildStep(GooglePayController            .Initialize());
+                                //s.AddChildStep(GenericPaymentController       .Initialize());
                                   s.AddChildStep(TaxController                  .Initialize());
                                   
                                   // Resources

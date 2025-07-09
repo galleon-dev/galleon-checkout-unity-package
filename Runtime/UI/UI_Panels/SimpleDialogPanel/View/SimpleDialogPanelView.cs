@@ -39,16 +39,16 @@ namespace Galleon.Checkout.UI
 
         public override void RefreshState()
         {
-            var paymentMethod                  = CheckoutClient.Instance.CurrentSession.PaymentMethodToDelete;
+            var paymentMethod                  = CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete;
             this.RemovePaymentMethodLabel.text = paymentMethod.DisplayName;
             
-            if      (paymentMethod.Type == PaymentMethod.PaymentMethodType.Visa.ToString())
+            if      (paymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
                 this.RemovePaymentMethodIcon.sprite = VisaSprite;
-            else if (paymentMethod.Type == PaymentMethod.PaymentMethodType.MasterCard.ToString())
+            else if (paymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
                 this.RemovePaymentMethodIcon.sprite = MasterCardSprite;
-            else if (paymentMethod.Type == PaymentMethod.PaymentMethodType.GPay.ToString())
+            else if (paymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
                 this.RemovePaymentMethodIcon.sprite = GPaySprite;
-            else if (paymentMethod.Type == PaymentMethod.PaymentMethodType.PayPal.ToString())
+            else if (paymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
                 this.RemovePaymentMethodIcon.sprite = PaypalSprite;
         }
 
@@ -58,8 +58,8 @@ namespace Galleon.Checkout.UI
         {
             Debug.Log("On Confirm Clicked");
             
-            Debug.Log($"Removing Payment Method : {CheckoutClient.Instance.CurrentSession.PaymentMethodToDelete.DisplayName}");
-            CheckoutClient.Instance.CurrentSession.User.RemovePaymentMethod(CheckoutClient.Instance.CurrentSession.PaymentMethodToDelete);
+            Debug.Log($"Removing Payment Method : {CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete.DisplayName}");
+            CheckoutClient.Instance.CurrentSession.User.RemovePaymentMethod(CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete);
             
             this.Result = DialogResult.Confirm;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());

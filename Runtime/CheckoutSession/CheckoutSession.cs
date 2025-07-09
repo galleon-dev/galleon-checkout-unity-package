@@ -25,9 +25,9 @@ namespace Galleon.Checkout
         public PurchaseResult                     PurchaseResult        = default;
         
         // Simple Dialog Panel data
-        public string                             LastDialogRequest     = null;
-        public SimpleDialogPanelView.DialogResult LastDialogResult      = SimpleDialogPanelView.DialogResult.None;
-        public PaymentMethod                      PaymentMethodToDelete = null;
+        public  string                             LastDialogRequest         = null;
+        public  SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
+        [FormerlySerializedAs("PaymentMethodToDelete")] public UserPaymentMethod                  userPaymentMethodToDelete = null;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -113,7 +113,7 @@ namespace Galleon.Checkout
                         
                         // Setup Transaction Steps
                         User.CurrentTransaction = new Transaction();
-                        foreach (var stepFunc in User.SelectedPaymentMethod.TransactionSteps)
+                        foreach (var stepFunc in User.SelectedUserPaymentMethod.TransactionSteps)
                         {
                             var step = stepFunc?.Invoke();
                             s.Log($"adding transaction step : {step.Name}");
@@ -182,10 +182,10 @@ namespace Galleon.Checkout
             new Step(name   : $"Temp_Flow"
                     ,action : async (flow) =>
                     {
-                        GetPaymentMethodsResponse PamentMethodDefinitions = default;
-                        PaymentMethodsResponse    PaymentMethods          = default;
+                        PaymentMethodDefinitionsResponse PamentMethodDefinitions = default;
+                        UserPaymentMethodsResponse       userPaymentMethods          = default;
                         
-                        CreditCardPaymentMethod   firstCard;
+                        CreditCardUserUserPaymentMethod   firstCardUserUser;
                         
                         PaymentInitiationResponse paymentInitiation = default;
                         
@@ -201,7 +201,7 @@ namespace Galleon.Checkout
                         flow.AddChildStep("get_payment_method_definitions"
                                          ,async x =>
                                          {
-                                             PamentMethodDefinitions = await CHECKOUT.Network.Get<GetPaymentMethodsResponse>($"{CHECKOUT.Network.SERVER_BASE_URL}/available_payment_methods");
+                                             PamentMethodDefinitions = await CHECKOUT.Network.Get<PaymentMethodDefinitionsResponse>($"{CHECKOUT.Network.SERVER_BASE_URL}/available_payment_methods");
      
                                              foreach (var definition in PamentMethodDefinitions.paymentMethods)
                                                  x.Log($"- {definition.name}, {definition.type}");
@@ -237,9 +237,9 @@ namespace Galleon.Checkout
                         flow.AddChildStep("get_user_payment_methods"
                                          ,async x =>
                                          {
-                                             PaymentMethods = await CHECKOUT.Network.Get<PaymentMethodsResponse>($"{CHECKOUT.Network.SERVER_BASE_URL}/payment_methods");
+                                             userPaymentMethods = await CHECKOUT.Network.Get<UserPaymentMethodsResponse>($"{CHECKOUT.Network.SERVER_BASE_URL}/payment_methods");
    
-                                             foreach (var paymentMethod in PaymentMethods.payment_methods)
+                                             foreach (var paymentMethod in userPaymentMethods.payment_methods)
                                                  x.Log($"- {paymentMethod.type}");
                                          });
                         
@@ -247,14 +247,14 @@ namespace Galleon.Checkout
                         flow.AddChildStep("get_first_card"
                                          ,async x =>
                                          {
-                                             var card = PaymentMethods.payment_methods.FirstOrDefault(x => x.type == "card") as CreditCardPaymentMethodData;
+                                             var card = userPaymentMethods.payment_methods.FirstOrDefault(x => x.type == "card") as CreditCardUserPaymentMethodData;
                                              
-                                             firstCard = new CreditCardPaymentMethod()
+                                             firstCardUserUser = new CreditCardUserUserPaymentMethod()
                                                          {
                                                            Type = card.type,
                                                          };
                                              
-                                             x.Log($"first card : {firstCard.Type}");
+                                             x.Log($"first card : {firstCardUserUser.Type}");
                                          });
                                              
                         
@@ -452,27 +452,27 @@ namespace Galleon.Checkout
         
         public class Payment_Method : Entity
         {
-            public PaymentMethodDefinition PaymentMethodDefinition;
-            public PaymentMethodData       PaymentMethodData;
-            public List<Step>              Actions;
+            public                                                 PaymentMethodDefinition PaymentMethodDefinition;
+            [FormerlySerializedAs("userPaymentMethod")] [FormerlySerializedAs("PaymentMethodData")] public UserPaymentMethodData   userPaymentMethodData;
+            public                                                 List<Step>              Actions;
         }
         
         public class CreditCard_Payment_Method : Payment_Method
         {
             public new CreditCardPaymentMethodDefinition PaymentMethodDefinition => (CreditCardPaymentMethodDefinition) base.PaymentMethodDefinition;
-            public new CreditCardPaymentMethodData       PaymentMethodData       => (CreditCardPaymentMethodData)       base.PaymentMethodData;
+            public new CreditCardUserPaymentMethodData       UserPaymentMethodData       => (CreditCardUserPaymentMethodData)       base.userPaymentMethodData;
         }
         
         public class GPay_Payment_Method : Payment_Method
         {
-            public new GPayPaymentMethodDefinition PaymentMethodDefinition => (GPayPaymentMethodDefinition) base.PaymentMethodDefinition;
-            public new GooglePayPaymentMethodData  PaymentMethodData       => (GooglePayPaymentMethodData)  base.PaymentMethodData;
+            public new ooglePayPaymentMethodDefinition PaymentMethodDefinition => (ooglePayPaymentMethodDefinition) base.PaymentMethodDefinition;
+            public new GooglePayUserPaymentMethodData  UserPaymentMethodData       => (GooglePayUserPaymentMethodData)  base.userPaymentMethodData;
         }
         
         public class Paypal_Payment_Method : Payment_Method
         {
             public new PayPalPaymentMethodDefinition PaymentMethodDefinition => (PayPalPaymentMethodDefinition) base.PaymentMethodDefinition;
-            public new PaypalPaymentMethodData       PaymentMethodData       => (PaypalPaymentMethodData)       base.PaymentMethodData;
+            public new PaypalUserPaymentMethodData       UserPaymentMethodData       => (PaypalUserPaymentMethodData)       base.userPaymentMethodData;
         }
         
         ///

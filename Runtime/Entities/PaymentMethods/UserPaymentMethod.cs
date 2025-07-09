@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class PaymentMethod : Entity
+    public class UserPaymentMethod : Entity
     {
         //// Types
         

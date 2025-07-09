@@ -75,7 +75,7 @@ namespace Galleon.Checkout.UI
         
         public void On_OkClick()
         {
-            PaymentMethod card = new PaymentMethod();
+            UserPaymentMethod card = new UserPaymentMethod();
             
             card.Type = CurrentCardFormat.Name;
             card.DisplayName = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";

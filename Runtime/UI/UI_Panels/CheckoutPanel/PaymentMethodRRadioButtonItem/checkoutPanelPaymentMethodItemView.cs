@@ -25,14 +25,14 @@ namespace Galleon.Checkout.UI
         
         //// Properties
         
-        public PaymentMethod     PaymentMethod     { get; set; }
+        public UserPaymentMethod     UserPaymentMethod     { get; set; }
         public CheckoutPanelView CheckoutPanelView { get; set; }
         
         //// Lifecycle
         
-        public void Initialize(PaymentMethod paymentMethod, CheckoutPanelView CheckoutPanelView)
+        public void Initialize(UserPaymentMethod userPaymentMethod, CheckoutPanelView CheckoutPanelView)
         {
-            this.PaymentMethod     = paymentMethod;
+            this.UserPaymentMethod     = userPaymentMethod;
             this.CheckoutPanelView = CheckoutPanelView;
             Refresh();
         }
@@ -48,17 +48,17 @@ namespace Galleon.Checkout.UI
                 return;
             }
                 
-            this.Label.text    = PaymentMethod.DisplayName;
-            this.CheckedImage  .gameObject.SetActive( this.PaymentMethod.IsSelected);
-            this.UncheckedImage.gameObject.SetActive(!this.PaymentMethod.IsSelected);
+            this.Label.text    = UserPaymentMethod.DisplayName;
+            this.CheckedImage  .gameObject.SetActive( this.UserPaymentMethod.IsSelected);
+            this.UncheckedImage.gameObject.SetActive(!this.UserPaymentMethod.IsSelected);
             
-            if      (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.Visa.ToString())
+            if      (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
                 this.Icon.sprite = VisaSprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.MasterCard.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
                 this.Icon.sprite = MasterCardSprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.GPay.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
                 this.Icon.sprite = GPaySprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.PayPal.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
                 this.Icon.sprite = PaypalSprite;
         }
         
@@ -73,14 +73,14 @@ namespace Galleon.Checkout.UI
         
         public void Select()
         {
-            this.PaymentMethod?.Select();
+            this.UserPaymentMethod?.Select();
             this.CheckoutPanelView.OnRadiobuttonSelected(this);
             Refresh();
         }
         
         public void Unselect()
         {
-            this.PaymentMethod?.Unselect();
+            this.UserPaymentMethod?.Unselect();
             Refresh();
         }
     }

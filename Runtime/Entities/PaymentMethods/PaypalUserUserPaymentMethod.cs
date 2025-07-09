@@ -1,6 +1,6 @@
 namespace Galleon.Checkout
 {
-    public class PaypalUserPaymentMethod : PaymentMethod
+    public class PaypalUserUserPaymentMethod : UserPaymentMethod
     {
         public Step CreatePaypalOrder()
         =>

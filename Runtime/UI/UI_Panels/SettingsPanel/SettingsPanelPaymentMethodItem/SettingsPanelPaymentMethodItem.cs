@@ -27,14 +27,14 @@ namespace Galleon.Checkout.UI
         
         //// Properties
         
-        public PaymentMethod     PaymentMethod     { get; set; }
+        public UserPaymentMethod     UserPaymentMethod     { get; set; }
         public SettingsPanelView SettingsPanelView { get; set; }
         
         //// Lifecycle
         
-        public void Initialize(PaymentMethod paymentMethod, SettingsPanelView settingsPanelView)
+        public void Initialize(UserPaymentMethod userPaymentMethod, SettingsPanelView settingsPanelView)
         {
-            this.PaymentMethod     = paymentMethod;
+            this.UserPaymentMethod     = userPaymentMethod;
             this.SettingsPanelView = settingsPanelView;
             Refresh();
         }
@@ -43,26 +43,26 @@ namespace Galleon.Checkout.UI
         
         public override void RefreshState()
         {    
-            this.Label.text = PaymentMethod?.DisplayName;
+            this.Label.text = UserPaymentMethod?.DisplayName;
 
-            if (this.PaymentMethod == null)
+            if (this.UserPaymentMethod == null)
             {
                 this.Label.text  = "Add Credit or Debit Card";
                 this.Icon.sprite = AddCreditCardSprite;
             }
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.Visa.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
                 this.Icon.sprite = VisaSprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.MasterCard.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
                 this.Icon.sprite = MasterCardSprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.Amex.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Amex.ToString())
                 this.Icon.sprite = AmexSprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.Diners.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Diners.ToString())
                 this.Icon.sprite = DinersSprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.Discover.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Discover.ToString())
                 this.Icon.sprite = DiscoverSprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.GPay.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
                 this.Icon.sprite = GPaySprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.PayPal.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
                 this.Icon.sprite = PaypalSprite;
         }
         
@@ -70,8 +70,8 @@ namespace Galleon.Checkout.UI
         
         public void On_Delete_Clicked()
         {
-            Debug.Log((this.PaymentMethod?.DisplayName??"NULL") + "_delete clicked");
-            this.SettingsPanelView.DeletePaymentMethod(this.PaymentMethod);
+            Debug.Log((this.UserPaymentMethod?.DisplayName??"NULL") + "_delete clicked");
+            this.SettingsPanelView.DeletePaymentMethod(this.UserPaymentMethod);
         }
     }
 }

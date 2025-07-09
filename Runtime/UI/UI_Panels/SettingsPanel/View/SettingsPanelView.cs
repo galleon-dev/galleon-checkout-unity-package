@@ -128,13 +128,13 @@ public class SettingsPanelView : View
     
     //////////////////////////////////////////////////////////////////////////// Events
     
-    public void DeletePaymentMethod(PaymentMethod paymentMethod)
+    public void DeletePaymentMethod(UserPaymentMethod userPaymentMethod)
     {
         if (IsEditingEmail)
             return;
         
         CheckoutClient.Instance.CurrentSession.LastDialogRequest     = "delete_payment_method";
-        CheckoutClient.Instance.CurrentSession.PaymentMethodToDelete = paymentMethod;
+        CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete = userPaymentMethod;
         
         this.Result = ViewResult.DeletePaymentMethod;
         CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
