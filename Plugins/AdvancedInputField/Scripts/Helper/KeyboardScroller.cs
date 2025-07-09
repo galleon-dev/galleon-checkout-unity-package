@@ -308,6 +308,7 @@ namespace AdvancedInputFieldPlugin
 		/// <param name="keyboardHeight">The keyboard height</param>
 		public void OnKeyboardHeightChanged(int keyboardHeight)
 		{
+			Debug.Log("OnKeyboardHeightChanged");
 			if(keyboardHeight > 0)
 			{
 				ScrollContent(keyboardHeight);

@@ -34,13 +34,20 @@ namespace Galleon.Checkout.UI
         public GameObject      PaymentMethodItemPrefab;
         
         public GameObject      AddCreditCardButtonElement;
-        
+
+
+        [Header("Payment Buttons")]
+        public GameObject PurchaseButton;
+        public GameObject GooglePayButton;
+        public GameObject PaypalPayButton;
+        public GameObject ApplePayButton;
+
         //////////////////////////////////////////////////////////////////////////// Links
-        
+
         public IEnumerable<checkoutPanelPaymentMethodItemView> PaymentMethodItemViews => GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
-        
+
         //////////////////////////////////////////////////////////////////////////// Initialization
-        
+
         public override void Initialize()
         {
             // Remove children (if any)
@@ -52,13 +59,13 @@ namespace Galleon.Checkout.UI
             
             // Add children
             var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
+
             foreach (var paymentMethod in paymentMethods)
             {
-                // Instantiate (and Init) Item
                 var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
                 item.Initialize(paymentMethod, this);
-                
+
                 // Add ui separator
                 Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsPanel.transform);
             }
@@ -76,6 +83,7 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"View"
                     ,action : async (s) =>
                     {
+                        Debug.Log("<color=green>VIEW</color>");
                         IsCompleted = false;
                         
                         Refresh();
@@ -94,7 +102,7 @@ namespace Galleon.Checkout.UI
                         
                         this.gameObject.SetActive(false);
                     });
-        
+
         //////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
@@ -127,10 +135,11 @@ namespace Galleon.Checkout.UI
             this.AddCreditCardButtonElement.SetActive(paymentMethods.Count == 0);
             
             ///////////////
-            
             // checkoutPanelPaymentMethodItemView[] methods = this.gameObject.GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
             // foreach (var method in methods)
             //     method.Refresh();
+
+            CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
         }
 
         //////////////////////////////////////////////////////////////////////////// Radio Buttons
@@ -170,6 +179,42 @@ namespace Galleon.Checkout.UI
         {
             this.Result = ViewResult.AddCard;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
+        }
+
+        public void ShowPurchaseButton()
+        {
+            Debug.Log("ShowPurchaseButton()");
+            GooglePayButton.SetActive(false);
+            PurchaseButton.SetActive(true);
+            PaypalPayButton.SetActive(false);
+            ApplePayButton.SetActive(false);
+        }
+
+        public void ShowGooglePayButton()
+        {
+            Debug.Log("ShowGooglePayButton()");
+            GooglePayButton.SetActive(true);
+            PurchaseButton.SetActive(false);
+            PaypalPayButton.SetActive(false);
+            ApplePayButton.SetActive(false);
+        }
+
+        public void ShowPaypalPayButton()
+        {
+            Debug.Log("ShowPaypalPayButton()");
+            GooglePayButton.SetActive(false);
+            PurchaseButton.SetActive(false);
+            PaypalPayButton.SetActive(true);
+            ApplePayButton.SetActive(false);
+        }
+
+        public void ShowApplePayButton()
+        {
+            Debug.Log("ShowApplePayButton()");
+            GooglePayButton.SetActive(false);
+            PurchaseButton.SetActive(false);
+            PaypalPayButton.SetActive(false);
+            ApplePayButton.SetActive(true);
         }
     }
 }

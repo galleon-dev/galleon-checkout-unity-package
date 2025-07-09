@@ -33,8 +33,9 @@ namespace Galleon.Checkout
             this.Name = "Fake User";
             
             this.PaymentMethods.Add(new CreditCardUserUserPaymentMethod() { Type = UserPaymentMethod.PaymentMethodType.MasterCard.ToString(), DisplayName = "MasterCard - **** - 4587" , IsSelected = false, });
-            this.PaymentMethods.Add(new() { Type = UserPaymentMethod.PaymentMethodType.GPay      .ToString(), DisplayName = "Google Pay - **** - 7348" , IsSelected = false, });
-            this.PaymentMethods.Add(new() { Type = UserPaymentMethod.PaymentMethodType.PayPal    .ToString(), DisplayName = "Paypal - **** - 9101" ,     IsSelected = false, });
+            this.PaymentMethods.Add(new() { Type = UserPaymentMethod.PaymentMethodType.GPay  .ToString(), DisplayName = "Google Pay - **** - 7348" , IsSelected = false, });
+            this.PaymentMethods.Add(new() { Type = UserPaymentMethod.PaymentMethodType.Apple .ToString(), DisplayName = "Apple Pay - **** - 5231"  , IsSelected = false, });
+            this.PaymentMethods.Add(new() { Type = UserPaymentMethod.PaymentMethodType.PayPal.ToString(), DisplayName = "Paypal - **** - 9101"     , IsSelected = false, });
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
@@ -50,7 +51,7 @@ namespace Galleon.Checkout
         }
         
         public void AddPaymentMethod(UserPaymentMethod userPaymentMethod)
-        {
+        {§
             this.PaymentMethods.Add(userPaymentMethod);
         }
         

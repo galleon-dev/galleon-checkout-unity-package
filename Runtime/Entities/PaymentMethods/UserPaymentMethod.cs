@@ -21,6 +21,7 @@ namespace Galleon.Checkout
             Discover,
             GPay,
             PayPal,
+            Apple
         }
         
         //// Members

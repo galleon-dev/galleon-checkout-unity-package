@@ -11,6 +11,7 @@ public class SettingsPanelView : View
     
     [Header("Email")]
     public TMP_Text           EmailLabel;
+    public GameObject EmailInputfieldBorder;
     public AdvancedInputField EmailInputField;
     
     [Header("Payment Methods")]
@@ -21,6 +22,12 @@ public class SettingsPanelView : View
     //////////////////////////////////////////////////////////////////////////// View Result
     
     public      ViewResult Result = ViewResult.None;
+    
+    public UnityEngine.UI.LayoutElement ScrollRectLayoutElement;
+    int ScrollRectMaxSize = 6;
+    float PaymentPrefabHeight = 175f;
+    float SeparatorHeight = 2f;
+
     public enum ViewResult
     {
         None,
@@ -28,9 +35,9 @@ public class SettingsPanelView : View
         Close,
         DeletePaymentMethod,
     }
-    
+
     //////////////////////////////////////////////////////////////////////////// Initialization
-            
+
     public override void Initialize()
     {
         // Remove children (if any)
@@ -51,6 +58,8 @@ public class SettingsPanelView : View
             // Add ui separator
             Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsHolder.transform);
         }
+
+        UpdateScrollRectMaxSize();
     }
         
     //////////////////////////////////////////////////////////////////////////// View Flow
@@ -94,22 +103,48 @@ public class SettingsPanelView : View
             // Add ui separator
             Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsHolder.transform);
         }
+
+        UpdateScrollRectMaxSize();
     }
-    
+
+    public void UpdateScrollRectMaxSize()
+    {
+        int PaymentMethodsAmount = CheckoutClient.Instance.CurrentUser.PaymentMethods.Count;
+
+        Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
+
+        if (PaymentMethodsAmount == 0)
+        {
+            ScrollRectLayoutElement.preferredHeight = 0;
+        }
+        else if (PaymentMethodsAmount <= ScrollRectMaxSize)
+        {
+            ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 2;
+        }
+        else
+        {
+            ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 2;
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////// UI Events
-    
+
     public void On_EditEmailClicked()
     {
         if (!IsEditingEmail)
         {
-            EmailLabel     .gameObject.SetActive(false);
-            EmailInputField.gameObject.SetActive(true);
+            // EmailLabel     .gameObject.SetActive(false);
+            // EmailInputField.gameObject.SetActive(true); 
+            EmailInputfieldBorder.SetActive(true);
+            EmailInputField.interactable = true;
             IsEditingEmail = true;
         }
         else
         {
-            EmailLabel     .gameObject.SetActive(true);
-            EmailInputField.gameObject.SetActive(false);
+            // EmailLabel     .gameObject.SetActive(true);
+            // EmailInputField.gameObject.SetActive(false);
+            EmailInputfieldBorder.SetActive(false);       
+            EmailInputField.interactable = false;
             IsEditingEmail = false;
         }
     }
@@ -118,9 +153,12 @@ public class SettingsPanelView : View
     {
         Debug.Log($"str = {str}");
         Debug.Log($"reason = {reason}");
-        
-        EmailLabel     .gameObject.SetActive(true);
-        EmailInputField.gameObject.SetActive(false);
+
+        //  EmailLabel     .gameObject.SetActive(true);
+        //  EmailInputField.gameObject.SetActive(false);
+
+        EmailInputfieldBorder.SetActive(false);
+        EmailInputField.interactable = false;
         IsEditingEmail = false;
         
         this.EmailLabel.text = str;
