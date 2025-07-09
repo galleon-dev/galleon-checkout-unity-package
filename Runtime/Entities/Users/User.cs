@@ -51,7 +51,7 @@ namespace Galleon.Checkout
         }
         
         public void AddPaymentMethod(UserPaymentMethod userPaymentMethod)
-        {§
+        {
             this.PaymentMethods.Add(userPaymentMethod);
         }
         

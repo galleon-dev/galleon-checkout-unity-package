@@ -166,7 +166,7 @@ namespace Galleon.Checkout.UI
         {
             if (IsCorrectInputFields())
             {
-                PaymentMethod card = new PaymentMethod();
+                UserPaymentMethod card = new UserPaymentMethod();
 
                 card.Type = CurrentCardFormat.Name;
                 card.DisplayName = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";

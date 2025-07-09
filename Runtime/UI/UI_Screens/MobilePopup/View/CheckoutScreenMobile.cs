@@ -29,16 +29,16 @@ namespace Galleon.Checkout.UI
         public FooterPanelView FooterPanelView;
 
         [Header("Panels")]
-        public CheckoutPanelView CheckoutPanel;
-        public CreditCardInfoPanelView CreditCardPanel;
-        public SettingsPanelView SettingsPanelView;
-        public SuccessPanelView SuccessPanelView;
-        public ErrorPanelView ErrorPanelView;
-        public SelectCurrencyPanelView SelectCurrencyPanelView;
+        public CheckoutPanelView            CheckoutPanel;
+        public CreditCardInfoPanelView      CreditCardPanel;
+        public SettingsPanelView            SettingsPanelView;
+        public SuccessPanelView             SuccessPanelView;
+        public ErrorPanelView               ErrorPanelView;
+        public SelectCurrencyPanelView      SelectCurrencyPanelView;
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView;
-        public SimpleDialogPanelView SimpleDialogPanelView;
-        public LoadingPanelView LoadingPanelView;
-        public CheckoutLoadingPanelView CheckoutLoadingPanelView;
+        public SimpleDialogPanelView        SimpleDialogPanelView;
+        public LoadingPanelView             LoadingPanelView;
+        public CheckoutLoadingPanelView     CheckoutLoadingPanelView;
 
         [HideInInspector]
         RectTransform InputFieldRect;// SafeArea related
@@ -111,9 +111,9 @@ namespace Galleon.Checkout.UI
                                   CheckoutClient.Instance.CheckoutScreenMobile.SetPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage).Execute();
                               });
 
-        public static Step CloseCheckoutScreenMobile()
+        public static Step EndCheckoutScreenMobile()
         =>
-            new Step(name: $"close_checkout_screen_mobile"
+            new Step(name: $"end_checkout_screen_mobile"
                     , action: async (s) =>
                               {
                                   Debug.Log("CloseCheckoutScreenMobile()");
@@ -228,10 +228,10 @@ namespace Galleon.Checkout.UI
 
         /////////////////////// Flow
 
-        public bool IsPageActive = false;
-        public Page CurrentPage = default;
+        public bool       IsPageActive      = false;
+        public Page       CurrentPage       = default;
         public List<Page> NavigationHistory = new();
-        public string NavigationNext = "";
+        public string     NavigationNext    = "";
 
         public Step ViewPage(Page page)
         =>
@@ -249,6 +249,7 @@ namespace Galleon.Checkout.UI
                         this.FooterPanelView.State = page.FooterState;
 
                         ///////////////////////// Refresh
+                        
                         Debug.Log("Page Name: " + page.Name);
                         RefreshState();
                         HeaderPanelView.RefreshState();
@@ -280,8 +281,8 @@ namespace Galleon.Checkout.UI
 
                         ///////////////////////// Result Helper
 
-                        page.NavigationMap[NavigationStates.Back.ToString()] = UI_Back();
-                        page.NavigationMap[NavigationStates.Close.ToString()] = UI_Close();
+                        page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
+                        page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
                         page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
 
                         ///////////////////////// Handle Result
@@ -672,8 +673,8 @@ namespace Galleon.Checkout.UI
 
                         switch (CheckoutPanel.Result)
                         {
-                            case CheckoutPanelView.ViewResult.Confirm: ViewSuccessPanel().Execute(); break;
-                            case CheckoutPanelView.ViewResult.Settings: ViewSettingsPanel().Execute(); break;
+                            case CheckoutPanelView.ViewResult.Confirm:             ViewSuccessPanel().Execute(); break;
+                            case CheckoutPanelView.ViewResult.Settings:            ViewSettingsPanel().Execute(); break;
                             case CheckoutPanelView.ViewResult.OtherPaymentMethods: ViewSelectPaymentMethodPanel().Execute(); break;
                         }
                     });
@@ -779,33 +780,33 @@ namespace Galleon.Checkout.UI
 
         private void DisableAllPanels()
         {
-            CheckoutPanel.gameObject.SetActive(false);
-            CreditCardPanel.gameObject.SetActive(false);
-            SettingsPanelView.gameObject.SetActive(false);
-            SuccessPanelView.gameObject.SetActive(false);
-            ErrorPanelView.gameObject.SetActive(false);
-            SelectCurrencyPanelView.gameObject.SetActive(false);
+            CheckoutPanel               .gameObject.SetActive(false);
+            CreditCardPanel             .gameObject.SetActive(false);
+            SettingsPanelView           .gameObject.SetActive(false);
+            SuccessPanelView            .gameObject.SetActive(false);
+            ErrorPanelView              .gameObject.SetActive(false);
+            SelectCurrencyPanelView     .gameObject.SetActive(false);
             SelectPaymentMethodPanelView.gameObject.SetActive(false);
-            SimpleDialogPanelView.gameObject.SetActive(false);
-            TestPanelView.gameObject.SetActive(false);
-            LoadingPanelView.gameObject.SetActive(false);
-            CheckoutLoadingPanelView.gameObject.SetActive(false);
+            SimpleDialogPanelView       .gameObject.SetActive(false);
+            TestPanelView               .gameObject.SetActive(false);
+            LoadingPanelView            .gameObject.SetActive(false);
+            CheckoutLoadingPanelView    .gameObject.SetActive(false);
         }
 
         public override void RefreshState()
         {
             DisableAllPanels();
 
-            if (this.State == STATE.test_panel.ToString()) TestPanelView.gameObject.SetActive(true);
-            else if (this.State == STATE.checkout_panel.ToString()) CheckoutPanel.gameObject.SetActive(true);
-            else if (this.State == STATE.success_panel.ToString()) SuccessPanelView.gameObject.SetActive(true);
-            else if (this.State == STATE.error_panel.ToString()) ErrorPanelView.gameObject.SetActive(true);
-            else if (this.State == STATE.credit_card_panel.ToString()) CreditCardPanel.gameObject.SetActive(true);
-            else if (this.State == STATE.settings_panel.ToString()) SettingsPanelView.gameObject.SetActive(true);
-            else if (this.State == STATE.select_payment_method_panel.ToString()) SelectPaymentMethodPanelView.gameObject.SetActive(true);
-            else if (this.State == STATE.simple_dialog_panel.ToString()) SimpleDialogPanelView.gameObject.SetActive(true);
-            else if (this.State == STATE.loading_panel.ToString()) LoadingPanelView.gameObject.SetActive(true);
-            else if (this.State == STATE.checkout_loading_panel.ToString()) CheckoutLoadingPanelView.gameObject.SetActive(true);
+            if      (this.State == STATE.test_panel                  .ToString()) TestPanelView               .gameObject.SetActive(true);
+            else if (this.State == STATE.checkout_panel              .ToString()) CheckoutPanel               .gameObject.SetActive(true);
+            else if (this.State == STATE.success_panel               .ToString()) SuccessPanelView            .gameObject.SetActive(true);
+            else if (this.State == STATE.error_panel                 .ToString()) ErrorPanelView              .gameObject.SetActive(true);
+            else if (this.State == STATE.credit_card_panel           .ToString()) CreditCardPanel             .gameObject.SetActive(true);
+            else if (this.State == STATE.settings_panel              .ToString()) SettingsPanelView           .gameObject.SetActive(true);
+            else if (this.State == STATE.select_payment_method_panel .ToString()) SelectPaymentMethodPanelView.gameObject.SetActive(true);
+            else if (this.State == STATE.simple_dialog_panel         .ToString()) SimpleDialogPanelView       .gameObject.SetActive(true);
+            else if (this.State == STATE.loading_panel               .ToString()) LoadingPanelView            .gameObject.SetActive(true);
+            else if (this.State == STATE.checkout_loading_panel      .ToString()) CheckoutLoadingPanelView    .gameObject.SetActive(true);
         }
     }
 }

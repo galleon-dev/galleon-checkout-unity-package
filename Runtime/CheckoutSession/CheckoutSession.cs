@@ -465,7 +465,7 @@ namespace Galleon.Checkout
         
         public class GPay_Payment_Method : Payment_Method
         {
-            public new ooglePayPaymentMethodDefinition PaymentMethodDefinition => (ooglePayPaymentMethodDefinition) base.PaymentMethodDefinition;
+            public new GPayPaymentMethodDefinition PaymentMethodDefinition => (GPayPaymentMethodDefinition) base.PaymentMethodDefinition;
             public new GooglePayUserPaymentMethodData  UserPaymentMethodData       => (GooglePayUserPaymentMethodData)  base.userPaymentMethodData;
         }
         

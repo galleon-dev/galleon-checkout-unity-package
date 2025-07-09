@@ -65,7 +65,7 @@ namespace Galleon.Checkout.UI
                 this.Icon.sprite = GPaySprite;
             else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
                 this.Icon.sprite = PaypalSprite;
-            else if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.Apple.ToString())
+            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
                 this.Icon.sprite = AppleSprite;
         }
         
