@@ -78,13 +78,13 @@ namespace Galleon.Checkout.UI
 
         public static Step InitializeCheckoutScreenMobile()
         =>
-            new Step(name: $"open_checkout_screen_mobile"
+            new Step(name: $"initialize_checkout_screen_mobile"
                     , action: async (s) =>
                               {
                                   // Instantiate screen
-                                  var CheckoutScreenMobileGO = GameObject.Instantiate(original: CheckoutClient.Instance.Resources.CheckoutPopupPrefab
-                                                                                     , position: new Vector3(0, 0, 9999)
-                                                                                     , rotation: Quaternion.identity);
+                                  var CheckoutScreenMobileGO = GameObject.Instantiate(original : CheckoutClient.Instance.Resources.CheckoutPopupPrefab
+                                                                                     ,position : new Vector3(0, 0, 9999)
+                                                                                     ,rotation : Quaternion.identity);
 
                                   CheckoutScreenMobileGO.SetActive(false);
                                   DontDestroyOnLoad(CheckoutScreenMobileGO);
@@ -134,6 +134,11 @@ namespace Galleon.Checkout.UI
         public void OnEnable()
         {
             overrideContentSize = null;
+            
+            NavigationHistory.Clear();
+            NavigationNext = "";
+            CurrentPage    = default;
+            IsPageActive   = false;
         }
 
         private async void Start()
@@ -421,7 +426,6 @@ namespace Galleon.Checkout.UI
             CurrentPage.PageResult = result;
         }
 
-        int frame = 0;
         void Update()
         {
             if (Application.platform == RuntimePlatform.Android
@@ -436,9 +440,6 @@ namespace Galleon.Checkout.UI
                 }
             }
             
-            if (frame % 3 != 0)
-                return;
-
             ParentPanel.TryGetComponent(out RectTransform parentTransform);
             var keyboardHeight         = Math.Max(0, GetKeyboardHeight()) - SafeAreaHeight;
             var targetSize             = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + keyboardHeight);
@@ -499,14 +500,21 @@ namespace Galleon.Checkout.UI
         {
             if (IsInTopNotchZone(InputFieldRect))
             {
-                Debug.LogWarning("InputField is in the top notch zone!");
+              //Debug.LogWarning("InputField is in the top notch zone!");
                 IncreaseSafeAreaHeight();
             }
         }
 
+        public Camera UI_Camera;
+        public override void Awake()
+        {
+            this.UI_Camera = Camera.main;
+        }
+
         bool IsInTopNotchZone(RectTransform rectTransform)
         {
-            if (rectTransform == null) return false;
+            if (!rectTransform) 
+                return false;
 
             // Get world corners
             Vector3[] corners = new Vector3[4];
@@ -517,7 +525,7 @@ namespace Galleon.Checkout.UI
 
             foreach (Vector3 corner in corners)
             {
-                Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(Camera.main, corner);
+                Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(UI_Camera, corner);
 
                 if (screenPoint.y > safeTopY)
                 {
@@ -791,10 +799,10 @@ namespace Galleon.Checkout.UI
 
         public async Task Close()
         {
-            CheckoutClient.Instance.IAPStore.FinishTransaction(product: new ProductDefinition(id: CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName
-                                                                                                     , type: ProductType.Consumable)
-                                                               , transactionId: "transactionID");
-
+            // Current page result is close
+            CurrentPage.PageResult = NavigationStates.Close.ToString();
+            IsPageActive = false;
+            
             // Close animation
             overrideContentSize = 0f;
             await Task.Delay(CloseAnimationDurationMS);

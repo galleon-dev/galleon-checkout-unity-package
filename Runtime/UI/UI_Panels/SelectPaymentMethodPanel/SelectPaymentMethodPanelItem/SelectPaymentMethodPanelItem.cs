@@ -27,7 +27,8 @@ namespace Galleon.Checkout.UI
         
         //// Properties
         
-        public PaymentMethodDefinition      PaymentMethodDefinition            { get; set; }
+        public PaymentMethodDefinition      PaymentMethodDefinition      { get; set; }
+        public UserPaymentMethod            UserPaymentMethod            { get; set; }
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView { get; set; }
         
         
@@ -40,6 +41,13 @@ namespace Galleon.Checkout.UI
             Refresh();
         }
         
+        public void Initialize(UserPaymentMethod userPaymentMethod, SelectPaymentMethodPanelView SelectPaymentMethodPanelView)
+        {
+            this.UserPaymentMethod            = userPaymentMethod;
+            this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
+            Refresh();
+        }
+        
         
         //// Refresh
         
@@ -47,22 +55,79 @@ namespace Galleon.Checkout.UI
         {    
             this.Label.text = PaymentMethodDefinition?.DisplayName;
 
+            //////////////////////////////////////////////// Default
             if (this.PaymentMethodDefinition      == null
-            ||  this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)
+            &&  this.UserPaymentMethod            == null)
             {
                 this.Label.text  = "Add Credit or Debit Card";
                 this.Icon.sprite = AddCreditCardSprite;
             }
-            else if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_GOOGLE_PAY)
+            //////////////////////////////////////////////// Payment Method Definitions
+            else if (this.PaymentMethodDefinition != null
+                 &&  this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)
+            {
+                this.Label.text  = "Add Credit or Debit Card";
+                this.Icon.sprite = AddCreditCardSprite;
+            }
+            else if (this.PaymentMethodDefinition != null
+                 &&  this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_GOOGLE_PAY)
             {
                 this.Icon.sprite = GPaySprite;
             }
-            else if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_PAYPAL)
+            else if (this.PaymentMethodDefinition != null
+                 &&  this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_PAYPAL)
             {
                 this.Icon.sprite = PaypalSprite;
             }
-            //else if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PaymentMethodType.Apple.ToString())
-            //    this.Icon.sprite = AppleSprite;
+            //////////////////////////////////////////////// UserPaymentMethods
+            else if (this.UserPaymentMethod != null
+                 &&  this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
+            {
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.MasterCardSprite;
+            }
+            else if (this.UserPaymentMethod      != null
+                 &&  this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
+            {
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.VisaSprite;
+            }
+            else if (this.UserPaymentMethod      != null
+                 &&  this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Amex.ToString())
+            {
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.AmexSprite;
+            }
+            else if (this.UserPaymentMethod      != null
+                 &&  this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Diners.ToString())
+            {
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.DinersSprite;
+            }
+            else if (this.UserPaymentMethod      != null
+                 &&  this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Discover.ToString())
+            {
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.DiscoverSprite;
+            }
+            else if (this.UserPaymentMethod      != null
+                 &&  this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
+            {
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.GPaySprite;
+            }
+            else if (this.UserPaymentMethod      != null
+                 &&  this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
+            {
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.PaypalSprite;
+            }
+            else if (this.UserPaymentMethod      != null
+                 &&  this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
+            {
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.AppleSprite;
+            }
         }
         
         //// UI Events

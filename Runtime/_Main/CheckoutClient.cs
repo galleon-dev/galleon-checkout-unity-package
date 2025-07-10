@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.Foundation;
 using Galleon.Checkout.UI;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -31,14 +32,13 @@ namespace Galleon.Checkout
         // Resources
         public CheckoutResources        Resources                   => CheckoutResources.Instance;
         
+        // System
+        public NavigationController     Navigation                  = new ();
+        
         // Controllers
         [Header("Controllers")]
         public TokenizerController      TokenizerController         = new(); 
         public PaymentMethodsController PaymentMethodsController    = new();
-      //public CreditCardController     CreditCardController        = new(); 
-      //public PaypalController         PaypalController            = new();
-      //public GooglePayController      GooglePayController         = new();
-      //public GenericPaymentController GenericPaymentController    = new();
         public TaxController            TaxController               = new();  
         
         // Entities
@@ -142,6 +142,8 @@ namespace Galleon.Checkout
         public static Analytics                Analytics       => CheckoutClient.Instance.Analytics;
          
         public static CheckoutResources        Resources       => CheckoutClient.Instance.Resources;
+        
+        public static NavigationController     Navigation       => CheckoutClient.Instance.Navigation;
         
         public static PaymentMethodsController PaymentMethods  => CheckoutClient.Instance.PaymentMethodsController;
         public static ProductsController       Products        => CheckoutClient.Instance.Products;
