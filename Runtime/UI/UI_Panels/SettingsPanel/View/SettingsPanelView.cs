@@ -48,7 +48,7 @@ public class SettingsPanelView : View
         }
         
         // Add children
-        var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
+        var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
         foreach (var paymentMethod in paymentMethods)
         {
             var go   = Instantiate(original : SettingsPanelPaymentMethodItemPrefab, parent : PaymentMethodsHolder.transform);
@@ -93,7 +93,7 @@ public class SettingsPanelView : View
         }
         
         // Add children
-        var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
+        var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
         foreach (var paymentMethod in paymentMethods)
         {
             var go   = Instantiate(original : SettingsPanelPaymentMethodItemPrefab, parent : PaymentMethodsHolder.transform);
@@ -109,7 +109,7 @@ public class SettingsPanelView : View
 
     public void UpdateScrollRectMaxSize()
     {
-        int PaymentMethodsAmount = CheckoutClient.Instance.CurrentUser.PaymentMethods.Count;
+        int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
 
         Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 

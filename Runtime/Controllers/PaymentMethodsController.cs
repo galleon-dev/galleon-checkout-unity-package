@@ -73,21 +73,23 @@ namespace Galleon.Checkout
             new Step(name   : $"test_populate_user_payment_method"
                     ,action : async (s) =>
                     {
-                        
                         this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
-                                                   {
-                                                       Type = "credit_card",
-                                                   });
+                                                    {
+                                                        Type        = UserPaymentMethod.PaymentMethodType.MasterCard.ToString(),
+                                                        DisplayName = "MasterCard - **** - 4587",
+                                                    });
                         
                         this.UserPaymentMethods.Add(new GooglePayUserPaymentMethod()
-                                                   {
-                                                       Type = "paypal",
-                                                   });
+                                                    {
+                                                        Type        = UserPaymentMethod.PaymentMethodType.PayPal.ToString(),
+                                                        DisplayName = "Google Pay - **** - 7348",
+                                                    });
                         
                         this.UserPaymentMethods.Add(new PaypalUserUserPaymentMethod()
-                                                   {
-                                                       Type = "google_pay",
-                                                   });
+                                                    {
+                                                        Type        = UserPaymentMethod.PaymentMethodType.GPay.ToString(),
+                                                        DisplayName = "Paypal - **** - 9101",
+                                                    });
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Definitions
