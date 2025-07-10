@@ -24,17 +24,18 @@ namespace Galleon.Checkout.UI
         public Sprite   GPaySprite;
         public Sprite   PaypalSprite;
         public Sprite   AppleSprite;
+        
         //// Properties
         
-        public UserPaymentMethod                UserPaymentMethod                { get; set; }
+        public PaymentMethodDefinition      PaymentMethodDefinition            { get; set; }
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView { get; set; }
         
         
         //// Lifecycle
         
-        public void Initialize(UserPaymentMethod userPaymentMethod, SelectPaymentMethodPanelView SelectPaymentMethodPanelView)
+        public void Initialize(PaymentMethodDefinition paymentMethodDefinition, SelectPaymentMethodPanelView SelectPaymentMethodPanelView)
         {
-            this.UserPaymentMethod                = userPaymentMethod;
+            this.PaymentMethodDefinition      = paymentMethodDefinition;
             this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
             Refresh();
         }
@@ -44,42 +45,37 @@ namespace Galleon.Checkout.UI
         
         public override void RefreshState()
         {    
-            this.Label.text = UserPaymentMethod?.DisplayName;
+            this.Label.text = PaymentMethodDefinition?.DisplayName;
 
-            if (this.UserPaymentMethod == null)
+            if (this.PaymentMethodDefinition      == null
+            ||  this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)
             {
                 this.Label.text  = "Add Credit or Debit Card";
                 this.Icon.sprite = AddCreditCardSprite;
             }
-            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
-                this.Icon.sprite = VisaSprite;
-            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
-                this.Icon.sprite = MasterCardSprite;
-            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Amex.ToString())
-                this.Icon.sprite = AmexSprite;
-            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Diners.ToString())
-                this.Icon.sprite = DinersSprite;
-            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Discover.ToString())
-                this.Icon.sprite = DiscoverSprite;
-            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
+            else if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_GOOGLE_PAY)
+            {
                 this.Icon.sprite = GPaySprite;
-            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
+            }
+            else if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_PAYPAL)
+            {
                 this.Icon.sprite = PaypalSprite;
-            else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
-                this.Icon.sprite = AppleSprite;
+            }
+            //else if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PaymentMethodType.Apple.ToString())
+            //    this.Icon.sprite = AppleSprite;
         }
         
         //// UI Events
         
         public void On_Click()
         {
-            if (this.UserPaymentMethod == null)
-                this.SelectPaymentMethodPanelView.On_NewCardClicked();
-            else
-            {
-                this.SelectPaymentMethodPanelView.On_Select();
-                CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(this.UserPaymentMethod);
-            }
+      //    if (this.PaymentMethodDefinition == null)
+      //        this.SelectPaymentMethodPanelView.On_NewCardClicked();
+      //    else
+      //    {
+      //        this.SelectPaymentMethodPanelView.On_Select();
+      //        CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(this.PaymentMethodDefinition);
+      //    }
         }
     }
 }

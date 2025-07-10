@@ -8,10 +8,20 @@ namespace Galleon.Checkout
 {
     public class PaymentMethodDefinition : Entity
     {
+        //// Consts
+        
+        public const string PAYMENT_METHOD_TYPE_CREDIT_CARD = "credit_card";
+        public const string PAYMENT_METHOD_TYPE_PAYPAL      = "paypal";
+        public const string PAYMENT_METHOD_TYPE_GOOGLE_PAY  = "google_pay";
+        
         //// Members
         
         public string                             Type;
         public Shared.PaymentMethodDefinitionData Data;
+        
+        //// Properties
+        
+        public string DisplayName => Data?.name ?? Type.ToString();
         
         //// Transaction Steps
         

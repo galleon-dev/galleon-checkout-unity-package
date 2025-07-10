@@ -136,19 +136,20 @@ namespace Galleon.Checkout
     
     public static class CHECKOUT
     {
-        public static Logger                 Logger         => CheckoutClient.Instance.Logger;
-        public static Network                Network        => CheckoutClient.Instance.Network;
-        public static Config                 Config         => CheckoutClient.Instance.Config;
-        public static Analytics              Analytics      => CheckoutClient.Instance.Analytics;
+        public static Logger                   Logger          => CheckoutClient.Instance.Logger;
+        public static Network                  Network         => CheckoutClient.Instance.Network;
+        public static Config                   Config          => CheckoutClient.Instance.Config;
+        public static Analytics                Analytics       => CheckoutClient.Instance.Analytics;
+         
+        public static CheckoutResources        Resources       => CheckoutClient.Instance.Resources;
         
-        public static CheckoutResources      Resources      => CheckoutClient.Instance.Resources;
-        
-        public static ProductsController     Products       => CheckoutClient.Instance.Products;
-        public static UsersController        Users          => CheckoutClient.Instance.Users;
-        public static User                   User           => CheckoutClient.Instance.CurrentUser;
-        public static Transaction            Transaction    => User.CurrentTransaction;
-        
-        public static bool                   IsTest         => Resources.IsTest;
+        public static PaymentMethodsController PaymentMethods  => CheckoutClient.Instance.PaymentMethodsController;
+        public static ProductsController       Products        => CheckoutClient.Instance.Products;
+        public static UsersController          Users           => CheckoutClient.Instance.Users;
+        public static User                     User            => CheckoutClient.Instance.CurrentUser;
+        public static Transaction              Transaction     => User.CurrentTransaction;
+         
+        public static bool                     IsTest          => Resources.IsTest;
     }   
 }
 

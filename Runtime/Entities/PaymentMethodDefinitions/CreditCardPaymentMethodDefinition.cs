@@ -12,7 +12,7 @@ namespace Galleon.Checkout
 {
     public class CreditCardPaymentMethodDefinition : PaymentMethodDefinition
     {
-        public string cards = "master_card, visa";
+        public string SupportedCards = "master_card, visa";
     }
 }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TMPro;
@@ -58,7 +59,7 @@ namespace Galleon.Checkout.UI
             }
             
             // Add children
-            var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
+            var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods.Take(3);
 
             foreach (var paymentMethod in paymentMethods)
             {
@@ -71,7 +72,7 @@ namespace Galleon.Checkout.UI
             }
 
             // Add defult add card button
-            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count == 0);
+            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
         }
         
         //////////////////////////////////////////////////////////////////////////// View Flow
@@ -120,7 +121,7 @@ namespace Galleon.Checkout.UI
             }
             
             // Add children
-            var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
+            var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods.Take(3);
             foreach (var paymentMethod in paymentMethods)
             {
                 var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);
@@ -132,7 +133,7 @@ namespace Galleon.Checkout.UI
             }
             
             // Add defult add card button
-            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count == 0);
+            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
             
             ///////////////
             // checkoutPanelPaymentMethodItemView[] methods = this.gameObject.GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();

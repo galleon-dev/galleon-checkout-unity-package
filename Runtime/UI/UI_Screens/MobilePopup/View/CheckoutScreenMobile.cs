@@ -464,7 +464,7 @@ namespace Galleon.Checkout.UI
         }
 
 
-        // SAFEAREA / NOTCH ESTIMATION
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// SAFEAREA / NOTCH ESTIMATION
 
 
         // Whichever InputField is selected/activates we are checking whether it touches Notch zone or not
@@ -529,7 +529,7 @@ namespace Galleon.Checkout.UI
             }
         }
 
-        /////////////////////// Pages
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Pages
 
         public Page TestPage = new Page(name: "test"
                                                           , header: HeaderPanelView.STATE.checkout_and_settings.ToString()

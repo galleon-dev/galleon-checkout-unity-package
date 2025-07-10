@@ -44,7 +44,7 @@ namespace Galleon.Checkout
                                                                TransactionSteps = { "charge" },
                                                            });
                         
-                        this.PaymentMethodsDefinitions.Add(new ooglePayPaymentMethodDefinition()
+                        this.PaymentMethodsDefinitions.Add(new GooglePayPaymentMethodDefinition()
                                                            {
                                                                Type                = "google_pay",
                                                                InitializationSteps = { "check_availability" },

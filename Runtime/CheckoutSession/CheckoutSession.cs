@@ -25,9 +25,9 @@ namespace Galleon.Checkout
         public PurchaseResult                     PurchaseResult        = default;
         
         // Simple Dialog Panel data
-        public  string                             LastDialogRequest         = null;
-        public  SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
-        [FormerlySerializedAs("PaymentMethodToDelete")] public UserPaymentMethod                  userPaymentMethodToDelete = null;
+        public string                             LastDialogRequest         = null;
+        public SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
+        public UserPaymentMethod                  userPaymentMethodToDelete = null;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -452,27 +452,27 @@ namespace Galleon.Checkout
         
         public class Payment_Method : Entity
         {
-            public                                                 PaymentMethodDefinition PaymentMethodDefinition;
-            [FormerlySerializedAs("userPaymentMethod")] [FormerlySerializedAs("PaymentMethodData")] public UserPaymentMethodData   userPaymentMethodData;
-            public                                                 List<Step>              Actions;
+            public PaymentMethodDefinition PaymentMethodDefinition;
+            public UserPaymentMethodData   userPaymentMethodData;
+            public List<Step>              Actions;
         }
         
         public class CreditCard_Payment_Method : Payment_Method
         {
             public new CreditCardPaymentMethodDefinition PaymentMethodDefinition => (CreditCardPaymentMethodDefinition) base.PaymentMethodDefinition;
-            public new CreditCardUserPaymentMethodData       UserPaymentMethodData       => (CreditCardUserPaymentMethodData)       base.userPaymentMethodData;
+            public new CreditCardUserPaymentMethodData   UserPaymentMethodData   => (CreditCardUserPaymentMethodData)   base.userPaymentMethodData;
         }
         
         public class GPay_Payment_Method : Payment_Method
         {
-            public new GPayPaymentMethodDefinition PaymentMethodDefinition => (GPayPaymentMethodDefinition) base.PaymentMethodDefinition;
-            public new GooglePayUserPaymentMethodData  UserPaymentMethodData       => (GooglePayUserPaymentMethodData)  base.userPaymentMethodData;
+            public new GooglePayPaymentMethodDefinition PaymentMethodDefinition => (GooglePayPaymentMethodDefinition) base.PaymentMethodDefinition;
+            public new GooglePayUserPaymentMethodData   UserPaymentMethodData   => (GooglePayUserPaymentMethodData)   base.userPaymentMethodData;
         }
         
         public class Paypal_Payment_Method : Payment_Method
         {
             public new PayPalPaymentMethodDefinition PaymentMethodDefinition => (PayPalPaymentMethodDefinition) base.PaymentMethodDefinition;
-            public new PaypalUserPaymentMethodData       UserPaymentMethodData       => (PaypalUserPaymentMethodData)       base.userPaymentMethodData;
+            public new PaypalUserPaymentMethodData   UserPaymentMethodData   => (PaypalUserPaymentMethodData)   base.userPaymentMethodData;
         }
         
         ///
