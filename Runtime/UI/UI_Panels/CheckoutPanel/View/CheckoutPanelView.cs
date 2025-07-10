@@ -51,28 +51,7 @@ namespace Galleon.Checkout.UI
 
         public override void Initialize()
         {
-            // Remove children (if any)
-            foreach (Transform child in PaymentMethodsPanel.transform)
-            {
-                Debug.Log($"-Removing Item {child.gameObject.name}");
-                Destroy(child.gameObject);
-            }
-            
-            // Add children
-            var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods.Take(3);
-
-            foreach (var paymentMethod in paymentMethods)
-            {
-                var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);
-                var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
-                item.Initialize(paymentMethod, this);
-
-                // Add ui separator
-                Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsPanel.transform);
-            }
-
-            // Add defult add card button
-            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
+            RefreshState();
         }
         
         //////////////////////////////////////////////////////////////////////////// View Flow
@@ -121,7 +100,7 @@ namespace Galleon.Checkout.UI
             }
             
             // Add children
-            var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods.Take(3);
+            var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods.Take(3);
             foreach (var paymentMethod in paymentMethods)
             {
                 var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);

@@ -69,13 +69,13 @@ namespace Galleon.Checkout.UI
         
         public void On_Click()
         {
-      //    if (this.PaymentMethodDefinition == null)
-      //        this.SelectPaymentMethodPanelView.On_NewCardClicked();
-      //    else
-      //    {
-      //        this.SelectPaymentMethodPanelView.On_Select();
-      //        CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(this.PaymentMethodDefinition);
-      //    }
+          if (this.PaymentMethodDefinition == null)
+              this.SelectPaymentMethodPanelView.On_NewCardClicked();
+          else
+          {
+            //this.SelectPaymentMethodPanelView.On_Select();
+            //CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(this.PaymentMethodDefinition);
+          }
         }
     }
 }
