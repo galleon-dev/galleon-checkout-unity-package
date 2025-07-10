@@ -149,10 +149,12 @@ namespace Galleon.Checkout.UI
                 yield return new WaitForEndOfFrame();
                 AdvancedInputFields[i].SelectionRefresh(); // instead of ManualSelect();
                 AdvancedInputFields[i].SetCaretToTextEnd();
+
                 yield return new WaitForEndOfFrame();
                 EventSystem.current.SetSelectedGameObject(null); // Deselection
             }
             yield return new WaitForSeconds(0.5f);
+
             NativeKeyboardManager.Keyboard.SetIgnoreHeight(false);
 
             yield return null;

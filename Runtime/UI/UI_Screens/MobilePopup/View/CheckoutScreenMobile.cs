@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
 using Galleon.Checkout.UI;
 using UnityEngine;
@@ -22,12 +21,12 @@ namespace Galleon.Checkout.UI
         // UI
 
         [Header("Parent Panel")]
-        public ParentPanel                  ParentPanel;
-        public RectTransform                contentTransform;
+        public ParentPanel ParentPanel;
+        public RectTransform contentTransform;
 
         [Header("Header & Footer")]
-        public HeaderPanelView              HeaderPanelView;
-        public FooterPanelView              FooterPanelView;
+        public HeaderPanelView HeaderPanelView;
+        public FooterPanelView FooterPanelView;
 
         [Header("Panels")]
         public CheckoutPanelView            CheckoutPanel;
@@ -41,20 +40,20 @@ namespace Galleon.Checkout.UI
         public LoadingPanelView             LoadingPanelView;
         public CheckoutLoadingPanelView     CheckoutLoadingPanelView;
 
+        [HideInInspector]
+        RectTransform InputFieldRect;// SafeArea related
+
         [Header("Test")]
         public TestPanelView TestPanelView;
 
         // Fields
 
-        private RectTransform InputFieldRect;// SafeArea related
-
-        private bool   isPending                = false;
-        private float? overrideContentSize      = null;
-        public  int    CloseAnimationDurationMS = 300;
-        public  float  SafeAreaHeight           = 0f;
+        private bool isPending = false;
+        private float? overrideContentSize = null;
+        public int CloseAnimationDurationMS = 300;
+        public float SafeAreaHeight = 0f;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
-
         bool ShowLoaderOnce = true;
 
         public void ShowInitialCheckoutPanelLoader()
@@ -148,12 +147,12 @@ namespace Galleon.Checkout.UI
             var user = CheckoutClient.Instance.CurrentSession.User;
 
             // Deselect Payment Method
-            foreach (var paymentMethod in CHECKOUT.PaymentMethods.UserPaymentMethods)
+            foreach (var paymentMethod in user.PaymentMethods)
                 paymentMethod.Unselect();
 
             // Select First payment method by default
-            if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count > 0)
-                CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
+            if (user.PaymentMethods.Count > 0)
+                user.PaymentMethods.First().Select();
 
         }
 
@@ -218,11 +217,11 @@ namespace Galleon.Checkout.UI
 
             public Page(string name, string header, string panel, string footer, Action<Page> setup = null)
             {
-                this.Name  = name;
+                this.Name = name;
                 this.Setup = setup;
 
                 this.headerState = header;
-                this.panelState  = panel;
+                this.panelState = panel;
                 this.FooterState = footer;
             }
         }
@@ -246,7 +245,7 @@ namespace Galleon.Checkout.UI
                         ///////////////////////// Set Sate
 
                         this.HeaderPanelView.State = page.headerState;
-                        this.State                 = page.panelState;
+                        this.State = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
 
                         ///////////////////////// Refresh
@@ -263,7 +262,7 @@ namespace Galleon.Checkout.UI
                         ///////////////////////// Definitions
 
                         IsPageActive = true;
-                        CurrentPage  = page;
+                        CurrentPage = page;
                         NavigationHistory.Add(page);
 
                         ///////////////////////// Await Page
@@ -288,7 +287,7 @@ namespace Galleon.Checkout.UI
 
                         ///////////////////////// Handle Result
 
-                        string pageResult   = CurrentPage.PageResult;
+                        string pageResult = CurrentPage.PageResult;
                         this.NavigationNext = pageResult;
 
                         if (page.NavigationMap.ContainsKey(NavigationNext))
@@ -312,7 +311,7 @@ namespace Galleon.Checkout.UI
                         ///////////////////////// Set Sate
 
                         this.HeaderPanelView.State = page.headerState;
-                        this.State                 = page.panelState;
+                        this.State = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
 
                         ///////////////////////// Refresh
@@ -342,8 +341,8 @@ namespace Galleon.Checkout.UI
 
                         ///////////////////////// Result Helper
 
-                        page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
-                        page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
+                        page.NavigationMap[NavigationStates.Back.ToString()] = UI_Back();
+                        page.NavigationMap[NavigationStates.Close.ToString()] = UI_Close();
                         page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
 
                         ///////////////////////// Handle Navigation Next
@@ -421,13 +420,12 @@ namespace Galleon.Checkout.UI
             CurrentPage.PageResult = result;
         }
 
-        int frame = 0;
         void Update()
         {
             if (Application.platform == RuntimePlatform.Android
-            ||  Application.platform == RuntimePlatform.IPhonePlayer
-            ||  Application.platform == RuntimePlatform.OSXEditor
-            ||  Application.platform == RuntimePlatform.WindowsEditor)
+            || Application.platform == RuntimePlatform.IPhonePlayer
+            || Application.platform == RuntimePlatform.OSXEditor
+            || Application.platform == RuntimePlatform.WindowsEditor)
             {
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
@@ -435,17 +433,12 @@ namespace Galleon.Checkout.UI
                     On_BackClicked();
                 }
             }
-            
-            if (frame % 3 != 0)
-                return;
 
             ParentPanel.TryGetComponent(out RectTransform parentTransform);
-            var keyboardHeight         = Math.Max(0, GetKeyboardHeight()) - SafeAreaHeight;
-            var targetSize             = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + keyboardHeight);
-            
+            var keyboardHeight = Math.Max(0, GetKeyboardHeight()) - SafeAreaHeight;
+            var targetSize = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + keyboardHeight);
             if (overrideContentSize.HasValue)
                 targetSize = new Vector2(parentTransform.sizeDelta.x, overrideContentSize.Value + keyboardHeight);
-            
             parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
 
             CheckSafeaArea();
@@ -453,22 +446,7 @@ namespace Galleon.Checkout.UI
 
         float GetKeyboardHeight()
         {
-            #if UNITY_EDITOR
-
-            if (!NativeKeyboardManager.Keyboard.Active)
-            {
-                return 0;
-            }
-            else
-            {
-                var transform      = NativeKeyboardManager.Keyboard.transform as RectTransform;
-                int keyboardHeight = Mathf.RoundToInt(transform.rect.height); //Convert to screen pixels
-                return keyboardHeight;
-            }
-
-
-            #elif UNITY_ANDROID && !UNITY_EDITOR
-            
+#if UNITY_ANDROID && !UNITY_EDITOR
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
             {
                 AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
@@ -478,16 +456,11 @@ namespace Galleon.Checkout.UI
                 int visibleHeight = rect.Call<int>("height");
                 return UnityEngine.Screen.height - visibleHeight;
             }
-            
-            #elif UNITY_IOS && !UNITY_EDITOR
-            
+#elif UNITY_IOS && !UNITY_EDITOR
             return TouchScreenKeyboard.area.height;
-            
-            #else
-            
+#else
             return 0f;
-            
-            #endif
+#endif
         }
 
 
