@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,9 +23,10 @@ namespace Galleon.Checkout.UI
             AddCard,
             OtherPaymentMethods,
         }
-        
+
         //////////////////////////////////////////////////////////////////////////// Members
-        
+
+        public PositionLayoutGroup PositionLayoutGroup;
         [Header("Shop Item")]
         public TextMeshProUGUI ProductTitleText;
         public TextMeshProUGUI PriceText;
@@ -107,19 +109,22 @@ namespace Galleon.Checkout.UI
 
         public override void RefreshState()
         {
+            Debug.Log("<color=green>RefreshState</color>");
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
             this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
-         
+
             ///////////////
-            
+
             // Remove children (if any)
+            Debug.Log("<color=orange>- Removing Payment Methods</color>");
             foreach (Transform child in PaymentMethodsPanel.transform)
             {
-                Debug.Log($"-Removing Item {child.gameObject.name}");
+               // Debug.Log($"-Removing Item {child.gameObject.name}");
                 Destroy(child.gameObject);
             }
-            
+
             // Add children
+            Debug.Log("<color=green>+ Adding Payment Methods</color>");
             var paymentMethods = CheckoutClient.Instance.CurrentUser.PaymentMethods;
             foreach (var paymentMethod in paymentMethods)
             {
@@ -140,6 +145,23 @@ namespace Galleon.Checkout.UI
             //     method.Refresh();
 
             CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
+
+            if (this.isActiveAndEnabled)
+            {
+                StartCoroutine(AdjustUIOverlap());
+            }
+        }
+
+        void OnDisable()
+        {
+            StopAllCoroutines();
+        }
+
+        IEnumerator AdjustUIOverlap()
+        {
+            PositionLayoutGroup.spacing = 0.01f;
+            yield return new WaitForSeconds(0.01f);
+            PositionLayoutGroup.spacing = 0;
         }
 
         //////////////////////////////////////////////////////////////////////////// Radio Buttons

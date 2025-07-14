@@ -455,6 +455,7 @@ MonoBehaviour:
   State: 
   Style: 
   Result: 0
+  PositionLayoutGroup: {fileID: 1325325375067432993}
   ProductTitleText: {fileID: 0}
   PriceText: {fileID: 0}
   PaymentMethodsPanel: {fileID: 2139531615818730614}
@@ -1902,6 +1903,10 @@ PrefabInstance:
     - target: {fileID: 4998081036528196255, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239427490942656740, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6774435814535091090, guid: 8fda39fd6359d40cab5fc97b20c42991, type: 3}
       propertyPath: m_AnchorMax.y

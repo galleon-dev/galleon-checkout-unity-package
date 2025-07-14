@@ -56,7 +56,7 @@ namespace Galleon.Checkout.UI
             this.Label.text = PaymentMethod.DisplayName;
             this.CheckedImage.gameObject.SetActive(this.PaymentMethod.IsSelected);
             this.UncheckedImage.gameObject.SetActive(!this.PaymentMethod.IsSelected);
-            Debug.Log("this.PaymentMethod.Type: " + this.PaymentMethod.Type + "  this.PaymentMethod.IsSelected" + this.PaymentMethod.IsSelected);
+           // Debug.Log("this.PaymentMethod.Type: " + this.PaymentMethod.Type + "  this.PaymentMethod.IsSelected" + this.PaymentMethod.IsSelected);
             if (this.PaymentMethod.Type == PaymentMethod.PaymentMethodType.Visa.ToString())
             {
                 this.Icon.sprite = VisaSprite;
