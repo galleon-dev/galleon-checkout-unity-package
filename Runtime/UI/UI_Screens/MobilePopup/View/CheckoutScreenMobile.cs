@@ -383,7 +383,7 @@ namespace Galleon.Checkout.UI
                               });
 
         public Step UI_PaymentMethods()
-       =>
+        =>
            new Step(name: $"UI_PaymentMethods"
                    , action: async (s) =>
                    {
@@ -566,103 +566,108 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Pages
 
-        public Page TestPage = new Page(name: "test"
-                                                          , header: HeaderPanelView.STATE.checkout_and_settings.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.test_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.terms_privacy_return.ToString()
-                                                          , setup: page =>
-                                                                 {
-                                                                     page.NavigationMap[TestPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                     page.NavigationMap["test"] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                 }
-                                                           );
+        public Page TestPage                 = new Page(name   : "test"
+                                                       ,header : HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                       ,panel  : CheckoutScreenMobile.STATE.test_panel           .ToString()
+                                                       ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString()
+                                                       ,setup  : page =>
+                                                               {
+                                                                   page.NavigationMap[TestPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                   page.NavigationMap["test"]                                      = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                               }
+                                                        );
 
-        public Page CheckoutPage = new Page(name: "checkout"
-                                                          , header: HeaderPanelView.STATE.checkout_and_settings.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.checkout_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.terms_privacy_return.ToString()
-                                                          , setup: page =>
-                                                                 {
-                                                                     page.NavigationMap[CheckoutPanelView.ViewResult.Confirm.ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
-                                                                     page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
-                                                                     page.NavigationMap[CheckoutPanelView.ViewResult.AddCard.ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
-                                                                     page.NavigationMap["test"] = CheckoutClient.Instance.CurrentSession.RunTransaction();
-                                                                 }
-                                                           );
+        public Page CheckoutLoadingPage      = new Page(name  : "checkout_loading"
+                                                       ,header: HeaderPanelView     .STATE.none                  .ToString()
+                                                       ,panel : CheckoutScreenMobile.STATE.checkout_loading_panel.ToString()
+                                                       ,footer: FooterPanelView     .STATE.none                  .ToString());
+                                                       
+                    
+        public Page CheckoutPage             = new Page(name  : "checkout"
+                                                       ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                       ,panel : CheckoutScreenMobile.STATE.checkout_panel       .ToString()
+                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
+                                                       ,setup : page =>
+                                                              {
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap["test"]                                                      = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                              }
+                                                        );
 
-        public Page SuccessPage = new Page(name: "success"
-                                                          , header: HeaderPanelView.STATE.x_button.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.success_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.terms_privacy_return.ToString());
+        public Page SuccessPage              = new Page(name   : "success"
+                                                       ,header : HeaderPanelView     .STATE.x_button            .ToString()
+                                                       ,panel  : CheckoutScreenMobile.STATE.success_panel       .ToString()
+                                                       ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString());
 
-        public Page ErrorPage = new Page(name: "error"
-                                                          , header: HeaderPanelView.STATE.back_and_text.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.error_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.terms_privacy_return.ToString());
+        public Page ErrorPage                = new Page(name   : "error"
+                                                       ,header : HeaderPanelView     .STATE.back_and_text       .ToString()
+                                                       ,panel  : CheckoutScreenMobile.STATE.error_panel         .ToString()
+                                                       ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString());
 
-        public Page CreditCardPage = new Page(name: "credit_card"
-                                                          , header: HeaderPanelView.STATE.credit_card_info.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.credit_card_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.terms_privacy_return.ToString()
-                                                          , setup: page =>
-                                                                 {
-                                                                     page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
-                                                                     page.NavigationMap["test"] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
-                                                                 }
-                                                           );
+        public Page CreditCardPage           = new Page(name   : "credit_card"
+                                                       ,header : HeaderPanelView     .STATE.credit_card_info    .ToString()
+                                                       ,panel  : CheckoutScreenMobile.STATE.credit_card_panel   .ToString()
+                                                       ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString()
+                                                       ,setup  : page =>
+                                                               {
+                                                                   page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
+                                                                   page.NavigationMap["test"]                                                = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
+                                                               }
+                                                        );
 
-        public Page SelectPaymentMethodsPage = new Page(name: "select_payment_methods"
-                                                          , header: HeaderPanelView.STATE.back_and_text.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.select_payment_method_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.terms_privacy_return.ToString()
-                                                          , setup: page =>
-                                                                 {
-                                                                     page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.NewCard.ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
-                                                                     page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.Selected.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                     page.NavigationMap["test"] = page.screen.ViewPage(page.screen.CreditCardPage);
-                                                                 }
-                                                           );
-
-
-        public Page SettingsPage = new Page(name: "settings"
-                                                          , header: HeaderPanelView.STATE.back_and_text.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.settings_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.terms_privacy_return.ToString()
-                                                          , setup: page =>
-                                                                 {
-                                                                     page.NavigationMap[SettingsPanelView.ViewResult.DeletePaymentMethod.ToString()] = page.screen.ViewPage(page.screen.SimpleDialogPage);
-                                                                     page.NavigationMap["test"] = page.screen.ViewPage(page.screen.SimpleDialogPage);
-                                                                 }
-                                                           );
-
-        public Page SimpleDialogPage = new Page(name: "simple_dialog_page"
-                                                          , header: HeaderPanelView.STATE.back_and_text.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.simple_dialog_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.none.ToString()
-                                                          , setup: page =>
-                                                                 {
-                                                                     var lastDialogRequest = CheckoutClient.Instance.CurrentSession.LastDialogRequest;
-                                                                     if (lastDialogRequest == "delete_payment_method")
-                                                                     {
-                                                                         page.NavigationMap[SimpleDialogPanelView.DialogResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SettingsPage);
-                                                                         page.NavigationMap[SimpleDialogPanelView.DialogResult.Decline.ToString()] = page.screen.ViewPage(page.screen.SettingsPage);
-                                                                         page.NavigationMap["test"] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                     }
-                                                                 }
-                                                           );
+        public Page SelectPaymentMethodsPage = new Page(name  : "select_payment_methods"
+                                                       ,header: HeaderPanelView     .STATE.back_and_text              .ToString()
+                                                       ,panel : CheckoutScreenMobile.STATE.select_payment_method_panel.ToString()
+                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return       .ToString()
+                                                       ,setup : page =>
+                                                              {
+                                                                  page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.NewCard .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.Selected.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                  page.NavigationMap["test"]                                                                  = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                              }
+                                                        );
 
 
-        public Page LoadingPage = new Page(name: "loading"
-                                                          , header: HeaderPanelView.STATE.none.ToString()
-                                                          , panel: CheckoutScreenMobile.STATE.loading_panel.ToString()
-                                                          , footer: FooterPanelView.STATE.none.ToString()
-                                                          , setup: page =>
-                                                                 {
-                                                                     page.NavigationMap[LoadingPanelView.ViewResult.Success.ToString()] = page.screen.ViewPage(page.screen.SuccessPage);
-                                                                     page.NavigationMap[LoadingPanelView.ViewResult.Error.ToString()] = page.screen.ViewPage(page.screen.ErrorPage);
-                                                                     page.NavigationMap["test"] = page.screen.ViewPage(page.screen.SuccessPage);
-                                                                 }
-                                                           );
+        public Page SettingsPage             = new Page(name  : "settings"
+                                                       ,header: HeaderPanelView     .STATE.back_and_text       .ToString()
+                                                       ,panel : CheckoutScreenMobile.STATE.settings_panel      .ToString()
+                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return.ToString()
+                                                       ,setup : page =>
+                                                              {
+                                                                  page.NavigationMap[SettingsPanelView.ViewResult.DeletePaymentMethod.ToString()] = page.screen.ViewPage(page.screen.SimpleDialogPage);
+                                                                  page.NavigationMap["test"]                                                      = page.screen.ViewPage(page.screen.SimpleDialogPage);
+                                                              }
+                                                        );
+
+        public Page SimpleDialogPage         = new Page(name   : "simple_dialog_page"
+                                                       ,header : HeaderPanelView     .STATE.back_and_text      .ToString()
+                                                       ,panel  : CheckoutScreenMobile.STATE.simple_dialog_panel.ToString()
+                                                       ,footer : FooterPanelView     .STATE.none               .ToString()
+                                                       ,setup  : page =>
+                                                               {
+                                                                   var lastDialogRequest = CheckoutClient.Instance.CurrentSession.LastDialogRequest;
+                                                                   if (lastDialogRequest == "delete_payment_method")
+                                                                   {
+                                                                       page.NavigationMap[SimpleDialogPanelView.DialogResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SettingsPage);
+                                                                       page.NavigationMap[SimpleDialogPanelView.DialogResult.Decline.ToString()] = page.screen.ViewPage(page.screen.SettingsPage);
+                                                                       page.NavigationMap["test"]                                                = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                   }
+                                                               }
+                                                        );
+
+        public Page LoadingPage              = new Page(name   : "loading"
+                                                       ,header : HeaderPanelView     .STATE.none         .ToString()
+                                                       ,panel  : CheckoutScreenMobile.STATE.loading_panel.ToString()
+                                                       ,footer : FooterPanelView     .STATE.none         .ToString()
+                                                       ,setup  : page =>
+                                                               {
+                                                                   page.NavigationMap[LoadingPanelView.ViewResult.Success.ToString()] = page.screen.ViewPage(page.screen.SuccessPage);
+                                                                   page.NavigationMap[LoadingPanelView.ViewResult.Error  .ToString()] = page.screen.ViewPage(page.screen.ErrorPage);
+                                                                   page.NavigationMap["test"]                                         = page.screen.ViewPage(page.screen.SuccessPage);
+                                                               }
+                                                        );
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Steps
@@ -708,8 +713,8 @@ namespace Galleon.Checkout.UI
 
                         switch (CheckoutPanel.Result)
                         {
-                            case CheckoutPanelView.ViewResult.Confirm:             ViewSuccessPanel().Execute(); break;
-                            case CheckoutPanelView.ViewResult.Settings:            ViewSettingsPanel().Execute(); break;
+                            case CheckoutPanelView.ViewResult.Confirm:             ViewSuccessPanel()            .Execute(); break;
+                            case CheckoutPanelView.ViewResult.Settings:            ViewSettingsPanel()           .Execute(); break;
                             case CheckoutPanelView.ViewResult.OtherPaymentMethods: ViewSelectPaymentMethodPanel().Execute(); break;
                         }
                     });

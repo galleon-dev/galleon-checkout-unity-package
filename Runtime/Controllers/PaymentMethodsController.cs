@@ -37,12 +37,12 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         
-                        this.PaymentMethodsDefinitions.Add(new CreditCardPaymentMethodDefinition()
-                                                           {
-                                                               Type             = "credit_card",
-                                                               VaultingSteps    = { "get_tokenizer", "tokenize" },
-                                                               TransactionSteps = { "charge" },
-                                                           });
+                      //this.PaymentMethodsDefinitions.Add(new CreditCardPaymentMethodDefinition()
+                      //                                   {
+                      //                                       Type             = "credit_card",
+                      //                                       VaultingSteps    = { "get_tokenizer", "tokenize" },
+                      //                                       TransactionSteps = { "charge" },
+                      //                                   });
                         
                         this.PaymentMethodsDefinitions.Add(new GooglePayPaymentMethodDefinition()
                                                            {
@@ -82,13 +82,13 @@ namespace Galleon.Checkout
                         this.UserPaymentMethods.Add(new GooglePayUserPaymentMethod()
                                                     {
                                                         Type        = UserPaymentMethod.PaymentMethodType.PayPal.ToString(),
-                                                        DisplayName = "Google Pay - **** - 7348",
+                                                        DisplayName = "PayPal - **** - 7348",
                                                     });
                         
                         this.UserPaymentMethods.Add(new PaypalUserUserPaymentMethod()
                                                     {
                                                         Type        = UserPaymentMethod.PaymentMethodType.GPay.ToString(),
-                                                        DisplayName = "Paypal - **** - 9101",
+                                                        DisplayName = "Google Pay - **** - 9101",
                                                     });
                     });
         

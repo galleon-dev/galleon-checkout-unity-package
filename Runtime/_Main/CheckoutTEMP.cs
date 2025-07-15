@@ -53,6 +53,40 @@ namespace Galleon.Checkout
         ///
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
+
+        public static void OpenUrl(string url)
+        {
+            #if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                // Get current Android activity
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity    = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                {
+                    // Create Uri.parse(url)
+                    using (var uriClass = new AndroidJavaClass("android.net.Uri"))
+                    using (var uri      = uriClass.CallStatic<AndroidJavaObject>("parse", url))
+
+                    // Create CustomTabsIntent.Builder()
+                    using (var builder          = new AndroidJavaObject("androidx.browser.customtabs.CustomTabsIntent$Builder"))
+                    using (var customTabsIntent = builder.Call<AndroidJavaObject>("build"))
+                    {
+                        // Launch the URL
+                        customTabsIntent.Call("launchUrl", activity, uri);
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Failed to open Chrome Custom Tab: " + e.Message);
+                Application.OpenURL(url); // fallback
+            }
+            #else
+            Application.OpenURL(url); // fallback in Editor or non-Android
+            #endif
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
         
         struct temp
         {

@@ -46,7 +46,7 @@ namespace Galleon.Checkout.Samples
         }   
         
         public async void PurchaseGalleon()
-        {
+        {   
             var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                            { 
                                                DisplayName = "fake_product_2",

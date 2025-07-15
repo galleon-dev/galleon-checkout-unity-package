@@ -62,6 +62,7 @@ namespace Galleon.Checkout
                         // View CheckoutPage
                         s.AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.CheckoutPage));
                         
+                        
                         /////////////////////////////////////// Post Steps
                         
                         // Report
@@ -119,7 +120,7 @@ namespace Galleon.Checkout
                             User.CurrentTransaction.TransactionSteps.Add(step);
                         }
                         
-                        ////////////////////////////////////////////////////////////// Steps
+                        ////////////////////////////////////////////////////////////// Transaction Steps
                         
                         // Add Child Transaction Steps
                         foreach (var transactionStep in User.CurrentTransaction.TransactionSteps)
@@ -127,6 +128,8 @@ namespace Galleon.Checkout
                             s.Log($"scheduling transaction step : {transactionStep.Name}");
                             s.AddChildStep(transactionStep);
                         }
+                        
+                        ////////////////////////////////////////////////////////////// Final Navigation Step
                         
                         // Navigate
                         s.AddChildStep("wait",        async x => await Task.Delay(1000));
