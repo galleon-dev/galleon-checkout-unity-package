@@ -79,12 +79,11 @@ namespace Galleon.Checkout.UI
 
             if (CVVInputField)
             {
-                CVVInputField.CharacterLimit = 4;
+                CVVInputField.OnValueChanged.AddListener(OnCVVValueChanged);
             }
 
             if (DateInputField)
             {
-                DateInputField.CharacterLimit = 5; // "MM/YY"
                 DateInputField.OnValueChanged.AddListener(OnDateValueChanged);
             }
 
@@ -132,6 +131,12 @@ namespace Galleon.Checkout.UI
             }
         }
 
+        private void Start()
+        {
+            // NativeKeyboardManager.Keyboard.ResetAutofill();
+        }
+
+
         public void RefocusInputFields()
         {
             StartCoroutine(RefocusAdvancedInputFields());
@@ -157,7 +162,38 @@ namespace Galleon.Checkout.UI
 
             NativeKeyboardManager.Keyboard.SetIgnoreHeight(false);
 
+            //  GetRootObjects();
+
             yield return null;
+        }
+
+        void GetRootObjects()
+        {
+            // Get all root GameObjects in the scene
+            GameObject[] rootGameObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+
+            // Log the names of all top-level GameObjects
+            foreach (GameObject go in rootGameObjects)
+            {
+                Debug.Log("Root Object: " + go.name);
+            }
+
+            GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+
+            // Filter and log only top-level GameObjects that are not in the active scene
+            Debug.Log("\nRoot GameObjects in DontDestroyOnLoad:");
+            foreach (GameObject go in allGameObjects)
+            {
+                // Check if the GameObject is a root object (no parent) and not part of the active scene
+                if (go.transform.parent == null)
+                {
+                    // Further check to ensure it's not a hidden or temporary object
+                    if (!go.hideFlags.HasFlag(HideFlags.HideAndDontSave) && go.scene.isLoaded)
+                    {
+                        Debug.Log("DontDestroyOnLoad: " + go.name);
+                    }
+                }
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////// UI Events
@@ -177,9 +213,13 @@ namespace Galleon.Checkout.UI
                 this.Result = ViewResult.Confirm;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
             }
-            FocusOnce = false;
+            SetFocusOnce();
         }
 
+        public void SetFocusOnce()
+        {
+            FocusOnce = false;
+        }
 
         bool IsCorrectInputFields()
         {
@@ -227,16 +267,12 @@ namespace Galleon.Checkout.UI
             return InputFieldsCorrect;
         }
 
-
-        private bool isUpdating;
-
-
         public void OnValueChanged(string text)
         {
             FormatCreditCardInput(text);
         }
 
-        void SetCardIcon(CardFormat card)
+        public void SetCardIcon(CardFormat card)
         {
             this.CardTypeIcon.gameObject.SetActive(true);
             if (card.Name == "MasterCard")
@@ -265,64 +301,26 @@ namespace Galleon.Checkout.UI
             }
         }
 
+        public void RemoveCardIcon()
+        {
+            if (this.CardTypeIcon)
+            {
+                this.CardTypeIcon.gameObject.SetActive(false);
+            }
+        }
 
-        string lastDigitInput = "";
         void OnDateValueChanged(string rawInput)
         {
             Debug.Log("<color=green>OnDateValueChanged. rawInput: " + rawInput + "</color>");
 
-            bool isBackspace = rawInput.Length <= lastDigitInput.Length;
-
-            // Strip non-digits
-            string digits = "";
-            foreach (char c in rawInput)
+            if(rawInput.Length > 4)
             {
-                if (char.IsDigit(c))
-                    digits += c;
-            }
-            if (digits.Length > 4)
-                digits = digits.Substring(0, 4);
-
-
-            Debug.Log("Digits: " + digits);
-            // Apply formatting
-            // string formatted = digits.Length <= 2 ? digits : digits.Substring(0, 2) + "/" + digits.Substring(2);
-
-            // Build formatted text
-            string formatted;
-            if (digits.Length == 0)
-            {
-                formatted = "";
-            }
-            else if (digits.Length == 1)
-            {
-                formatted = digits; // "1"
-            }
-            else if (digits.Length == 2)
-            {
-                formatted = digits + "/"; // "12/"
-            }
-            else
-            {
-                formatted = digits.Insert(2, "/"); // "12/3" or "12/34"
+                rawInput = rawInput.Remove(rawInput.Length-1);
             }
 
-            // Prevent slash from reappearing when backspacing from 3 -> 2
-            if (isBackspace && digits.Length == 2)
+            if (rawInput.Length == 4)
             {
-                formatted = digits;
-            }
-
-            // Only update if text changed
-            if (DateInputField.Text != formatted)
-            {
-                DateInputField.SetText(formatted); // SetTextAndPreserveSelection
-                DateInputField.SetCaretToTextEnd();
-            }
-
-            if (formatted.Length == 5)
-            {
-                if (!ValidateDateExpiry(formatted, out string err))
+                if (!ValidateDateExpiry(rawInput, out string err))
                 {
                     DateErrorText.text = err;
                     DateErrorText.gameObject.SetActive(true);
@@ -340,8 +338,6 @@ namespace Galleon.Checkout.UI
                 DateErrorText.gameObject.SetActive(false);
                 IsValidDate = true;
             }
-
-            lastDigitInput = digits;
         }
 
         public static bool ValidateDateExpiry(string formatted, out string error)
@@ -349,14 +345,14 @@ namespace Galleon.Checkout.UI
             error = null;
 
             // Expect format "MM/YY"
-            if (formatted.Length != 5 || formatted[2] != '/')
+            if (formatted.Length != 4)
             {
                 error = "Invalid format. Use MM/YY";
                 return false;
             }
 
             string monthStr = formatted.Substring(0, 2);
-            string yearStr = formatted.Substring(3, 2);
+            string yearStr = formatted.Substring(2, 2);
 
             if (!int.TryParse(monthStr, out int month) ||
                 !int.TryParse(yearStr, out int yy))
@@ -387,36 +383,34 @@ namespace Galleon.Checkout.UI
             return true;
         }
 
-
-        public void OnCVVValueChanged()
+        public void OnCVVValueChanged(string digits)
         {
-           // return;
-            Debug.Log("<color=green>OnCVVValueChanged. rawInput: " + CVVInputField.Text + "</color>");
+            Debug.Log("<color=green>OnCVVValueChanged. rawInput: " + digits + "</color>");
 
-            string rawInput = CVVInputField.Text;
-
-            // Determine expected length (4 for Amex, else 3)
             bool isAmex = CreditCardNumberField.Text.Replace(" ", "").StartsWith("34") ||
-                          CreditCardNumberField.Text.Replace(" ", "").StartsWith("37");
-            expectedCVVLength = isAmex ? 4 : 3;
-          
-            CVVInputField.ApplyCharacterLimit(expectedCVVLength);
+            CreditCardNumberField.Text.Replace(" ", "").StartsWith("37");
+            int expectedCVVLength = isAmex ? 4 : 3;
 
-
-            if (rawInput.Length != 0)
+            if (expectedCVVLength == 4)
             {
-                // Strip non-digits
-                string digits = new string(rawInput.Where(char.IsDigit).ToArray());
-
-                // Trim to max length & set
-                if (digits.Length > expectedCVVLength)
+                CVVInputField.PlaceHolderText = "0000";
+            }
+            else
+            {
+                if (digits.Length == 4)
                 {
-                    digits = digits.Substring(0, expectedCVVLength);
+                    CVVInputField.Text = digits.Remove(digits.Length - 1);
                 }
+                CVVInputField.PlaceHolderText = "000";
+            }
 
-                CVVInputField.Text = digits;
+            if (digits.Length > expectedCVVLength)
+            {
+                digits = digits.Remove(digits.Length - 1);
+            }
 
-                // Validate
+            if (digits.Length != 0)
+            {
                 if (digits.Length == expectedCVVLength)
                 {
                     CVVNumberErrorText.gameObject.SetActive(false);
@@ -442,51 +436,31 @@ namespace Galleon.Checkout.UI
             {
                 NameErrorText.gameObject.SetActive(false);
             }
-            // Validator selected for name entering from inspector menu 
         }
-
 
         void FormatCreditCardInput(string rawInput)
         {
-            Debug.Log("<color=green>CreditCardNumberField. rawInput: " + rawInput + "</color>");
+            Debug.Log("FormatCreditCardInput: " + rawInput);
 
-            string digits = "";
-            foreach (char c in rawInput)
+            if (rawInput.Length > GetFormatForDigits(rawInput).MaxLength)
             {
-                if (char.IsDigit(c))
-                {
-                    digits += c;
-                }
+                rawInput = rawInput.Remove(rawInput.Length - 1);
+                Debug.Log("Updated RawInput: " + rawInput);
             }
+           
+            CheckLuhnOnEndEdit(rawInput);
 
-            CardFormat cardFormat = GetFormatForDigits(digits);
+            OnCVVValueChanged(CVVInputField.Text);
+        }
 
-            string formatted = FormatCardNumber(digits, cardFormat);
-
-            if (CreditCardNumberField.Text != formatted)
-            {
-                Debug.Log("Formatted: " + formatted);
-                CreditCardNumberField.SetText(formatted);
-                CreditCardNumberField.SetCaretToTextEnd();
-            }
-
-            // SET CARD ICON
-
-            if (cardFormat.Name != lastFormatUsed.Name)
-            {
-                SetCardIcon(cardFormat);
-                lastFormatUsed = cardFormat;
-
-                CreditCardNumberField.CharacterLimit = cardFormat.InputFieldLimit;
-            }
-
+        public void CheckLuhnOnEndEdit(string digits)
+        {
             // LUHN VALIDATION (only when input is complete)
             // LUHN only checks if the number is structurally valid. If the final result is not divisible by 10, the number is invalid.
+
             IsValidCreditCardNumber = IsValidLuhn(digits); // digits.Length == format.MaxLength && 
 
             Debug.Log("LUHN isValid: " + IsValidCreditCardNumber);
-
-            // I have excluded (digits.Length == format.MaxLength) in conditions rechecking as for Visa card this varies between 13-19 digits, where in our logic we defined only 19. 
 
             if (!IsValidCreditCardNumber)
             {
@@ -497,72 +471,22 @@ namespace Galleon.Checkout.UI
             {
                 CardNumberErrorText.gameObject.SetActive(false);
             }
-
-            OnCVVValueChanged();
-
-            this.CurrentCardFormat = cardFormat;
         }
 
-
-
-        static string FormatCardNumber(string digits, CardFormat cardFormat)
-        {
-            string formatted = string.Empty;
-            int SeparatorIndex = 0;
-
-            Debug.Log(cardFormat.Name + " Group Size: " + cardFormat.GroupSizes.Length);
-
-            if (digits.Length > 0)
-            {
-                formatted += digits.Substring(0, Mathf.Min(cardFormat.GroupSizes[0], digits.Length));
-            }
-
-            if (digits.Length > cardFormat.GroupSizes[0])
-            {
-                formatted += " - " + digits.Substring(cardFormat.GroupSizes[0], Mathf.Min(cardFormat.GroupSizes[1], digits.Length - cardFormat.GroupSizes[0]));
-            }
-
-            if (cardFormat.GroupSizes.Length >= 3)
-            {
-                SeparatorIndex = cardFormat.GroupSizes[0] + cardFormat.GroupSizes[1];
-                if (digits.Length > SeparatorIndex)
-                {
-                    formatted += " - " + digits.Substring(SeparatorIndex, Mathf.Min(cardFormat.GroupSizes[2], digits.Length - SeparatorIndex));
-                }
-            }
-
-            if (cardFormat.GroupSizes.Length >= 4)
-            {
-                SeparatorIndex = cardFormat.GroupSizes[0] + cardFormat.GroupSizes[1] + cardFormat.GroupSizes[2];
-                if (digits.Length > SeparatorIndex)
-                {
-                    formatted += " - " + digits.Substring(SeparatorIndex, Mathf.Min(cardFormat.GroupSizes[3], digits.Length - SeparatorIndex));
-                }
-            }
-
-            if (cardFormat.GroupSizes.Length >= 5)
-            {
-                SeparatorIndex = cardFormat.GroupSizes[0] + cardFormat.GroupSizes[1] + cardFormat.GroupSizes[2] + cardFormat.GroupSizes[3];
-                if (digits.Length > SeparatorIndex)
-                {
-                    formatted += " - " + digits.Substring(SeparatorIndex, Mathf.Min(cardFormat.GroupSizes[4], digits.Length - SeparatorIndex));
-                }
-            }
-
-            return formatted;
-        }
-
-        CardFormat GetFormatForDigits(string digits)
+        public CardFormat GetFormatForDigits(string digits)
         {
             foreach (var (matcher, format) in cardFormats)
             {
                 if (matcher(digits))
                     return format;
             }
+
+            this.CurrentCardFormat = cardFormats[^1].format;
+
             return cardFormats[^1].format; // fallback
         }
 
-        private struct CardFormat
+        public struct CardFormat
         {
             public string Name;
             public int MaxLength;
@@ -615,6 +539,7 @@ namespace Galleon.Checkout.UI
             // Default fallback
             (_ => true, new CardFormat("Unknown", 16, new[] { 4, 4, 4, 4 },
                 25))
+
         };
 
         bool IsValidLuhn(string digits)

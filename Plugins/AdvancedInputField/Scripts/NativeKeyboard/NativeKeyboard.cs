@@ -213,14 +213,15 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Event callback when other inputfield got autofilled</summary>
         public void OnAutofillUpdate(string text, AutofillType autofillType)
         {
-            Debug.Log("OnAutofillUpdate (NativeKeyboard): " + text);
+            Debug.Log("<b>OnAutofillUpdate (NativeKeyboard): " + text + "</b>");
             AdvancedInputField[] inputfields = GameObject.FindObjectsOfType<AdvancedInputField>();
             int length = inputfields.Length;
             for (int i = 0; i < length; i++) //Find an enabled inputfield with given autofillType
             {
                 if (inputfields[i].AutofillType == autofillType)
                 {
-                    inputfields[i].Engine.SetText(text);
+                    // inputfields[i].Engine.SetText(text.Replace("/", ""));
+                    inputfields[i].Text = text.Replace("/", "");
                 }
             }
         }
@@ -228,9 +229,7 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Event callback when the keyboard gets shown</summary>
         public void OnKeyboardShow()
         {
-            Debug.Log("1. OnKeyboardShow: " + IgnoreHeight);
-            if (IgnoreHeight)
-                return;
+            Debug.Log("OnKeyboardShow()");
 
             nativeEventQueue.Enqueue(new NativeKeyboardEvent(NativeKeyboardEventType.SHOW));
             State = KeyboardState.VISIBLE;
@@ -239,9 +238,7 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Event callback when the keyboard gets hidden</summary>
         public void OnKeyboardHide()
         {
-            Debug.Log("OnKeyboardHide: " + IgnoreHeight);
-            if (IgnoreHeight)
-                return;
+            Debug.Log("OnKeyboardHide()");
 
             nativeEventQueue.Enqueue(new NativeKeyboardEvent(NativeKeyboardEventType.HIDE));
             State = KeyboardState.HIDDEN;
@@ -284,25 +281,20 @@ namespace AdvancedInputFieldPlugin
         public void OnMoveUp(bool shift, bool ctrl)
         {
             Debug.Log("OnMoveUp");
-            if (IgnoreHeight)
-                return;
             nativeEventQueue.Enqueue(new NativeKeyboardEvent(NativeKeyboardEventType.MOVE_UP, default, default, shift, ctrl));
         }
 
         public void OnMoveDown(bool shift, bool ctrl)
         {
             Debug.Log("MoveDown");
-            if (IgnoreHeight)
-                return;
             nativeEventQueue.Enqueue(new NativeKeyboardEvent(NativeKeyboardEventType.MOVE_DOWN, default, default, shift, ctrl));
         }
 
         /// <summary>Event callback when the height of the keyboard has changed</summary>
         public void OnKeyboardHeightChanged(int height)
         {
-            Debug.Log("2. onKeyboardHeightChanged: " + height + "  Ignore Height: " + IgnoreHeight);
-            if (IgnoreHeight == false)
-            {
+            Debug.Log("onKeyboardHeightChanged: " + height);
+
                 if (onKeyboardHeightChanged != null)
                 {
                     onKeyboardHeightChanged.Invoke(height);
@@ -312,7 +304,7 @@ namespace AdvancedInputFieldPlugin
                 {
                     State = KeyboardState.HIDDEN;
                 }
-            }
+            
         }
 
         bool IgnoreHeight = false;
