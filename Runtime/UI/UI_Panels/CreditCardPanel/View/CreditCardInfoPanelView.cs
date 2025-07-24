@@ -133,7 +133,7 @@ namespace Galleon.Checkout.UI
 
         private void Start()
         {
-            // NativeKeyboardManager.Keyboard.ResetAutofill();
+            NativeKeyboardManager.ResetAutofill();
         }
 
 
@@ -147,36 +147,21 @@ namespace Galleon.Checkout.UI
             Debug.Log("<color=green>RefocusInputFields() for Autofill</color>");
             int AdvancedInputFieldsAmount = AdvancedInputFields.Count;
 
-            NativeKeyboardManager.Keyboard.SetIgnoreHeight(true);
-
             for (int i = 0; i < AdvancedInputFieldsAmount; i++)
             {
-                yield return new WaitForEndOfFrame();
+                // yield return new WaitForEndOfFrame();
                 AdvancedInputFields[i].SelectionRefresh(); // instead of ManualSelect();
-                AdvancedInputFields[i].SetCaretToTextEnd();
-
-                yield return new WaitForEndOfFrame();
-                EventSystem.current.SetSelectedGameObject(null); // Deselection
+                // AdvancedInputFields[i].SetCaretToTextEnd();
+                //   yield return new WaitForEndOfFrame();
+                AdvancedInputFields[i].ManualDeselect(EndEditReason.KEYBOARD_DONE); //EventSystem.current.SetSelectedGameObject(null); // Deselection
             }
-            yield return new WaitForSeconds(0.5f);
-
-            NativeKeyboardManager.Keyboard.SetIgnoreHeight(false);
-
-            //  GetRootObjects();
-
+            //  yield return new WaitForSeconds(0.5f);
             yield return null;
         }
 
-        void GetRootObjects()
+        public void ShowKeyboardCanvas(bool Show)
         {
             // Get all root GameObjects in the scene
-            GameObject[] rootGameObjects = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
-
-            // Log the names of all top-level GameObjects
-            foreach (GameObject go in rootGameObjects)
-            {
-                Debug.Log("Root Object: " + go.name);
-            }
 
             GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
 
@@ -191,6 +176,10 @@ namespace Galleon.Checkout.UI
                     if (!go.hideFlags.HasFlag(HideFlags.HideAndDontSave) && go.scene.isLoaded)
                     {
                         Debug.Log("DontDestroyOnLoad: " + go.name);
+                        if (go.name.ToLower() == "portraitkeyboardcanvas")
+                        {
+                            go.gameObject.SetActive(Show);
+                        }
                     }
                 }
             }
@@ -313,9 +302,9 @@ namespace Galleon.Checkout.UI
         {
             Debug.Log("<color=green>OnDateValueChanged. rawInput: " + rawInput + "</color>");
 
-            if(rawInput.Length > 4)
+            if (rawInput.Length > 4)
             {
-                rawInput = rawInput.Remove(rawInput.Length-1);
+                rawInput = rawInput.Remove(rawInput.Length - 1);
             }
 
             if (rawInput.Length == 4)
@@ -447,7 +436,7 @@ namespace Galleon.Checkout.UI
                 rawInput = rawInput.Remove(rawInput.Length - 1);
                 Debug.Log("Updated RawInput: " + rawInput);
             }
-           
+
             CheckLuhnOnEndEdit(rawInput);
 
             OnCVVValueChanged(CVVInputField.Text);
