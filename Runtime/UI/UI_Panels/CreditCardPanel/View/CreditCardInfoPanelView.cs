@@ -139,7 +139,7 @@ namespace Galleon.Checkout.UI
 
         public void RefocusInputFields()
         {
-            StartCoroutine(RefocusAdvancedInputFields());
+           StartCoroutine(RefocusAdvancedInputFields());
         }
 
         IEnumerator RefocusAdvancedInputFields()

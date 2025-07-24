@@ -21,7 +21,8 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////// Members
         
-        public TMP_InputField EmailInputField;
+       // public TMP_InputField EmailInputField;
+        public AdvancedInputFieldPlugin.AdvancedInputField EmailInputField;
         public TMP_Text       ErrorText;
         public TMP_Text       MainText;
         
@@ -63,7 +64,7 @@ namespace Galleon.Checkout.UI
         
         public async void OnConfirmEmailButtonClick()
         {
-            var email = this.EmailInputField.text;
+            var email = this.EmailInputField.Text;
             
             if (string.IsNullOrEmpty(email))
             {
