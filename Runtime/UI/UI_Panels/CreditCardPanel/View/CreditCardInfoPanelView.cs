@@ -122,69 +122,41 @@ namespace Galleon.Checkout.UI
 
 
         // Related to Autofill Fix while refocusing inputfields
-        bool FocusOnce = true;
-        private void OnEnable()
-        {
-            if (FocusOnce)
-            {
-                RefocusInputFields();
-            }
-        }
+        /* 
+         
+          private void OnEnable()
+           {
+                   RefocusInputFields();
+           }
 
-        private void Start()
-        {
-            NativeKeyboardManager.ResetAutofill();
-        }
+           private void Start()
+           {
+               NativeKeyboardManager.ResetAutofill();
+           }
 
+           public void RefocusInputFields()
+           {
+             StartCoroutine(RefocusAdvancedInputFields());
+           }
 
-        public void RefocusInputFields()
-        {
-           StartCoroutine(RefocusAdvancedInputFields());
-        }
+           IEnumerator RefocusAdvancedInputFields()
+           {
+               Debug.Log("<color=green>RefocusInputFields() for Autofill</color>");
+               int AdvancedInputFieldsAmount = AdvancedInputFields.Count;
 
-        IEnumerator RefocusAdvancedInputFields()
-        {
-            Debug.Log("<color=green>RefocusInputFields() for Autofill</color>");
-            int AdvancedInputFieldsAmount = AdvancedInputFields.Count;
+               for (int i = 0; i < AdvancedInputFieldsAmount; i++)
+               {
+                   // yield return new WaitForEndOfFrame();
+                   AdvancedInputFields[i].SelectionRefresh(); // instead of ManualSelect();
+                   // AdvancedInputFields[i].SetCaretToTextEnd();
+                   //   yield return new WaitForEndOfFrame();
+                   AdvancedInputFields[i].ManualDeselect(EndEditReason.KEYBOARD_DONE); //EventSystem.current.SetSelectedGameObject(null); // Deselection
+               }
+               //  yield return new WaitForSeconds(0.5f);
+               yield return null;
+           }
 
-            for (int i = 0; i < AdvancedInputFieldsAmount; i++)
-            {
-                // yield return new WaitForEndOfFrame();
-                AdvancedInputFields[i].SelectionRefresh(); // instead of ManualSelect();
-                // AdvancedInputFields[i].SetCaretToTextEnd();
-                //   yield return new WaitForEndOfFrame();
-                AdvancedInputFields[i].ManualDeselect(EndEditReason.KEYBOARD_DONE); //EventSystem.current.SetSelectedGameObject(null); // Deselection
-            }
-            //  yield return new WaitForSeconds(0.5f);
-            yield return null;
-        }
-
-        public void ShowKeyboardCanvas(bool Show)
-        {
-            // Get all root GameObjects in the scene
-
-            GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
-
-            // Filter and log only top-level GameObjects that are not in the active scene
-            Debug.Log("\nRoot GameObjects in DontDestroyOnLoad:");
-            foreach (GameObject go in allGameObjects)
-            {
-                // Check if the GameObject is a root object (no parent) and not part of the active scene
-                if (go.transform.parent == null)
-                {
-                    // Further check to ensure it's not a hidden or temporary object
-                    if (!go.hideFlags.HasFlag(HideFlags.HideAndDontSave) && go.scene.isLoaded)
-                    {
-                        Debug.Log("DontDestroyOnLoad: " + go.name);
-                        if (go.name.ToLower() == "portraitkeyboardcanvas")
-                        {
-                            go.gameObject.SetActive(Show);
-                        }
-                    }
-                }
-            }
-        }
-
+        */
         //////////////////////////////////////////////////////////////////////////// UI Events
 
         public void On_OkClick()
@@ -202,12 +174,6 @@ namespace Galleon.Checkout.UI
                 this.Result = ViewResult.Confirm;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
             }
-            SetFocusOnce();
-        }
-
-        public void SetFocusOnce()
-        {
-            FocusOnce = false;
         }
 
         bool IsCorrectInputFields()
