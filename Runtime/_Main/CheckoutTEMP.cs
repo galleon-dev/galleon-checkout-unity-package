@@ -8,10 +8,27 @@ using System.Text;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json.Linq;
+using Unity.Collections;
 using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
+#endif
+
+#if UNITY_EDITOR
+using UnityEngine;
+using Unity.Collections.LowLevel.Unsafe;
+
+[InitializeOnLoad]
+public static class LeakDetectionInitializer
+{
+    static LeakDetectionInitializer()
+    {
+        // Enable leak detection with full stack traces in editor
+        NativeLeakDetection.Mode = NativeLeakDetectionMode.EnabledWithStackTrace;
+        Debug.Log("Native Leak Detection with Stack Traces Enabled");
+    }
+}
 #endif
 
 namespace Galleon.Checkout
@@ -41,7 +58,7 @@ namespace Galleon.Checkout
         ///     Definition
         ///     Data
         ///     Actions
-        
+        ///
         ///         Session Start
         ///             Transaction Start
         ///                 payment_method_transaction_action
@@ -107,12 +124,12 @@ namespace Galleon.Checkout
         #endif
         
         public Step MyStep(int number)
-            =>
+        =>
             new Step(name   : $"MyStep"
                     ,action : async (s) =>
-                              {
-                                  
-                              });
+                            {
+                                
+                            });
         
         #region TEST STEPS
         
@@ -196,13 +213,13 @@ namespace Galleon.Checkout
                                   s.Log("---------------------------------------Health Check");
                                   
                                   
-                                  await CHECKOUT.Network.Get("https://localhost:4000/health");
+                                  await CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/health");
                                   
                                   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                   
                                   s.Log("---------------------------------------Get Access Token");
                                   
-                                  var accessToken = await CHECKOUT.Network.Post(url  : "https://localhost:4000/authenticate"
+                                  var accessToken = await CHECKOUT.Network.Post(url  : $"{CHECKOUT.Network.SERVER_BASE_URL}/authenticate"
                                                                                ,body : new
                                                                                      {
                                                                                          AppId  = "test.app",
@@ -233,7 +250,7 @@ namespace Galleon.Checkout
                                   
                                   s.Log("---------------------------------------Get Tokenizer");
                                   
-                                  var tokenizerResponse = await CHECKOUT.Network.Get(url     : "https://localhost:4000/tokenizer"
+                                  var tokenizerResponse = await CHECKOUT.Network.Get(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/tokenizer"
                                                                                     ,headers : new()
                                                                                              {
                                                                                                 { "Authorization", $"Bearer {userAccessToken}" },
@@ -356,7 +373,7 @@ namespace Galleon.Checkout
                                                                       
                                   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                                                   
-                                  var chargeResponse = await CHECKOUT.Network.Post(url      : $"https://localhost:4000/charge"
+                                  var chargeResponse = await CHECKOUT.Network.Post(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
                                                                                             {
                                                                                                 { "Authorization", $"Bearer {userAccessToken}" }
@@ -480,7 +497,7 @@ namespace Galleon.Checkout
         #endregion
         
         #region Updated_temp_flow
-        
+        /*
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// TEMP FLOW
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// TEMP FLOW
@@ -603,8 +620,8 @@ namespace Galleon.Checkout
                                                                                                                                                                    }
                                                                                                                                                      });
                                                                            
-                                                                           x.Log($"- is success     : {paymentInitiation.success}");
-                                                                           x.Log($"- order ID       : {paymentInitiation.orderId}");
+                                                                         //x.Log($"- is success     : {paymentInitiation.success}");
+                                                                         //x.Log($"- order ID       : {paymentInitiation.orderId}");
                                                                            x.Log($"- transaction ID : {paymentInitiation.transactionId}");
                                                                        });
                                              
@@ -687,8 +704,8 @@ namespace Galleon.Checkout
                                                                                                                                                                    }
                                                                                                                                                      });
                                                                            
-                                                                           x.Log($"- is success     : {paymentInitiation.success}");
-                                                                           x.Log($"- order ID       : {paymentInitiation.orderId}");
+                                                                         //x.Log($"- is success     : {paymentInitiation.success}");
+                                                                         //x.Log($"- order ID       : {paymentInitiation.orderId}");
                                                                            x.Log($"- transaction ID : {paymentInitiation.transactionId}");
                                                                        });
                                              
@@ -745,8 +762,8 @@ namespace Galleon.Checkout
                                                                                                                                                                    }
                                                                                                                                                      });
                                                                            
-                                                                           x.Log($"- is success     : {paymentInitiation.success}");
-                                                                           x.Log($"- order ID       : {paymentInitiation.orderId}");
+                                                                         //x.Log($"- is success     : {paymentInitiation.success}");
+                                                                         //x.Log($"- order ID       : {paymentInitiation.orderId}");
                                                                            x.Log($"- transaction ID : {paymentInitiation.transactionId}");
                                                                        });
                                          });
@@ -755,6 +772,56 @@ namespace Galleon.Checkout
                     });
         
         
+        */
         #endregion
+        
+        #region Test Input Class
+        
+        public class TestInputEvent : Entity
+        {
+            /////////////////////////////////////////////////// Members
+            
+            public string       EventName;
+            
+            public List<string> ExpressionssToRun;
+            public List<Step>   StepsToRun;
+            
+            /////////////////////////////////////////////////// Main API
+            
+            public Step Evaluate(string scenarioName)
+            =>
+                new Step(name   : $"evaluate_event_{EventName}"
+                        ,action : async (s) =>
+                        {
+                            if (!scenarios.ContainsKey(scenarioName))
+                                return;
+                            
+                            var scenarioExpressions = this.scenarios[scenarioName];
+                            var steps    = scenarioExpressions.Select(x => new Step(name : x, action: async step=>{} ));
+
+                            foreach (var step in steps)
+                            {
+                                await step.Execute();
+                            }
+                        });
+            
+            /////////////////////////////////////////////////// Methods
+            
+            Dictionary<string, List<string>> scenarios = new();
+            
+            public void RegisterAction(string eventName, string Action)
+            {
+                
+            }
+            
+            //// Possible Steps
+            ///  
+            /// Finish Page with result.
+            /// Update CurrentTest.
+            /// DoAction (e.g. Fill all input fields) 
+        }
+        #endregion // Test input class
     }
+    
 }
+

@@ -270,6 +270,11 @@ namespace Galleon.Checkout.UI
                         IsPageActive = true;
                         CurrentPage  = page;
                         NavigationHistory.Add(page);
+                        
+                        ///////////////////////// Focus
+                        
+                        foreach (var view in views)
+                            view.Focus();
 
                         ///////////////////////// Await Page
 
@@ -280,7 +285,7 @@ namespace Galleon.Checkout.UI
                             if (CHECKOUT.IsTest)
                             {
                                 await Task.Delay(1000);
-                                OnPageFinishedWithResult("test");
+                                OnPageFinishedWithResult(CHECKOUT.CurrentTest);
                                 break;
                             }
                         }
@@ -573,14 +578,18 @@ namespace Galleon.Checkout.UI
                                                        ,setup  : page =>
                                                                {
                                                                    page.NavigationMap[TestPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                   page.NavigationMap["test"]                                      = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                   page.NavigationMap["test_1"]                                    = page.screen.ViewPage(page.screen.CheckoutPage);
                                                                }
                                                         );
 
         public Page CheckoutLoadingPage      = new Page(name  : "checkout_loading"
                                                        ,header: HeaderPanelView     .STATE.none                  .ToString()
                                                        ,panel : CheckoutScreenMobile.STATE.checkout_loading_panel.ToString()
-                                                       ,footer: FooterPanelView     .STATE.none                  .ToString());
+                                                       ,footer: FooterPanelView     .STATE.none                  .ToString()
+                                                       ,setup : page =>
+                                                              {
+                                                                  page.NavigationMap["checkout"] = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                              });
                                                        
                     
         public Page CheckoutPage             = new Page(name  : "checkout"
@@ -592,7 +601,8 @@ namespace Galleon.Checkout.UI
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
-                                                                  page.NavigationMap["test"]                                                      = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap["test_1"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap["test_2"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                               }
                                                         );
 
@@ -613,7 +623,7 @@ namespace Galleon.Checkout.UI
                                                        ,setup  : page =>
                                                                {
                                                                    page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
-                                                                   page.NavigationMap["test"]                                                = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
+                                                                   page.NavigationMap["test_1"]                                              = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
                                                                }
                                                         );
 
@@ -625,7 +635,7 @@ namespace Galleon.Checkout.UI
                                                               {
                                                                   page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.NewCard .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
                                                                   page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.Selected.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                  page.NavigationMap["test"]                                                                  = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap["test_1"]                                                                = page.screen.ViewPage(page.screen.CreditCardPage);
                                                               }
                                                         );
 
@@ -637,7 +647,7 @@ namespace Galleon.Checkout.UI
                                                        ,setup : page =>
                                                               {
                                                                   page.NavigationMap[SettingsPanelView.ViewResult.DeletePaymentMethod.ToString()] = page.screen.ViewPage(page.screen.SimpleDialogPage);
-                                                                  page.NavigationMap["test"]                                                      = page.screen.ViewPage(page.screen.SimpleDialogPage);
+                                                                  page.NavigationMap["test_1"]                                                    = page.screen.ViewPage(page.screen.SimpleDialogPage);
                                                               }
                                                         );
 
@@ -652,7 +662,7 @@ namespace Galleon.Checkout.UI
                                                                    {
                                                                        page.NavigationMap[SimpleDialogPanelView.DialogResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SettingsPage);
                                                                        page.NavigationMap[SimpleDialogPanelView.DialogResult.Decline.ToString()] = page.screen.ViewPage(page.screen.SettingsPage);
-                                                                       page.NavigationMap["test"]                                                = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                       page.NavigationMap["test_1"]                                              = page.screen.ViewPage(page.screen.CheckoutPage);
                                                                    }
                                                                }
                                                         );
@@ -665,115 +675,10 @@ namespace Galleon.Checkout.UI
                                                                {
                                                                    page.NavigationMap[LoadingPanelView.ViewResult.Success.ToString()] = page.screen.ViewPage(page.screen.SuccessPage);
                                                                    page.NavigationMap[LoadingPanelView.ViewResult.Error  .ToString()] = page.screen.ViewPage(page.screen.ErrorPage);
-                                                                   page.NavigationMap["test"]                                         = page.screen.ViewPage(page.screen.SuccessPage);
+                                                                   page.NavigationMap["test_1"]                                       = page.screen.ViewPage(page.screen.SuccessPage);
                                                                }
                                                         );
 
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Steps
-
-        public Step ViewTestPanel()
-        =>
-            new Step(name: $"view_test_panel"
-                    , action: async (s) =>
-                    {
-                        DisableAllPanels();
-                        TestPanelView.gameObject.SetActive(true);
-
-                        this.HeaderPanelView.State = HeaderPanelView.STATE.checkout_and_settings.ToString();
-                        this.HeaderPanelView.RefreshState();
-
-                        await Task.Delay(1000);
-                        this.HeaderPanelView.State = HeaderPanelView.STATE.back_and_text.ToString();
-                        this.HeaderPanelView.RefreshState();
-
-                        await Task.Delay(1000);
-                        this.HeaderPanelView.State = HeaderPanelView.STATE.x_button.ToString();
-                        this.HeaderPanelView.RefreshState();
-
-                        await Task.Delay(1000);
-                        this.FooterPanelView.State = FooterPanelView.STATE.terms_privacy_return.ToString();
-                        this.FooterPanelView.RefreshState();
-
-                        await Task.Delay(1000);
-                        this.FooterPanelView.State = FooterPanelView.STATE.long_terms_of_service.ToString();
-                        this.FooterPanelView.RefreshState();
-
-                        //TestPanel.SetActive(false);
-                    });
-
-
-        public Step ViewCheckoutPanel()
-        =>
-            new Step(name: $"view_checkout_panel"
-                    , action: async (s) =>
-                    {
-                        DisableAllPanels();
-                        await CheckoutPanel.View().Execute();
-
-                        switch (CheckoutPanel.Result)
-                        {
-                            case CheckoutPanelView.ViewResult.Confirm:             ViewSuccessPanel()            .Execute(); break;
-                            case CheckoutPanelView.ViewResult.Settings:            ViewSettingsPanel()           .Execute(); break;
-                            case CheckoutPanelView.ViewResult.OtherPaymentMethods: ViewSelectPaymentMethodPanel().Execute(); break;
-                        }
-                    });
-
-        public Step ViewSuccessPanel()
-        =>
-            new Step(name: $"view_success_panel"
-                    , action: async (s) =>
-                    {
-                        DisableAllPanels();
-                        await SuccessPanelView.View().Execute();
-
-                        // switch (SuccessPanelView.Result)
-                        // {
-                        //     case SuccessPanelView.ViewResult.Confirm : Close(); break;
-                        // }
-                    });
-
-        public Step ViewSettingsPanel()
-        =>
-            new Step(name: $"view_settings_panel"
-                    , action: async (s) =>
-                    {
-                        DisableAllPanels();
-                        await SettingsPanelView.View().Execute();
-
-                        switch (SettingsPanelView.Result)
-                        {
-                            case SettingsPanelView.ViewResult.Close: ViewCheckoutPanel().Execute(); break;
-                        }
-                    });
-
-        public Step ViewSelectPaymentMethodPanel()
-        =>
-            new Step(name: $"view_select_payment_methods_panel"
-                    , action: async (s) =>
-                    {
-                        DisableAllPanels();
-                        await CreditCardPanel.View().Execute();
-
-                        switch (CreditCardPanel.Result)
-                        {
-                            case CreditCardInfoPanelView.ViewResult.Confirm: Close(); break;
-                        }
-                    });
-
-        public Step ViewCreditCardPanel()
-        =>
-            new Step(name: $"view_credit_card_panel"
-                    , action: async (s) =>
-                    {
-                        DisableAllPanels();
-                        await CreditCardPanel.View().Execute();
-
-                        switch (CreditCardPanel.Result)
-                        {
-                            case CreditCardInfoPanelView.ViewResult.Confirm: Close(); break;
-                        }
-                    });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
 

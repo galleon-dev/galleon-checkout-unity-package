@@ -20,6 +20,9 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
+        // SessionData
+        public string                             SessionID             = "1";
+        
         // Purchase data
         public CheckoutProduct                    SelectedProduct;
         public PurchaseResult                     PurchaseResult        = default;
@@ -49,19 +52,23 @@ namespace Galleon.Checkout
         public  Step Flow()
         => _flow ??=
             new Step(name   : $"checkout_session_flow"
-                    ,tags   : new [] { "report"}
+                    ,tags   : new [] { "report" }
                     ,action : async (s) =>
                     {
                         /////////////////////////////////////// Pre Steps
                         
                         // Open Screen
+                        s.AddPreStep(StartSession());
                         s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
                         
                         /////////////////////////////////////// Steps
                         
                         // View CheckoutPage
-                        s.AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.CheckoutPage));
-                        
+                        s.AddChildStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
+                        s.AddChildStep(CheckoutClient.Instance.TaxController.GetTaxInfo());
+                        s.AddChildStep("wait",        async x => await Task.Delay(1000));
+                        s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
+                        s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                         
                         /////////////////////////////////////// Post Steps
                         
@@ -95,6 +102,36 @@ namespace Galleon.Checkout
                         }
                     });
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Session Steps
+        
+        public Step StartSession()
+        =>
+            new Step(name   : $"start_session"
+                    ,action : async (s) =>
+                    {
+                        var response = await CHECKOUT.Network.Post<CreateCheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-sessions/init"
+                                                                                                 ,headers  : new ()
+                                                                                                           {
+                                                                                                               { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                                           }
+                                                                                                 ,body     : new Shared.CreateCheckoutSessionRequest()
+                                                                                                           {
+                                                                                                              Order     = new OrderDetails()
+                                                                                                                        {
+                                                                                                                            sku      = "sku-1", // SelectedProduct.DisplayName,
+                                                                                                                            amount   = 100,
+                                                                                                                            currency = "USD",
+                                                                                                                            quantity = 1,
+                                                                                                                        },
+                                                                                                              ExpiresAt = DateTime.UtcNow.AddDays(1),
+                                                                                                           });
+                        
+                        if (!response.Success)
+                            throw new Exception("Create checkout session fail");
+                        
+                        this.SessionID = response.SessionId;           
+                    });
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// transaction Steps
         
         public Step RunTransaction()
@@ -106,10 +143,9 @@ namespace Galleon.Checkout
                         
                         // Show Loading Screen
                         s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.LoadingPage));
+                        s.AddPreStep(StartTransaction());
                         
-                        // Start Transaction
-                        s.AddPreStep("start_transaction"
-                                    ,async x => CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/start_transaction"));
+                        ////////////////////////////////////////////////////////////// Transaction Steps
                         
                         // Setup Transaction Steps
                         User.CurrentTransaction = new Transaction();
@@ -119,8 +155,6 @@ namespace Galleon.Checkout
                             s.Log($"adding transaction step : {step.Name}");
                             User.CurrentTransaction.TransactionSteps.Add(step);
                         }
-                        
-                        ////////////////////////////////////////////////////////////// Transaction Steps
                         
                         // Add Child Transaction Steps
                         foreach (var transactionStep in User.CurrentTransaction.TransactionSteps)
@@ -138,18 +172,68 @@ namespace Galleon.Checkout
                        
                         ////////////////////////////////////////////////////////////// Post Steps
                         
-                                                
                         ///////// TEMP
                         this.lastTransactionResult = new TransactionResultData()
-                                                     {
-                                                        isSuccess         = true,
-                                                        errors            = null,
-                                                        isCanceled        = false,
-                                                        transaction_id    = "test_transaction",
-                                                     };
+                                                   {
+                                                      isSuccess         = true,
+                                                      errors            = null,
+                                                      isCanceled        = false,
+                                                      transaction_id    = "test_transaction",
+                                                   };
                         
                         // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());
+                    });
+        
+        
+        public Step StartTransaction()
+        =>
+            new Step(name   : $"start_transaction"
+                    ,action : async (s) =>
+                    {
+                        var card        = User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
+                        card.CardNumber = "4242424242424242";
+                        card.CardMonth  = "12";
+                        card.CardYear   = "2026";
+                        card.CardCCV    = "123";
+                        await card.GetTokenizer().Execute();
+                        await card.Tokenize()    .Execute();
+                        
+                        var cardToken = card.TokenID;
+                        
+                        var response = await CHECKOUT.Network.Post<PaymentInitiationResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/payments/initiate"
+                                                                                             ,headers  : new ()
+                                                                                                       {
+                                                                                                           { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                                       }
+                                                                                             ,body     : new Shared.PaymentInitiationRequest()
+                                                                                                       {
+                                                                                                           method       = new PaymentMethodDetails()
+                                                                                                                        {
+                                                                                                                            id   = "stripe",
+                                                                                                                            data = new()
+                                                                                                                                 {
+                                                                                                                                      { "Number",   cardToken },
+                                                                                                                                      { "ExpMonth", cardToken },
+                                                                                                                                      { "ExpYear",  cardToken },
+                                                                                                                                      { "Cvc",      cardToken }
+                                                                                                                                 },
+                                                                                                                        },
+                                                                                                           order        = new OrderDetails()
+                                                                                                                        {
+                                                                                                                            sku      = "sku-1",
+                                                                                                                            quantity = 1,
+                                                                                                                            amount   = 100,
+                                                                                                                            currency = "USD",
+                                                                                                                        },
+                                                                                                           expiresAt    = DateTime.UtcNow.AddDays(1),
+                                                                                                           metadata     = new()
+                                                                                                                        {
+                                                                                                                            { "TransactionId", Guid.NewGuid().ToString() }
+                                                                                                                        }
+                                                                                                       });
+                        
+                        var orderID = response.orderId;
                     });
         
         public Step HandleTransactionResult()
@@ -171,7 +255,6 @@ namespace Galleon.Checkout
                                                   IsError     = result.errors?.Length > 0,
                                               };
                     });
-
         
     }
 }

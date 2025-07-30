@@ -1,43 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UIElements;
+using System.Threading.Tasks;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-namespace Galleon.Checkout.Foundation
+namespace Galleon.Checkout
 {
-    #if UNITY_EDITOR
-    [CreateAssetMenu(fileName = "new_network_endpoint", menuName = "Galleon/Network Endpoint")]
-    #endif
-    public class NetworkEndpoint : ScriptableObject, IEntity
+    public class NetworkEndpoint<TRequest, TResponse> : Entity
     {
-        //////////////////////////////////////////////////////////////// IEntity
-
-        public EntityNode Node { get; }
-        
-        //////////////////////////////////////////////////////////////// Members
-        
-        public string URL;
-        public string Method;
+        public string                     URL     { get; set; }
+        public string                     Method  { get; set; }
+        public Dictionary<string, string> Headers { get; set; }
     }
-    
-    #if UNITY_EDITOR
-    [CustomEditor(typeof(NetworkEndpoint))]
-    public class NetworkEndpointEditor : Editor
-    {
-        
-        // Create a VisualElement for the custom editor UI
-        public override VisualElement CreateInspectorGUI()
-        {
-            return new IMGUIContainer(() =>
-            {
-                DrawDefaultInspector();
-            });
-        }
-
-    }
-    #endif
 }

@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Galleon.Checkout.Foundation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -12,7 +14,7 @@ namespace Galleon.Checkout.UI
 {
     public class CheckoutPanelView : View
     {
-        //////////////////////////////////////////////////////////////////////////// View Result
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
         
         public      ViewResult Result = ViewResult.None;
         public enum ViewResult
@@ -25,71 +27,45 @@ namespace Galleon.Checkout.UI
             OtherPaymentMethods,
         }
 
-        //////////////////////////////////////////////////////////////////////////// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
-        public PositionLayoutGroup PositionLayoutGroup;
         [Header("Shop Item")]
-        public TextMeshProUGUI ProductTitleText;
-        public TextMeshProUGUI PriceText;
+        public TextMeshProUGUI  ProductTitleText;
+        public TextMeshProUGUI  PriceText;
+        public TextMeshProUGUI  TaxText;
         
         [Header("Payment Methods")]
-        public GameObject      PaymentMethodsPanel;
-        public GameObject      PaymentMethodItemPrefab;
+        public GameObject       PaymentMethodsPanel;
+        public GameObject       PaymentMethodItemPrefab;
         
-        public GameObject      AddCreditCardButtonElement;
+        public GameObject       AddCreditCardButtonElement;
 
 
         [Header("Payment Buttons")]
-        public GameObject PurchaseButton;
-        public GameObject GooglePayButton;
-        public GameObject PaypalPayButton;
-        public GameObject ApplePayButton;
+        public GameObject       PurchaseButton;
+        public GameObject       GooglePayButton;
+        public GameObject       PaypalPayButton;
+        public GameObject       ApplePayButton;
 
-        //////////////////////////////////////////////////////////////////////////// Links
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Links
 
         public IEnumerable<checkoutPanelPaymentMethodItemView> PaymentMethodItemViews => GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
 
-        //////////////////////////////////////////////////////////////////////////// Initialization
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public override void Initialize()
         {
             RefreshState();
         }
-        
-        //////////////////////////////////////////////////////////////////////////// View Flow
-        
-        public bool IsCompleted = false;
-        
-        public Step View()
-        =>
-            new Step(name   : $"View"
-                    ,action : async (s) =>
-                    {
-                        Debug.Log("<color=green>VIEW</color>");
-                        IsCompleted = false;
-                        
-                        Refresh();
-                        
-                        this.gameObject.SetActive(true);
-                        
-                        // TEMP
-                        //await s.CaptureReport();
-                      //this.Flow.AddChildStep(Refresh());
-                        this.Flow.AddChildStep(name:"capture report", s => s.CaptureReport());
-                        this.Flow.AddChildStep(name: "wait a second", action: async s => await Task.Delay(5000));
-                        
-                        await this.Flow.Execute();
-                        //while (!IsCompleted)
-                        //    await Task.Yield();
-                        
-                        this.gameObject.SetActive(false);
-                    });
 
-        //////////////////////////////////////////////////////////////////////////// Refresh
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
         {
+            if (CheckoutClient.Instance.CurrentSession == null) return;
+            
             Debug.Log("<color=green>RefreshState</color>");
+            
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
             this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
 
@@ -123,27 +99,11 @@ namespace Galleon.Checkout.UI
             // foreach (var method in methods)
             //     method.Refresh();
 
-            CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
-
-            if (this.isActiveAndEnabled)
-            {
-                StartCoroutine(AdjustUIOverlap());
-            }
+          //CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
         }
 
-        void OnDisable()
-        {
-            StopAllCoroutines();
-        }
 
-        IEnumerator AdjustUIOverlap()
-        {
-            PositionLayoutGroup.spacing = 0.01f;
-            yield return new WaitForSeconds(0.01f);
-            PositionLayoutGroup.spacing = 0;
-        }
-
-        //////////////////////////////////////////////////////////////////////////// Radio Buttons
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Radio Buttons
         
         public void OnRadiobuttonSelected(checkoutPanelPaymentMethodItemView SelectedItem)
         {
@@ -156,7 +116,7 @@ namespace Galleon.Checkout.UI
             }
         }
         
-        //////////////////////////////////////////////////////////////////////////// UI Events
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
         
         public void OnConfirmPurchaseClick()
         {
@@ -182,40 +142,53 @@ namespace Galleon.Checkout.UI
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
+        
         public void ShowPurchaseButton()
         {
             Debug.Log("ShowPurchaseButton()");
             GooglePayButton.SetActive(false);
-            PurchaseButton.SetActive(true);
+            PurchaseButton .SetActive(true);
             PaypalPayButton.SetActive(false);
-            ApplePayButton.SetActive(false);
+            ApplePayButton .SetActive(false);
         }
 
         public void ShowGooglePayButton()
         {
             Debug.Log("ShowGooglePayButton()");
-            GooglePayButton.SetActive(true);
-            PurchaseButton.SetActive(false);
-            PaypalPayButton.SetActive(false);
-            ApplePayButton.SetActive(false);
+            GooglePayButton .SetActive(true);
+            PurchaseButton  .SetActive(false);
+            PaypalPayButton .SetActive(false);
+            ApplePayButton  .SetActive(false);
         }
 
         public void ShowPaypalPayButton()
         {
             Debug.Log("ShowPaypalPayButton()");
-            GooglePayButton.SetActive(false);
-            PurchaseButton.SetActive(false);
-            PaypalPayButton.SetActive(true);
-            ApplePayButton.SetActive(false);
+            GooglePayButton .SetActive(false);
+            PurchaseButton  .SetActive(false);
+            PaypalPayButton .SetActive(true);
+            ApplePayButton  .SetActive(false);
         }
 
         public void ShowApplePayButton()
         {
             Debug.Log("ShowApplePayButton()");
-            GooglePayButton.SetActive(false);
-            PurchaseButton.SetActive(false);
-            PaypalPayButton.SetActive(false);
-            ApplePayButton.SetActive(true);
+            GooglePayButton .SetActive(false);
+            PurchaseButton  .SetActive(false);
+            PaypalPayButton .SetActive(false);
+            ApplePayButton  .SetActive(true);
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
+        
+        public TestScenario scenario_1        => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase)}()" });
+        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_select_other_methods)}()" });
+        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_settings_page)}()" });
+        public TestScenario scenario_2_part_3 => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase)}()" });
+        
+        public Step test_confirmPurchase()      => new Step(action : async (s) => { OnConfirmPurchaseClick(); });
+        public Step test_select_other_methods() => new Step(action : async (s) => { OnOtherPaymentMethodsClick(); });
+        public Step test_settings_page()        => new Step(action : async (s) => { OnSettingsClick(); });
     }
 }

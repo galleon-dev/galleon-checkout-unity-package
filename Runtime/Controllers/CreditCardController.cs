@@ -23,7 +23,7 @@ namespace Galleon.Checkout
             new Step(name   : $"get_tokenizer"
                     ,action : async (s) =>
                     {
-                        var tokenizerResponse = await CHECKOUT.Network.Get(url     : "https://localhost:4000/tokenizer"
+                        var tokenizerResponse = await CHECKOUT.Network.Get(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/tokenizer"
                                                                           ,headers : new()
                                                                                    {
                                                                                       { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" },
@@ -178,7 +178,7 @@ namespace Galleon.Checkout
             new Step(name   : $"charge"
                     ,action : async (s) =>
                     {                                               
-                        var chargeResponse = await CHECKOUT.Network.Post(url    : $"https://localhost:4000/charge"
+                        var chargeResponse = await CHECKOUT.Network.Post(url    : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                       ,headers  : new ()
                                                                                 {
                                                                                     { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }

@@ -35,7 +35,7 @@ namespace Galleon.Checkout
             
             // Main Foldout
             MainFoldout       = new Foldout(); this.Add(MainFoldout);
-            MainFoldout.text  = DisplayName ?? "Raw";
+            MainFoldout.text  = "Raw";
             MainFoldout.value = false; // Closed by default
             MainFoldout.RegisterValueChangedCallback(x => { if (x.target == MainFoldout) RefreshUI(); });
             

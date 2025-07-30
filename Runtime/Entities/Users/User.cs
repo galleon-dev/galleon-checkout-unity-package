@@ -54,6 +54,8 @@ namespace Galleon.Checkout
             
             foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
                 method.Unselect();
+            
+            CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
         }
     }
 }

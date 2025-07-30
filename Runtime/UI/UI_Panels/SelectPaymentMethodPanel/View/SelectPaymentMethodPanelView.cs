@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Galleon.Checkout.Foundation;
 using UnityEngine;
 
 namespace Galleon.Checkout.UI
@@ -140,5 +141,13 @@ namespace Galleon.Checkout.UI
             }
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
+        
+        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_add_new_card)}()" });
+        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_back_to_checkout)}()" });
+        
+        public Step test_add_new_card()     => new Step(action : async (s) => { On_NewCardClicked(); });
+        public Step test_back_to_checkout() => new Step(action : async (s) => { On_Select();         });
+        
     }
 }

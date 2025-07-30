@@ -108,7 +108,10 @@ namespace Galleon.Checkout
             
             
             var genericInspector = new GenericInspector(target:SelectedEntity);
+            
+            this.InspectorScrollView.Add(new EntityNode.EntityInspector(SelectedEntity));
             this.InspectorScrollView.Add(genericInspector);
+            
         }
     }
 }

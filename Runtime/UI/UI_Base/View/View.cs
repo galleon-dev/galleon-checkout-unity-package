@@ -89,5 +89,20 @@ namespace Galleon.Checkout.UI
         public virtual void RefreshState()
         {   
         }
+
+        public async Task Focus()
+        {
+            await OnFocus();
+        }
+        
+        public virtual async Task OnFocus()
+        {
+            #if DEBUG
+            
+            await Task.Delay(1000);
+            await this.Node.RunCurrentTestScenario();
+            
+            #endif
+        }
     }
 }

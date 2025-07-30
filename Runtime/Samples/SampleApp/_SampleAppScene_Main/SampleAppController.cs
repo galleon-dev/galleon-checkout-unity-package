@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.Samples;
 using UnityEngine;
@@ -26,6 +27,19 @@ namespace Galleon.SampleApp
         async void Start()
         {
             await CheckoutAPI.Initialize();
+            
+            if (CHECKOUT.IsTest)
+                await TestCheckout();
+        }
+        
+        public async Task TestCheckout()
+        {
+            var result = await CheckoutAPI.Purchase(new CheckoutProduct
+                                           { 
+                                               DisplayName = "test product",
+                                               PriceText   = "$5.99",
+                                           });
+            
         }
         
         

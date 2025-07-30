@@ -42,7 +42,7 @@ namespace Galleon.Checkout
             this.TransactionSteps = new()
                                     {
                                         Charge,
-                                        AwaitSocket
+                                      //AwaitSocket
                                     };
         }
         
@@ -153,8 +153,6 @@ namespace Galleon.Checkout
                         this.TokenID      = tokenID;
                     });
 
-        
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
         public Step Charge()
@@ -162,34 +160,50 @@ namespace Galleon.Checkout
             new Step(name   : $"charge"
                     ,action : async (s) =>
                     {                                               
-                      //var chargeResponse = await CHECKOUT.Network.Post(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
-                        var chargeResponse = await CHECKOUT.Network.Post(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/test_charge"
-                                                                        ,headers  : new ()
-                                                                                  {
-                                                                                      { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
-                                                                                  }
-                                                                        ,body     : new
-                                                                                  {
-                                                                                      Sku      = "sku-1",
-                                                                                      Quantity = 1,
-                                                                                      Amount   = 100,
-                                                                                      Currency = "USD",
-                                                                                      Card     = new 
-                                                                                               {
-                                                                                                   Number   = TokenID,
-                                                                                                   ExpMonth = TokenID,
-                                                                                                   ExpYear  = TokenID,
-                                                                                                   Cvc      = TokenID,
-                                                                                               }
-                                                                                  });
+                        var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
+                                                                                  ,headers  : new ()
+                                                                                            {
+                                                                                                { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                            }
+                                                                                  ,body     : new Shared.ChargeRequest()
+                                                                                            {
+                                                                                                SessionId          = CHECKOUT.Session.SessionID,
+                                                                                                IsNewPaymentMethod = true,
+                                                                                                PaymentMethod      = new PaymentMethodDetails()
+                                                                                                                   {
+                                                                                                                        id   = "stripe",
+                                                                                                                        data = new ()
+                                                                                                                             {
+                                                                                                                                  { "Number",  this.TokenID },
+                                                                                                                                  { "ExpMonth",this.TokenID },
+                                                                                                                                  { "ExpYear", this.TokenID },
+                                                                                                                                  { "Cvc",     this.TokenID },
+                                                                                                                             }
+                                                                                                                   },
+                                                                                                SavePaymentMethod  = true
+                                                                                            
+                                                                                                // Sku      = "sku-1",
+                                                                                                // Quantity = 1,
+                                                                                                // Amount   = 100,
+                                                                                                // Currency = "USD",
+                                                                                                // Card     = new 
+                                                                                                //          {
+                                                                                                //              Number   = TokenID,
+                                                                                                //              ExpMonth = TokenID,
+                                                                                                //              ExpYear  = TokenID,
+                                                                                                //              Cvc      = TokenID,
+                                                                                                //          }
+                                                                                            });
                         
-                        var json = chargeResponse.ToString();
-                        
-                        ChargeResponse response = JsonConvert.DeserializeObject<ChargeResponse>(json);
-                        
-                        if (response.transaction_result != null)
+                        if (response.Success)
                         {
-                            CheckoutClient.Instance.CurrentSession.lastTransactionResult = response.transaction_result;
+                            CheckoutClient.Instance.CurrentSession.lastTransactionResult = new TransactionResultData()
+                                                                                         {
+                                                                                             errors         = response.Errors,
+                                                                                             isCanceled     = false,
+                                                                                             isSuccess      = true,
+                                                                                             transaction_id = "12345",
+                                                                                         };
                         }
                         else if (response.NextActions != null)
                         {
@@ -285,5 +299,4 @@ namespace Galleon.Checkout
                     });
     }
 }
-
 

@@ -1,9 +1,12 @@
+using System.Linq;
 using System.Threading.Tasks;
 using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
+using Galleon.Checkout.Foundation;
 using Galleon.Checkout.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SettingsPanelView : View
 {
@@ -11,22 +14,22 @@ public class SettingsPanelView : View
     
     [Header("Email")]
     public TMP_Text           EmailLabel;
-    public GameObject EmailInputfieldBorder;
+    public GameObject         EmailInputfieldBorder;
     public AdvancedInputField EmailInputField;
     
     [Header("Payment Methods")]
-    public GameObject     SettingsPanelPaymentMethodItemPrefab;
-    public GameObject     PaymentMethodsHolder;
-    public bool           IsEditingEmail = false;
+    public GameObject         SettingsPanelPaymentMethodItemPrefab;
+    public GameObject         PaymentMethodsHolder;
+    public bool               IsEditingEmail = false;
     
     //////////////////////////////////////////////////////////////////////////// View Result
     
-    public      ViewResult Result = ViewResult.None;
+    public ViewResult         Result = ViewResult.None;
     
-    public UnityEngine.UI.LayoutElement ScrollRectLayoutElement;
-    int ScrollRectMaxSize = 6;
-    float PaymentPrefabHeight = 175f;
-    float SeparatorHeight = 2f;
+    public  LayoutElement     ScrollRectLayoutElement;
+    private int               ScrollRectMaxSize   = 6;
+    private float             PaymentPrefabHeight = 175f;
+    private float             SeparatorHeight     = 2f;
 
     public enum ViewResult
     {
@@ -164,6 +167,12 @@ public class SettingsPanelView : View
         this.EmailLabel.text = str;
     }
     
+    public void On_Done()
+    {
+        this.Result = ViewResult.Back;
+        CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
+    }
+    
     //////////////////////////////////////////////////////////////////////////// Events
     
     public void DeletePaymentMethod(UserPaymentMethod userPaymentMethod)
@@ -171,10 +180,19 @@ public class SettingsPanelView : View
         if (IsEditingEmail)
             return;
         
-        CheckoutClient.Instance.CurrentSession.LastDialogRequest     = "delete_payment_method";
+        CheckoutClient.Instance.CurrentSession.LastDialogRequest         = "delete_payment_method";
         CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete = userPaymentMethod;
         
         this.Result = ViewResult.DeletePaymentMethod;
         CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
     }
+    
+    
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
+        
+        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_delete_last_payment_method)}()" });
+        public TestScenario scenario_2_part_3 => new TestScenario(expressions : new[] { $"{nameof(test_go_back)}()" });
+        
+        public Step test_delete_last_payment_method() => new Step(action : async (s) => GetComponentsInChildren<SettingsPanelPaymentMethodItem>().Last().On_Delete_Clicked() );
+        public Step test_go_back()                    => new Step(action : async (s) => On_Done() );
 }

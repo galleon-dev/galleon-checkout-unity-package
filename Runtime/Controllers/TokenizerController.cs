@@ -30,7 +30,7 @@ namespace Galleon.Checkout
                         if (this.Tokenizer != null)
                             return;
                         
-                        var tokenizerResponse = await CHECKOUT.Network.Get(url     : "https://localhost:4000/tokenizer"
+                        var tokenizerResponse = await CHECKOUT.Network.Get(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/tokenizer"
                                                                           ,headers : new()
                                                                                    {
                                                                                       { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" },

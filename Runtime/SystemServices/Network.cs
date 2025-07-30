@@ -21,11 +21,12 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
-        public string SERVER_BASE_URL = "https://localhost:4000";
+        public string SERVER_BASE_URL = "https://localhost:4000/v1";
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public string GalleonUserAccessToken = "";
+      //public string GalleonUserAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6InBheWVyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwOS8wOS9pZGVudGl0eS9jbGFpbXMvYWN0b3IiOiJ0ZXN0LmFwcCJ9.eWgcUHry2SxwShuAO_jHtBFQ5x8c4iBJaPwyn9iqNa4";
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle 
 
@@ -34,7 +35,7 @@ namespace Galleon.Checkout
             new Step(name   : "initialize_network"
                     ,tags   : new[] { "init" }
                     ,action : async s =>
-                    {              
+                    {
                         s.AddChildStep(GetUserAccessToken());
                     });
         
@@ -45,8 +46,8 @@ namespace Galleon.Checkout
             new Step(name   : "get_user_access_token"
                     ,action : async s =>
                     {
-                        string appID  = "test.app";
-                        string id     = "app-1";
+                        string appID  = "test.app-1";
+                        string id     = "test.app-1";
                         string device = "local_unity_test_client";
                         
                         s.Log($"Getting Galleon User Access Token.");
@@ -61,7 +62,10 @@ namespace Galleon.Checkout
                                                               Id     = id,
                                                               Device = device,
                                                           });
-                                                          
+                        
+                        await Post(url  : $"{SERVER_BASE_URL}/development/seed");                      
+                        
+                        
                         /// Response Example :
                         /// {
                         ///     "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6InBheWVyIiwiaXNzIjoiR2FsbGVvbiIsImF1ZCI6InRlc3QuYXBwIn0.xdg3d7xMIVAhDm_9JpSl5MENnmWAaZDHRjApWUMj-t8",
@@ -82,6 +86,7 @@ namespace Galleon.Checkout
                         s.Log($"Retrieved access token: {userAccessToken}");
                         
                         this.GalleonUserAccessToken = userAccessToken;
+                        
 
                     });
         

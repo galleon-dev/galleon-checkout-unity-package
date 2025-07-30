@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Galleon.Checkout.Foundation;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -25,7 +28,12 @@ namespace Galleon.Checkout
 
     public partial class EntityNode
     {
-        public EntityNode(IEntity entity)
+        ///////////////////////////////////////////////////////////////////////// Lifecycle
+        
+        public EntityNode(IEntity entity
+                        ,[CallerMemberName] string callerName = ""
+                        ,[CallerLineNumber] int    callerLine = 0
+                        ,[CallerFilePath  ] string callerPath = "")
         {
             if (entity == null)
                 throw new Exception("entity is null in EntityNode constructor");
@@ -33,38 +41,22 @@ namespace Galleon.Checkout
             this.Entity      = entity;
             this.DisplayName = entity.GetType().Name;
             
-            PopulatePredefinedChildren();
+            this.Breadcrumbs.Add(new Breadcrumb(callerName, callerLine, callerPath, displayName : "creation_breadcrumb"));
+            
+            Setup();
         }
         
-        ///////////////////////////////////////////////////////////////////////// Helper Methods
+        ///////////////////////////////////////////////////////////////////////// Setup
         
-        public void PopulatePredefinedChildren()
+        public void Setup()
         {
-            // Auto Child Entities
-            var type    = Entity.GetType();
-            var members = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            PopulatePredefinedChildren();
             
-            foreach (var member in members)
+            #if UNITY_EDITOR
+          //if (Application.isPlaying) 
+            #endif
             {
-                var value = member switch
-                {
-                    System.Reflection.FieldInfo    field => field.GetValue(Entity),
-                  //System.Reflection.PropertyInfo prop  => prop.GetValue(entity), // Not Properties!
-                    _ => null
-                };
-
-                if (value != null && value is IEntity e)
-                {
-                    this.Children.Add(e);
-                    
-                    #if UNITY_EDITOR
-                    var header = member.GetCustomAttribute<HeaderAttribute>();
-                    if (header != null)
-                    {
-                        e.Node.editorExtras.HeaderAttributeText = header.header;
-                    }
-                    #endif
-                }
+                PopulateTestScenarios();
             }
         }
         
@@ -78,7 +70,43 @@ namespace Galleon.Checkout
         public Tags     Tags = new Tags();
         
         public string DisplayName;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Breadcrumbs
 
+        public List<Breadcrumb> Breadcrumbs = new();
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Testing
+        
+        public List<TestScenario> TestScenarios = new();
+        
+        public static string CurrentTestScenario = "scenario_1";
+        
+        protected void PopulateTestScenarios()
+        {
+            IEnumerable<TestScenario> scenarios = this.Reflection.TestScenarios();
+
+            foreach (var scenario in scenarios)
+            {
+                scenario.Target = this.Entity;
+                this.TestScenarios.Add(scenario);
+            }
+        }
+        
+        public async Task RunCurrentTestScenario()
+        {
+            await RunTestScenario(CurrentTestScenario);
+        }
+        
+        public async Task RunTestScenario(string scenarioName)
+        {
+            var scenario = this.TestScenarios.First(x => x.Name == scenarioName);
+            
+            if (scenario == null)
+                return;
+            
+            await scenario.RunScenario().Execute();
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Node
 
         [SerializeReference] public IEntity       Parent   = null;
@@ -88,7 +116,6 @@ namespace Galleon.Checkout
 
         public IEnumerable<IEntity>               Ancestors()   => EnumerateUp  (this.Entity);
         public IEnumerable<IEntity>               Descendants() => EnumerateDown(this.Entity);
-
 
         public void SetParent(IEntity parent)
         {
@@ -158,13 +185,44 @@ namespace Galleon.Checkout
             
         }
         
+        
+        public void PopulatePredefinedChildren()
+        {
+            // Auto Child Entities
+            var type    = Entity.GetType();
+            var members = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            
+            foreach (var member in members)
+            {
+                var value = member switch
+                {
+                    System.Reflection.FieldInfo    field => field.GetValue(Entity),
+                  //System.Reflection.PropertyInfo prop  => prop.GetValue(entity), // Not Properties!
+                    _ => null
+                };
+
+                if (value != null && value is IEntity e)
+                {
+                    this.Children.Add(e);
+                    
+                    #if UNITY_EDITOR
+                    var header = member.GetCustomAttribute<HeaderAttribute>();
+                    if (header != null)
+                    {
+                        e.Node.editorExtras.HeaderAttributeText = header.header;
+                    }
+                    #endif
+                }
+            }
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Reflection
         
         public        EntityReflection Reflection => new(Entity);
         public struct EntityReflection
         {
             private IEntity Entity;
-            public EntityReflection(IEntity entity) => Entity = entity;
+            public  EntityReflection(IEntity entity) => Entity = entity;
             
             public IEnumerable<Step> Steps()
             {
@@ -221,6 +279,31 @@ namespace Galleon.Checkout
                 
                 yield break;
             }
+            
+            public IEnumerable<TestScenario> TestScenarios()
+            {
+                var type = this.Entity.GetType();
+                
+                // Retrieve all properties and fields in the type that are of type TestScenario
+                var members = type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                  .Where     (m => (m is FieldInfo    fi && fi.FieldType    == typeof(TestScenario)) 
+                                                || (m is PropertyInfo pi && pi.PropertyType == typeof(TestScenario)));
+
+                foreach (var member in members)
+                {
+                    var value = member switch
+                    {
+                        FieldInfo    field => field.GetValue(this.Entity),
+                        PropertyInfo prop  => prop .GetValue(this.Entity),
+                        _ => null
+                    };
+
+                    if (value is TestScenario scenario)
+                    {
+                        yield return scenario;
+                    }
+                }
+            }   
         }
         
         
@@ -237,6 +320,24 @@ namespace Galleon.Checkout
                                                                      get { _ExplorerItem.TryGetTarget(out var e); return e;        } 
                                                                      set { _ExplorerItem = new WeakReference<ExplorerItem>(value); }
                                                                  }
+        
+        public class EntityInspector : Inspector<IEntity>
+        {
+            public EntityInspector(IEntity target) : base(target)
+            {
+                Foldout foldout = new Foldout() { text = $"{target.Node.DisplayName} entity" , value = false}; this.Add(foldout);
+                foldout.Add(new Label(" "));
+                
+                // Breadcrumbs
+                var breadcrumbsFolderout = new Foldout() { text = "Breadcrumbs", value = true }; foldout.Add(breadcrumbsFolderout);
+                breadcrumbsFolderout?.Clear();
+                foreach (var breadcrumb in Target.Node.Breadcrumbs)
+                {
+                    var breadcrumbInspector = new Breadcrumb.Inspector(breadcrumb, breadcrumb.DisplayName);
+                    breadcrumbsFolderout.Add(breadcrumbInspector);
+                }
+            }
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Unity Editor
         #if UNITY_EDITOR

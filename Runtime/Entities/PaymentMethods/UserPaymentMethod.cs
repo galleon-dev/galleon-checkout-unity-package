@@ -30,8 +30,10 @@ namespace Galleon.Checkout
         public string DisplayName;
         public bool   IsSelected;
         
-        public UserPaymentMethodData Data;
+        public bool   IsNewPaymentMethod = true;
         
+        public UserPaymentMethodData Data;
+
         //// UI Actions
         
         public void Select()

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Galleon.Checkout;
+using Galleon.Checkout.Foundation;
 using UnityEngine.UIElements;
 using Debug = UnityEngine.Debug;
 using StepAction=System.Func<Galleon.Checkout.Step,System.Threading.Tasks.Task>;
@@ -14,7 +15,7 @@ namespace Galleon.Checkout
 {
     public class Step : Entity
     {
-        ////////////////////////////////////////// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public string           Name;
         public List<string>     Tags                        = new();
@@ -31,8 +32,9 @@ namespace Galleon.Checkout
         public DateTime         StartTime                   = DateTime.MaxValue;
         public DateTime         EndTime                     = DateTime.MaxValue;
         
+        public List<string>     StepLog                     = new();
         
-        ////////////////////////////////////////// Link
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Link
         
         public StepController StepController => Root.Instance.Runtime.StepController;
         
@@ -44,17 +46,17 @@ namespace Galleon.Checkout
             await Task.Yield();
         }
         
-        ////////////////////////////////////////// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-        public Step(string                     name             = null
-                    ,IEnumerable<string>       tags             = default
-                    ,StepAction                action           = null
-                    ,[CallerMemberName] string CallerMemberName = ""
-                    ,[CallerLineNumber] int    CallerLineNumber = 0
-                    ,[CallerFilePath  ] string CallerFilePath   = "")
+        public Step(string                     name       = null
+                    ,IEnumerable<string>       tags       = default
+                    ,StepAction                action     = null
+                    ,[CallerMemberName] string callerName = ""
+                    ,[CallerLineNumber] int    callerLine = 0
+                    ,[CallerFilePath  ] string callerPath = "")
         {
             // Name
-            this.Name = name;
+            this.Name = name ?? callerName;
             
             // Tags
             if (tags != default)
@@ -64,11 +66,29 @@ namespace Galleon.Checkout
             this.Action = action;
             
             // Breadcrumb
-            this.Breadcrumbs.Add(new Breadcrumb(CallerMemberName, CallerLineNumber, CallerFilePath, displayName : "creation_breadcrumb"));
+            this.Breadcrumbs.Add(new Breadcrumb(callerName, callerLine, callerPath, displayName : "creation_breadcrumb"));
         }
-    
-        ////////////////////////////////////////// Main Methods
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setters
+        
+        private Step SET         (Action            setter   ) {  setter?.Invoke(); return this; }
+        public  Step setName     (string            name     ) => SET(() => this.Name      = name);
+        public  Step setTags     (params string[]   tags     ) => SET(() => this.Tags      .AddRange(tags)); 
+        public  Step setAction   (StepAction        action   ) => SET(() => this.Action    = action);
+        
+        public Step Temp()
+        =>
+            new Step()
+           .setName  ("name")
+           .setTags  ("bla", "bli")
+           .setAction(async s =>
+                      {
+                          s.Log("step action");
+                      });
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Methods
+        
+        
         public async Task Execute(Breadcrumb                sourceBreadcrumb   = default
                                  ,[CallerMemberName] string CallerMemberName   = ""
                                  ,[CallerLineNumber] int    CallerLineNumber   = 0
@@ -154,11 +174,11 @@ namespace Galleon.Checkout
             }
             catch (Exception e)
             {
-                Debug.Log($"<color=red>[HANDLED-ERROR]</color> {e.ToString()}");
+                Debug.Log($"<color=red>[CAUGHT]</color> {e.ToString()}");
             }
         }
         
-        ////////////////////////////////////////// Child Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Child Steps
         
         public void AddChildStep(Step step)
         {
@@ -173,7 +193,7 @@ namespace Galleon.Checkout
         }
         
         
-        ////////////////////////////////////////// Pre Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Pre Steps
         
         public void AddPreStep(Step step)
         {
@@ -188,7 +208,7 @@ namespace Galleon.Checkout
         }
         
         
-        ////////////////////////////////////////// Post Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Post Steps
         
         public void AddPostStep(Step step)
         {
@@ -203,7 +223,7 @@ namespace Galleon.Checkout
         }
         
         
-        ////////////////////////////////////////// Methods
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Log Methods
         
         public void Log(object message)
         {
@@ -221,9 +241,12 @@ namespace Galleon.Checkout
             #endregion // PREFIX
             
             Debug.Log($"{prefix}{message}");
+            this.StepLog.Add($"{prefix}{message}");
         }
 
-        ////////////////////////////////////////// Inspector
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inspector
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         public class StepInspector : Inspector<Step>
         {

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
+using Galleon.Checkout.Foundation;
 using Galleon.Checkout.UI;
 using TMPro;
 using UnityEngine;
@@ -632,5 +633,27 @@ namespace Galleon.Checkout.UI
             }
             return digits.Length >= 12 && sum % 10 == 0; // avoid false positive on short input
         }
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
+        
+        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[]
+                                                                              {
+                                                                                  $"{nameof(test_fill_card_data)}()",
+                                                                                  $"{nameof(test_confirm)}()"
+                                                                              });
+        
+        public Step test_fill_card_data() => new Step(action : async (s) =>
+                                                             {
+                                                                 NameInputField.Text        = "jhon doe";
+                                                                 CreditCardNumberField.Text = "5326 1023 0312 5595";
+                                                                 DateInputField.Text        = "09/26";
+                                                                 CVVInputField.Text         = "230";
+                                                                 
+                                                                 await Task.Delay(500);
+                                                                 EntityNode.CurrentTestScenario = "scenario_2_part_2";
+                                                             });
+        
+        public Step test_confirm() => new Step(action : async (s) => On_OkClick() );
     }
 }

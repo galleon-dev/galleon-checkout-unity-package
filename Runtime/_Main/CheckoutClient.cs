@@ -41,6 +41,9 @@ namespace Galleon.Checkout
         public PaymentMethodsController PaymentMethodsController    = new();
         public TaxController            TaxController               = new();  
         
+        // Payment Actions
+        public PaymentActionsController PaymentActions              = new();
+        
         // Entities
         [Header("Entities")]
         public ProductsController       Products                    = new();
@@ -58,6 +61,8 @@ namespace Galleon.Checkout
         // TEMP - testing/debug/wip/etc...
         [Header("Temp")]
         public CheckoutTEMP             Temp                        = new();
+        
+        public string                   CurrentTest                 = "test_1";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Entry Point
         
@@ -93,11 +98,13 @@ namespace Galleon.Checkout
                                   // Controllers
                                   s.AddChildStep(TokenizerController            .Initialize());
                                   s.AddChildStep(PaymentMethodsController       .Initialize());
+                                
                                 //s.AddChildStep(CreditCardController           .Initialize());
                                 //s.AddChildStep(PaypalController               .Initialize());
                                 //s.AddChildStep(GooglePayController            .Initialize());
                                 //s.AddChildStep(GenericPaymentController       .Initialize());
-                                  s.AddChildStep(TaxController                  .Initialize());
+                                  
+                              //s.AddChildStep(TaxController                  .Initialize());
                                   
                                   // Resources
                                   s.AddChildStep(Resources                      .Initialize());
@@ -143,6 +150,8 @@ namespace Galleon.Checkout
          
         public static CheckoutResources        Resources       => CheckoutClient.Instance.Resources;
         
+        public static CheckoutSession          Session         => CheckoutClient.Instance.CurrentSession;
+        
         public static NavigationController     Navigation       => CheckoutClient.Instance.Navigation;
         
         public static PaymentMethodsController PaymentMethods  => CheckoutClient.Instance.PaymentMethodsController;
@@ -152,6 +161,7 @@ namespace Galleon.Checkout
         public static Transaction              Transaction     => User.CurrentTransaction;
          
         public static bool                     IsTest          => Resources.IsTest;
+        public static string                   CurrentTest     { get => CheckoutClient.Instance.CurrentTest; set => CheckoutClient.Instance.CurrentTest = value; } 
     }   
 }
 

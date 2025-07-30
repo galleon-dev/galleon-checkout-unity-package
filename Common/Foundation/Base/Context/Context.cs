@@ -1,0 +1,19 @@
+using UnityEngine.Serialization;
+
+namespace Galleon.Checkout.Foundation
+{
+    public class Context : Entity
+    {
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+        
+        public Context()
+        {
+            // Search for packages
+        }
+        
+        public Package Package1 = new();
+        
+    }
+}
