@@ -27,8 +27,10 @@ namespace Galleon.Checkout.UI
             OtherPaymentMethods,
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+        //////////////////////////////////////////////////////////////////////////// Members
 
+        public PositionLayoutGroup PositionLayoutGroup;
+        
         [Header("Shop Item")]
         public TextMeshProUGUI  ProductTitleText;
         public TextMeshProUGUI  PriceText;

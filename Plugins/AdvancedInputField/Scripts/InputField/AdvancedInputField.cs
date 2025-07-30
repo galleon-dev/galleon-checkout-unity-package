@@ -87,7 +87,7 @@ namespace AdvancedInputFieldPlugin
         CREDIT_CARD_NUMBER,
         CREDIT_CARD_DATE,
         CREDIT_CARD_CCV,
-		CREDIT_CARD_NAME
+		EMAIL_ADDRESS
 	}
 
 	/// <summary>The type of return key to display on mobile</summary>
