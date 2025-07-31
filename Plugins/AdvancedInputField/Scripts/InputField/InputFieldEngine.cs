@@ -1,4 +1,4 @@
-﻿// Copyright (c) Jeroen van Pienbroek. All rights reserved.
+// Copyright (c) Jeroen van Pienbroek. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 using System.Collections;
@@ -1660,7 +1660,7 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Disables text editing</summary>
         internal void EndEditMode()
         {
-            Debug.Log("BeginEditMode");
+            Debug.Log("EndEditMode");
             editMode = false;
             if (ActionBar != null)
             {
@@ -1960,7 +1960,6 @@ namespace AdvancedInputFieldPlugin
             this.beginEditReason = beginEditReason;
             Reselect();
             EnableSelection();
-            return;
             BeginEditMode();
             switch (InputField.CaretOnBeginEdit)
             {

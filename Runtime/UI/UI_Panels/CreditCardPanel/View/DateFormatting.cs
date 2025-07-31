@@ -83,7 +83,8 @@ namespace AdvancedInputFieldPlugin
 
         public override int DetermineProcessedCaret(string text, int caretPosition, string processedText)
         {
-            Debug.Log("DetermineProcessedCaret");
+          //  Debug.Log("DetermineProcessedCaret");
+
             if (caretPosition == 0)
             {
                 return 0;

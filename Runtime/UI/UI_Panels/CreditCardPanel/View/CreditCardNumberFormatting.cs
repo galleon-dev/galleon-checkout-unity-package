@@ -41,6 +41,7 @@ namespace AdvancedInputFieldPlugin
 
         public override string ProcessText(string text, int caretPosition)
         {
+            // Debug.Log("ProcessText, caretPosition: " + caretPosition);
             int length = text.Length;
 
             if (length > MaxInputFieldLimit)
@@ -57,7 +58,10 @@ namespace AdvancedInputFieldPlugin
 
                 if (length == 0)
                 {
-                    CreditCardInfoPanelView.RemoveCardIcon();
+                    if (CreditCardInfoPanelView)
+                    {
+                        CreditCardInfoPanelView.RemoveCardIcon();
+                    }
                     return string.Empty;
                 }
 
@@ -70,9 +74,11 @@ namespace AdvancedInputFieldPlugin
                         if (i >= 0 && i <= 4)
                         {
                             // Get Card Type
-                            cardFormat = CreditCardInfoPanelView.GetFormatForDigits(text);
-
-                            CreditCardInfoPanelView.SetCardIcon(cardFormat);
+                            if (CreditCardInfoPanelView)
+                            {
+                                cardFormat = CreditCardInfoPanelView.GetFormatForDigits(text);
+                                CreditCardInfoPanelView.SetCardIcon(cardFormat);
+                            }
 
                             // Set Limit
                             if (CreditCardAdvancedInputField)
@@ -108,9 +114,11 @@ namespace AdvancedInputFieldPlugin
 
         public override int DetermineProcessedCaret(string text, int caretPosition, string processedText)
         {
+           // Debug.Log("DetermineProcessedCaret(), caretPosition: " + caretPosition + " processedText: " + processedText.Length + " Only Numbers: " + CreditCardAdvancedInputField.Text.Length);
+
             if (caretPosition == 0)
             {
-                return 0;
+               return 0;
             }
 
             int length = processedText.Length;
@@ -140,6 +148,8 @@ namespace AdvancedInputFieldPlugin
 
         public override int DetermineCaret(string text, string processedText, int processedCaretPosition)
         {
+           //Debug.Log("DetermineCaret(), processedCaretPosition: " + processedCaretPosition + " processedText: " + processedText.Length + " Only Numbers: " + CreditCardAdvancedInputField.Text.Length);
+
             if (processedCaretPosition == 0)
             {
                 return 0;
