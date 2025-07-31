@@ -363,7 +363,15 @@ namespace Galleon.Checkout
             
             public bool isDraft => Entity.Node.Tags.Contains("crud_draft") || Entity.Node.IsCrudDraft;
             
-            public void Create() {}
+            public void Create()
+            {
+                var type = Entity.GetType();
+                
+                if (type.GetMethod("CRUD_Create") is MethodInfo createMethod)
+                {
+                    createMethod.Invoke(this.Entity, null);
+                }
+            }
             public void Delete() {}
             public void Update() {}
             
@@ -398,7 +406,10 @@ namespace Galleon.Checkout
             
             public void Plus(IEntity entity)
             {
-                
+                entity.Node.IsCrudDraft = true;
+                this.Entity.Node.AddChild(entity);
+                entity.Node.Crud.Create();
+                entity.Node.IsCrudDraft = false;
             }
             public void Minus(IEntity entity)
             {

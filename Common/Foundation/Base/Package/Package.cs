@@ -1,4 +1,6 @@
+using System.IO;
 using log4net.Plugin;
+using UnityEngine;
 
 namespace Galleon.Checkout.Foundation
 {
@@ -139,13 +141,15 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"Do_Assets_Plus_Folder"
                     ,action : async (s) =>
                     {
-                        // 1. child node of type folder is created
-                        // 2. folder is DRAFT
-                        // 3. folder.CREATE() is called
-                        // 4. Actual physical folder is created.
-                        // 5. folder is not longer draft.
- 
-                        this.Assets.Node.Live.Plus(new Folder() {Name = "f1"});
+                        this.Assets.Node.Live.Plus(new Folder() { Name = "f1" });
+                    });
+        
+        public Step Do_Core_Plus_Folder() 
+        =>
+            new Step(name   : $"Do_Core_Plus_Folder"
+                    ,action : async (s) =>
+                    {
+                        Assets.Node.Live.Plus(new Folder() { Name = "f1" });
                     });
     }
     
@@ -153,7 +157,18 @@ namespace Galleon.Checkout.Foundation
     public class Folder : Asset
     {
         public string Name;
+        
+        public void CRUD_Create()
+        {
+            Debug.Log("FOLDER_CURD_CREATE");
+            return;
+            
+            string Path = $"Assets/{Name}";
+            Debug.Log($"Creating folder {Path}");
+            Directory.CreateDirectory(Path);
+        }
     }
 }
+
 
 

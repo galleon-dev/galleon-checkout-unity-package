@@ -109,6 +109,7 @@ namespace Galleon.Checkout
             new Step(name   : $"start_session"
                     ,action : async (s) =>
                     {
+                        
                         await Task.Delay(1000);
                         return;
                         
