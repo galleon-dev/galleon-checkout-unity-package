@@ -79,7 +79,7 @@ namespace Galleon.Checkout
         
         public List<TestScenario> TestScenarios = new();
         
-        public static string CurrentTestScenario = "scenario_1";
+        public static string CurrentTestScenario = ""; // "scenario_1";
         
         protected void PopulateTestScenarios()
         {
@@ -342,7 +342,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Unity Editor
         #if UNITY_EDITOR
         
-        public EditorExtras editorExtras = new EditorExtras();
+        public       EditorExtras editorExtras = new EditorExtras();
         public class EditorExtras
         {
             public string HeaderAttributeText;
@@ -396,10 +396,18 @@ namespace Galleon.Checkout
             IEntity Entity;
             public LIVE(IEntity entity) => this.Entity = entity;
             
-            public void Plus(IEntity entity)   {}
-            public void Minus()  {}
-            public void Equals() {}
-        }
-        
+            public void Plus(IEntity entity)
+            {
+                
+            }
+            public void Minus(IEntity entity)
+            {
+                
+            }
+            public void Equals(string path, string value)
+            {
+                
+            }
+        }       
     }
 }

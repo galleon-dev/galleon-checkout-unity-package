@@ -58,15 +58,15 @@ namespace Galleon.Checkout
                         /////////////////////////////////////// Pre Steps
                         
                         // Open Screen
-                        s.AddPreStep(StartSession());
                         s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
+                        s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
+                        s.AddPreStep(StartSession());
                         
                         /////////////////////////////////////// Steps
                         
                         // View CheckoutPage
-                        s.AddChildStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
-                        s.AddChildStep(CheckoutClient.Instance.TaxController.GetTaxInfo());
-                        s.AddChildStep("wait",        async x => await Task.Delay(1000));
+                      //s.AddChildStep(CheckoutClient.Instance.TaxController.GetTaxInfo());
+                      //s.AddChildStep("wait",        async x => await Task.Delay(1000));
                         s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                         
@@ -109,6 +109,9 @@ namespace Galleon.Checkout
             new Step(name   : $"start_session"
                     ,action : async (s) =>
                     {
+                        await Task.Delay(1000);
+                        return;
+                        
                         var response = await CHECKOUT.Network.Post<CreateCheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-sessions/init"
                                                                                                  ,headers  : new ()
                                                                                                            {

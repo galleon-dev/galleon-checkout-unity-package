@@ -55,7 +55,8 @@ namespace Galleon.Checkout
                         s.Log($"ID = {id}");
                         s.Log($"Device = {device}");
                         
-                        var accessToken = await Post(url  : $"{SERVER_BASE_URL}/authenticate"
+                      //var accessToken = await Post(url  : $"{SERVER_BASE_URL}/authenticate"
+                        var accessToken =       Post(url  : $"{SERVER_BASE_URL}/authenticate"
                                                     ,body : new
                                                           {
                                                               AppId  = appID,
@@ -63,7 +64,7 @@ namespace Galleon.Checkout
                                                               Device = device,
                                                           });
                         
-                        await Post(url  : $"{SERVER_BASE_URL}/development/seed");                      
+                      //await Post(url  : $"{SERVER_BASE_URL}/development/seed");                      
                         
                         
                         /// Response Example :

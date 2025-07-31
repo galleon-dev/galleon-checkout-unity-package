@@ -32,10 +32,12 @@ namespace Galleon.Checkout
         public GenericInspector(object target, string displayName = null) : base(target)
         {
             string DisplayName = displayName.ToSafeString();
+            if (string.IsNullOrWhiteSpace(DisplayName)) 
+                DisplayName = "Raw";
             
             // Main Foldout
             MainFoldout       = new Foldout(); this.Add(MainFoldout);
-            MainFoldout.text  = "Raw";
+            MainFoldout.text  = DisplayName ?? "Raw";
             MainFoldout.value = false; // Closed by default
             MainFoldout.RegisterValueChangedCallback(x => { if (x.target == MainFoldout) RefreshUI(); });
             
