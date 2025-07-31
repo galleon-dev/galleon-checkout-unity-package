@@ -37,7 +37,7 @@ namespace AdvancedInputFieldPlugin
 
         public override string ProcessText(string text, int caretPosition)
         {
-            Debug.Log("CVV ProcessText: " + text);
+           // Debug.Log("CVV ProcessText: " + text);
             StringBuilder.Length = 0; //Clears the contents of the StringBuilder
             int numberCount = 0;
 
@@ -96,7 +96,8 @@ namespace AdvancedInputFieldPlugin
 
         public override int DetermineProcessedCaret(string text, int caretPosition, string processedText)
         {
-            Debug.Log("DetermineProcessedCaret");
+            // Debug.Log("DetermineProcessedCaret");
+
             if (caretPosition == 0)
             {
                 return 0;

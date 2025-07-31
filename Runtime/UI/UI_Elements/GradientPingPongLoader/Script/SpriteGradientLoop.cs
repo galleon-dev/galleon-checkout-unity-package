@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GalleonGradientLoaderUI
+namespace GalleonGradientPingPongLoaderUI
 {
     public class SpriteGradientLoop : MonoBehaviour
     {

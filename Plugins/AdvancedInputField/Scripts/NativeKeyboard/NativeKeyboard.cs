@@ -229,8 +229,6 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Event callback when the keyboard gets shown</summary>
         public void OnKeyboardShow()
         {
-            Debug.Log("OnKeyboardShow()");
-
             nativeEventQueue.Enqueue(new NativeKeyboardEvent(NativeKeyboardEventType.SHOW));
             State = KeyboardState.VISIBLE;
         }
@@ -238,8 +236,6 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Event callback when the keyboard gets hidden</summary>
         public void OnKeyboardHide()
         {
-            Debug.Log("OnKeyboardHide()");
-
             nativeEventQueue.Enqueue(new NativeKeyboardEvent(NativeKeyboardEventType.HIDE));
             State = KeyboardState.HIDDEN;
         }
@@ -293,8 +289,6 @@ namespace AdvancedInputFieldPlugin
         /// <summary>Event callback when the height of the keyboard has changed</summary>
         public void OnKeyboardHeightChanged(int height)
         {
-            Debug.Log("onKeyboardHeightChanged: " + height);
-
                 if (onKeyboardHeightChanged != null)
                 {
                     onKeyboardHeightChanged.Invoke(height);

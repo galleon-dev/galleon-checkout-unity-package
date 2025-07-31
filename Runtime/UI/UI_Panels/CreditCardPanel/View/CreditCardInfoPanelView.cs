@@ -223,6 +223,39 @@ namespace Galleon.Checkout.UI
             return InputFieldsCorrect;
         }
 
+        IEnumerator CheckIfFocusOnCVV()
+        {
+            yield return new WaitForSeconds(0.1f);
+            if (!string.IsNullOrEmpty(NameInputField.Text) && !string.IsNullOrEmpty(CreditCardNumberField.Text) && !string.IsNullOrEmpty(DateInputField.Text) && string.IsNullOrEmpty(CVVInputField.Text))
+            {
+                CardFormat CF = GetFormatForDigits(CreditCardNumberField.Text);
+                if (MaxLength == 0)
+                {
+                    MaxLength = CF.MaxLength;
+                }
+
+                if (DateInputField.Text.Length == 4 && (CreditCardNumberField.Text.Length == MaxLength || (CreditCardNumberField.Text.Length == 16) && CF.Name.ToLower() == "visa"))
+                {
+                    // Debug.Log("SELECT CVV");
+                    int AdvancedInputFieldsAmount = AdvancedInputFields.Count;
+                    for (int i = 0; i < AdvancedInputFieldsAmount; i++)
+                    {
+                        if (AdvancedInputFields[i].Selected)
+                        {
+                            // Debug.Log("Deselected: " + AdvancedInputFields[i].name);
+                            AdvancedInputFields[i].ManualDeselect(EndEditReason.PROGRAMMATIC_DESELECT);
+                            yield return new WaitForEndOfFrame();
+                        }
+                    }
+                    CVVInputField.ManualSelect();
+                }
+            }
+            else
+            {
+                Debug.Log("Some of the InputFields are not empty, therefore we don't focus on CVV");
+            }
+        }
+
         public void OnValueChanged(string text)
         {
             FormatCreditCardInput(text);
@@ -287,6 +320,8 @@ namespace Galleon.Checkout.UI
                 {
                     DateErrorText.gameObject.SetActive(false);
                     IsValidDate = true;
+
+                    StartCoroutine(CheckIfFocusOnCVV());
                 }
             }
             else
@@ -392,13 +427,16 @@ namespace Galleon.Checkout.UI
             {
                 NameErrorText.gameObject.SetActive(false);
             }
+
+            StartCoroutine(CheckIfFocusOnCVV());
         }
 
+        int MaxLength;
         void FormatCreditCardInput(string rawInput)
         {
             Debug.Log("FormatCreditCardInput: " + rawInput);
-
-            if (rawInput.Length > GetFormatForDigits(rawInput).MaxLength)
+            MaxLength = GetFormatForDigits(rawInput).MaxLength;
+            if (rawInput.Length > MaxLength)
             {
                 rawInput = rawInput.Remove(rawInput.Length - 1);
                 Debug.Log("Updated RawInput: " + rawInput);
@@ -407,6 +445,8 @@ namespace Galleon.Checkout.UI
             CheckLuhnOnEndEdit(rawInput);
 
             OnCVVValueChanged(CVVInputField.Text);
+
+            StartCoroutine(CheckIfFocusOnCVV());
         }
 
         public void CheckLuhnOnEndEdit(string digits)
