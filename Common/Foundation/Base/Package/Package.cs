@@ -125,29 +125,34 @@ namespace Galleon.Checkout.Foundation
                         ///         -t      :
                         /// Print
                         ///     Print "Thing t1"
+                        ///
+                        ///
+                        /// ///////////////////
+                        /// 
+                        /// easy : Assets + f
+                        /// big  : Core   + go
+                        /// 
                     });
-        
+
+        public Step Do_Assets_Plus_Folder() 
+        =>
+            new Step(name   : $"Do_Assets_Plus_Folder"
+                    ,action : async (s) =>
+                    {
+                        // 1. child node of type folder is created
+                        // 2. folder is DRAFT
+                        // 3. folder.CREATE() is called
+                        // 4. Actual physical folder is created.
+                        // 5. folder is not longer draft.
+ 
+                        this.Assets.Node.Live.Plus(new Folder() {Name = "f1"});
+                    });
     }
     
-    public class myelement
+    public class Asset  : Entity {}
+    public class Folder : Asset
     {
-        // CRUD
-        public void Create() {}
-        public void Delete() {}
-        public void Update() {}
-    }
-    
-    public class ENode_DOT_Element_Aspect
-    {
-        // Definitions
-        public void GetDefinitions()  {}
-        public void GetElement()      {}
-        public void GetAssetsFolder() {}
-        
-        // +/-/e
-        public void Plus () {} // = add_child + create() 
-        public void Minus() {} // = delete() + remove_child
-        public void Edit () {} // = Update(path=value)
+        public string Name;
     }
 }
 

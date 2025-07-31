@@ -351,5 +351,55 @@ namespace Galleon.Checkout
         
         #endif // UNITY_EDITOR
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - self CRUD
+        
+        public bool IsCrudDraft = true;
+        
+        public        CRUD Crud => new(Entity);
+        public struct CRUD
+        {
+            public IEntity Entity;
+            public CRUD(IEntity entity) => this.Entity = entity;
+            
+            public bool isDraft => Entity.Node.Tags.Contains("crud_draft") || Entity.Node.IsCrudDraft;
+            
+            public void Create() {}
+            public void Delete() {}
+            public void Update() {}
+            
+            public void OpenForEdit()  {}
+            public void CloseForEdit() {}
+            
+            public bool DoesExist()  {return !isDraft;}
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element
+     
+        public        ELEMENT Element => new(Entity);
+        public struct ELEMENT
+        {
+            IEntity Entity;
+            public ELEMENT(IEntity entity) => this.Entity = entity;
+            
+            // Definitions
+            public IEntity GetDefinitions()  { return default; }
+            public IEntity GetElement()      { return default; }
+            public IEntity GetAssetsFolder() { return default; }
+        }
+            
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live Tree
+     
+        public        LIVE Live => new(Entity);
+        public struct LIVE
+        {
+            IEntity Entity;
+            public LIVE(IEntity entity) => this.Entity = entity;
+            
+            public void Plus(IEntity entity)   {}
+            public void Minus()  {}
+            public void Equals() {}
+        }
+        
     }
 }
