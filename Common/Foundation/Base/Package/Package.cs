@@ -1,4 +1,4 @@
-using log4net.Plugin;
+//using log4net.Plugin;
 
 namespace Galleon.Checkout.Foundation
 {
