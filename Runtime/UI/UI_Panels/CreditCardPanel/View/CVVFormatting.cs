@@ -1,6 +1,9 @@
 // Copyright (c) Jeroen van Pienbroek. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
+#if ANDROID
+
+
 using Galleon.Checkout.UI;
 using System.Text;
 using UnityEngine;
@@ -166,3 +169,6 @@ namespace AdvancedInputFieldPlugin
         }
     }
 }
+
+
+#endif

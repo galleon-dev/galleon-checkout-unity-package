@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.UI;
@@ -13,11 +12,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+#if ANDROID
+using AdvancedInputFieldPlugin;
+#endif
+
 
 namespace Galleon.Checkout.UI
 {
     public class CreditCardInfoPanelView : View
     {
+        #if ANDROID
+        
         //////////////////////////////////////////////////////////////////////////// Members
         public List<AdvancedInputField> AdvancedInputFields;
 
@@ -577,5 +582,9 @@ namespace Galleon.Checkout.UI
                                                              });
         
         public Step test_confirm() => new Step(action : async (s) => On_OkClick() );
+    
+        #endif // ANDROID
+    
     }
+
 }

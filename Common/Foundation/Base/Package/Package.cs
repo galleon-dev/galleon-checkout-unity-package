@@ -1,6 +1,6 @@
 using System.IO;
-using log4net.Plugin;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Galleon.Checkout.Foundation
 {
@@ -11,7 +11,16 @@ namespace Galleon.Checkout.Foundation
         public Assets Assets = new Assets();
         public Core   Core   = new Core();
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public Package()
+        {
+            var rootFolderPath     = Application.dataPath + "/" + "package1/";
+            this.Assets.RootFolder = new Folder() { Path = rootFolderPath };
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Steps
+        
         
         public Step Report()
         =>
@@ -136,12 +145,20 @@ namespace Galleon.Checkout.Foundation
                         /// 
                     });
 
+        public Step Print_Package_Root_Folder() 
+        =>
+            new Step(name   : $"Print_Package_Root_Folder"
+                    ,action : async (s) =>
+                    {
+                        s.Log(Assets.RootFolder.Path);
+                    });
+        
         public Step Do_Assets_Plus_Folder() 
         =>
             new Step(name   : $"Do_Assets_Plus_Folder"
                     ,action : async (s) =>
                     {
-                        this.Assets.Node.Live.Plus(new Folder() { Name = "f1" });
+                        this.Assets.RootFolder.Node.Live.Plus(new Folder() { Name = "f1" });
                     });
         
         public Step Do_Core_Plus_Folder() 
@@ -149,25 +166,48 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"Do_Core_Plus_Folder"
                     ,action : async (s) =>
                     {
-                        Assets.Node.Live.Plus(new Folder() { Name = "f1" });
+                        // Test :
+                        Core.Plus(new Folder() { Name = "f1" });
                     });
     }
     
-    public class Asset  : Entity {}
+    /////////////////////////////////////////////////
+    
+    public class Asset  : Entity
+    {
+        public string Path;
+        public string FolderPath;
+    }
+    
+    /////////////////////////////////////////////////
+    
     public class Folder : Asset
     {
         public string Name;
         
-        public void CRUD_Create()
+        public static string PackageRootFolderPath => Application.dataPath + "/" + "package1/";
+        
+        //// CRUD
+        
+        public class FolderCrudHandler : CrudHandler<Folder>
         {
-            Debug.Log("FOLDER_CURD_CREATE");
-            return;
-            
-            string Path = $"Assets/{Name}";
-            Debug.Log($"Creating folder {Path}");
-            Directory.CreateDirectory(Path);
+            public override void Create()
+            {
+                string Path = $"Assets/{target.Name}";
+                Debug.Log($"Creating folder {Path}");
+                Directory.CreateDirectory(Path);
+                
+                Debug.Log("FOLDER_CURD_CREATE");
+                return;
+            }
         }
+        
+        //// 
     }
+    
+    /// Assets.Print "> Folder f1" =
+    ///     Assets.Plus(Folder);
+    ///     Assets.Edit(Folder.Name, "f1");
 }
 
 

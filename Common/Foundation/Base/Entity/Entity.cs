@@ -325,17 +325,86 @@ namespace Galleon.Checkout
         {
             public EntityInspector(IEntity target) : base(target)
             {
-                Foldout foldout = new Foldout() { text = $"{target.Node.DisplayName} entity" , value = false}; this.Add(foldout);
-                foldout.Add(new Label(" "));
+                // Main
+                Foldout foldout = new Foldout() { text = $"{target.Node.DisplayName} entity" , value = true}; this.Add(foldout);
+                //foldout.Add(new Label(" "));
+                foldout.contentContainer.style.backgroundColor = new Color(0.3f,0.3f,0.3f);
                 
                 // Breadcrumbs
-                var breadcrumbsFolderout = new Foldout() { text = "Breadcrumbs", value = true }; foldout.Add(breadcrumbsFolderout);
+                var breadcrumbsFolderout = new Foldout() { text = "Breadcrumbs", value = false }; foldout.Add(breadcrumbsFolderout);
                 breadcrumbsFolderout?.Clear();
                 foreach (var breadcrumb in Target.Node.Breadcrumbs)
                 {
                     var breadcrumbInspector = new Breadcrumb.Inspector(breadcrumb, breadcrumb.DisplayName);
                     breadcrumbsFolderout.Add(breadcrumbInspector);
                 }
+                
+                // Steps
+                #region STEPS
+                
+                // get all methods that return void and have no params
+                var steps = target.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                                            .Where     (m => m is PropertyInfo p && p.PropertyType == typeof(Step) 
+                                                          || m is MethodInfo mi && mi.GetParameters().Length == 0 && mi.ReturnType == typeof(Step) && !mi.Name.StartsWith("get_"))
+                                            .ToArray   ();
+                
+                if (steps.Length > 0)
+                {
+                    ButtonFoldout StepsFoldout               = new ButtonFoldout(); foldout.Add(StepsFoldout);
+                    StepsFoldout.Button.style.maxWidth       = 120;
+                    StepsFoldout.Text                        = $"STEPS ({steps.Count()})";
+                    StepsFoldout.Expanded                    = false; // Closed by default
+                    
+                    foreach (var step in steps)
+                    {
+                        try
+                        {
+                            Button button                = new Button(); StepsFoldout.Content.Add(button);
+                            button.text                  =  step.Name;
+                            button.style.unityTextAlign  = TextAnchor.MiddleLeft;
+                            button.clicked              += () =>
+                                                           {
+                                                               if (step is MethodInfo m)
+                                                               {
+                                                                   Step s;
+                                                                   
+                                                                   if (m.IsStatic)
+                                                                     s = m.Invoke(null, null) as Step;
+                                                                   else
+                                                                     s = m.Invoke(target, null) as Step;
+                                                                   
+                                                                   s.Execute();
+                                                               }
+                                                               if (step is PropertyInfo p)
+                                                               {
+                                                                   Step s;
+                                                                   if (p.GetMethod?.IsStatic ?? false)
+                                                                       s = p.GetValue(null) as Step;
+                                                                   else
+                                                                       s = p.GetValue(target) as Step;
+                                                                       
+                                                                   s.Execute();
+                                                               }
+                                                           };
+                            
+                            bool isPublic = (step is MethodInfo methodInfo && methodInfo.IsPublic) || (step is PropertyInfo propertyInfo && propertyInfo.GetMethod != null && propertyInfo.GetMethod.IsPublic);
+                            if (!isPublic)
+                                button.text += " (private)";
+                            bool isStatic =  (step is MethodInfo methodInfoCheck && methodInfoCheck.IsStatic || step is PropertyInfo propertyInfoCheck && propertyInfoCheck.GetMethod?.IsStatic == true);
+                            if (isStatic)
+                                button.text += " (static)";
+                        }
+                        catch (Exception e)
+                        {
+                            TextField errorText = new TextField(); StepsFoldout.Add(errorText);
+                            errorText.value = $"(error : {e.Message})";
+                            errorText.label = $"method = [{step?.Name.ToSafeString()}]";
+                        }
+                    }
+                }
+
+                
+                #endregion  // STEPS
             }
         }
         
@@ -363,14 +432,18 @@ namespace Galleon.Checkout
             
             public bool isDraft => Entity.Node.Tags.Contains("crud_draft") || Entity.Node.IsCrudDraft;
             
+            public bool SupportsCRUD => Entity.GetType().GetNestedTypes().Any(x => x.IsSubclassOf(typeof(CrudHandler)));
+            
             public void Create()
             {
-                var type = Entity.GetType();
+                if (!SupportsCRUD)
+                    throw new Exception($"type {Entity.GetType().FullName} does not support CRUD");
                 
-                if (type.GetMethod("CRUD_Create") is MethodInfo createMethod)
-                {
-                    createMethod.Invoke(this.Entity, null);
-                }
+                var type            = Entity.GetType();
+                var crudType        = type.GetNestedTypes().FirstOrDefault(x => x.IsSubclassOf(typeof(CrudHandler)));
+                var crudInstance    = Activator.CreateInstance(crudType, true) as CrudHandler;
+                crudInstance.target = Entity;
+                crudInstance.Create();
             }
             public void Delete() {}
             public void Update() {}
@@ -390,7 +463,7 @@ namespace Galleon.Checkout
             public ELEMENT(IEntity entity) => this.Entity = entity;
             
             // Definitions
-            public IEntity GetDefinitions()  { return default; }
+            public IEntity GetDefinition()   { return default; }
             public IEntity GetElement()      { return default; }
             public IEntity GetAssetsFolder() { return default; }
         }
@@ -411,14 +484,39 @@ namespace Galleon.Checkout
                 entity.Node.Crud.Create();
                 entity.Node.IsCrudDraft = false;
             }
+            public void Minus()
+            {
+                
+            }
             public void Minus(IEntity entity)
             {
                 
             }
-            public void Equals(string path, string value)
+            public void Edit(string path, string value)
             {
                 
             }
         }       
     }
+    
+    /////////////////////////////////////////////////
+    
+    public class CrudHandler
+    {
+        public object target; 
+        public virtual void Create() {}
+        public virtual void Update() {}
+        public virtual void Delete() {}
+    }
+    public class CrudHandler<T> : CrudHandler where T : class
+    {
+        public new T target
+        {
+            get => base.target as T;
+            set => base.target = value;
+        }
+    }
+    
+    /////////////////////////////////////////////////
 }
+

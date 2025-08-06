@@ -1,44 +1,49 @@
 using System;
+using System.Linq;
 using UnityEngine.UIElements;
 
 namespace Galleon.Checkout.Foundation
 {
     public class Core : Entity
     {
-        public static event Action P_1;
-        public Step Do_P_1()
+        public void Plus(IEntity entity)
+        {
+            if (entity is Folder f)
+            {
+                var package = this.Node.Parent as Package;
+                var Assets  = package.Assets;
+                Assets.Node.Live.Plus(f);
+            }
+            else
+            {
+                var definition     = entity.Node.Element.GetDefinition();
+                var treeDefinition = ""; // var tree = definition.treeDefinition;
+                var tree           = this.Node.Descendants().First(x => x.GetType().Name == treeDefinition);
+                tree.Node.Live.Plus(entity);
+            }
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////// TEMP
+        
+        public Step Do_Core_Plus_Folder() 
         =>
-            new Step(name   : $"P_1"
-                    ,action : async (s) =>
+            new Step(action : async (s) =>
                     {
-                        P_1?.Invoke();
-                    });
-        public static event Action P_2;
-        public Step Do_P_2()
-        =>
-            new Step(name   : $"P_2"
-                    ,action : async (s) =>
-                    {
-                        P_2?.Invoke();
-                    });
-        public static event Action P_3;
-        public Step Do_P_3()
-        =>
-            new Step(name   : $"P_3"
-                    ,action : async (s) =>
-                    {
-                        P_3?.Invoke();
+                        var Package = this.Node.Parent as Package;
+                        var assets = Package.Assets;
+                        assets.Do_Assets_Plus_Folder();
                     });
         
+        //////////////////////////////////////////////////////////////////////////////////// Inspector
         public class Inspector : Inspector<Core>
         {
             public Inspector(Core target) : base(target)
             {
-                this.Add(new Button(async () => await target.Do_P_1().Execute()) { text = "P 1" });
-                this.Add(new Button(async () => await target.Do_P_2().Execute()) { text = "P 2" });
-                this.Add(new Button(async () => await target.Do_P_3().Execute()) { text = "P 3" });
+                Button btn_CorePlusFolder   = new Button(); this.Add(btn_CorePlusFolder);
+                btn_CorePlusFolder.clicked += () => target.Do_Core_Plus_Folder().Execute(); 
+                btn_CorePlusFolder.text     = "Assets + Folder";
             }
         }
-        
     }
 }
+

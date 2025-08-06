@@ -622,8 +622,10 @@ namespace Galleon.Checkout.UI
                                                        ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString()
                                                        ,setup  : page =>
                                                                {
+                                                                   #if Android
                                                                    page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
                                                                    page.NavigationMap["test_1"]                                              = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
+                                                                   #endif
                                                                }
                                                         );
 

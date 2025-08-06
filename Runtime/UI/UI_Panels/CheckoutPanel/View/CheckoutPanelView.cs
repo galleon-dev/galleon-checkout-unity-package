@@ -184,13 +184,16 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
-        public TestScenario scenario_1        => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase)}()" });
+        public TestScenario scenario_1        => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase     )}()" });
         public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_select_other_methods)}()" });
-        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_settings_page)}()" });
-        public TestScenario scenario_2_part_3 => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase)}()" });
+        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_settings_page       )}()" });
+        public TestScenario scenario_2_part_3 => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase     )}()" });
         
-        public Step test_confirmPurchase()      => new Step(action : async (s) => { OnConfirmPurchaseClick(); });
+        public Step test_confirmPurchase()      => new Step(action : async (s) => { OnConfirmPurchaseClick();     });
         public Step test_select_other_methods() => new Step(action : async (s) => { OnOtherPaymentMethodsClick(); });
-        public Step test_settings_page()        => new Step(action : async (s) => { OnSettingsClick(); });
+        public Step test_settings_page()        => new Step(action : async (s) => { OnSettingsClick();            });
+        
+        /// Test Rule : On_Next("checkoutPanel").Do("confirm_purchase")
+        /// Test Rule : On_ALL ("whatever")     .Do("confirm_purchase")
     }
 }
