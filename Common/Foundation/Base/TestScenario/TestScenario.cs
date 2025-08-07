@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Galleon.Checkout.Foundation
 {
@@ -49,6 +51,21 @@ namespace Galleon.Checkout.Foundation
             {
                 var testStep = DynamicExpression.Evaluate<Step>(this.Target, expression);
                 yield return testStep;
+            }
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
+        
+        public void bla()
+        {
+            Step.OnStepExecuted += StepOnOnStepExecuted;
+            async Task StepOnOnStepExecuted(Step step)
+            {
+                if (step.Name == "focus")
+                {
+                    await Task.Delay(5000);
+                    Debug.Log("AAAA");
+                }
             }
         }
     }

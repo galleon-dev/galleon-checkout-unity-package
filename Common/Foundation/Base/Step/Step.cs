@@ -17,22 +17,26 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public string           Name;
-        public List<string>     Tags                        = new();
-        public StepAction       Action;
+        public string             Name;
+        public List<string>       Tags                        = new();
+        public StepAction         Action;
         
-        public List<Step>       ChildSteps                  = new();
-        public List<Step>       PreSteps                    = new();
-        public List<Step>       PostSteps                   = new();
-        public Step             ParentStep { get; set; }    = null;
+        public List<Step>         ChildSteps                  = new();
+        public List<Step>         PreSteps                    = new();
+        public List<Step>         PostSteps                   = new();
+        public Step               ParentStep { get; set; }    = null;
 
-        public List<Breadcrumb> Breadcrumbs                 = new();
+        public List<Breadcrumb>   Breadcrumbs                 = new();
         
-        public Stopwatch        ExecutionStopwatch;
-        public DateTime         StartTime                   = DateTime.MaxValue;
-        public DateTime         EndTime                     = DateTime.MaxValue;
+        public Stopwatch          ExecutionStopwatch;
+        public DateTime           StartTime                   = DateTime.MaxValue;
+        public DateTime           EndTime                     = DateTime.MaxValue;
         
-        public List<string>     StepLog                     = new();
+        public List<string>       StepLog                     = new();
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
+        
+        public static event Func<Step, Task> OnStepExecuted;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Link
         
@@ -171,6 +175,13 @@ namespace Galleon.Checkout
                 EndTime = DateTime.Now;
                 var execution_finished_breadcrumb = sourceBreadcrumb ?? new Breadcrumb(CallerMemberName, CallerLineNumber, CallerFilePath, displayName: "execution_finished_breadcrumb");
                 this.Breadcrumbs.Add(execution_finished_breadcrumb);                
+                
+                ////////////////////////////////////////////////
+                
+                // Fire Event
+                if ( OnStepExecuted?.Invoke(this) is Task t )
+                    await t;
+                
             }
             catch (Exception e)
             {

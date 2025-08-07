@@ -328,6 +328,7 @@ namespace Galleon.Checkout
                 // Main
                 Foldout foldout = new Foldout() { text = $"{target.Node.DisplayName} entity" , value = true}; this.Add(foldout);
                 //foldout.Add(new Label(" "));
+                //foldout.Add(new Label(" "));
                 foldout.contentContainer.style.backgroundColor = new Color(0.3f,0.3f,0.3f);
                 
                 // Breadcrumbs
