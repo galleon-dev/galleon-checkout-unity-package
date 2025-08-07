@@ -15,6 +15,8 @@ namespace Galleon.Checkout.UI
 {
     public class CreditCardInfoPanelView : View
     {
+        #if ANDROID
+        
         //////////////////////////////////////////////////////////////////////////// Members
         
         public AdvancedInputField CreditCardNumberField;
@@ -290,6 +292,8 @@ namespace Galleon.Checkout.UI
             }
             return digits.Length >= 12 && sum % 10 == 0; // avoid false positive on short input
         }
+
+        #endif
     }
 }
 

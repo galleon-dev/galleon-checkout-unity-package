@@ -461,8 +461,10 @@ namespace Galleon.Checkout.UI
                                                           ,footer : FooterPanelView     .STATE.terms_privacy_return .ToString()
                                                           ,setup  : page =>
                                                                   {
+                                                                      #if ANDROID
                                                                       page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
                                                                       page.NavigationMap["test"]                                                = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                      #endif
                                                                   }
                                                            );
         
@@ -518,111 +520,6 @@ namespace Galleon.Checkout.UI
                                                                       page.NavigationMap["test"]                                         = page.screen.ViewPage(page.screen.SuccessPage);
                                                                   }
                                                            );
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Steps
-        
-        public Step ViewTestPanel()
-        =>
-            new Step(name   : $"view_test_panel" 
-                    ,action : async (s) =>
-                    {
-                        DisableAllPanels();
-                        TestPanelView.gameObject.SetActive(true);
-                        
-                        this.HeaderPanelView.State = HeaderPanelView.STATE.checkout_and_settings.ToString(); 
-                        this.HeaderPanelView.RefreshState();
-
-                        await Task.Delay(1000);
-                        this.HeaderPanelView.State = HeaderPanelView.STATE.back_and_text.ToString(); 
-                        this.HeaderPanelView.RefreshState();
-
-                        await Task.Delay(1000);
-                        this.HeaderPanelView.State = HeaderPanelView.STATE.x_button.ToString(); 
-                        this.HeaderPanelView.RefreshState();
-
-                        await Task.Delay(1000);
-                        this.FooterPanelView.State = FooterPanelView.STATE.terms_privacy_return.ToString();
-                        this.FooterPanelView.RefreshState();
-                        
-                        await Task.Delay(1000);
-                        this.FooterPanelView.State = FooterPanelView.STATE.long_terms_of_service.ToString();
-                        this.FooterPanelView.RefreshState();
-                        
-                      //TestPanel.SetActive(false);
-                    });
-        
-        
-        public Step ViewCheckoutPanel()
-        =>
-            new Step(name   : $"view_checkout_panel"
-                    ,action : async (s) =>
-                    {
-                        DisableAllPanels();
-                        await CheckoutPanel.View().Execute();
-
-                        switch (CheckoutPanel.Result)
-                        {
-                            case CheckoutPanelView.ViewResult.Confirm             : ViewSuccessPanel()            .Execute(); break;
-                            case CheckoutPanelView.ViewResult.Settings            : ViewSettingsPanel()           .Execute(); break;
-                            case CheckoutPanelView.ViewResult.OtherPaymentMethods : ViewSelectPaymentMethodPanel().Execute(); break;
-                        }
-                    });
-        
-        public Step ViewSuccessPanel()
-        =>
-            new Step(name   : $"view_success_panel"
-                    ,action : async (s) =>
-                    {
-                        DisableAllPanels();
-                        await SuccessPanelView.View().Execute();
-
-                        // switch (SuccessPanelView.Result)
-                        // {
-                        //     case SuccessPanelView.ViewResult.Confirm : Close(); break;
-                        // }
-                    });
-        
-        public Step ViewSettingsPanel()
-        =>
-            new Step(name   : $"view_settings_panel"
-                    ,action : async (s) =>
-                    {
-                        DisableAllPanels();
-                        await SettingsPanelView.View().Execute();
-                        
-                        switch (SettingsPanelView.Result)
-                        {
-                            case SettingsPanelView.ViewResult.Close : ViewCheckoutPanel().Execute(); break;
-                        }
-                    });
-        
-        public Step ViewSelectPaymentMethodPanel()
-        =>
-            new Step(name   : $"view_select_payment_methods_panel"
-                    ,action : async (s) =>
-                    {
-                        DisableAllPanels();
-                        await CreditCardPanel.View().Execute();
-                        
-                        switch (CreditCardPanel.Result)
-                        {
-                            case CreditCardInfoPanelView.ViewResult.Confirm : Close(); break;
-                        }
-                    });
-        
-        public Step ViewCreditCardPanel()
-        =>
-            new Step(name   : $"view_credit_card_panel"
-                    ,action : async (s) =>
-                    {
-                        DisableAllPanels();
-                        await CreditCardPanel.View().Execute();
-                        
-                        switch (CreditCardPanel.Result)
-                        {
-                            case CreditCardInfoPanelView.ViewResult.Confirm : Close(); break;
-                        }
-                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
 
