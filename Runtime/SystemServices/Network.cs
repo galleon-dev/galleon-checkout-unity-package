@@ -21,12 +21,15 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
-        public string SERVER_BASE_URL = "https://localhost:4000/v1";
+        //public string SERVER_BASE_URL = "https://localhost:4000/v1";
+        //public string SERVER_BASE_URL = "https://galleon-bridge-server-production.up.railway.app";
+        public string SERVER_BASE_URL = "http://localhost:3000";
+        
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public string GalleonUserAccessToken = "";
-      //public string GalleonUserAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6InBheWVyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwOS8wOS9pZGVudGl0eS9jbGFpbXMvYWN0b3IiOiJ0ZXN0LmFwcCJ9.eWgcUHry2SxwShuAO_jHtBFQ5x8c4iBJaPwyn9iqNa4";
+      //public string GalleonUserAccessToken = "";
+        public string GalleonUserAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdHJpcGVDdXN0b21lcklkIjoiY3VzX1NxR2Rab1FHZXRTUFZSIiwiYXBwSWQiOiJ0ZXN0LmFwcCIsImlhdCI6MTc1NDkxNjUyOCwiZXhwIjoxNzU1NTIxMzI4fQ.FpD_ujYnwm6SNWPvHkSbVf-y-ZKeuQxHJ8F-Ai7zIVU";
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle 
 
@@ -46,6 +49,8 @@ namespace Galleon.Checkout
             new Step(name   : "get_user_access_token"
                     ,action : async s =>
                     {
+                        return;
+                        
                         string appID  = "test.app-1";
                         string id     = "test.app-1";
                         string device = "local_unity_test_client";

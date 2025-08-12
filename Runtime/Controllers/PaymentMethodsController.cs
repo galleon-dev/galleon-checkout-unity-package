@@ -25,8 +25,11 @@ namespace Galleon.Checkout
                         PaymentMethodsDefinitions.Node.DisplayName = "Payment Method Definitions";
                         UserPaymentMethods.Node.DisplayName        = "User Payment Methods";
                         
-                        s.AddChildStep(TestPopulatePaymentMethodDefinitions());
-                        s.AddChildStep(TestPopulatePaymentMethods());
+                        s.AddChildStep(GetPaymentMethodDefinitions());
+                        s.AddChildStep(GetUserPaymentMethods());
+                        
+                        //s.AddChildStep(TestPopulatePaymentMethodDefinitions());
+                        //s.AddChildStep(TestPopulatePaymentMethods());
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
@@ -99,14 +102,28 @@ namespace Galleon.Checkout
             new Step(name   : $"get_payment_method_definitions"
                     ,action : async (s) =>
                     {
-                      //var _result = await CHECKOUT.Network.Get<Shared.PaymentMethodDefinitionsResponse>($"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions-test");
+                        var _result = await CHECKOUT.Network.Get<Shared.PaymentMethodDefinitionsResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions"
+                                                                                                         ,headers  : new ()
+                                                                                                         {
+                                                                                                             { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                                         });
                         
-                        List<Shared.PaymentMethodDefinitionData> dataList = new();
+                        var dataList = _result.definitions;
 
                         foreach (var data in dataList)
                         {
                             PaymentMethodDefinition pmd = new PaymentMethodDefinition();
                             pmd.Data = data;
+                            
+                            this.PaymentMethodsDefinitions.Add(new PayPalPaymentMethodDefinition()
+                                                           {
+                                                               Type                = pmd.Type,
+                                                               InitializationSteps = {},
+                                                               TransactionSteps    =
+                                                                                   {
+                                                                                   },
+                                                               Data                = data,
+                                                           });
                         }
                     });
         
@@ -117,15 +134,27 @@ namespace Galleon.Checkout
             new Step(name   : $"get_user_payment_methods"
                     ,action : async (s) =>
                     {
-                      //var _result = await CHECKOUT.Network.Get<Shared.UserPaymentMethodsResponse>($"{CHECKOUT.Network.SERVER_BASE_URL}/user-payment-method-test");
+                        var _result = await CHECKOUT.Network.Get<Shared.UserPaymentMethodsResponse>(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/user-payment-methods"
+                                                                                                   ,headers : new ()
+                                                                                                   {
+                                                                                                       { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                                   });
                         
-                        List<UserPaymentMethodData> dataList = new();
+                        var dataList = _result.payment_methods;
 
                         foreach (var data in dataList)
                         {
                             UserPaymentMethod pm = new UserPaymentMethod();
                             pm.Data          = data;
+                            
+                            this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
+                                                        {
+                                                            Type        = pm.Data.credit_card_type ?? "credit card",
+                                                            DisplayName = pm.Data.display_name,
+                                                            Data        = data,
+                                                        });
                         }
+                        
                     });
         
     }

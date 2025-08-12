@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Galleon.Checkout;
+using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -67,19 +68,6 @@ namespace Galleon.Checkout
         ///////////////////////
         
         public TokenizerData Tokenizer;
-        
-        public class TokenizerData
-        {
-            public long             Timestamp = 0L;
-            public TokenizerPayload Payload   = new();
-            
-            public class TokenizerPayload
-            {
-                public string                     ServiceUrl      = "";
-                public string                     RequestFormat   = "";
-                public Dictionary<string, string> Headers         = new();
-            }
-        }
         
         ///////////////////////
 

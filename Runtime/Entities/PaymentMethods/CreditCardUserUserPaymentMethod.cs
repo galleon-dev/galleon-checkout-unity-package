@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,21 +62,20 @@ namespace Galleon.Checkout
             new Step(name   : $"tokenize"
                     ,action : async (s) =>
                     {
-                      //var card                = new 
-                      //                          {
-                      //                              Number = "4242424242424242",
-                      //                              Month  = 12,
-                      //                              Year   = 2026,
-                      //                              Cvc    = "123"
-                      //                          };
-                        
-                        var card                = new 
-                                                  {
-                                                      Number = CardNumber,
-                                                      Month  = CardMonth,
-                                                      Year   = CardYear,
-                                                      Cvc    = CardCCV,
-                                                  };
+                      //var card = new 
+                      //           {
+                      //               Number = "4242424242424242",
+                      //               Month  = 12,
+                      //               Year   = 2026,
+                      //               Cvc    = "123"
+                      //           };
+                      var card = new 
+                       {
+                           Number = CardNumber,
+                           Month  = CardMonth,
+                           Year   = CardYear,
+                           Cvc    = CardCCV,
+                       };
                         
                         
                         var Tokenizer           = CheckoutClient.Instance.TokenizerController.Tokenizer;
@@ -160,6 +160,8 @@ namespace Galleon.Checkout
             new Step(name   : $"charge"
                     ,action : async (s) =>
                     {                                               
+                        var upm = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
+                        
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
                                                                                             {
@@ -167,60 +169,62 @@ namespace Galleon.Checkout
                                                                                             }
                                                                                   ,body     : new Shared.ChargeRequest()
                                                                                             {
-                                                                                                SessionId          = CHECKOUT.Session.SessionID,
-                                                                                                IsNewPaymentMethod = true,
-                                                                                                PaymentMethod      = new PaymentMethodDetails()
-                                                                                                                   {
-                                                                                                                        id   = "stripe",
-                                                                                                                        data = new ()
-                                                                                                                             {
-                                                                                                                                  { "Number",  this.TokenID },
-                                                                                                                                  { "ExpMonth",this.TokenID },
-                                                                                                                                  { "ExpYear", this.TokenID },
-                                                                                                                                  { "Cvc",     this.TokenID },
-                                                                                                                             }
-                                                                                                                   },
-                                                                                                SavePaymentMethod  = true
+                                                                                                session_id            = CHECKOUT.Session.SessionID,
+                                                                                                is_new_payment_method = false,
+                                                                                                payment_method        = new PaymentMethodDetails()
+                                                                                                                      {
+                                                                                                                           id   = upm.Data.id,
+                                                                                                                           data = new ()
+                                                                                                                                {
+                                                                                                                                     { "token",  this.TokenID },
+                                                                                                                                   
+                                                                                                                                }
+                                                                                                                      },
+                                                                                                save_payment_method   = false,
                                                                                             
-                                                                                                // Sku      = "sku-1",
-                                                                                                // Quantity = 1,
-                                                                                                // Amount   = 100,
-                                                                                                // Currency = "USD",
-                                                                                                // Card     = new 
-                                                                                                //          {
-                                                                                                //              Number   = TokenID,
-                                                                                                //              ExpMonth = TokenID,
-                                                                                                //              ExpYear  = TokenID,
-                                                                                                //              Cvc      = TokenID,
-                                                                                                //          }
                                                                                             });
                         
-                        if (response.Success)
-                        {
-                            CheckoutClient.Instance.CurrentSession.lastTransactionResult = new TransactionResultData()
-                                                                                         {
-                                                                                             errors         = response.Errors,
-                                                                                             isCanceled     = false,
-                                                                                             isSuccess      = true,
-                                                                                             transaction_id = "12345",
-                                                                                         };
-                        }
-                        else if (response.NextActions != null)
-                        {
-                            var        flow        = s.ParentStep;
-                            List<Step> nextActions = new();
-
-                            foreach (var step in nextActions)
-                            {
-                                flow.AddChildStep(step);
-                            }
-                        }
-                        else
-                        {
-                            // NO TRANSACTION RESULT AND NO NEXT ACTION . ERROR .
-                        }
+                        
+                        CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+                                                                                     {
+                                                                                         errors      = null,
+                                                                                         is_canceled = false,
+                                                                                         is_success  = true,
+                                                                                         charge_id   = response.result.charge_id,
+                                                                                     };
+                         if (response.next_actions != null)
+                         {
+                             var flow = s.ParentStep;
+                             
+                             foreach (var paymentAction in response.next_actions)
+                             {
+                                 if (paymentAction.parameters.ContainsKey("url"))
+                                 {
+                                     var url = paymentAction.parameters["url"].ToString();
+                                     flow.AddChildStep(OpenURL(url));
+                                 }
+                             }
+                             
+                             List<Step> nextActions = new();
+ 
+                             foreach (var step in nextActions)
+                             {
+                                 flow.AddChildStep(step);
+                             }
+                         }
+                         else
+                         {
+                             // NO TRANSACTION RESULT AND NO NEXT ACTION . ERROR .
+                         }
                     });   
         
+        public Step OpenURL(string url) 
+            =>
+            new Step(name   : $"open_url"
+                    ,action : async (s) =>
+                              {
+                                  Application.OpenURL(url);
+                              });
         
         public Step AwaitSocket()
         =>

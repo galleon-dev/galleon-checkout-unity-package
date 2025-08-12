@@ -17,9 +17,9 @@ namespace Galleon.Checkout
                                                                                             }
                                                                                   ,body     : new Shared.ChargeRequest()
                                                                                             {
-                                                                                                SessionId          = CHECKOUT.Session.SessionID,
-                                                                                                IsNewPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod.IsNewPaymentMethod,
-                                                                                                PaymentMethod      = new PaymentMethodDetails()
+                                                                                                session_id          = CHECKOUT.Session.SessionID,
+                                                                                                is_new_payment_method = CHECKOUT.User.SelectedUserPaymentMethod.IsNewPaymentMethod,
+                                                                                                payment_method      = new PaymentMethodDetails()
                                                                                                                    {
                                                                                                                         id   = "1",
                                                                                                                         data = new ()
@@ -27,20 +27,18 @@ namespace Galleon.Checkout
                                                                                                                                   { "token", "bla" }
                                                                                                                              }
                                                                                                                    },
-                                                                                                SavePaymentMethod  = CHECKOUT.User.SelectedUserPaymentMethod.IsNewPaymentMethod,
+                                                                                                save_payment_method  = CHECKOUT.User.SelectedUserPaymentMethod.IsNewPaymentMethod,
                                                                                             });
                         
-                        if (response.Success)
-                        {
-                            CheckoutClient.Instance.CurrentSession.lastTransactionResult = new TransactionResultData()
-                                                                                         {
-                                                                                             errors         = response.Errors,
-                                                                                             isCanceled     = false,
-                                                                                             isSuccess      = true,
-                                                                                             transaction_id = "12345",
-                                                                                         };
-                        }
-                        else if (response.NextActions != null)
+                        CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+                                                                                {
+                                                                                    errors         = new []{"error"},
+                                                                                    is_canceled     = false,
+                                                                                    is_success      = true,
+                                                                                    charge_id = "12345",
+                                                                                };
+                        
+                        if (response.next_actions != null)
                         {
                             var        flow        = s.ParentStep;
                             List<Step> nextActions = new();

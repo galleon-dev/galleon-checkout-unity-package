@@ -109,8 +109,10 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Node
 
-        [SerializeReference] public IEntity       Parent   = null;
-        [SerializeReference] public List<IEntity> Children = new List<IEntity>();
+        [SerializeReference] public IEntity          Parent     = null;
+                             public EntityNode       ParentNode => Parent.Node;
+        [SerializeReference] public List<IEntity>    Children   = new();
+                             public List<EntityNode> ChildNodes => Children.Select(c => c.Node).ToList();
         
         public List<WeakReference<IEntity>>       LinkedChildren { get; set; } = new();
 
@@ -437,6 +439,33 @@ namespace Galleon.Checkout
             
             public void Create()
             {
+                GetCrudHandler().Create();
+            }
+            
+            public void OnAddedToParent(IEntity parent)
+            {
+                GetCrudHandler().OnAddedToParent(parent);
+            }
+            
+            public void Delete()
+            {
+                GetCrudHandler().Delete();
+            }
+            
+            public void Update() {}
+            
+            public bool DoesExist()
+            {
+                return GetCrudHandler().DoesExist();
+            }
+            
+            public void OpenForEdit()  {}
+            public void CloseForEdit() {}
+            
+            ////////////////////////////// Helpers
+            
+            public CrudHandler GetCrudHandler()
+            {
                 if (!SupportsCRUD)
                     throw new Exception($"type {Entity.GetType().FullName} does not support CRUD");
                 
@@ -444,15 +473,9 @@ namespace Galleon.Checkout
                 var crudType        = type.GetNestedTypes().FirstOrDefault(x => x.IsSubclassOf(typeof(CrudHandler)));
                 var crudInstance    = Activator.CreateInstance(crudType, true) as CrudHandler;
                 crudInstance.target = Entity;
-                crudInstance.Create();
+                
+                return crudInstance;
             }
-            public void Delete() {}
-            public void Update() {}
-            
-            public void OpenForEdit()  {}
-            public void CloseForEdit() {}
-            
-            public bool DoesExist()  {return !isDraft;}
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element
@@ -482,16 +505,14 @@ namespace Galleon.Checkout
             {
                 entity.Node.IsCrudDraft = true;
                 this.Entity.Node.AddChild(entity);
+                entity.Node.Crud.OnAddedToParent(parent : this.Entity);
                 entity.Node.Crud.Create();
                 entity.Node.IsCrudDraft = false;
             }
             public void Minus()
             {
-                
-            }
-            public void Minus(IEntity entity)
-            {
-                
+                Entity.Node.ParentNode.RemoveChild(Entity);
+                Entity.Node.Crud.Delete();
             }
             public void Edit(string path, string value)
             {
@@ -505,9 +526,12 @@ namespace Galleon.Checkout
     public class CrudHandler
     {
         public object target; 
-        public virtual void Create() {}
-        public virtual void Update() {}
-        public virtual void Delete() {}
+        public virtual void Create()    {}
+        public virtual void Update()    {}
+        public virtual void Delete()    {}
+        public virtual bool DoesExist() { return default; }
+        
+        public virtual void OnAddedToParent(IEntity Parent) {}
     }
     public class CrudHandler<T> : CrudHandler where T : class
     {

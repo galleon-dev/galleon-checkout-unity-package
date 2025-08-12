@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 
 namespace Galleon.Checkout
@@ -7,7 +8,7 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////// Members
         
-        public TokenizerDefinition Tokenizer;
+        public TokenizerData Tokenizer;
         
         //////////////////////////////////////////////////////////////////////////////// Lifecycle
          
@@ -30,7 +31,7 @@ namespace Galleon.Checkout
                         if (this.Tokenizer != null)
                             return;
                         
-                        var tokenizerResponse = await CHECKOUT.Network.Get(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/tokenizer"
+                        var tokenizerResponse = await CHECKOUT.Network.Get<GetTokenizerResponse>(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/tokenizer"
                                                                           ,headers : new()
                                                                                    {
                                                                                       { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" },
@@ -51,43 +52,11 @@ namespace Galleon.Checkout
                         ///                                   }
                         ///               }
                         /// }
-
-                        #region OLD_CODE
-                        // var tokenizer = JsonConvert.DeserializeAnonymousType(value               : tokenizerResponse.ToString()
-                        //                                                     ,anonymousTypeObject : new 
-                        //                                                                          {
-                        //                                                                              Timestamp = 0L,
-                        //                                                                              Payload   = new
-                        //                                                                              {
-                        //                                                                                  ServiceUrl    = "",
-                        //                                                                                  RequestFormat = "",
-                        //                                                                                  Headers       = new Dictionary<string,string>()
-                        //                                                                              }
-                        //                                                                          });
-                        #endregion // OLD CODE
                         
-                        TokenizerDefinition tokenizer = JsonConvert.DeserializeObject<TokenizerDefinition>(tokenizerResponse.ToString());
-                        this.Tokenizer          = tokenizer;
+                        this.Tokenizer = tokenizerResponse.tokenizer_data;
                         
-                        s.Log($"Retrieved tokenizer service URL: {tokenizer.Payload.ServiceUrl}");
+                        s.Log($"Retrieved tokenizer service URL: {Tokenizer.Payload.ServiceUrl}");
                     });
-        
-        
-        
-        //////////////////////////////////////////////////////////////////////////////// Data
-        
-        public class TokenizerDefinition
-        {
-            public long             Timestamp = 0L;
-            public TokenizerPayload Payload   = new();
-            
-            public class TokenizerPayload
-            {
-                public string                     ServiceUrl    = "";
-                public string                     RequestFormat = "";
-                public Dictionary<string, string> Headers       = new();
-            }
-        }
         
     }
 }

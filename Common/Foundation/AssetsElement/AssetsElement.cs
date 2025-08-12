@@ -8,7 +8,7 @@ namespace Galleon.Checkout.Foundation
 {
     public class Assets : Entity
     {
-        public Folder RootFolder;
+        public FolderAsset RootFolderAsset;
         
         
         //////////////////////////////////////////////////////////////////////////////////// TEMP
@@ -23,20 +23,20 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        this.RootFolder.Node.Live.Plus(new Folder() { Name = "f1" });
+                        this.RootFolderAsset.Node.Live.Plus(new FolderAsset() { FolderName = "f1" });
                     });
         public Step Do_Assets_Equals_Folder() 
         =>
             new Step(action : async (s) =>
                     {
-                        var folder = this.RootFolder.Node.Descendants().OfType<Folder>().First(x => x.Name == "f1");
+                        var folder = this.RootFolderAsset.Node.Descendants().OfType<FolderAsset>().First(x => x.FolderName == "f1");
                         folder.Node.Live.Edit("Name", "f1_edited");
                     });
         public Step Do_Assets_Minus_Folder() 
         =>
             new Step(action : async (s) =>
                     {
-                        var folder = this.RootFolder.Node.Descendants().OfType<Folder>().First(x => x.Name == "f1");
+                        var folder = this.RootFolderAsset.Node.Descendants().OfType<FolderAsset>().First(x => x.FolderName == "f1");
                         folder.Node.Live.Minus();
                     });
         public Step Do_Assets_Print_Folder() 
@@ -69,10 +69,11 @@ namespace Galleon.Checkout.Foundation
                 btn_Minus.text     = "Assets - Folder";
                 
                 Button btn_Print   = new Button(); this.Add(btn_Print);
-                btn_Print.clicked += () => target.Do_Assets_Minus_Folder().Execute(); 
+                btn_Print.clicked += () => target.Do_Assets_Print_Folder().Execute(); 
                 btn_Print.text     = "Print Folder";
                 
             }
         }
     }
 }
+

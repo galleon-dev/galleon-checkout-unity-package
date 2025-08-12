@@ -8,7 +8,7 @@ namespace Galleon.Checkout.Foundation
     {
         public void Plus(IEntity entity)
         {
-            if (entity is Folder f)
+            if (entity is FolderAsset f)
             {
                 var package = this.Node.Parent as Package;
                 var Assets  = package.Assets;

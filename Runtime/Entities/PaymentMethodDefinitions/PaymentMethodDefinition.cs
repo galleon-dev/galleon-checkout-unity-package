@@ -21,7 +21,7 @@ namespace Galleon.Checkout
         
         //// Properties
         
-        public string DisplayName => Data?.name ?? Type.ToString();
+        public string DisplayName => Data?.type ?? Type.ToString();
         
         //// Transaction Steps
         
