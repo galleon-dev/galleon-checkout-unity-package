@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Galleon.Checkout;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using UnityEngine;
@@ -353,4 +354,81 @@ namespace Galleon.Checkout.Foundation
         
         public Task Print(PrintNode printNode);
     }
+}
+
+public class OpNode : Entity
+{
+    public string       op_id;
+    public string       op_instructions;
+    public int          op_state;
+    
+    public OpNode[]     StoredOperations => new [] { new OpNode() };
+    
+    
+    public List<Phase>  phases = new List<Phase>();
+    public class        Phase
+    {
+        public string       phase;
+        public List<Action> PhaseActions;
+    }
+    
+    public List<Action> actions = new List<Action>();
+    
+    ////////////////////////////////////////////////////////////////////// Actual actions
+    
+    void doThing_1()
+    {
+        // do the thing
+        
+        RefreshAssetDB();
+    }
+    
+    void do_thing_2()
+    {
+        
+    }
+    
+    ////////////////////////////////////////////////////////////////////// Lifecycle
+    
+    private void StartOrResume()
+    {
+        string currentPhase = op_state.ToString();
+        Phase p             = phases.First(x => x.phase == currentPhase);
+        
+        this.actions.AddRange(p.PhaseActions);
+    }
+    
+    ////////////////////////////////////////////////////////////////////// Helpers
+    
+    void RefreshAssetDB(){}
+    
+    void Save() {}
+    void Load() {}
+    
+    void InitOnLoad() {OnReload();}
+    void OnReload()
+    {
+        foreach (var op in StoredOperations)
+        {
+            op.StartOrResume();
+        }
+    }
+    
+    /// Assets.Node.Print("> Folder f1"); 
+    /// =>
+    ///     PrintNode.NewPrintOperation(test : raw_text, parent : Assets)
+    ///     =>
+    ///         op.state        = "start";
+    ///         op.instructions = raw_text;
+    ///         op.parentEntity = Assets;
+    ///         op.id           = parent.id + date_time; 
+    ///
+    ///         op.StartOrResume()
+    ///         =>
+    ///             phase p = op.Phases[op.State];
+    ///
+    ///             foreach action in p.actions
+    ///                 action.Execute
+    ///                 state.Update
+    ///                 op.Save 
 }

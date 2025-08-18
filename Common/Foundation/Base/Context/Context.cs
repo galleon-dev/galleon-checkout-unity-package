@@ -6,14 +6,18 @@ namespace Galleon.Checkout.Foundation
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
+        public Package             Package1       = new();
+        
+        public OperationController Operations     = new();
+        public StepController      StepController = new StepController();
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public Context()
         {
             // Search for packages
         }
-        
-        public Package Package1 = new();
         
     }
 }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Galleon.Checkout;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -197,6 +199,79 @@ namespace Galleon.Checkout.Foundation
             return rootNode;
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Write API
+
+        /// <summary>
+        /// Returns a string representation of the current node only.
+        /// </summary>
+        public string SelfToString()
+        {
+            return RawText ?? "";
+        }
+
+        /// <summary>
+        /// Returns a string representation of the whole tree from the current node downwards.
+        /// </summary>
+        public string TreeToString()
+        {
+            var result = new List<string>();
+            AddNodeToString(this, result, 0);
+            return string.Join("\n", result);
+
+            void AddNodeToString(TextNode node, List<string> result, int depth)
+            {
+                // Skip empty nodes
+                if (string.IsNullOrEmpty(node.RawText)) return;
+                
+                var lines = node.RawText.Split('\n');
+                if (lines.Length == 0) return;
+                
+                // Find the position of '>' in the first line to determine alignment for continuation lines
+                string firstLine = lines[0].TrimStart();
+                int    arrowPos  = firstLine.IndexOf('>');
+                int    alignPos  = arrowPos >= 0 ? arrowPos + 2 : 0;
+                
+                // Create base indentation based on tree depth (4 spaces per level)
+                string depthIndent = new string(' ', depth * 4);
+                
+                // Process each line in the node
+                foreach (var line in lines)
+                {
+                    string trimmed = line.TrimStart();
+                 
+                    // Add alignment indentation only for continuation lines (not starting with '>')
+                    string indent  = depthIndent + (trimmed.StartsWith(">") ? "" : new string(' ', alignPos));
+                    result.Add(indent + trimmed);
+                }
+
+                // Recursively process all child nodes
+                foreach (var child in node.Node.Children.OfType<TextNode>())
+                {
+                    AddNodeToString(child, result, depth + 1);
+                }
+            }
+
+        }
+
+
+        
+        /// <summary>
+        /// Writes the tree to the file at the specified path.
+        /// </summary>
+        public void WriteToFile(string path)
+        {
+            try
+            {
+                string content = TreeToString();
+                System.IO.File.WriteAllText(path, content);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"Failed to write TextNode tree to file '{path}': {ex.Message}");
+                throw;
+            }
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Unity Test Menu
 
         #if UNITY_EDITOR
@@ -206,17 +281,17 @@ namespace Galleon.Checkout.Foundation
         {
             string mockText = 
 @"
-parent line #main .alpha
+> parent line #main .alpha
   second line of parent
   third line of parent #secondary_tag .beta
-  > child #nested .childdot
-     child continuation line 1
-     child continuation line 2 #child_tag
-     > subchild .deepest
-       subchild details
-  > another_child
-    another_child notes line 1
-    another_child notes line 2 #another_tag .bottom
+    > child #nested .childdot
+      child continuation line 1
+      child continuation line 2 #child_tag
+        > subchild .deepest
+          subchild details
+    > another_child
+      another_child notes line 1
+      another_child notes line 2 #another_tag .bottom
 > second_root .rooted
      > deep
          > deeper
@@ -236,6 +311,68 @@ parent line #main .alpha
                 }
                 Debug.Log("Hashtags: [" + string.Join(", ", child.Hashtags) + "]");
                 Debug.Log("Dots: [" + string.Join(", ", child.Dots) + "]");
+            }
+        }
+
+        #if UNITY_EDITOR
+        [MenuItem("Tools/Test Write API")]
+        #endif
+        public static void TestWriteAPI()
+        {
+            string mockText = 
+@"
+> parent line #main .alpha
+  second line of parent
+  third line of parent #secondary_tag .beta
+    > child #nested .childdot
+      child continuation line 1
+      child continuation line 2 #child_tag
+        > subchild .deepest
+          subchild details
+    > another_child
+      another_child notes line 1
+      another_child notes line 2 #another_tag .bottom
+> second_root .rooted
+    > deep
+        > deeper
+          even deeper content #deep_tag .last
+          second line of deeper
+";
+
+            TextNode root = Parse(mockText);
+
+            Debug.Log("=== Testing Write API ===");
+            
+            // Test SelfToString on a specific child node
+            var childNode = root.Node.Children.OfType<TextNode>().FirstOrDefault();
+            if (childNode != null)
+            {
+                Debug.Log("SelfToString() for child node:");
+                Debug.Log(childNode.SelfToString());
+                Debug.Log("---");
+            }
+
+            // Test TreeToString on the root
+            Debug.Log("TreeToString() for entire tree:");
+            string treeString = root.TreeToString();
+            Debug.Log(treeString);
+            Debug.Log("---");
+
+            // Test WriteToFile (write to a temporary file)
+            string tempPath = System.IO.Path.Combine(Application.temporaryCachePath, "TextNode_Test_Output.txt");
+            try
+            {
+                root.WriteToFile(tempPath);
+                Debug.Log($"Successfully wrote tree to: {tempPath}");
+                
+                // Verify the file was written correctly
+                string fileContent = System.IO.File.ReadAllText(tempPath);
+                Debug.Log("File content verification:");
+                Debug.Log(fileContent);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"WriteToFile test failed: {ex.Message}");
             }
         }
     }
