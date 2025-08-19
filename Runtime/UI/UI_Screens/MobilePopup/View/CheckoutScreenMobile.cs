@@ -20,6 +20,9 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
         // UI
+        
+        [Header("General")]
+        public bool                         IsLandscape = false;
 
         [Header("Parent Panel")]
         public ParentPanel                  ParentPanel;
@@ -42,16 +45,16 @@ namespace Galleon.Checkout.UI
         public CheckoutLoadingPanelView     CheckoutLoadingPanelView;
 
         [Header("Test")]
-        public TestPanelView TestPanelView;
+        public TestPanelView                TestPanelView;
 
         // Fields
 
-        private RectTransform InputFieldRect;// SafeArea related
+        private RectTransform               InputFieldRect; // SafeArea related
 
-        private bool   isPending                = false;
-        private float? overrideContentSize      = null;
-        public  int    CloseAnimationDurationMS = 300;
-        public  float  SafeAreaHeight           = 0f;
+        private bool                        isPending                = false;
+        private float?                      overrideContentSize      = null;
+        public  int                         CloseAnimationDurationMS = 300;
+        public  float                       SafeAreaHeight           = 0f;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
 
@@ -445,16 +448,19 @@ namespace Galleon.Checkout.UI
                 }
             }
             
-            ParentPanel.TryGetComponent(out RectTransform parentTransform);
-            var keyboardHeight         = Math.Max(0, GetKeyboardHeight()) - SafeAreaHeight;
-            var targetSize             = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + keyboardHeight);
-            
-            if (overrideContentSize.HasValue)
-                targetSize = new Vector2(parentTransform.sizeDelta.x, overrideContentSize.Value + keyboardHeight);
-            
-            parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
+            if (!IsLandscape)
+            {
+                ParentPanel.TryGetComponent(out RectTransform parentTransform);
+                var keyboardHeight         = Math.Max(0, GetKeyboardHeight()) - SafeAreaHeight;
+                var targetSize             = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + keyboardHeight);
+                
+                if (overrideContentSize.HasValue)
+                    targetSize = new Vector2(parentTransform.sizeDelta.x, overrideContentSize.Value + keyboardHeight);
+                
+                parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
 
-            CheckSafeaArea();
+                CheckSafeaArea();
+            }
         }
 
         float GetKeyboardHeight()

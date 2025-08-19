@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Galleon.Checkout.Foundation.Tests;
 using UnityEngine;
 
 namespace Galleon.Checkout
@@ -9,7 +10,7 @@ namespace Galleon.Checkout
     {
         ////////////////// Members
         
-        public StepController StepController = new StepController();
+        public TestController TestController = new TestController();
         
         ////////////////// Lifecycle
         

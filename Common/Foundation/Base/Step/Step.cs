@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using Codice.Client.BaseCommands;
 using UnityEngine;
 using Galleon.Checkout;
 using Galleon.Checkout.Foundation;
@@ -34,13 +35,35 @@ namespace Galleon.Checkout
         
         public List<string>       StepLog                     = new();
         
+        public STEP_STATE         StepState                   = STEP_STATE  .None;
+        public ACTION_STATE       ActionState                 = ACTION_STATE.None;
+        
+        public Action<Step>       OnPostChildStep             = null;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
+        
+        public enum STEP_STATE
+        {
+            None,
+            Running,
+            Completed,
+            PreviouslyCompleted,
+        }
+        
+        public enum ACTION_STATE
+        {
+            None,
+            Success,
+            Error,
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
         
         public static event Func<Step, Task> OnStepExecuted;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Link
         
-        public StepController StepController => Root.Instance.Runtime.StepController;
+        public StepController StepController => Root.Instance.Context.StepController;
         
         //////// TEMP
         public static event Action<Step> ReportStep;
@@ -53,11 +76,11 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public Step(string                     name       = null
-                    ,IEnumerable<string>       tags       = default
-                    ,StepAction                action     = null
-                    ,[CallerMemberName] string callerName = ""
-                    ,[CallerLineNumber] int    callerLine = 0
-                    ,[CallerFilePath  ] string callerPath = "")
+                   ,IEnumerable<string>       tags       = default
+                   ,StepAction                action     = null
+                   ,[CallerMemberName] string callerName = ""
+                   ,[CallerLineNumber] int    callerLine = 0
+                   ,[CallerFilePath  ] string callerPath = "")
         {
             // Name
             this.Name = name ?? callerName;
@@ -120,12 +143,17 @@ namespace Galleon.Checkout
                 
                 // Add as linked child to step controller
                 if (this.ParentStep == null)
-                    Root.Instance.Runtime.StepController.Node.AddLinkedChild(this);
-              //else
-              //    this.ParentStep.Node.AddLinkedChild(this);
+                    Root.Instance.Context.StepController.Node.AddLinkedChild(this);
+                //else
+                //    this.ParentStep.Node.AddLinkedChild(this);
                 
                 // set display name
                 this.Node.DisplayName = $"Step {this.Name}";
+                
+                ////////////////////////////////////////////////
+                
+                if (StepState == STEP_STATE.PreviouslyCompleted)
+                    goto skip_to_end;
                 
                 ////////////////////////////////////////////////
                 
@@ -168,6 +196,10 @@ namespace Galleon.Checkout
                     var   postStep = PostSteps[i];
                     await postStep.Execute();
                 }
+                
+                ////////////////////////////////////////////////
+                
+                skip_to_end:
                 
                 ////////////////////////////////////////////////
                 
