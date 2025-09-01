@@ -89,8 +89,8 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init"}
                     ,action : async s =>
                               {
-                                  await CheckoutClient.Instance.RunCheckoutSession(new CheckoutProduct() { DisplayName = "Test Product", PriceText = "$4.99"})
-                                                               .Execute();
+                                  //await CheckoutClient.Instance.RunCheckoutSession(new CheckoutProduct() { DisplayName = "Test Product", PriceText = "$4.99"})
+                                  //                             .Execute();
                                   
                                   // Test
                                   // s.AddChildStep(this.SetupTest());
