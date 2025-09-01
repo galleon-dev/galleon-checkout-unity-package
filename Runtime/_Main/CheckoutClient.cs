@@ -112,7 +112,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow Steps
 
-        public Step RunCheckoutSession(CheckoutProduct product)
+        public Step CreateCheckoutSession(CheckoutProduct product)
         =>
             new Step(name   : $"run_checkout_session"
                     ,action : async (s) =>
@@ -126,7 +126,13 @@ namespace Galleon.Checkout
                                   
                                   // Assign product
                                   CurrentSession.SelectedProduct = product;
-                                  
+                              });
+        
+        public Step RunCheckoutSession()
+        =>
+            new Step(name   : $"run_checkout_session"
+                    ,action : async (s) =>
+                              {
                                   // Start Session
                                   await CurrentSession.Flow().Execute();
                               });

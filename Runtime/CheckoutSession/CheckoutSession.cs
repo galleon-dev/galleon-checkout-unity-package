@@ -24,10 +24,12 @@ namespace Galleon.Checkout
         public CheckoutProduct                    SelectedProduct;
         public PurchaseResult                     PurchaseResult        = default;
         
+        public Dictionary<string, string>         Metadata              = new();
+        
         // Simple Dialog Panel data
         public  string                             LastDialogRequest         = null;
         public  SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
-        [FormerlySerializedAs("PaymentMethodToDelete")] public UserPaymentMethod                  userPaymentMethodToDelete = null;
+        public  UserPaymentMethod                  userPaymentMethodToDelete = null;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -318,7 +320,8 @@ namespace Galleon.Checkout
                                                                                                                                                                       expMonth = cardToken,
                                                                                                                                                                       expYear  = cardToken,
                                                                                                                                                                       cvc      = cardToken,
-                                                                                                                                                                  }
+                                                                                                                                                                  },
+                                                                                                                                                         metadata = CheckoutClient.Instance.CurrentSession.Metadata, 
                                                                                                                                                      });
                                                                            
                                                                            x.Log($"- is success : {chargeResponse.transaction_result.isSuccess}");

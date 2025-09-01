@@ -55,12 +55,13 @@ namespace Galleon.Checkout
             Debug.Log($"IAP - Purchasing {product.id} ({product.type})");
             Debug.Log("===============================");
             
-            await CheckoutClient.Instance.RunCheckoutSession(product: new CheckoutProduct()
-                                                                      {
-                                                                          DisplayName = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedTitle,
-                                                                          PriceText   = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedPriceString
-                                                                      })
-                                                                      .Execute();
+            await CheckoutClient.Instance.CreateCheckoutSession(product: new CheckoutProduct()
+                                                                       {
+                                                                           DisplayName = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedTitle,
+                                                                           PriceText   = this.ProductDescriptions.First(p => p.storeSpecificId == product.storeSpecificId).metadata.localizedPriceString
+                                                                       })
+                                                                       .Execute();
+            await CheckoutClient.Instance.RunCheckoutSession().Execute();
             
             // Simulate a successful purchase
             this.callback.OnPurchaseSucceeded(storeSpecificId       : product.storeSpecificId
