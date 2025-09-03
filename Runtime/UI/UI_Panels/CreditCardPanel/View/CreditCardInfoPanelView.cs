@@ -573,9 +573,9 @@ namespace Galleon.Checkout.UI
         public Step test_fill_card_data() => new Step(action : async (s) =>
                                                              {
                                                                  NameInputField.Text        = "jhon doe";
-                                                                 CreditCardNumberField.Text = "5326 1023 0312 5595";
+                                                                 CreditCardNumberField.Text = "4242 4242 4242 4242";
                                                                  DateInputField.Text        = "09/26";
-                                                                 CVVInputField.Text         = "230";
+                                                                 CVVInputField.Text         = "111";
                                                                  
                                                                  await Task.Delay(500);
                                                                  EntityNode.CurrentTestScenario = "scenario_2_part_2";
