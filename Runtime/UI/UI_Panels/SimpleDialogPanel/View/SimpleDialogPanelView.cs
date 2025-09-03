@@ -10,7 +10,6 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public TMP_Text MainText;
-        public TMP_Text ConfirmButtonText;
         public TMP_Text DeclineButtonText;
         
         //// Members
