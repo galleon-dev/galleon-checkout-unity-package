@@ -13,10 +13,12 @@ public class SettingsPanelView : View
     //////////////////////////////////////////////////////////////////////////// Members
     
     [Header("Email")]
-    public TMP_Text           EmailLabel;
     public GameObject         EmailInputfieldBorder;
     public AdvancedInputField EmailInputField;
-    
+
+    public SuccessPanelView SuccessPanelView;
+    public AdvancedInputField SuccessPanelEmailInputField;
+
     [Header("Payment Methods")]
     public GameObject         SettingsPanelPaymentMethodItemPrefab;
     public GameObject         PaymentMethodsHolder;
@@ -43,6 +45,31 @@ public class SettingsPanelView : View
 
     public override void Initialize()
     {
+
+        string Email = PlayerPrefs.GetString("Email");
+
+        if (!string.IsNullOrEmpty(Email))
+        {
+            if (SuccessPanelEmailInputField)
+            {
+                SuccessPanelEmailInputField.Text = Email;
+            }
+
+            if (EmailInputField)
+            {
+                EmailInputField.Text = Email;
+            }
+
+            if (string.IsNullOrEmpty(SuccessPanelEmailInputField.Text))
+            {
+                SuccessPanelView.ShowEmail(false);
+            }
+            else
+            {
+                SuccessPanelView.ShowEmail(true);
+            }
+        }
+
         // Remove children (if any)
         foreach (Transform child in PaymentMethodsHolder.transform)
         {
@@ -136,16 +163,12 @@ public class SettingsPanelView : View
     {
         if (!IsEditingEmail)
         {
-            // EmailLabel     .gameObject.SetActive(false);
-            // EmailInputField.gameObject.SetActive(true); 
             EmailInputfieldBorder.SetActive(true);
             EmailInputField.interactable = true;
             IsEditingEmail = true;
         }
         else
         {
-            // EmailLabel     .gameObject.SetActive(true);
-            // EmailInputField.gameObject.SetActive(false);
             EmailInputfieldBorder.SetActive(false);       
             EmailInputField.interactable = false;
             IsEditingEmail = false;
@@ -157,14 +180,26 @@ public class SettingsPanelView : View
         Debug.Log($"str = {str}");
         Debug.Log($"reason = {reason}");
 
-        //  EmailLabel     .gameObject.SetActive(true);
-        //  EmailInputField.gameObject.SetActive(false);
-
         EmailInputfieldBorder.SetActive(false);
         EmailInputField.interactable = false;
         IsEditingEmail = false;
         
-        this.EmailLabel.text = str;
+        if(SuccessPanelEmailInputField)
+        {
+            SuccessPanelEmailInputField.Text = EmailInputField.Text;
+
+            if(string.IsNullOrEmpty(SuccessPanelEmailInputField.Text))
+            {
+                SuccessPanelView.ShowEmail(false);
+            } else
+            {
+                SuccessPanelView.ShowEmail(true);
+
+                PlayerPrefs.SetString("Email", SuccessPanelEmailInputField.Text);
+                PlayerPrefs.Save();
+            }
+        } 
+       // this.EmailLabel.text = str;
     }
     
     public void On_Done()

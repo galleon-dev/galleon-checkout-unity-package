@@ -1,6 +1,4 @@
-using System.IO;
-using UnityEngine;
-using UnityEngine.UIElements;
+using log4net.Plugin;
 
 namespace Galleon.Checkout.Foundation
 {
