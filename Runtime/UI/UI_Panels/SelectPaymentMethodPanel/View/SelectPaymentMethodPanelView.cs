@@ -13,6 +13,7 @@ namespace Galleon.Checkout.UI
 
         private int        ScrollRectMaxSize   = 3;
         private float      PaymentPrefabHeight = 200f;
+		private float      PaymentPrefabHeightLandscape = 125f;
         private float      SeparatorHeight     = 2f;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
@@ -125,6 +126,13 @@ namespace Galleon.Checkout.UI
         {
             int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
 
+            float PrefabHeight = PaymentPrefabHeight;
+
+            if (CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape)
+            {
+                PrefabHeight = PaymentPrefabHeightLandscape;
+            }
+
             Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
             if (PaymentMethodsAmount == 0)
@@ -133,11 +141,12 @@ namespace Galleon.Checkout.UI
             }
             else if (PaymentMethodsAmount <= ScrollRectMaxSize)
             {
-                ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 2;
+
+                ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PrefabHeight + SeparatorHeight) + 2;
             }
             else
             {
-                ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 2;
+                ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PrefabHeight + SeparatorHeight) + 2;
             }
         }
 

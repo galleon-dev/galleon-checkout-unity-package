@@ -52,6 +52,7 @@ namespace Galleon.Checkout
         
         [Header("Screens")]
         public GameObject CheckoutPopupPrefab;
+		public GameObject CheckoutPopupLandscapePrefab;
         
         [Header("UI Elements")]
         public GameObject UI_Seporator;

@@ -3,20 +3,19 @@
 
 using UnityEngine;
 
-#if UNITY_EDITOR
-public class CreditCardNumberFormatting : MonoBehaviour {}
-#elif ANDROID && !UNITY_EDITOR
+//
+//public class CreditCardNumberFormatting : MonoBehaviour {}
+
 
 using Galleon.Checkout.UI;
 using System.Text;
-using UnityEngine;
 
 namespace AdvancedInputFieldPlugin
 {
     /// <summary>Class to format text as credit card number separated by spaces every 4 numbers</summary>
     public class CreditCardNumberFormatting : LiveDecorationFilter
     {
-        
+#if UNITY_ANDROID
         public AdvancedInputField CreditCardAdvancedInputField;
         public CreditCardInfoPanelView CreditCardInfoPanelView;
         CreditCardInfoPanelView.CardFormat cardFormat;
@@ -192,6 +191,6 @@ namespace AdvancedInputFieldPlugin
             return (c >= '0' && c <= '9');
         }
     }
-}
 
 #endif
+}

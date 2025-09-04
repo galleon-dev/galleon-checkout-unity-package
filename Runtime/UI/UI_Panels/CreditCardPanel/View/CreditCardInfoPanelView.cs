@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-#if ANDROID
+#if UNITY_ANDROID
 using AdvancedInputFieldPlugin;
 #endif
 
@@ -21,8 +21,8 @@ namespace Galleon.Checkout.UI
 {
     public class CreditCardInfoPanelView : View
     {
-        #if ANDROID
-        
+#if UNITY_ANDROID
+
         //////////////////////////////////////////////////////////////////////////// Members
         public List<AdvancedInputField> AdvancedInputFields;
 

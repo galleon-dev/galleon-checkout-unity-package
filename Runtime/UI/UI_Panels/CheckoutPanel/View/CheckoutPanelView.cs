@@ -63,6 +63,7 @@ namespace Galleon.Checkout.UI
 
         public override void Initialize()
         {
+            Debug.Log("CheckoutPanelView --> Initialize()");
             RefreshState();
         }
 
@@ -108,8 +109,11 @@ namespace Galleon.Checkout.UI
             //     method.Refresh();
 
             //CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
-
-            GenerateTaxes();
+            
+            if (TaxesContainer != null)
+            {
+                GenerateTaxes();
+            }
         }
 
         void GenerateTaxes()
