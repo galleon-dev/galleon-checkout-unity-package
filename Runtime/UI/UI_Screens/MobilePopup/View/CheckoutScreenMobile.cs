@@ -81,10 +81,10 @@ namespace Galleon.Checkout.UI
 
         public static Step InitializeCheckoutScreenMobile()
         =>
-            new Step(name: $"initialize_checkout_screen_mobile"
-                    , action: async (s) =>
+            new Step(name   : $"initialize_checkout_screen_mobile"
+                    ,action : async (s) =>
                               {
-								                                    GameObject Prefab = null; // For Portrait or Landscape Mode
+								  GameObject Prefab = null; // For Portrait or Landscape Mode
                                   bool IsLandscapeMode = false;
 
                                   if (UnityEngine.Device.Screen.orientation == ScreenOrientation.Portrait || UnityEngine.Device.Screen.orientation == ScreenOrientation.PortraitUpsideDown)
@@ -100,7 +100,8 @@ namespace Galleon.Checkout.UI
                                   }
 
 
-								#if UNITY_EDITOR
+                                  #if UNITY_EDITOR
+                                  
                                   if (UnityEngine.Device.Screen.width > UnityEngine.Device.Screen.height)
                                   {
                                       Debug.Log("Device is in Landscape mode");
@@ -111,19 +112,22 @@ namespace Galleon.Checkout.UI
                                   {
                                       Debug.Log("Device is in Portrait mode");
                                       Prefab = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
-                                  }                            
-								#endif
+                                  } 
+                                  
+								  #endif
 
                                   Debug.Log("Orientation In Landscape? " + IsLandscapeMode + "  Prefab Selected: " + Prefab.name);
 
                                   // Instantiate screen
-                                  var CheckoutScreenMobileGO = GameObject.Instantiate(original: Prefab
-                                                                                     , position: new Vector3(0, 0, 9999)
-                                                                                     , rotation: Quaternion.identity);
+                                  var CheckoutScreenMobileGO = GameObject.Instantiate(original : Prefab
+                                                                                     ,position : new Vector3(0, 0, 9999)
+                                                                                     ,rotation : Quaternion.identity);
 
 
                                   CheckoutScreenMobileGO.SetActive(false);
                                   DontDestroyOnLoad(CheckoutScreenMobileGO);
+                                  
+                                  CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>();
 								  
 								  /*
                                   // Instantiate screen
@@ -142,7 +146,6 @@ namespace Galleon.Checkout.UI
 
         public static Step OpenCheckoutScreenMobile()
         =>
-
             new Step(name: $"open_checkout_screen_mobile"
                     , action: async (s) =>
                               {

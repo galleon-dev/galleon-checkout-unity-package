@@ -12,10 +12,11 @@ using System.Text;
 
 namespace AdvancedInputFieldPlugin
 {
+    #if UNITY_ANDROID
     /// <summary>Class to format text as credit card number separated by spaces every 4 numbers</summary>
     public class CreditCardNumberFormatting : LiveDecorationFilter
     {
-#if UNITY_ANDROID
+        
         public AdvancedInputField CreditCardAdvancedInputField;
         public CreditCardInfoPanelView CreditCardInfoPanelView;
         CreditCardInfoPanelView.CardFormat cardFormat;
@@ -192,5 +193,5 @@ namespace AdvancedInputFieldPlugin
         }
     }
 
-#endif
+    #endif
 }

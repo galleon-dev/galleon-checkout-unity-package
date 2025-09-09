@@ -6,11 +6,12 @@ namespace Galleon.Footer
     public class CheckFooter : MonoBehaviour
     {
         public FooterPanelView FooterPanelView;
+        
         private void OnEnable()
         {
             if (FooterPanelView)
             {
-                FooterPanelView.ShowViewPaymentMethods(true);
+                //FooterPanelView.ShowViewPaymentMethods(true);
             }
         }
 
@@ -18,7 +19,7 @@ namespace Galleon.Footer
         {
             if (FooterPanelView)
             {
-                FooterPanelView.ShowViewPaymentMethods(false);
+                //FooterPanelView.ShowViewPaymentMethods(false);
             }
         }
     }

@@ -28,8 +28,8 @@ namespace Galleon.Checkout
                         s.AddChildStep(GetPaymentMethodDefinitions());
                         s.AddChildStep(GetUserPaymentMethods());
                         
-                        //s.AddChildStep(TestPopulatePaymentMethodDefinitions());
-                        //s.AddChildStep(TestPopulatePaymentMethods());
+                        s.AddChildStep(TestPopulatePaymentMethodDefinitions());
+                        s.AddChildStep(TestPopulatePaymentMethods());
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp

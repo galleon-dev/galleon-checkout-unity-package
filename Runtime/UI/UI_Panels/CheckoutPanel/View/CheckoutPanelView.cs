@@ -17,7 +17,7 @@ namespace Galleon.Checkout.UI
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 
-        public ViewResult Result = ViewResult.None;
+        public      ViewResult Result = ViewResult.None;
         public enum ViewResult
         {
             None,
@@ -33,28 +33,29 @@ namespace Galleon.Checkout.UI
         public PositionLayoutGroup PositionLayoutGroup;
 
         [Header("Shop Item")]
-        public TextMeshProUGUI ProductTitleText;
-        public TextMeshProUGUI PriceText;
-        public TextMeshProUGUI TaxText;
+        public TextMeshProUGUI  ProductTitleText;
+        public TextMeshProUGUI  PriceText;
+        public TextMeshProUGUI  TaxText;
 
         [Header("Payment Methods")]
-        public GameObject PaymentMethodsPanel;
-        public GameObject PaymentMethodItemPrefab;
-        public GameObject AddCreditCardButtonElement;
+        public GameObject       PaymentMethodsPanel;
+        public GameObject       PaymentMethodItemPrefab;
+        public GameObject       AddCreditCardButtonElement;
 
         [Header("Payment Buttons")]
-        public GameObject PurchaseButton;
-        public GameObject GooglePayButton;
-        public GameObject PaypalPayButton;
-        public GameObject ApplePayButton;
+        public GameObject       PurchaseButton;
+        public GameObject       GooglePayButton;
+        public GameObject       PaypalPayButton;
+        public GameObject       ApplePayButton;
 
         [Header("Taxes")]
         public List<GameObject> TaxesPanels;
-        public GameObject TaxesContainer;
-        public GameObject TaxPrefab;
-        public TextMeshProUGUI SubtotalPriceText;
-        public TextMeshProUGUI TotalPriceText;
-        bool IsUSAorCanadaUser = true;
+        public GameObject       TaxesContainer;
+        public GameObject       TaxPrefab;
+        public TextMeshProUGUI  SubtotalPriceText;
+        public TextMeshProUGUI  TotalPriceText;
+        bool                    IsUSAorCanadaUser = true;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Links
 
         public IEnumerable<checkoutPanelPaymentMethodItemView> PaymentMethodItemViews => GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
@@ -76,7 +77,7 @@ namespace Galleon.Checkout.UI
             Debug.Log("<color=green>RefreshState</color>");
 
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
-            this.PriceText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+            this.PriceText       .text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
 
             ///////////////
 
@@ -92,7 +93,7 @@ namespace Galleon.Checkout.UI
             var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods.Take(3);
             foreach (var paymentMethod in paymentMethods)
             {
-                var go = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
+                var go   = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
                 item.Initialize(paymentMethod, this);
 
@@ -131,10 +132,10 @@ namespace Galleon.Checkout.UI
 
             // These are Taxes added only for testing. Should be commented out later on
             taxes.Clear();
-            taxes.Add("VAT", new Shared.TaxItem { tax_amount = 9.90m, inclusive = false });
-            taxes.Add("IRS", new Shared.TaxItem { tax_amount = 5.50m, inclusive = false });
-            taxes.Add("CUSTOMS", new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
-            taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m, inclusive = false });
+            taxes.Add("VAT",          new Shared.TaxItem { tax_amount = 9.90m,  inclusive = false });
+            taxes.Add("IRS",          new Shared.TaxItem { tax_amount = 5.50m,  inclusive = false });
+            taxes.Add("CUSTOMS",      new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
+            taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m,  inclusive = false });
             //#endif
 
             if (Checkout.CheckoutClient.Instance != null)
@@ -252,36 +253,36 @@ namespace Galleon.Checkout.UI
         {
             Debug.Log("ShowPurchaseButton()");
             GooglePayButton.SetActive(false);
-            PurchaseButton.SetActive(true);
+            PurchaseButton .SetActive(true);
             PaypalPayButton.SetActive(false);
-            ApplePayButton.SetActive(false);
+            ApplePayButton .SetActive(false);
         }
 
         public void ShowGooglePayButton()
         {
             Debug.Log("ShowGooglePayButton()");
             GooglePayButton.SetActive(true);
-            PurchaseButton.SetActive(false);
+            PurchaseButton .SetActive(false);
             PaypalPayButton.SetActive(false);
-            ApplePayButton.SetActive(false);
+            ApplePayButton .SetActive(false);
         }
 
         public void ShowPaypalPayButton()
         {
             Debug.Log("ShowPaypalPayButton()");
             GooglePayButton.SetActive(false);
-            PurchaseButton.SetActive(false);
+            PurchaseButton .SetActive(false);
             PaypalPayButton.SetActive(true);
-            ApplePayButton.SetActive(false);
+            ApplePayButton .SetActive(false);
         }
 
         public void ShowApplePayButton()
         {
             Debug.Log("ShowApplePayButton()");
             GooglePayButton.SetActive(false);
-            PurchaseButton.SetActive(false);
+            PurchaseButton .SetActive(false);
             PaypalPayButton.SetActive(false);
-            ApplePayButton.SetActive(true);
+            ApplePayButton .SetActive(true);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios

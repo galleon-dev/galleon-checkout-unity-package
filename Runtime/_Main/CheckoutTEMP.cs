@@ -16,8 +16,6 @@ using UnityEditor;
 #endif
 
 #if UNITY_EDITOR
-using UnityEngine;
-using Unity.Collections.LowLevel.Unsafe;
 
 [InitializeOnLoad]
 public static class LeakDetectionInitializer
@@ -821,7 +819,6 @@ namespace Galleon.Checkout
             /// DoAction (e.g. Fill all input fields) 
         }
         #endregion // Test input class
-    }
-    
+    }    
 }
 
