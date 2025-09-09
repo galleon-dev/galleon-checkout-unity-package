@@ -15,6 +15,9 @@ namespace Galleon.Checkout
         
         public static async Task<PurchaseResult> Purchase(CheckoutProduct product, Dictionary<string, string> metadata = null)
         {
+            if (metadata == null)
+                metadata = new Dictionary<string, string>();
+            
             await  CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
             CheckoutClient.Instance.CurrentSession.Metadata = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             await  CheckoutClient.Instance.RunCheckoutSession().Execute();

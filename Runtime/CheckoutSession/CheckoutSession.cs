@@ -125,6 +125,7 @@ namespace Galleon.Checkout
                                                                                                                        currency = "USD",
                                                                                                                    },
                                                                                                         expires_at = DateTime.UtcNow.AddDays(1),
+                                                                                                        metadata   = CHECKOUT.Session.Metadata,
                                                                                                      });
                         
                         

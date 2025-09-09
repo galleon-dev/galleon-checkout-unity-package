@@ -215,7 +215,7 @@ namespace Galleon.Checkout
                                                                                                                                 }
                                                                                                                       },
                                                                                                 save_payment_method   = false,
-                                                                                            
+                                                                                                //metadata              = CHECKOUT.Session.Metadata,
                                                                                             });
                         
                         
