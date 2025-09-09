@@ -26,7 +26,8 @@ namespace Galleon.Checkout
         
         //public string SERVER_BASE_URL = "https://localhost:4000/v1";
         //public string SERVER_BASE_URL = "https://galleon-bridge-server-production.up.railway.app";
-        public string SERVER_BASE_URL = "http://localhost:3000";
+        //public string SERVER_BASE_URL = "http://localhost:3000";
+        public string SERVER_BASE_URL = "https://bridge-staging-api.galleon.so";
         
         public const int TIMEOUT_MILLISECONDS = 10000;
         
@@ -77,18 +78,14 @@ namespace Galleon.Checkout
                         s.Log($"ID     = {id}");
                         s.Log($"Device = {device}");
                         
-                      //var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
                                                              {
-                                                                 { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6InRlc3QuYXBwIiwiaWF0IjoxNzU0NzYzNTU4fQ.NoWs-D79w2ad51jh-fQfY3LeDSUUM1cayfM4cKgSIBk" }
+                                                                 { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
                                                              }
                                                     ,body    : new
                                                              {
-                                                                 app_user_id = "test",
-                                                                 AppId       = appID,
-                                                                 Id          = id,
-                                                                 Device      = device,
+                                                                 app_user_id = "test"
                                                              });
                         
                       //await Post(url  : $"{SERVER_BASE_URL}/development/seed");                      
@@ -246,8 +243,10 @@ namespace Galleon.Checkout
             
             
             // Send Request
+            
             //string formattedRequest = JToken.Parse(jsonBody).ToString(Formatting.Indented);
             //Debug.Log($">>> ({request.method}){request.url}\n{formattedRequest}");
+            
             var endpointName = request.url.Replace(SERVER_BASE_URL, "");
             Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}) {endpointName}");
             var op = request.SendWebRequest();
@@ -277,7 +276,7 @@ namespace Galleon.Checkout
             if (!request.error.IsNullOrEmpty())
                 Debug.LogError(request.error);
             if (request.result != UnityWebRequest.Result.Success)
-                throw new Exception($"ERROR FOR NETWORK REQUEST : {url}");
+                throw new Exception($"ERROR FOR NETWORK REQUEST : {url}\n{request.error}");
             
             request.Dispose();
             
