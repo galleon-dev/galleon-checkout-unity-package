@@ -28,8 +28,10 @@ namespace Galleon.Checkout
                         s.AddChildStep(GetPaymentMethodDefinitions());
                         s.AddChildStep(GetUserPaymentMethods());
                         
-                        //s.AddChildStep(TestPopulatePaymentMethodDefinitions());
-                        //s.AddChildStep(TestPopulatePaymentMethods());
+                        // s.AddChildStep(TestPopulatePaymentMethodDefinitions());
+                        // s.AddChildStep(TestPopulatePaymentMethods());
+
+                        s.AddChildStep(InitializeDefinitions());
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
@@ -40,12 +42,12 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         
-                      //this.PaymentMethodsDefinitions.Add(new CreditCardPaymentMethodDefinition()
-                      //                                   {
-                      //                                       Type             = "credit_card",
-                      //                                       VaultingSteps    = { "get_tokenizer", "tokenize" },
-                      //                                       TransactionSteps = { "charge" },
-                      //                                   });
+                       this.PaymentMethodsDefinitions.Add(new CreditCardPaymentMethodDefinition()
+                                                          {
+                                                              Type             = "credit_card",
+                                                              VaultingSteps    = { "get_tokenizer", "tokenize" },
+                                                              TransactionSteps = { "charge" },
+                                                          });
                         
                         this.PaymentMethodsDefinitions.Add(new GooglePayPaymentMethodDefinition()
                                                            {
@@ -80,6 +82,13 @@ namespace Galleon.Checkout
                                                     {
                                                         Type        = UserPaymentMethod.PaymentMethodType.MasterCard.ToString(),
                                                         DisplayName = "MasterCard - **** - 4587",
+                                                        Data        = new()
+                                                                    {
+                                                                        type             = "credit_card",
+                                                                        credit_card_type = "mastercard",
+                                                                        display_name     = "MasterCard - **** - 4587",
+                                                                        id               = "master_card",
+                                                                    }
                                                     });
                         
                         this.UserPaymentMethods.Add(new GooglePayUserPaymentMethod()
@@ -127,6 +136,15 @@ namespace Galleon.Checkout
                         }
                     });
         
+        public Step InitializeDefinitions() 
+        =>
+            new Step(name   : $"initialize_definitions"
+                    ,action : async (s) =>
+                    {
+                        foreach (var definition in PaymentMethodsDefinitions)
+                            s.AddChildStep(definition.Initialize());
+                    });
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Payment Methods
         
         public Step GetUserPaymentMethods()
@@ -145,7 +163,8 @@ namespace Galleon.Checkout
                         foreach (var data in dataList)
                         {
                             UserPaymentMethod pm = new UserPaymentMethod();
-                            pm.Data          = data;
+                            pm.Data              = data;
+                            pm.Data.type         = "credit_card";
                             
                             this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
                                                         {

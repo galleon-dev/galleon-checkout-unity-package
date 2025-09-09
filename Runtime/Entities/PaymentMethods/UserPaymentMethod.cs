@@ -14,6 +14,7 @@ namespace Galleon.Checkout
         
         public enum PaymentMethodType
         {
+            Card,
             Visa,
             MasterCard,
             Amex,
@@ -45,6 +46,16 @@ namespace Galleon.Checkout
         {
             this.IsSelected = false;
         }
+        
+        //// Vaulting
+        
+        public virtual Step RunVaultingSteps() 
+        =>
+            new Step(name   : $"run_vaulting_steps"
+                    ,action : async (s) =>
+                    {
+                        
+                    });
         
         //// Transaction Steps
         

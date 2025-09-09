@@ -1,5 +1,11 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,6 +15,66 @@ namespace Galleon.Checkout.Foundation
 {
     public class OperationController : Entity
     {
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
+        
+        public string OperationsStateFileRelativePath => $"TEMP/ongoing_operations.json";
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+       
+        public List<string> OngoingOperations = new();
+        
+        public List<Operation> AllRegisteredOperations;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
+        
+        public async Task ResumeAllOngoingOperations()
+        {
+            await Load();
+            
+            List<Operation> operations = new();
+
+            foreach (var operationID in OngoingOperations)
+            {
+                var op = Operation.Load(operationID);
+                operations.Add(op);
+            }
+
+            for (int i = 0; i < operations.Count; i++)
+            {
+                var op = operations[i];
+                Debug.Log($"Resuming : {op.ID}");
+                await op.Resume();
+            }
+        }
+        
+        public async Task Save()
+        {
+            var json = JsonConvert.SerializeObject(OngoingOperations);
+            var path = Path.Combine(Application.dataPath, OperationsStateFileRelativePath);
+            File.WriteAllText(path:path, contents:json);
+        }
+        
+        public async Task Load()
+        {
+            try
+            {
+                var path = Path.Combine(Application.dataPath, OperationsStateFileRelativePath);
+
+                if (!File.Exists(path))
+                    throw new Exception($"Failed to load ongoing operations");
+            
+                var json = File.ReadAllText(path);
+                OngoingOperations = JsonConvert.DeserializeObject<List<string>>(json);
+                
+            }
+            catch (Exception e)
+            {
+                //Debug.LogError(e.Message);
+                OngoingOperations = new List<string>();
+            }
+        }
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
         
         #if UNITY_EDITOR
@@ -16,19 +82,39 @@ namespace Galleon.Checkout.Foundation
         #else
         [RuntimeInitializeOnLoadMethod]
         #endif
-        public static void InitializeOnLoad()
+        public static async void InitializeOnLoad()
         {
+            await Task.Yield();
             
+            Root.Instance.Context.Operations.AllRegisteredOperations = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Operations()).ToList();
+            
+            await Root.Instance.Context.Operations.ResumeAllOngoingOperations();
         }
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Tests
+        #region Tests
         
-        public Operation TestOperation => new Operation (ID : "test_operation")
+        // TEMP
+        
+        
+        public Operation TestOperation => new Operation 
+                                          (
+                                              ID : "test_operation"
+                                          )
+                                          .AddStep(new Step(name   : "test_step_0_start_asset_editing"
+                                                           ,action : async s =>
+                                                                   {
+                                                                       #if UNITY_EDITOR
+                                                                       
+                                                                       AssetDatabase.StartAssetEditing();
+                                                                       
+                                                                       #endif
+                                                                   }))
                                           .AddStep(new Step(name   : "test_step_1_creat_asset"
                                                            ,action : async s =>
                                                                    {
                                                                        #if UNITY_EDITOR
-
+                                                                       
                                                                        // create prefab
                                                                        var go = new GameObject("Test");
                                                                        var prefabPath = "Assets/TEMP/Test.prefab";
@@ -50,8 +136,8 @@ namespace Galleon.Checkout.Foundation
                                                                            {
                                                                            }
                                                                        }";
+                                                                       
                                                                        System.IO.File.WriteAllText(scriptPath, scriptContent);
-                                                                                                                                               
                                                                        
                                                                        #endif
                                                                        
@@ -61,11 +147,14 @@ namespace Galleon.Checkout.Foundation
                                                                    {
                                                                        #if UNITY_EDITOR
                                                                        
+                                                                       AssetDatabase.StopAssetEditing();
                                                                        AssetDatabase.Refresh();
+                                                                       
+                                                                       await Task.Delay(5000);
                                                                        
                                                                        #endif
                                                                    }))
-                                          .AddStep(new Step(name   : "test_step_1_use_asset"
+                                          .AddStep(new Step(name   : "test_step_3_use_asset"
                                                            ,action : async s =>
                                                                    {
                                                                        #if UNITY_EDITOR
@@ -97,5 +186,10 @@ namespace Galleon.Checkout.Foundation
                     {
                         await TestOperation.Execute();
                     });
-        }
+    
+        
+        #endregion // Tests
+        
+    }
 }
+

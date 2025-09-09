@@ -12,18 +12,18 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-#if ANDROID
+#if UNITY_ANDROID
 using AdvancedInputFieldPlugin;
 #endif
-
 
 namespace Galleon.Checkout.UI
 {
     public class CreditCardInfoPanelView : View
     {
-        #if ANDROID
+        #if UNITY_ANDROID
         
         //////////////////////////////////////////////////////////////////////////// Members
+
         public List<AdvancedInputField> AdvancedInputFields;
 
         public AdvancedInputField CreditCardNumberField;
@@ -57,6 +57,7 @@ namespace Galleon.Checkout.UI
         bool IsValidCreditCardNumber = false;
         bool IsValidDate = false;
         int expectedCVVLength = 3;
+        
         //////////////////////////////////////////////////////////////////////////// View Result
 
         public ViewResult Result = ViewResult.None;
@@ -165,15 +166,23 @@ namespace Galleon.Checkout.UI
         */
         //////////////////////////////////////////////////////////////////////////// UI Events
 
-        public void On_OkClick()
+        public async void On_OkClick()
         {
             if (IsCorrectInputFields())
             {
-                UserPaymentMethod card = new UserPaymentMethod();
+                var card = new CreditCardUserUserPaymentMethod();
 
-                card.Type = CurrentCardFormat.Name;
+                card.Type        = CurrentCardFormat.Name;
                 card.DisplayName = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
 
+                card.CardHolderName = NameInputField.Text;
+                card.CardNumber     = CreditCardNumberField.Text;
+                card.CardCCV        = CVVInputField.Text;
+                card.CardMonth      = DateInputField.Text.Substring(0, 2);
+                card.CardYear       = DateInputField.Text.Substring(2, 2);
+                
+                await card.RunVaultingSteps().Execute();
+                
                 CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod(card);
                 CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(card);
 
@@ -257,7 +266,7 @@ namespace Galleon.Checkout.UI
             }
             else
             {
-                Debug.Log("Some of the InputFields are not empty, therefore we don't focus on CVV");
+                // Debug.Log("Some of the InputFields are not empty, therefore we don't focus on CVV");
             }
         }
 

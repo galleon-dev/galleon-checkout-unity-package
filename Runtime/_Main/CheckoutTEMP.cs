@@ -10,15 +10,13 @@ using Galleon.Checkout.Shared;
 using Newtonsoft.Json.Linq;
 using Unity.Collections;
 using UnityEngine;
+using Galleon.Checkout.NETWORK;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 #if UNITY_EDITOR
-using UnityEngine;
-using Unity.Collections.LowLevel.Unsafe;
-
 [InitializeOnLoad]
 public static class LeakDetectionInitializer
 {
@@ -113,7 +111,7 @@ namespace Galleon.Checkout
         [MenuItem("Tools/Test Temporary Method")]
         private static void TestTemporaryMethod()
         {
-          var list = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps(new temp()));
+            var list = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps(new temp()));
           //var list = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps());
 
             foreach (var step in list)
@@ -123,13 +121,6 @@ namespace Galleon.Checkout
         }
         #endif
         
-        public Step MyStep(int number)
-        =>
-            new Step(name   : $"MyStep"
-                    ,action : async (s) =>
-                            {
-                                
-                            });
         
         #region TEST STEPS
         
@@ -821,7 +812,47 @@ namespace Galleon.Checkout
             /// DoAction (e.g. Fill all input fields) 
         }
         #endregion // Test input class
-    }
-    
+        
+        #region Network
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Network
+        
+        public NetworkEndpoint TestEndpoint = new NetworkEndpoint()
+                                              .setURL    (() => $"{CHECKOUT.Network.SERVER_BASE_URL}/authenticate")
+                                              .setMethod (Http_Method.Post)
+                                              .setHeaders(("Authorization", () => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6InRlc3QuYXBwIiwiaWF0IjoxNzU0NzYzNTU4fQ.NoWs-D79w2ad51jh-fQfY3LeDSUUM1cayfM4cKgSIBk"))
+                                            //.setHeaders(("Authorization", () => $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}"))
+                                              ;
+        
+        
+        
+        public NetworkEndpoint AuthEndpoint => Network.Endpoint("/authenticate")
+                                              .setMethod          (Http_Method.Post)
+                                              .setRequestBodyType <Shared.AuthenticateRequest> ()
+                                              .setResponseBodyType<Shared.AuthenticateResponse>()
+                                              ;
+        
+        public Step TestEndpoints() 
+        =>
+            new Step(name   : $"test_endpoints"
+                    ,action : async (s) =>
+                    {
+                        var request = TestEndpoint.Request()
+                                      .setBody(new
+                                               {
+                                                   app_user_id = "test",
+                                                   AppId       = "test.app-1",
+                                                   Id          = "test.app-1",
+                                                   Device      = "local_unity_test_client",
+                                               })
+                                      ;
+                        
+                        var result  = await request.SendWebRequest();
+                        
+                        s.Log(result);
+                    });
+        
+        #endregion // Network
+    }    
 }
 

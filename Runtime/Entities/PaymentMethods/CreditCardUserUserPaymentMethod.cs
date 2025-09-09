@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -49,6 +50,17 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Vaulting Steps
         
+        public override Step RunVaultingSteps() 
+        =>
+            new Step(name   : $"run_vaulting_steps"
+                    ,action : async (s) =>
+                    {
+                        s.AddChildStep(GetTokenizer());
+                        s.AddChildStep(Tokenize());
+                        s.AddChildStep(AddPaymentMethod());
+                        
+                    });
+        
         public Step GetTokenizer()
         =>
             new Step(name   : $"get_tokenizer"
@@ -69,13 +81,14 @@ namespace Galleon.Checkout
                       //               Year   = 2026,
                       //               Cvc    = "123"
                       //           };
-                      var card = new 
-                       {
-                           Number = CardNumber,
-                           Month  = CardMonth,
-                           Year   = CardYear,
-                           Cvc    = CardCCV,
-                       };
+                      
+                        var card = new 
+                        {
+                            Number = CardNumber,
+                            Month  = CardMonth,
+                            Year   = CardYear,
+                            Cvc    = CardCCV,
+                        };
                         
                         
                         var Tokenizer           = CheckoutClient.Instance.TokenizerController.Tokenizer;
@@ -84,8 +97,8 @@ namespace Galleon.Checkout
                                                                              ,headers  : Tokenizer.Payload.Headers
                                                                              ,jsonBody : Tokenizer.Payload.RequestFormat
                                                                                                           .Replace("<CC_NUMBER>", card.Number)
-                                                                                                          .Replace("<CC_MONTH>",  card.Month.ToString())
-                                                                                                          .Replace("<CC_YEAR>",   card.Year .ToString())
+                                                                                                          .Replace("<CC_MONTH>",  $@"""{card.Month}""")
+                                                                                                          .Replace("<CC_YEAR>",   $@"""20{card.Year}""")
                                                                                                           .Replace("<CC_CVC>",    card.Cvc)
                                                                              );
 
@@ -153,6 +166,28 @@ namespace Galleon.Checkout
                         this.TokenID      = tokenID;
                     });
 
+        
+        public Step AddPaymentMethod()
+        =>
+            new Step(name   : $"add_payment_method"
+                    ,action : async (s) =>
+                    {
+                        var result = await CHECKOUT.Network.Post<AddPaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/add-payment-method" 
+                                                                                          ,headers  : new ()
+                                                                                                    {
+                                                                                                        { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                                    }
+                                                                                          ,body     : new AddPaymentMethodRequest()
+                                                                                                    {
+                                                                                                        payment_method_definition_type = "credit_card",
+                                                                                                        credit_card_token              = this.TokenID,
+                                                                                                    }
+                                                                                            );
+
+                        s.Log(result.created_payment_method.id);     
+                    });
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
         public Step Charge()
@@ -176,8 +211,7 @@ namespace Galleon.Checkout
                                                                                                                            id   = upm.Data.id,
                                                                                                                            data = new ()
                                                                                                                                 {
-                                                                                                                                     { "token",  this.TokenID },
-                                                                                                                                   
+                                                                                                                                     { "token",  this.TokenID },                                                                                                                                   
                                                                                                                                 }
                                                                                                                       },
                                                                                                 save_payment_method   = false,
@@ -185,45 +219,109 @@ namespace Galleon.Checkout
                                                                                             });
                         
                         
-                        CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
-                                                                                     {
-                                                                                         errors      = null,
-                                                                                         is_canceled = false,
-                                                                                         is_success  = true,
-                                                                                         charge_id   = response.result.charge_id,
-                                                                                     };
-                         if (response.next_actions != null)
-                         {
-                             var flow = s.ParentStep;
-                             
-                             foreach (var paymentAction in response.next_actions)
-                             {
-                                 if (paymentAction.parameters.ContainsKey("url"))
-                                 {
-                                     var url = paymentAction.parameters["url"].ToString();
-                                     flow.AddChildStep(OpenURL(url));
-                                 }
-                             }
-                             
-                             List<Step> nextActions = new();
- 
-                             foreach (var step in nextActions)
-                             {
-                                 flow.AddChildStep(step);
-                             }
-                         }
-                         else
-                         {
-                             // NO TRANSACTION RESULT AND NO NEXT ACTION . ERROR .
-                         }
+                        //////////////////////////////////////////////////////////////////////
+                        ///
+                        // response = new ChargeResponse()
+                        // {
+                        //     result       = null,
+                        //     next_actions = new PaymentAction[]
+                        //                  {
+                        //                      new PaymentAction()
+                        //                      {
+                        //                          action     = "open_url",
+                        //                          parameters = new Dictionary<string, object>()
+                        //                                     {
+                        //                                         { "url",            "https://levan-galleon.github.io/galleon_web_demo?title=Superplay%20Product&price=$4.99" },
+                        //                                         { "deep_link_path", "checkoutapp"                                                                            }
+                        //                                     } 
+                        //                      }
+                        //                  }
+                        // };
+                        ///
+                        //////////////////////////////////////////////////////////////////////
+                        
+                        if (response.next_actions != null)
+                        {
+                            var flow = s.ParentStep;
+                            
+                            foreach (var paymentAction in response.next_actions)
+                            {
+                                if (paymentAction.action == "open_url")
+                                {
+                                    var url          = paymentAction.parameters["url"           ].ToString();
+                                  //var deepLinkPath = paymentAction.parameters["deep_link_path"].ToString();
+                                    string deepLinkPath = "test.app";
+                                    flow.AddChildStep(OpenURL(url,deepLinkPath));
+                                    flow.AddChildStep(CheckStatus());
+                                    
+                                }
+                            }
+                        }
+                        else if (response.result != null)
+                        {    
+                            CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+                                                                                          {
+                                                                                              errors      = null,
+                                                                                              is_canceled = false,
+                                                                                              is_success  = true,
+                                                                                              charge_id   = response.result.charge_id,
+                                                                                          };
+                        } 
+                        else
+                        {
+                            // NO TRANSACTION RESULT AND NO NEXT ACTION. ERROR.
+                            throw new Exception("Charge: No result or next action");
+                        }
                     });   
         
-        public Step OpenURL(string url) 
-            =>
+        public Step OpenURL(string url, string deepLinkPath = null) 
+        =>
             new Step(name   : $"open_url"
                     ,action : async (s) =>
                               {
+                                  #if UNITY_EDITOR
                                   Application.OpenURL(url);
+                                  await Task.Delay(2000);
+                                  return;
+                                  #endif
+                                  
+                                  Dictionary<string, object> values = new();
+                                  
+                                  await CheckoutClient.Instance.URLs.OpenAndAwaitURL(url,deepLinkPath, values).Execute();
+                                  
+                                  foreach (var kvp in values)
+                                      Debug.Log($"+ value : {kvp}");
+                              });
+        
+        public Step CheckStatus(int attemptNumber = 1) 
+        =>
+            new Step(name   : $"check_status_attempt_{attemptNumber}"
+                    ,action : async (s) =>
+                              {
+                                  int maxAttempts = 5;
+                                  
+                                  var response = await CHECKOUT.Network.Get<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/{CHECKOUT.Session.SessionID}"
+                                                                                                    ,headers  : new ()
+                                                                                                              {
+                                                                                                                  { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                                              });
+                                  
+                                  var status = response?.status ?? "NULL";
+                                  s.Log(status);
+                        
+                                  if (status != null && status == "completed")
+                                  {
+                                      // transaction over
+                                  }
+                                  else if (attemptNumber < maxAttempts)
+                                  {
+                                      await Task.Delay(1000);
+                                      s.ParentStep.AddChildStep(CheckStatus(attemptNumber + 1));
+                                  }
+                                  else
+                                  {
+                                      Debug.Log("max reattempts reached - transaction failed.");
+                                  }
                               });
         
         public Step AwaitSocket()

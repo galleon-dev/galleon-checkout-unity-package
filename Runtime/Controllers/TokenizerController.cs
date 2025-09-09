@@ -60,3 +60,31 @@ namespace Galleon.Checkout
         
     }
 }
+
+/// > checkout_session_flow
+///     > open_checkout_screen_mobile
+///     > set_checkout_loading_page
+///     > start_session
+///     > tax_success
+///     > navigate
+///     > report
+///     > end_checkout_screen_mobile
+///     > end_checkout_session
+///     > View_checkout_page
+///     > View_credit_card_page
+///     > View_selected_payment_method_page
+///     > UI_Back
+///     > View_checkout_page
+///     > run_transaction
+///         > set_loading_page
+///         > start_transaction
+///         > charge
+///         > wait
+///         > set_succews
+///         > navigate
+///         > handle_transaction_result
+///         > View_success_page
+///         > UI_close
+///
+///
+/// 

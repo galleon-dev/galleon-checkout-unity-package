@@ -97,6 +97,8 @@ namespace Galleon.Checkout.UI
         
         public virtual async Task OnFocus()
         {
+            await OnViewFocus().Execute();
+            
             #if DEBUG
             
             await Task.Delay(1000);
@@ -104,5 +106,12 @@ namespace Galleon.Checkout.UI
             
             #endif
         }
+        
+        public Step OnViewFocus() 
+        =>
+            new Step(name   : $"on_view_focus_{this.name}"
+                    ,action : async (s) =>
+                    { 
+                    });
     }
 }

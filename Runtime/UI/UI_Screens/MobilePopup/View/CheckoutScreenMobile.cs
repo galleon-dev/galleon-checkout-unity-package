@@ -9,7 +9,6 @@ using Galleon.Checkout;
 using Galleon.Checkout.UI;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.Purchasing;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -99,11 +98,9 @@ namespace Galleon.Checkout.UI
 
         public static Step OpenCheckoutScreenMobile()
         =>
-
             new Step(name: $"open_checkout_screen_mobile"
                     , action: async (s) =>
                               {
-                                  Debug.Log("<color=green>OpenCheckoutScreenMobile()</color>");
                                   if (CheckoutClient.Instance.CheckoutScreenMobile is null)
                                   {
                                       Debug.LogError("CheckoutClient.Instance.CheckoutScreenMobile is NULL");
@@ -259,7 +256,6 @@ namespace Galleon.Checkout.UI
 
                         ///////////////////////// Refresh
                         
-                        Debug.Log("Page Name: " + page.Name);
                         RefreshState();
                         HeaderPanelView.RefreshState();
                         FooterPanelView.RefreshState();
@@ -425,7 +421,6 @@ namespace Galleon.Checkout.UI
         {
             GalleonLogoClicked?.Invoke();
         }
-
 
 
         public void OnPageFinishedWithResult(string result)
@@ -628,12 +623,12 @@ namespace Galleon.Checkout.UI
                                                        ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString()
                                                        ,setup  : page =>
                                                                {
-                                                                   #if Android
-                                                                   page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
+                                                                   #if UNITY_ANDROID || UNITY_EDITOR
+                                                                   page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                                    page.NavigationMap["test_1"]                                              = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
                                                                    #endif
                                                                }
-                                                        );
+                                                       );
 
         public Page SelectPaymentMethodsPage = new Page(name  : "select_payment_methods"
                                                        ,header: HeaderPanelView     .STATE.back_and_text              .ToString()
@@ -641,9 +636,10 @@ namespace Galleon.Checkout.UI
                                                        ,footer: FooterPanelView     .STATE.terms_privacy_return       .ToString()
                                                        ,setup : page =>
                                                               {
-                                                                  page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.NewCard .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
-                                                                  page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.Selected.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                  page.NavigationMap["test_1"]                                                                = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.NewCard         .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.SelectedNew     .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.SelectedExisting.ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap["test_1"]                                                                        = page.screen.ViewPage(page.screen.CreditCardPage);
                                                               }
                                                         );
 
@@ -693,6 +689,12 @@ namespace Galleon.Checkout.UI
         public void OnShadeClick()
         {
             Close();
+        }
+
+        public static event Action<bool> On_ApplicationFocus;
+        public void OnApplicationFocus(bool hasFocus)
+        {
+            On_ApplicationFocus?.Invoke(hasFocus);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
@@ -761,5 +763,15 @@ namespace Galleon.Checkout.UI
             else if (this.State == STATE.loading_panel               .ToString()) LoadingPanelView            .gameObject.SetActive(true);
             else if (this.State == STATE.checkout_loading_panel      .ToString()) CheckoutLoadingPanelView    .gameObject.SetActive(true);
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
+        
+        public Step TestCloseCheckoutScreenClicked() 
+        =>
+            new Step(name   : $"test_close_checkout_screen_clicked"
+                    ,action : async (s) =>
+                    {
+                        CheckoutClient.Instance.CheckoutScreenMobile.On_CloseClicked();
+                    });
     }
 }

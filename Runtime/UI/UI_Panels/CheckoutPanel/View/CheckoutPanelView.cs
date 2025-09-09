@@ -38,10 +38,8 @@ namespace Galleon.Checkout.UI
         
         [Header("Payment Methods")]
         public GameObject       PaymentMethodsPanel;
-        public GameObject       PaymentMethodItemPrefab;
-        
+        public GameObject       PaymentMethodItemPrefab;        
         public GameObject       AddCreditCardButtonElement;
-
 
         [Header("Payment Buttons")]
         public GameObject       PurchaseButton;
@@ -66,7 +64,7 @@ namespace Galleon.Checkout.UI
         {
             if (CheckoutClient.Instance.CurrentSession == null) return;
             
-            Debug.Log("<color=green>RefreshState</color>");
+            // Debug.Log("<color=green>RefreshState</color>");
             
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
             this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
@@ -74,7 +72,7 @@ namespace Galleon.Checkout.UI
             ///////////////
 
             // Remove children (if any)
-            Debug.Log("<color=orange>- Removing Payment Methods</color>");
+            // Debug.Log("<color=orange>- Removing Payment Methods</color>");
             foreach (Transform child in PaymentMethodsPanel.transform)
             {
                // Debug.Log($"-Removing Item {child.gameObject.name}");
@@ -116,6 +114,10 @@ namespace Galleon.Checkout.UI
                 
                 item.Unselect();
             }
+            
+            //ShowPurchaseButton();
+            //var image = PurchaseButton.gameObject.GetComponent<Image>();
+            //image.sprite = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.First().LogoSprite;
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -148,7 +150,7 @@ namespace Galleon.Checkout.UI
         
         public void ShowPurchaseButton()
         {
-            Debug.Log("ShowPurchaseButton()");
+            //Debug.Log("ShowPurchaseButton()");
             GooglePayButton.SetActive(false);
             PurchaseButton .SetActive(true);
             PaypalPayButton.SetActive(false);
@@ -157,7 +159,7 @@ namespace Galleon.Checkout.UI
 
         public void ShowGooglePayButton()
         {
-            Debug.Log("ShowGooglePayButton()");
+            //Debug.Log("ShowGooglePayButton()");
             GooglePayButton .SetActive(true);
             PurchaseButton  .SetActive(false);
             PaypalPayButton .SetActive(false);
@@ -166,7 +168,7 @@ namespace Galleon.Checkout.UI
 
         public void ShowPaypalPayButton()
         {
-            Debug.Log("ShowPaypalPayButton()");
+            //Debug.Log("ShowPaypalPayButton()");
             GooglePayButton .SetActive(false);
             PurchaseButton  .SetActive(false);
             PaypalPayButton .SetActive(true);
@@ -175,7 +177,7 @@ namespace Galleon.Checkout.UI
 
         public void ShowApplePayButton()
         {
-            Debug.Log("ShowApplePayButton()");
+            //Debug.Log("ShowApplePayButton()");
             GooglePayButton .SetActive(false);
             PurchaseButton  .SetActive(false);
             PaypalPayButton .SetActive(false);
@@ -189,7 +191,7 @@ namespace Galleon.Checkout.UI
         public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_settings_page       )}()" });
         public TestScenario scenario_2_part_3 => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase     )}()" });
         
-        public Step test_confirmPurchase()      => new Step(action : async (s) => { OnConfirmPurchaseClick();     });
+        public Step test_confirmPurchase()      => new Step(name : "checkout_panel_test_confirm_purchase", action : async (s) => { OnConfirmPurchaseClick();     });
         public Step test_select_other_methods() => new Step(action : async (s) => { OnOtherPaymentMethodsClick(); });
         public Step test_settings_page()        => new Step(action : async (s) => { OnSettingsClick();            });
         
@@ -197,3 +199,4 @@ namespace Galleon.Checkout.UI
         /// Test Rule : On_ALL ("whatever")     .Do("confirm_purchase")
     }
 }
+

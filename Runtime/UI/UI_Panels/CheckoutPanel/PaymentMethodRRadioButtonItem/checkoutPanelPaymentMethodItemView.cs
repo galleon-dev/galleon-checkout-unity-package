@@ -22,16 +22,16 @@ namespace Galleon.Checkout.UI
         Color              UnselectedOptionColor = new Color(0.8679245f, 0.8679245f, 0.8679245f, 1);
 
         [Header("Sprites")]
-        public Sprite VisaSprite;
-        public Sprite MasterCardSprite;
-        public Sprite GPaySprite;
-        public Sprite PaypalSprite;
-        public Sprite AppleSprite;
-        public Sprite AddCardSprite;
+        public Sprite      VisaSprite;
+        public Sprite      MasterCardSprite;
+        public Sprite      GPaySprite;
+        public Sprite      PaypalSprite;
+        public Sprite      AppleSprite;
+        public Sprite      AddCardSprite;
 
         //// Properties
 
-        public UserPaymentMethod PaymentMethod { get; set; }
+        public UserPaymentMethod PaymentMethod     { get; set; }
         public CheckoutPanelView CheckoutPanelView { get; set; }
 
         //// Lifecycle
@@ -50,14 +50,16 @@ namespace Galleon.Checkout.UI
             if (CheckoutPanelView == null)
             {
                 this.Icon.sprite = AddCardSprite;
-                this.Label.text = "Add Credit Card";
+                this.Label.text  = "Add Credit Card";
                 return;
             }
 
             this.Label.text = PaymentMethod.DisplayName;
-            this.CheckedImage.gameObject.SetActive(this.PaymentMethod.IsSelected);
+            this.CheckedImage  .gameObject.SetActive( this.PaymentMethod.IsSelected);
             this.UncheckedImage.gameObject.SetActive(!this.PaymentMethod.IsSelected);
-            Debug.Log("this.PaymentMethod.Type: " + this.PaymentMethod.Type + "  this.PaymentMethod.IsSelected" + this.PaymentMethod.IsSelected);
+            
+            // Debug.Log("this.PaymentMethod.Type: " + this.PaymentMethod.Type + "  this.PaymentMethod.IsSelected" + this.PaymentMethod.IsSelected);
+            
             if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
             {
                 this.Icon.sprite = VisaSprite;

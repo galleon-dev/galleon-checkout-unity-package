@@ -218,3 +218,32 @@ namespace Galleon.Checkout
         }
     }
 }
+
+namespace Galleon.Checkout
+{
+    public class ExplorerItem2 : VisualElement
+    {
+        // UI
+        ButtonFoldout2 ItemElement;
+        VisualElement  InspectorsElement;
+        VisualElement  ChildrenElement;
+        
+        // Data
+        public object Target;
+        
+        // Lifecycle
+        void Refresh() {}
+        
+        void RefreshItem()       {}
+        void RefreshInspectors() {}
+        void RefreshChildren()   {}
+    }
+    
+    public class ButtonFoldout2 : VisualElement
+    {
+        VisualElement FoldButton;
+        VisualElement MainButton;
+        VisualElement WidgetsElement;
+    }
+}
+

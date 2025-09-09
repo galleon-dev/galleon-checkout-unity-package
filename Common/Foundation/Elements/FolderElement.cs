@@ -21,7 +21,7 @@ namespace Galleon.Checkout.Foundation
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-         public string FolderName   {get; set;}
+         public string FolderName   { get; set; } = "new_folder";
                                     //{
                                     //    get => System.IO.Path.GetFileName(Path);
                                     //    set => Rename(value); 
@@ -41,6 +41,11 @@ namespace Galleon.Checkout.Foundation
         
         public void DeleteFolder()
         {
+            #if UNITY_EDITOR
+            if (File.Exists($"{Path}.meta"))
+                File.Delete($"{Path}.meta");
+            #endif
+            
             Directory.Delete(Path);
         }
         
@@ -49,6 +54,9 @@ namespace Galleon.Checkout.Foundation
             if (parent is not Asset parentAsset)
                 throw new Exception("FolderElement.OnAddedToParent: Parent is not Asset");
 
+            if (this.Node.CRUDCommonName != null)
+                this.FolderName = this.Node.CRUDCommonName;
+            
             this.Path = System.IO.Path.Combine(parentAsset.Path, this.FolderName);
         }
         
@@ -97,10 +105,51 @@ namespace Galleon.Checkout.Foundation
         
         public class FolderCrudHandler : CrudHandler<FolderAsset>
         {
-            public override void Create()                        => target.CreateFolder();
-            public override void Delete()                        => target.DeleteFolder();
-            public override void OnAddedToParent(IEntity Parent) => target.OnAddedToParent(Parent);
-            public override bool DoesExist()                     => target.DoesFolderExist();
+            public override void Create()                          => target.CreateFolder();
+            public override void Delete()                          => target.DeleteFolder();
+            public override void OnAddedToParent(IEntity Parent)   => target.OnAddedToParent(Parent);
+            public override bool DoesExist()                       => target.DoesFolderExist();
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Scan Handler
+        
+        public class FolderScanHandler : ScanHandler<FolderAsset>
+        {
+            public override void Scan()
+            {
+                // Debug.Log($"-> scanning {this.target.GetType().Name}");
+                
+                var folder       = target;
+                var path         = folder.Path;
+                
+                if (path == null)
+                    return;
+                
+                var childFolders = Directory.EnumerateDirectories(folder.Path);
+                
+                foreach (var childFolderPath in childFolders)
+                {
+                    // Debug.Log($"--> scanned : {childFolderPath}");
+                    EmitScannedItem(parent:target, itemCategory:"folder", item: childFolderPath);
+                }
+            }
+
+            public override void Register()
+            {
+                OnItemScanned -= HandleItemScanned;
+                OnItemScanned += HandleItemScanned;
+                
+                void HandleItemScanned(object parent, string itemCategory, object item)
+                {
+                    if (parent      is FolderAsset parentFolder
+                    && itemCategory == "folder"
+                    && item         is string path)
+                    {
+                        var child = new FolderAsset() { FolderPath = path, Path = path };
+                        parentFolder.Node.AddChild(child);
+                    }
+                }
+            }
         }
     }
 }

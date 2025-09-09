@@ -3,10 +3,6 @@
 
 using UnityEngine;
 
-#if UNITY_EDITOR
-public class CreditCardNumberFormatting : MonoBehaviour {}
-#elif ANDROID && !UNITY_EDITOR
-
 using Galleon.Checkout.UI;
 using System.Text;
 using UnityEngine;
@@ -193,5 +189,3 @@ namespace AdvancedInputFieldPlugin
         }
     }
 }
-
-#endif

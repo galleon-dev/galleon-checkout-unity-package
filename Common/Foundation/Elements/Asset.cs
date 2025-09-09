@@ -4,5 +4,6 @@ namespace Galleon.Checkout.Foundation
     {
         public string Path;
         public string FolderPath;
+        
     }
 }

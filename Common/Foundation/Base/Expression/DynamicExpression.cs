@@ -85,6 +85,11 @@ namespace Galleon.Checkout.Foundation
             }
         }
         
+        public static void SetValue(object origin, string expression, object value)
+        {
+            
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////// Test
         
         #if UNITY_EDITOR
@@ -118,3 +123,4 @@ namespace Galleon.Checkout.Foundation
         
     }
 }
+

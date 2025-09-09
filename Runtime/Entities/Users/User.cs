@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.Shared;
 using UnityEngine;
 
 namespace Galleon.Checkout
@@ -10,8 +11,7 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
        
-        public string                ID;
-        public string                Name;
+        public string                Email = "";
  
         public List<CreditCardToken> Tokens                 = new();
         
@@ -27,8 +27,6 @@ namespace Galleon.Checkout
 
         public User()
         {
-            this.ID   = new Guid().ToString();
-            this.Name = "Fake User";
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
@@ -48,9 +46,24 @@ namespace Galleon.Checkout
             CHECKOUT.PaymentMethods.UserPaymentMethods.Add(userPaymentMethod);
         }
         
-        public void RemovePaymentMethod(UserPaymentMethod userPaymentMethod)
+        public async void RemovePaymentMethod(UserPaymentMethod userPaymentMethod)
         {
             CHECKOUT.PaymentMethods.UserPaymentMethods.Remove(userPaymentMethod);
+            
+            if (userPaymentMethod.Data.id != null)
+            {
+                var result = await CHECKOUT.Network.Post<RemovePaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/remove-payment-method" 
+                                                                                     ,headers  : new ()
+                                                                                               {
+                                                                                                   { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                               }
+                                                                                     ,body     : new RemovePaymentMethodRequest()
+                                                                                               {
+                                                                                                   payment_method_id = userPaymentMethod.Data.id,
+                                                                                               }
+                                                                                      );
+                
+            }
             
             foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
                 method.Unselect();

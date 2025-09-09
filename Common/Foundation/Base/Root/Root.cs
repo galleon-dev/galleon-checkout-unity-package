@@ -29,7 +29,8 @@ namespace Galleon.Checkout
         
         static Root()
         {
-            var root = Instance;    
+            var root = Instance;
+            Instance.Node.Initialize();
         }
         
         public Root()

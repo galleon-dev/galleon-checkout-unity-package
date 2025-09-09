@@ -114,7 +114,7 @@ public class SettingsPanelView : View
     {
         int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
 
-        Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
+        // Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
         if (PaymentMethodsAmount == 0)
         {
@@ -152,7 +152,7 @@ public class SettingsPanelView : View
         }
     }
     
-    public void On_FinishedEditingEmail(string str, EndEditReason reason)
+    public async void On_FinishedEditingEmail(string str, EndEditReason reason)
     {
         Debug.Log($"str = {str}");
         Debug.Log($"reason = {reason}");
@@ -165,6 +165,8 @@ public class SettingsPanelView : View
         IsEditingEmail = false;
         
         this.EmailLabel.text = str;
+        CHECKOUT.Session.User.Email = str;
+        await CHECKOUT.Actions.SetEmail().Execute();
     }
     
     public void On_Done()
@@ -196,3 +198,4 @@ public class SettingsPanelView : View
         public Step test_delete_last_payment_method() => new Step(action : async (s) => GetComponentsInChildren<SettingsPanelPaymentMethodItem>().Last().On_Delete_Clicked() );
         public Step test_go_back()                    => new Step(action : async (s) => On_Done() );
 }
+

@@ -67,7 +67,7 @@ namespace Galleon.Checkout.UI
 
         public override void RefreshState()
         {
-            Debug.Log("HEADER - RefreshState: " + this.State);
+            // Debug.Log("HEADER - RefreshState: " + this.State);
             DisableAllPanels();
 
             if (this.State == STATE.checkout_and_settings.ToString())

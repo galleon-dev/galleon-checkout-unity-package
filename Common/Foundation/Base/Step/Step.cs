@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
-using Codice.Client.BaseCommands;
 using UnityEngine;
 using Galleon.Checkout;
 using Galleon.Checkout.Foundation;
@@ -38,13 +37,22 @@ namespace Galleon.Checkout
         public STEP_STATE         StepState                   = STEP_STATE  .None;
         public ACTION_STATE       ActionState                 = ACTION_STATE.None;
         
-        public Action<Step>       OnPostChildStep             = null;
+        public Action<Step>       PostStepAction              = null;
+        public Action<Step>       PreChildStepAction          = null;
+        public Action<Step>       PostChildStepAction         = null;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
+        
+        public static event Action<Step>     OnPreStepExecute;
+        public static event Func<Step, Task> OnStepExecuted;
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
         
         public enum STEP_STATE
         {
             None,
+            Pending,
             Running,
             Completed,
             PreviouslyCompleted,
@@ -56,10 +64,6 @@ namespace Galleon.Checkout
             Success,
             Error,
         }
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
-        
-        public static event Func<Step, Task> OnStepExecuted;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Link
         
@@ -75,7 +79,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-        public Step(string                     name       = null
+        public Step(string                    name       = null
                    ,IEnumerable<string>       tags       = default
                    ,StepAction                action     = null
                    ,[CallerMemberName] string callerName = ""
@@ -153,7 +157,15 @@ namespace Galleon.Checkout
                 ////////////////////////////////////////////////
                 
                 if (StepState == STEP_STATE.PreviouslyCompleted)
+                {
+                    Debug.Log($"skipping previously completed step {this.Name}");
                     goto skip_to_end;
+                }
+                
+                ////////////////////////////////////////////////
+                
+                // emit execute event
+                OnPreStepExecute?.Invoke(this);
                 
                 ////////////////////////////////////////////////
                 
@@ -176,7 +188,12 @@ namespace Galleon.Checkout
                 for (int i = 0; i < PreSteps.Count; i++)
                 {
                     var   preStep = PreSteps[i];
+                    
+                    PreChildStepAction?.Invoke(preStep);
+                    
                     await preStep.Execute();
+                    
+                    PostChildStepAction?.Invoke(preStep);
                 }
                 
                 ////////////////////////////////////////////////
@@ -185,7 +202,12 @@ namespace Galleon.Checkout
                 for (int i = 0; i < ChildSteps.Count; i++)
                 {
                     var child = ChildSteps[i];
+                    
+                    PreChildStepAction?.Invoke(child);
+                    
                     await child.Execute();
+                    
+                    PostChildStepAction?.Invoke(child);
                 }
                 
                 ////////////////////////////////////////////////
@@ -194,7 +216,12 @@ namespace Galleon.Checkout
                 for (int i = 0; i < PostSteps.Count; i++)
                 {
                     var   postStep = PostSteps[i];
+                    
+                    PreChildStepAction?.Invoke(postStep);
+                    
                     await postStep.Execute();
+                    
+                    PostChildStepAction?.Invoke(postStep);
                 }
                 
                 ////////////////////////////////////////////////
@@ -214,12 +241,16 @@ namespace Galleon.Checkout
                 if ( OnStepExecuted?.Invoke(this) is Task t )
                     await t;
                 
+                // Post Step Action
+                PostStepAction?.Invoke(this);
+                
             }
             catch (Exception e)
             {
                 Debug.Log($"<color=red>[CAUGHT]</color> {e.ToString()}");
             }
         }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Child Steps
         

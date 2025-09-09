@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace Galleon.Checkout.UI
 
         public  GameObject SelectPaymentMethodItemPrefab;
         public  GameObject SelectPaymentMethodItemsHolder;
-
+        
         private int        ScrollRectMaxSize   = 3;
         private float      PaymentPrefabHeight = 200f;
         private float      SeparatorHeight     = 2f;
@@ -24,7 +25,8 @@ namespace Galleon.Checkout.UI
         {
             None,
             NewCard,
-            Selected,
+            SelectedNew,
+            SelectedExisting,
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Initialization
@@ -41,7 +43,7 @@ namespace Galleon.Checkout.UI
             // Remove children (if any)
             foreach (Transform child in SelectPaymentMethodItemsHolder.transform)
             {
-                Debug.Log($"-Removing Item {child.gameObject.name}");
+                // Debug.Log($"-Removing Item {child.gameObject.name}");
                 Destroy(child.gameObject);
             }
 
@@ -91,8 +93,8 @@ namespace Galleon.Checkout.UI
 
         public Step View()
         =>
-            new Step(name: $"view_select_payment_methods_panel"
-                    , action: async (s) =>
+            new Step(name   : $"view_select_payment_methods_panel"
+                    ,action : async (s) =>
                     {
                         IsCompleted = false;
 
@@ -112,10 +114,20 @@ namespace Galleon.Checkout.UI
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
         }
 
-        public void On_Select()
+        public void On_Select(SelectPaymentMethodPanelItem item)
         {
-            this.Result = ViewResult.Selected;
-            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
+            if (item.PaymentMethodDefinition != null)
+            {
+                this.Result = ViewResult.SelectedNew;
+                CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());   
+            }
+            else if (item.UserPaymentMethod != null)
+            {
+                CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(item.UserPaymentMethod);
+                
+                this.Result = ViewResult.SelectedExisting;
+                CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
+            }
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
@@ -123,7 +135,8 @@ namespace Galleon.Checkout.UI
         
         public void UpdateScrollRectMaxSize()
         {
-            int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
+            int PaymentMethodsAmount = Math.Max(CHECKOUT.PaymentMethods.UserPaymentMethods.Count + CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.Count
+                                               ,6);
 
             Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
@@ -143,11 +156,12 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
-        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_add_new_card)}()" });
-        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_back_to_checkout)}()" });
+        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_add_new_card)}()"     });
+        //public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_back_to_checkout)}()" });
         
         public Step test_add_new_card()     => new Step(action : async (s) => { On_NewCardClicked(); });
-        public Step test_back_to_checkout() => new Step(action : async (s) => { On_Select();         });
+        //public Step test_back_to_checkout() => new Step(action : async (s) => { On_Select();     });
         
     }
 }
+

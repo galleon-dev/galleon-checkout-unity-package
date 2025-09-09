@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -43,7 +45,13 @@ namespace Galleon.Checkout
             
             this.Breadcrumbs.Add(new Breadcrumb(callerName, callerLine, callerPath, displayName : "creation_breadcrumb"));
             
-            Setup();
+            //Setup();
+        }
+        
+        public void Initialize()
+        {
+            foreach (var child in this.Descendants())
+                child.Node.Setup();
         }
         
         ///////////////////////////////////////////////////////////////////////// Setup
@@ -192,29 +200,92 @@ namespace Galleon.Checkout
         {
             // Auto Child Entities
             var type    = Entity.GetType();
-            var members = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            var members = type.GetFields(BindingFlags.Instance | BindingFlags.Public)
+                              .Where(m => !(typeof(Step).IsAssignableFrom(m.FieldType)));
             
             foreach (var member in members)
             {
-                var value = member switch
+                try
                 {
-                    System.Reflection.FieldInfo    field => field.GetValue(Entity),
-                  //System.Reflection.PropertyInfo prop  => prop.GetValue(entity), // Not Properties!
-                    _ => null
-                };
-
-                if (value != null && value is IEntity e)
-                {
-                    this.Children.Add(e);
+                    var value = member switch
+                                {
+                                    FieldInfo field => field.GetValue(Entity),
+                                    //System.Reflection.PropertyInfo prop  => prop.GetValue(entity), // Not Properties!
+                                    _ => null
+                                };
                     
-                    #if UNITY_EDITOR
-                    var header = member.GetCustomAttribute<HeaderAttribute>();
-                    if (header != null)
+                    
+                    if (value != null && value is IEntity e)
                     {
-                        e.Node.editorExtras.HeaderAttributeText = header.header;
+                        //this.AddChild(e);
+                        this.AddChild(e);
+                        
+                        #if UNITY_EDITOR
+                        var header = member.GetCustomAttribute<HeaderAttribute>();
+                        if (header != null)
+                        {
+                            e.Node.editorExtras.HeaderAttributeText = header.header;
+                        }
+                        #endif
                     }
-                    #endif
                 }
+                catch (Exception ex)
+                {
+                    Debug.Log(ex.ToString());
+                }
+
+            }
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Quick Debug
+        
+        public void LogDumpTree()
+        {
+            DumpTreeNode(this.Entity, 0);
+            void DumpTreeNode(IEntity entity, int level)
+            {
+                var indent = new string(' ', level * 2);
+                Debug.Log($"{indent}{entity}");
+
+                foreach (var child in entity.Node.Children)
+                    DumpTreeNode(child, level + 1);
+            }
+        }
+
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Storage
+        
+        public string _SelfPathID = null;
+        public string SelfPathID  => _SelfPathID ?? this.Entity.GetType().Name;
+        public string PathID      => string.Join(".", Ancestors().Skip(1).Reverse().ToList().Select(p => p.Node.SelfPathID).Concat(new[] { SelfPathID }));
+            
+        public        EntityStorage Storage => new(Entity);
+        public struct EntityStorage
+        {
+            private IEntity Entity;
+            public  EntityStorage(IEntity entity) => Entity = entity;
+            
+            public void Store(string key, object value)
+            {
+                try
+                {
+                    var filePath = Path.Combine(Application.dataPath, "Storage", $"{key}.json");
+                    var json     = JsonConvert.SerializeObject(value);
+                    File.WriteAllText(filePath, json);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e.ToString());
+                }
+            }
+            
+            public T      Load<T>(string key) => (T)Load(key);
+            public object Load   (string key)
+            {
+                var filePath = Path.Combine(Application.dataPath, "Storage", $"{key}.json");
+                var json     = File.ReadAllText(filePath);
+                var value    = JsonConvert.DeserializeObject(json);
+                return value;
             }
         }
         
@@ -242,7 +313,6 @@ namespace Galleon.Checkout
                 
                 yield break;
             }
-            
                         
             public IEnumerable<Step> Steps(object parameterObject)
             {
@@ -282,6 +352,24 @@ namespace Galleon.Checkout
                 yield break;
             }
             
+            public IEnumerable<Func<Step>> StepMethods()
+            {
+                var type = this.Entity.GetType();
+
+                // Retrieve all methods in the type that have a return type of Step
+                var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                  .Where(m => m.GetParameters().Length == 0)
+                                  .Where(m => m.ReturnType == typeof(Step));
+
+                foreach (var method in methods)
+                {
+                    var origin = this;
+                    yield return () => (Step)method.Invoke(origin.Entity, null);
+                }
+
+                yield break;
+            }
+            
             public IEnumerable<TestScenario> TestScenarios()
             {
                 var type = this.Entity.GetType();
@@ -306,6 +394,31 @@ namespace Galleon.Checkout
                     }
                 }
             }   
+            
+            public IEnumerable<Operation> Operations()
+            {
+                var type = this.Entity.GetType();
+
+                // Retrieve all properties and fields in the type that are of type Operation
+                var members = type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                  .Where     (m => (m is FieldInfo    fi && fi.FieldType    == typeof(Operation)) 
+                                                || (m is PropertyInfo pi && pi.PropertyType == typeof(Operation)));
+
+                foreach (var member in members)
+                {
+                    var value = member switch
+                    {
+                        FieldInfo    field => field.GetValue(this.Entity),
+                        PropertyInfo prop  => prop .GetValue(this.Entity),
+                        _ => null
+                    };
+
+                    if (value is Operation operation)
+                    {
+                        yield return operation;
+                    }
+                }
+            }
         }
         
         
@@ -426,6 +539,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - self CRUD
         
         public bool IsCrudDraft = true;
+        public string CRUDCommonName;
         
         public        CRUD Crud => new(Entity);
         public struct CRUD
@@ -452,7 +566,10 @@ namespace Galleon.Checkout
                 GetCrudHandler().Delete();
             }
             
-            public void Update() {}
+            public void Update(string path, string value)
+            {
+                GetCrudHandler().Update(path, value);
+            }
             
             public bool DoesExist()
             {
@@ -478,6 +595,54 @@ namespace Galleon.Checkout
             }
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Scan
+        
+        public        SCAN Scan => new(Entity);
+        public struct SCAN
+        {
+            IEntity Entity;
+            public SCAN(IEntity entity) => this.Entity = entity;
+            
+            public bool SupportsScan => Entity.GetType().GetNestedTypes().Any(x => x.IsSubclassOf(typeof(ScanHandler)));
+            
+            public ScanHandler GetScanHandler()
+            {
+                if (!SupportsScan)
+                    throw new Exception($"type {Entity.GetType().FullName} does not support Scan");
+                
+                var type            = Entity.GetType();
+                var scanType        = type.GetNestedTypes().FirstOrDefault(x => x.IsSubclassOf(typeof(ScanHandler)));
+                var scanInstance    = Activator.CreateInstance(scanType, true) as ScanHandler;
+                scanInstance.target = Entity;
+                
+                return scanInstance;
+            }
+            
+            public void Register()
+            {
+                var scanHandler = GetScanHandler();
+                scanHandler.Register();
+            }
+            public void ScanSelf()
+            {
+                var scanHandler = GetScanHandler();
+                scanHandler.Scan();
+            }
+            public void ScanRecursive()
+            {
+                this.ScanSelf();
+                
+                var children = this.Entity?.Node?.Children;
+                if (children == null) return;
+
+                foreach (var child in children)
+                {
+                    if (child == null) continue;
+                    child.Node.Scan.ScanRecursive();
+                }
+            }
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element
      
         public        ELEMENT Element => new(Entity);
@@ -492,7 +657,8 @@ namespace Galleon.Checkout
             public IEntity GetAssetsFolder() { return default; }
         }
             
-        
+        public Resource GetResource() => new Resource();
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live Tree
      
         public        LIVE Live => new(Entity);
@@ -511,14 +677,30 @@ namespace Galleon.Checkout
             }
             public void Minus()
             {
-                Entity.Node.ParentNode.RemoveChild(Entity);
                 Entity.Node.Crud.Delete();
+                Entity.Node.ParentNode.RemoveChild(Entity);
             }
             public void Edit(string path, string value)
             {
-                
+                Entity.Node.Crud.Update(path, value);
             }
-        }       
+        }    
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Print
+     
+        
+        public        PRINTING Printing => new(Entity);
+        public struct PRINTING
+        {
+            IEntity Entity;
+            public PRINTING(IEntity entity) => this.Entity = entity;
+            
+            public async void Print(string id, string text)
+            {
+                var   op = new PrintOperation(ID:id, parent:Entity, text:text);
+                await op.Print().Execute();   
+            }
+        }
     }
     
     /////////////////////////////////////////////////
@@ -527,13 +709,48 @@ namespace Galleon.Checkout
     {
         public object target; 
         public virtual void Create()    {}
-        public virtual void Update()    {}
         public virtual void Delete()    {}
         public virtual bool DoesExist() { return default; }
+        
+        public virtual void Update(string path, object value)
+        {
+            DynamicExpression.SetValue(origin:target, expression:path, value:value);
+        }
         
         public virtual void OnAddedToParent(IEntity Parent) {}
     }
     public class CrudHandler<T> : CrudHandler where T : class
+    {
+        public new T target
+        {
+            get => base.target as T;
+            set => base.target = value;
+        }
+    }
+    
+    /////////////////////////////////////////////////
+    
+    public class ScanHandler
+    {
+        public object target;
+        
+        public delegate void OnItemScannedDelegate(object parent, string itemCategory, object item);
+        public static event  OnItemScannedDelegate OnItemScanned; 
+        
+        public virtual void Scan()
+        {
+        }
+        
+        public void EmitScannedItem(object parent, string itemCategory, object item)
+        {
+            OnItemScanned?.Invoke(parent, itemCategory, item);
+        }
+        
+        public virtual void Register()
+        {
+        }
+    }
+    public class ScanHandler<T> : ScanHandler where T : class
     {
         public new T target
         {

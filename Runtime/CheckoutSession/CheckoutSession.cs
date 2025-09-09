@@ -40,7 +40,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
         
-        [FormerlySerializedAs("lastTransactionResult")] public ChargeResultData lastChargeResult;
+        public ChargeResultData                   lastChargeResult;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
         
@@ -74,9 +74,9 @@ namespace Galleon.Checkout
                         
                         // Report
                         s.AddPostStep("report", async x =>
-                                               {
-                                                   Report?.Invoke();
-                                               });
+                                                {
+                                                    Report?.Invoke();
+                                                });
                         
                         // Close
                         s.AddPostStep(CheckoutScreenMobile.EndCheckoutScreenMobile());
@@ -129,6 +129,22 @@ namespace Galleon.Checkout
                         this.SessionID = response.session_id;           
                     });
         
+        public Step CancelSession() 
+        =>
+            new Step(name   : $"cancel_session"
+                    ,action : async (s) =>
+                    {
+                        var response = await CHECKOUT.Network.Post<CancelCheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/cancel"
+                                                                                                 ,headers  : new ()
+                                                                                                           {
+                                                                                                               { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                                           }
+                                                                                                 ,body     : new Shared.CancelCheckoutSessionRequest()
+                                                                                                           {
+                                                                                                              session_id = CHECKOUT.Session.SessionID,
+                                                                                                           });
+                    });
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// transaction Steps
         
         public Step RunTransaction()
@@ -163,7 +179,8 @@ namespace Galleon.Checkout
                         ////////////////////////////////////////////////////////////// Final Navigation Step
                         
                         // Navigate
-                        s.AddChildStep("wait",        async x => await Task.Delay(1000));
+                        //s.AddChildStep("wait",        async x => await Task.Delay(1000));
+                      //s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.SuccessPage));
                         s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.NavigationNext = "Success");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                        
@@ -197,7 +214,6 @@ namespace Galleon.Checkout
                       //await card.Tokenize()    .Execute();
                         
                         var cardToken = card.TokenID;
-                        
                     });
         
         public Step HandleTransactionResult()
@@ -222,5 +238,3 @@ namespace Galleon.Checkout
         
     }
 }
-
-
