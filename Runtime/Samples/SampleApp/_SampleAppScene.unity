@@ -149,7 +149,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: bc58277679f0a4136b76806cfa6a36fd, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: bc58277679f0a4136b76806cfa6a36fd, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2081,8 +2081,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1210701588}
   - {fileID: 95347521}
+  - {fileID: 1210701588}
   m_Father: {fileID: 2075147689}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -14593,7 +14593,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 655869851}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1468992740 stripped
 MonoBehaviour:
@@ -58816,6 +58816,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed820cdad6e44e54e98e48d341dcefd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CreditCardAdvancedInputField: {fileID: 0}
+  CreditCardInfoPanelView: {fileID: 0}
+  separatorCharacter: ' - '
 --- !u!222 &5087216365551392949
 CanvasRenderer:
   m_ObjectHideFlags: 0
