@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -12,9 +13,11 @@ namespace Galleon.Checkout
             return new InitializationResult() { IsSuccess = true };
         }
         
-        public static async Task<PurchaseResult> Purchase(CheckoutProduct product)
+        public static async Task<PurchaseResult> Purchase(CheckoutProduct product, Dictionary<string, string> metadata = null)
         {
-            await  CheckoutClient.Instance.RunCheckoutSession(product).Execute();
+            await  CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
+            CheckoutClient.Instance.CurrentSession.Metadata = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            await  CheckoutClient.Instance.RunCheckoutSession().Execute();
             return CheckoutClient.Instance.CurrentSession.PurchaseResult;
         }
     }

@@ -27,6 +27,8 @@ namespace Galleon.Checkout
         public CheckoutProduct                    SelectedProduct;
         public PurchaseResult                     PurchaseResult        = default;
         
+        public Dictionary<string, string>         Metadata              = new();
+        
         // Simple Dialog Panel data
         public string                             LastDialogRequest         = null;
         public SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
