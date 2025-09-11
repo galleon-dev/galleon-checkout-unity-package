@@ -32,6 +32,7 @@ namespace Galleon.Checkout
     
     public class PurchaseResult
     {
+        public string       OrderID    { get; set; }
         public bool         IsSuccess  { get; set; }
         public bool         IsCanceled { get; set; }
         public bool         IsError    { get; set; }
@@ -39,7 +40,7 @@ namespace Galleon.Checkout
 
         public override string ToString()
         {
-            return $"PurchaseResult: IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, Errors={string.Join(", ", Errors ?? new List<string>())}";
+            return $"PurchaseResult: OrderID={OrderID} IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, Errors={string.Join(", ", Errors ?? new List<string>())}";
         }
     }
 }

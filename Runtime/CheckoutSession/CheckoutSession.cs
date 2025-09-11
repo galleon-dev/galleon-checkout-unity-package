@@ -96,6 +96,7 @@ namespace Galleon.Checkout
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                   {
+                                                      OrderID    = CHECKOUT.Session?.SessionID ?? "NULL",
                                                       IsSuccess  = false,
                                                       IsCanceled = true,
                                                       IsError    = false,
@@ -232,6 +233,7 @@ namespace Galleon.Checkout
                         
                         this.PurchaseResult = new PurchaseResult()
                                               {
+                                                  OrderID     = CHECKOUT.Session?.SessionID ?? "NULL",
                                                   IsSuccess   = result.is_success,
                                                   IsCanceled  = result.is_canceled,
                                                   Errors      = result.errors?.ToList(),
