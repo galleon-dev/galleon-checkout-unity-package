@@ -181,10 +181,13 @@ namespace Galleon.Checkout.UI
                 card.CardMonth      = DateInputField.Text.Substring(0, 2);
                 card.CardYear       = DateInputField.Text.Substring(2, 2);
                 
-                await card.RunVaultingSteps().Execute();
-                
+                card.Data    = new();
+                card.Data.id = "pending";
                 CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod(card);
                 CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(card);
+
+                await card.RunVaultingSteps().Execute();
+                
 
                 this.Result = ViewResult.Confirm;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
@@ -390,7 +393,7 @@ namespace Galleon.Checkout.UI
 
         public void OnCVVValueChanged(string digits)
         {
-            Debug.Log("<color=green>OnCVVValueChanged. rawInput: " + digits + "</color>");
+            // Debug.Log("<color=green>OnCVVValueChanged. rawInput: " + digits + "</color>");
 
             bool isAmex = CreditCardNumberField.Text.Replace(" ", "").StartsWith("34") ||
             CreditCardNumberField.Text.Replace(" ", "").StartsWith("37");
@@ -448,12 +451,12 @@ namespace Galleon.Checkout.UI
         int MaxLength;
         void FormatCreditCardInput(string rawInput)
         {
-            Debug.Log("FormatCreditCardInput: " + rawInput);
+            // Debug.Log("FormatCreditCardInput: " + rawInput);
             MaxLength = GetFormatForDigits(rawInput).MaxLength;
             if (rawInput.Length > MaxLength)
             {
                 rawInput = rawInput.Remove(rawInput.Length - 1);
-                Debug.Log("Updated RawInput: " + rawInput);
+                // Debug.Log("Updated RawInput: " + rawInput);
             }
 
             CheckLuhnOnEndEdit(rawInput);

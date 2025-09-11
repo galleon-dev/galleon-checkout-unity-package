@@ -184,6 +184,9 @@ namespace Galleon.Checkout
                                                                                                     }
                                                                                             );
 
+                        var pendingPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.Data.id == "pending");
+                        pendingPaymentMethod.Data.id = result.created_payment_method.id;
+                        
                         s.Log(result.created_payment_method.id);     
                     });
         
@@ -253,7 +256,6 @@ namespace Galleon.Checkout
                                     string deepLinkPath = "test.app";
                                     flow.AddChildStep(OpenURL(url,deepLinkPath));
                                     flow.AddChildStep(CheckStatus());
-                                    
                                 }
                             }
                         }
