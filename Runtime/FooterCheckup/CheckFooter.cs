@@ -11,7 +11,7 @@ namespace Galleon.Footer
         {
             if (FooterPanelView)
             {
-                //FooterPanelView.ShowViewPaymentMethods(true);
+                FooterPanelView.ShowViewPaymentMethods(true);
             }
         }
 
@@ -19,7 +19,7 @@ namespace Galleon.Footer
         {
             if (FooterPanelView)
             {
-                //FooterPanelView.ShowViewPaymentMethods(false);
+                FooterPanelView.ShowViewPaymentMethods(false);
             }
         }
     }

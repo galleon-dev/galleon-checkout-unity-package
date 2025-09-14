@@ -125,6 +125,9 @@ namespace Galleon.Checkout.UI
                     </html>",
                 IsBodyHtml = true
             };
+
+            Debug.Log(email + " " + message.Subject + " " + message.Body);
+
             try
             {
                 await SendEmail(to: email, subject: message.Subject, body: message.Body);

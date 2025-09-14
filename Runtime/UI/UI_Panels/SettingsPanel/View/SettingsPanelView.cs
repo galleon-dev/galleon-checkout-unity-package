@@ -194,10 +194,9 @@ public class SettingsPanelView : View
             } else
             {
                 SuccessPanelView.ShowEmail(true);
-
-                PlayerPrefs.SetString("Email", SuccessPanelEmailInputField.Text);
-                PlayerPrefs.Save();
             }
+            PlayerPrefs.SetString("Email", SuccessPanelEmailInputField.Text);
+            PlayerPrefs.Save();
         } 
        // this.EmailLabel.text = str;
     }

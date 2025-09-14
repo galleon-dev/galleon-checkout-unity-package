@@ -11,7 +11,7 @@ namespace Galleon.Footer
         {
             if (FooterPanelView)
             {
-                // FooterPanelView.ShowTermsOfService(false);
+                FooterPanelView.ShowTermsOfService(false);
             }
         }
 
@@ -19,7 +19,7 @@ namespace Galleon.Footer
         {
             if (FooterPanelView)
             {
-                // FooterPanelView.ShowTermsOfService(true);
+                FooterPanelView.ShowTermsOfService(true);
             }
         }
     }

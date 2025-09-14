@@ -108,6 +108,8 @@ namespace Galleon.Checkout.UI
                     this.PriceText.text = $"${SubTotal.ToString(CultureInfo.InvariantCulture)}";
                 }
             }
+
+            CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
         }
 
         void CreateTaxPrefab(string taxName, string taxAmount)

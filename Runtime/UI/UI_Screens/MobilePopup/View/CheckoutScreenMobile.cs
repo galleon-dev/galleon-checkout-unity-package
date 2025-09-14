@@ -60,8 +60,15 @@ namespace Galleon.Checkout.UI
 
         bool ShowLoaderOnce = true;
 
+        private void OnDisable()
+        {
+            ShowLoaderOnce = true;
+        }
+
         public void ShowInitialCheckoutPanelLoader()
         {
+
+            Debug.Log("ShowInitialCheckoutPanelLoader()");
             StopAllCoroutines();
             if (ShowLoaderOnce)
             {
