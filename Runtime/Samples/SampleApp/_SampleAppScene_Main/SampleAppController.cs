@@ -38,7 +38,7 @@ namespace Galleon.SampleApp
             //await Task.Yield();
             //Root.Instance.Runtime.TestController.Test().Execute();
             
-            await CheckoutAPI.Initialize();
+            await CheckoutAPI.Initialize(jwt : "");
             
             if (CHECKOUT.IsTest)
                 await TestCheckout();
