@@ -7,7 +7,7 @@ namespace Galleon.Checkout
 {
     public class CheckoutAPI
     {   
-        public static async Task<InitializationResult> Initialize()
+        public static async Task<InitializationResult> Initialize(string jwt)
         {
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             return new InitializationResult() { IsSuccess = true };
