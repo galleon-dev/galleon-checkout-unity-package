@@ -67,6 +67,8 @@ namespace Galleon.Checkout
             new Step(name   : "get_user_access_token"
                     ,action : async s =>
                     {   
+                        return;
+                        
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
                                                              {
