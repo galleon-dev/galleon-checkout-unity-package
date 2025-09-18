@@ -66,30 +66,17 @@ namespace Galleon.Checkout
         =>
             new Step(name   : "get_user_access_token"
                     ,action : async s =>
-                    {
-                        //return;
-                        
-                        string appID  = "test.app-1";
-                        string id     = "test.app-1";
-                        string device = "local_unity_test_client";
-                        
-                        s.Log($"Getting Galleon User Access Token.");
-                        s.Log($"AppID  = {appID}");
-                        s.Log($"ID     = {id}");
-                        s.Log($"Device = {device}");
-                        
+                    {   
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
                                                              {
-                                                                 { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
+                                                               //{ "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
+                                                                 { "Authorization", $"Bearer {GalleonUserAccessToken}" }
                                                              }
                                                     ,body    : new
                                                              {
-                                                                 app_user_id = "test"
+                                                                 app_user_id = "test_vadimski"
                                                              });
-                        
-                      //await Post(url  : $"{SERVER_BASE_URL}/development/seed");                      
-                        
                         
                         /// Response Example :
                         /// {
