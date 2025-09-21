@@ -112,22 +112,45 @@ namespace Galleon.Checkout
             new Step(name   : $"start_session"
                     ,action : async (s) =>
                     {   
+                        
+                        var body = new Shared.CheckoutSessionRequest() {
+                                                                          expires_at = DateTime.UtcNow.AddDays(1),
+                                                                          order      = new OrderDetails()
+                                                                                       {
+                                                                                           sku      = "sku-1-3DS", // SelectedProduct.DisplayName,
+                                                                                           amount   = 100,
+                                                                                           currency = "USD",
+                                                                                       },
+                                                                          metadata   = CHECKOUT.Session.Metadata
+                                                                       };
+
+                        try
+                        {
+                            Debug.Log($"Body : {body.ToString()}");
+                            Debug.Log($"Body.expires_at : {body.expires_at}");
+                            Debug.Log($"Body.order : {body.order?.ToString()}");
+                            Debug.Log($"Body.order.sku : {body.order?.ToString()}");
+                            Debug.Log($"Body.order.amount : {body.order?.amount.ToString()}");
+                            Debug.Log($"Body.order.currency : {body.order?.currency?.ToString()}");
+                            Debug.Log($"Body.metadata : {body.metadata?.Count}");
+                            if (body.metadata != null)
+                                foreach (var kvp in body.metadata)
+                                    Debug.Log($"Body.metadata[{kvp.Key}] : {kvp.Value}");
+                            Debug.Log($"Body-Json : {JsonConvert.SerializeObject(body)}");
+                            Debug.Log($"Header : Bearer {CHECKOUT.Network.GalleonUserAccessToken}");
+                        }
+                        catch (Exception e)
+                        {
+                            
+                        }
+                        
                         var response = await CHECKOUT.Network.Post<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/create"
                                                                                            ,headers  : new ()
                                                                                                      {
                                                                                                          { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                      }
-                                                                                           ,body     : new Shared.CheckoutSessionRequest()
-                                                                                                     {
-                                                                                                        expires_at = DateTime.UtcNow.AddDays(1),
-                                                                                                        order      = new OrderDetails()
-                                                                                                                     {
-                                                                                                                         sku      = "sku-1-3DS", // SelectedProduct.DisplayName,
-                                                                                                                         amount   = 100,
-                                                                                                                         currency = "USD",
-                                                                                                                     },
-                                                                                                        metadata   = CHECKOUT.Session.Metadata,
-                                                                                                     });
+                                                                                           ,body     : body
+                                                                                                     );
                         
                         
                         this.SessionID = response.session_id;           

@@ -195,17 +195,23 @@ namespace Galleon.Checkout
             
             if (encodingType == RequestEncodingType.JSON)
             {
+                Debug.Log($"- Post request with JSON body");
+                
                 // Set Body
                 if (body != default)
+                {
                     jsonBody = JsonConvert.SerializeObject(body);
+                    Debug.Log($"- jsonBody : {jsonBody}");
+                }
                 
                 #if UNITY_6000_0_OR_NEWER
+                Debug.Log($"- creating post request UNITY 6");
+
                 request = UnityWebRequest.Post(uri         : url
                                               ,postData    : jsonBody
                                               ,contentType : "application/json");
                 #else
-              //request = UnityWebRequest.Post(uri        : url
-              //                              ,postData    : jsonBody);
+                Debug.Log($"- creating post request");
                 
                 request                 = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
                 byte[] jsonToSend       = Encoding.UTF8.GetBytes(jsonBody);
@@ -217,6 +223,8 @@ namespace Galleon.Checkout
             }
             else if (encodingType == RequestEncodingType.FormUrlEncoded)
             {
+                Debug.Log($"- Post request URL encoded");
+                
                 WWWForm form = new WWWForm();
                 foreach (var field in formFields)
                     form.AddField(field.Key, field.Value);
