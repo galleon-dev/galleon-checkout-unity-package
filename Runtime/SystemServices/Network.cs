@@ -204,13 +204,13 @@ namespace Galleon.Checkout
                     Debug.Log($"- jsonBody : {jsonBody}");
                 }
                 
-                #if UNITY_6000_0_OR_NEWER
-                Debug.Log($"- creating post request UNITY 6");
-
-                request = UnityWebRequest.Post(uri         : url
-                                              ,postData    : jsonBody
-                                              ,contentType : "application/json");
-                #else
+                // #if UNITY_6000_0_OR_NEWER
+                // Debug.Log($"- creating post request UNITY 6");
+                // 
+                // request = UnityWebRequest.Post(uri         : url
+                //                               ,postData    : jsonBody
+                //                               ,contentType : "application/json");
+                // #else
                 Debug.Log($"- creating post request");
                 
                 request                 = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
@@ -219,7 +219,7 @@ namespace Galleon.Checkout
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
 
-                #endif
+                // #endif
             }
             else if (encodingType == RequestEncodingType.FormUrlEncoded)
             {
