@@ -119,13 +119,13 @@ namespace Galleon.Checkout
                                                                                                      }
                                                                                            ,body     : new Shared.CheckoutSessionRequest()
                                                                                                      {
-                                                                                                        order      = new OrderDetails()
-                                                                                                                   {
-                                                                                                                       sku      = "sku-1-3DS", // SelectedProduct.DisplayName,
-                                                                                                                       amount   = 100,
-                                                                                                                       currency = "USD",
-                                                                                                                   },
                                                                                                         expires_at = DateTime.UtcNow.AddDays(1),
+                                                                                                        order      = new OrderDetails()
+                                                                                                                     {
+                                                                                                                         sku      = "sku-1-3DS", // SelectedProduct.DisplayName,
+                                                                                                                         amount   = 100,
+                                                                                                                         currency = "USD",
+                                                                                                                     },
                                                                                                         metadata   = CHECKOUT.Session.Metadata,
                                                                                                      });
                         

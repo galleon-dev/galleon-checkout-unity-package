@@ -10,6 +10,7 @@ namespace Galleon.Checkout
         public static async Task<InitializationResult> Initialize(string jwt)
         {
             CheckoutClient.Instance.Network.GalleonUserAccessToken = jwt;
+          
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             
             return new InitializationResult() { IsSuccess = true };
