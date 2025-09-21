@@ -172,16 +172,18 @@ namespace Galleon.Checkout
             new Step(name   : $"add_payment_method"
                     ,action : async (s) =>
                     {
+                        var body = new AddPaymentMethodRequest()
+                                   {
+                                       payment_method_definition_type = "credit_card",
+                                       credit_card_token              = this.TokenID,
+                                   };
+                        
                         var result = await CHECKOUT.Network.Post<AddPaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/add-payment-method" 
                                                                                           ,headers  : new ()
                                                                                                     {
                                                                                                         { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                     }
-                                                                                          ,body     : new AddPaymentMethodRequest()
-                                                                                                    {
-                                                                                                        payment_method_definition_type = "credit_card",
-                                                                                                        credit_card_token              = this.TokenID,
-                                                                                                    }
+                                                                                          ,body     : body
                                                                                             );
 
                         var pendingPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.Data.id == "pending");
@@ -200,26 +202,28 @@ namespace Galleon.Checkout
                     {                                               
                         var upm = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
                         
+                        var body = new Shared.ChargeRequest()
+                                   {
+                                       session_id            = CHECKOUT.Session.SessionID,
+                                       is_new_payment_method = false,
+                                       payment_method        = new PaymentMethodDetails()
+                                                             {
+                                                                  id   = upm.Data.id,
+                                                                  data = new ()
+                                                                       {
+                                                                            { "token",  this.TokenID },                                                                                                                                   
+                                                                       }
+                                                             },
+                                       save_payment_method   = false,
+                                       //metadata              = CHECKOUT.Session.Metadata,
+                                   };
+                        
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
                                                                                             {
                                                                                                 { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                             }
-                                                                                  ,body     : new Shared.ChargeRequest()
-                                                                                            {
-                                                                                                session_id            = CHECKOUT.Session.SessionID,
-                                                                                                is_new_payment_method = false,
-                                                                                                payment_method        = new PaymentMethodDetails()
-                                                                                                                      {
-                                                                                                                           id   = upm.Data.id,
-                                                                                                                           data = new ()
-                                                                                                                                {
-                                                                                                                                     { "token",  this.TokenID },                                                                                                                                   
-                                                                                                                                }
-                                                                                                                      },
-                                                                                                save_payment_method   = false,
-                                                                                                //metadata              = CHECKOUT.Session.Metadata,
-                                                                                            });
+                                                                                  ,body     : body);
                         
                         
                         //////////////////////////////////////////////////////////////////////

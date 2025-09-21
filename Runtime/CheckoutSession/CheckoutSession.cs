@@ -161,15 +161,17 @@ namespace Galleon.Checkout
             new Step(name   : $"cancel_session"
                     ,action : async (s) =>
                     {
+                        var body = new Shared.CancelCheckoutSessionRequest()
+                                   {
+                                      session_id = CHECKOUT.Session.SessionID,
+                                   };
+                        
                         var response = await CHECKOUT.Network.Post<CancelCheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/cancel"
                                                                                                  ,headers  : new ()
                                                                                                            {
                                                                                                                { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                            }
-                                                                                                 ,body     : new Shared.CancelCheckoutSessionRequest()
-                                                                                                           {
-                                                                                                              session_id = CHECKOUT.Session.SessionID,
-                                                                                                           });
+                                                                                                 ,body     : body);
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// transaction Steps

@@ -12,25 +12,27 @@ namespace Galleon.Checkout
                     {                                               
                         var selectedUserPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
                         
+                        var body = new Shared.ChargeRequest()
+                                  {
+                                      session_id              = CHECKOUT.Session.SessionID,
+                                      is_new_payment_method   = selectedUserPaymentMethod.IsNewPaymentMethod,
+                                      payment_method          = new PaymentMethodDetails()
+                                                              {
+                                                                   id   = "1",
+                                                                   data = new ()
+                                                                        {
+                                                                             { "token", "bla" }
+                                                                        }
+                                                              },
+                                      save_payment_method     = selectedUserPaymentMethod.IsNewPaymentMethod,
+                                  };
+                        
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
                                                                                             {
                                                                                                 { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                             }
-                                                                                  ,body     : new Shared.ChargeRequest()
-                                                                                            {
-                                                                                                session_id              = CHECKOUT.Session.SessionID,
-                                                                                                is_new_payment_method   = selectedUserPaymentMethod.IsNewPaymentMethod,
-                                                                                                payment_method          = new PaymentMethodDetails()
-                                                                                                                        {
-                                                                                                                             id   = "1",
-                                                                                                                             data = new ()
-                                                                                                                                  {
-                                                                                                                                       { "token", "bla" }
-                                                                                                                                  }
-                                                                                                                        },
-                                                                                                save_payment_method     = selectedUserPaymentMethod.IsNewPaymentMethod,
-                                                                                            });
+                                                                                  ,body     : body);
                         
                         CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
                                                                                 {
@@ -64,16 +66,18 @@ namespace Galleon.Checkout
                         var email     = CHECKOUT.Session.User.Email;
                         var sessionID = CHECKOUT.Session.SessionID;
                         
+                        var body = new Shared.UpdateEmailRequest()
+                                   {
+                                       email      = email,
+                                       session_id = sessionID,
+                                   };
+                        
                         var response  = await CHECKOUT.Network.Post<UpdateEmailResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/update-email"
                                                                                         ,headers  : new ()
                                                                                                   {
                                                                                                       { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                   }
-                                                                                        ,body     : new Shared.UpdateEmailRequest()
-                                                                                                  {
-                                                                                                      email      = email,
-                                                                                                      session_id = sessionID,
-                                                                                                  });
+                                                                                        ,body     : body);
                     });
     }
 }

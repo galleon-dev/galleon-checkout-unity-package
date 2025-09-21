@@ -52,16 +52,17 @@ namespace Galleon.Checkout
             
             if (userPaymentMethod.Data.id != null)
             {
+                var body = new RemovePaymentMethodRequest()
+                           {
+                               payment_method_id = userPaymentMethod.Data.id,
+                           };
+                
                 var result = await CHECKOUT.Network.Post<RemovePaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/remove-payment-method" 
                                                                                      ,headers  : new ()
                                                                                                {
                                                                                                    { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                }
-                                                                                     ,body     : new RemovePaymentMethodRequest()
-                                                                                               {
-                                                                                                   payment_method_id = userPaymentMethod.Data.id,
-                                                                                               }
-                                                                                      );
+                                                                                     ,body     : body);
                 
             }
             
