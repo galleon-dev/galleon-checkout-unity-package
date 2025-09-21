@@ -15,20 +15,19 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public Step Initialize()
-            =>
+        =>
             new Step(name   : "initialize_storage"
                     ,tags   : new[] { "init" }
                     ,action : async s =>
-                              {
-                                  
-                              });
+                    {    
+                    });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
         public void Write<T>(string key, T value)
         {
             string fullKey = $"{KEY_PREFIX}{key}";
-            string json = JsonConvert.SerializeObject(value);
+            string json    = JsonConvert.SerializeObject(value);
             PlayerPrefs.SetString(fullKey, json);
             
             // Add key to saved keys list

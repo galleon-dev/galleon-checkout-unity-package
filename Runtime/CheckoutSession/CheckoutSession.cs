@@ -162,15 +162,7 @@ namespace Galleon.Checkout
                         
                         // Setup Transaction Steps
                         User.CurrentTransaction = new Transaction();
-                        foreach (var stepFunc in User.SelectedUserPaymentMethod.TransactionSteps)
-                        {
-                            var step = stepFunc?.Invoke();
-                            s.Log($"adding transaction step : {step.Name}");
-                            User.CurrentTransaction.TransactionSteps.Add(step);
-                        }
-                        
-                        // Add Child Transaction Steps
-                        foreach (var transactionStep in User.CurrentTransaction.TransactionSteps)
+                        foreach (var transactionStep in User.SelectedUserPaymentMethod.GetTransactionSteps())
                         {
                             s.Log($"scheduling transaction step : {transactionStep.Name}");
                             s.AddChildStep(transactionStep);
@@ -194,9 +186,18 @@ namespace Galleon.Checkout
                                                  is_canceled = false,
                                                  charge_id   = "test_transaction",
                                               };
+                        /////////
+                        
+                        s.AddPostStep(name   : "save_used_payment_method_if_success"
+                                     ,action : async x =>
+                                               {
+                                                   if (this.lastChargeResult.is_success)
+                                                       x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
+                                               });
                         
                         // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());
+                        
                     });
         
         
@@ -238,3 +239,4 @@ namespace Galleon.Checkout
         
     }
 }
+

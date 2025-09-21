@@ -26,7 +26,8 @@ namespace Galleon.Checkout
         
         //public string SERVER_BASE_URL = "https://localhost:4000/v1";
         //public string SERVER_BASE_URL = "https://galleon-bridge-server-production.up.railway.app";
-        public string SERVER_BASE_URL = "http://localhost:3000";
+        //public string SERVER_BASE_URL = "http://localhost:3000";
+        public string SERVER_BASE_URL = "https://bridge-staging-api.galleon.so";
         
         public const int TIMEOUT_MILLISECONDS = 10000;
         
@@ -81,7 +82,7 @@ namespace Galleon.Checkout
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
                                                              {
-                                                                 { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6InRlc3QuYXBwIiwiaWF0IjoxNzU0NzYzNTU4fQ.NoWs-D79w2ad51jh-fQfY3LeDSUUM1cayfM4cKgSIBk" }
+                                                                 { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
                                                              }
                                                     ,body    : new
                                                              {

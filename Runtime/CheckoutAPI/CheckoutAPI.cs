@@ -6,7 +6,7 @@ namespace Galleon.Checkout
 {
     public class CheckoutAPI
     {   
-        public static async Task<InitializationResult> Initialize()
+        public static async Task<InitializationResult> Initialize(CheckoutConfiguration configuration)
         {
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             return new InitializationResult() { IsSuccess = true };
@@ -17,6 +17,12 @@ namespace Galleon.Checkout
             await  CheckoutClient.Instance.RunCheckoutSession(product).Execute();
             return CheckoutClient.Instance.CurrentSession.PurchaseResult;
         }
+    }
+    
+    public class CheckoutConfiguration
+    {
+        public string JWT;
+        public string Country;
     }
     
     public class InitializationResult

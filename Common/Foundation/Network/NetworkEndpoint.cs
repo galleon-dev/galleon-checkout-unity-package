@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.Foundation;
 using Galleon.Checkout.NETWORK;
 using UnityEngine.UIElements;
 
@@ -18,10 +19,9 @@ namespace Galleon.Checkout
         public Type                             RequestBodyType  = default;
         public Type                             ResponseBodyType = default;
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dev
+        public Collection<NetworkRequest>       RequestHistory   = new();
         
-        /// History
-        List<NetworkRequest> History = new();
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dev
         
         #if DEBUG
         /// Mocks
@@ -39,7 +39,6 @@ namespace Galleon.Checkout
         public  NetworkEndpoint setResponseBodyType     (Type                            type   ) => SET(() => this.ResponseBodyType = type);
         public  NetworkEndpoint setResponseBodyType<T>  (                                       ) => SET(() => this.ResponseBodyType = typeof(T));
         
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
         public NetworkRequest Request()
@@ -52,8 +51,27 @@ namespace Galleon.Checkout
                          .setResponseBodyType(ResponseBodyType)
                          ;
             
+            request.Endpoint = this;
+            
             return request;
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// history
+        
+        public void AddToHistory(NetworkRequest request)
+        {
+            RequestHistory.Add(request);
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug Steps
+        
+        public Step DebugSendRequest() 
+        =>
+            new Step(name   : $"debug_send_request_{URL?.Invoke()}"
+                    ,action : async (s) =>
+                    {
+                        await this.Request().SendWebRequest();
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// INSPECTOR
         

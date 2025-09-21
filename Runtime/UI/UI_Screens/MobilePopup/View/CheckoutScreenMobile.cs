@@ -57,27 +57,6 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
 
-        bool ShowLoaderOnce = true;
-
-        public void ShowInitialCheckoutPanelLoader()
-        {
-            StopAllCoroutines();
-            if (ShowLoaderOnce)
-            {
-                CheckoutLoadingPanelView.gameObject.SetActive(true);
-                CheckoutPanel.gameObject.SetActive(false);
-                StartCoroutine(DisableInitialLoader(1f));
-            }
-        }
-
-        IEnumerator DisableInitialLoader(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            CheckoutLoadingPanelView.gameObject.SetActive(false);
-            CheckoutPanel.gameObject.SetActive(true);
-            ShowLoaderOnce = false;
-        }
-
         public static Step InitializeCheckoutScreenMobile()
         =>
             new Step(name: $"initialize_checkout_screen_mobile"

@@ -127,7 +127,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
         
         public Step TEST_FLOW()
-            => 
+        => 
             new Step(name   : "TEST_FLOW"
                     ,tags   : new[] { "init"}
                     ,action : async s =>
@@ -788,7 +788,7 @@ namespace Galleon.Checkout
                                 return;
                             
                             var scenarioExpressions = this.scenarios[scenarioName];
-                            var steps    = scenarioExpressions.Select(x => new Step(name : x, action: async step=>{} ));
+                            var steps               = scenarioExpressions.Select(x => new Step(name : x, action: async step=>{} ));
 
                             foreach (var step in steps)
                             {
@@ -820,17 +820,23 @@ namespace Galleon.Checkout
         public NetworkEndpoint TestEndpoint = new NetworkEndpoint()
                                               .setURL    (() => $"{CHECKOUT.Network.SERVER_BASE_URL}/authenticate")
                                               .setMethod (Http_Method.Post)
-                                              .setHeaders(("Authorization", () => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6InRlc3QuYXBwIiwiaWF0IjoxNzU0NzYzNTU4fQ.NoWs-D79w2ad51jh-fQfY3LeDSUUM1cayfM4cKgSIBk"))
-                                            //.setHeaders(("Authorization", () => $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}"))
+                                            //.setHeaders(("Authorization", () => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44"))
+                                              .setHeaders(("Authorization", () => $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}"))
                                               ;
-        
-        
         
         public NetworkEndpoint AuthEndpoint => Network.Endpoint("/authenticate")
                                               .setMethod          (Http_Method.Post)
                                               .setRequestBodyType <Shared.AuthenticateRequest> ()
                                               .setResponseBodyType<Shared.AuthenticateResponse>()
                                               ;
+
+        public NetworkEndpoint PMD_Endpoint = new NetworkEndpoint()
+                                              .setURL    (() => $"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions")
+                                              .setMethod (Http_Method.Get)
+                                              .setHeaders(("Authorization", () => $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}"))
+                                              ;
+
+        
         
         public Step TestEndpoints() 
         =>
@@ -855,4 +861,192 @@ namespace Galleon.Checkout
         #endregion // Network
     }    
 }
+
+/// Standards
+///  > example of a class :
+///     "
+///     public class MyExampleClass
+///     {
+///         ////////////////////////////////////////////////////////////////// Members
+///         
+///         public  int    myInt;
+///         public  string myString;
+///         
+///         private float  myFloat;
+///         
+///         ////////////////////////////////////////////////////////////////// Lifecycle
+///         
+///         public MyExampleClass()
+///         {
+///         }
+///         
+///         ////////////////////////////////////////////////////////////////// API Steps
+///         
+///         public Step DoTheAPIThing()
+///         =>
+///             new Step(name   : "do_the_api_thing"
+///                     ,action : async s =>
+///                     {
+///                         await DoTheThing();   
+///                     });
+///                     
+///         ////////////////////////////////////////////////////////////////// helper Methods
+///         
+///         private async Task DoTheThing()
+///         {
+///             // Do the thing
+///         }
+///         
+///         //////////////////////////////////////////////////////////////////
+///     }
+///     "
+///     
+
+/// Overview : 
+///     - The app is designed like a tree.
+///     - Every entity in the app is a node in the tree
+///         - There is an EntityNode class,that links between parents and children
+///         - There is an IEntity Infterface witch all entities implement
+///             - It only has a Property of type "EntityNode" called "Node"
+///             - and so all objects can access the tree by using object.Node.Parent / object.Node.Children
+///             - Node also has "Decendents" and "Ancestors" for easy traversal in the tree
+/// - Initialization :
+///     - when we call myEntity.Node.Initialize : at the creation of an entity (EntityNode to be exact),
+///       we automaticly recursivly go over all fields that are IEntities using reflection
+///       and add them to the tree (each under its relevent parent).
+///       this doesnt initialize any logic, just the logistics of the tntity tree and maybe other small stuff.
+/// - Structure :
+///     - There is a "Root" Class that is the root of the tree.
+///         - it has a child entity "Project"
+///             - many editor tools and or other entities that work in edit-time (not just run-time) are initialized and added as children of "Project"
+///         - it has a child entity "Runtime"
+///             - all runtime objects (or rather the root tuntime objects) are initialized added under "Runtime" entity at runtime start
+/// - Explorer :
+///     - There is an entity Explorer
+///     - data is stored in entities, not temporary variables. that way its always available in the explorer
+/// - Node Aspects :
+///     - Log
+///     - Breadcrumbs
+///     - Testing
+///     - Debug
+///     - Storage
+///     - ID (static, dynamic)
+///     - Reflection
+///     - Inspector
+///     - Editor Extras
+/// - Steps :
+///     - we have a class called Step.
+///     - we put all major code operations in steps
+///     - example of a step :
+///     "
+///     public Step myStep()
+///     =>
+///         new Step(name   : "my_step"
+///                 ,action : async (s) =>
+///                 {
+///                     // do something here
+///                 } 
+///     "
+///     - a step has some basic properties like name and optional tags
+///     - a step has an Execute() method that executes the step
+///         - a step may have an action that is the first thing that runs when its executed
+///         - a step may have child steps that run in sequence (after the action) when its executed
+///         - a step may also have "PreSteps" and "PostSteps" that run (before and after) the child steps
+///             - for example : a child step can dynamicly add more steps in runtime to the childSteps sequence, but the PreSteps and PostSteps remain as they are
+///         - a step has some debug features, such as log, stopwatch, breadcumbs, etc..
+///         - the action of a step receives a reference to the step itself, so that it can work with it and use its features
+/// 
+
+/// - There is an Interface called IEntity
+/// - There is a class called Entity
+/// - There is a class called EntityNode
+///     + Aspects
+///         + Tree     
+
+/// - editor window called "Explorer"
+/// - a visual element called "ExplorerItem"
+///     - Row
+///         + foldout button
+///         + main button
+///         + indicators
+///     - Self Content
+///         + Inspectors
+///     - Children
+
+        /// > Explorer Window
+        ///     - Create an editor window called EditorExplorer
+        ///    (- Create a runtime ui doc called RuntimeExplorer)
+        /// > Explorer
+        ///     - Create a VisualElement called Explorer
+        ///       - the explorer will show the entity tree, and will contain the root visual element that will handle its children, etc.
+        /// > Explorer Modes
+        ///     - Tree
+        ///     - Split Portrait
+        ///     - Split Landscape
+        /// > Widget
+        ///     > Widget UI
+        ///         - Create a VisualElement class called "Widget"
+        ///         - it acts similar to a foldout, where it has a main item (button) and content that you can toggle, but more complicated then a foldout.
+        ///         - the main item :
+        ///             - Children Foldout Button
+        ///             - Main button )opens content foldout)
+        ///             - Extras
+        ///                 - Indicators
+        ///         - Children foldout
+        ///         - Content foldout
+        ///             - Inspectors
+        ///             - Entity Inspector
+        ///             - Raw Inspector
+        ///     > Widget Code
+        ///         - Data
+        ///         - Refresh
+        /// > Explorer Item
+        ///     - Create a Class called ExplorerItem
+
+/// > "Resource" (Element)
+///     - the project is madeup of Assets.
+///     - a logical related group of assets is an element.
+///     - an entity (via its node) can get a reference to the relevent element that the entity belongs to.
+///         - this information is defined in the element.
+///         - for example. the "FolderElement" defines that it has a "FolderAsset" as its asset type. so when calling FolderAsset.Element we have to info needed to return FolderElement.  
+/// > CRUD & Live Actions
+///     - an element has CRUD and LIVE actions.
+///         - Live = Plus, Minus, Equals
+///         - CRUD = Create, Update, Delete
+///         - Scan
+/// > Trees
+///     - there are different types or "layers" of logical trees in a project or a package
+///     - for example
+///         - the assets tree - the layer that is all the actual assets and files making up the project.
+///         - Heirarchy tree - the layer that is all the objects in the heirarchy, such as Scenes Prefabs, GameObjects and components.
+///         - Data tree - data is represented by its own tree.
+///         - Runtime tree - the layer that is all the runtime entities in the app at runtime
+///     - a tree is defined by its root. the root is just an entity. like all other entities. it functions as a root of a tree.
+/// > CRUD & Live with trees
+///     - element defines what trees ("layers") it relates to. and what elements are relevant for each of those trees.
+///     - an element can define complex +/-/= logic between trees.
+///         - for example :
+///             - adding a "FolderAsset" to "Assets" tree is a direct simple action.
+///             - but adding "FolderAsset" to "Core" is a complex action - the core element defines that assets that are added to it should be added under its assets element, and so the final result is that the folder asset is added to the assets tree under core.   
+ 
+        /// > Elements
+        ///     - what are elements ?
+        ///         - for example : when we want to add a "Car" to our project, we dont say "add a prefab with a script and a mesh and a material of a car and put it in a folder called car, and initialize it in runtime, and manage all cards with a car-manager, etc.",
+        ///                         we just say "add a car" and the rest is implied from our understanding of the structure and the standards of the project.
+        ///         - a "car" in this example is an element.
+        ///         - an Element is a class.
+        ///         - an Element object is a group of related assets, resources, definitions, data, and whatever else is needed, that represents a specific entity/concept in a project.
+        ///         - there are many "trees" that make up a project: the assets tree, the hierarch tree, data tree, runtime tree, etc.   
+        ///         - an Element also defines what actions happen when you add/remove/modify it in a project,
+        ///             for simple elements this maybe a simple straight-forward operation like adding a new folder under a parent folder in the assets tree,
+        ///             and for a "car" for example, this will probably involve adding a prefab, a script, a mesh, a material, i.e. updating many trees in the project.
+        /// 
+        ///                
+
+
+/// > Network
+///     > Endpoint
+///     > Request
+///     > History
+///     > Mock
 

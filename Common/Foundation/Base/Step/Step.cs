@@ -102,20 +102,21 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setters
         
-        private Step SET         (Action            setter   ) {  setter?.Invoke(); return this; }
-        public  Step setName     (string            name     ) => SET(() => this.Name      = name);
-        public  Step setTags     (params string[]   tags     ) => SET(() => this.Tags      .AddRange(tags)); 
-        public  Step setAction   (StepAction        action   ) => SET(() => this.Action    = action);
+        private Step SET         (Action            setter) {  setter?.Invoke(); return this; }
+        public  Step setName     (string            name  ) => SET(() => this.Name   = name);
+        public  Step setTags     (params string[]   tags  ) => SET(() => this.Tags   .AddRange(tags)); 
+        public  Step setAction   (StepAction        action) => SET(() => this.Action = action);
         
         public Step Temp()
         =>
             new Step()
-           .setName  ("name")
-           .setTags  ("bla", "bli")
-           .setAction(async s =>
+            .setName  ("name")
+            .setTags  ("bla", "bli")
+            .setAction(async s =>
                       {
                           s.Log("step action");
-                      });
+                      })
+            ;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Methods
         
@@ -318,6 +319,44 @@ namespace Galleon.Checkout
             this.StepLog.Add($"{prefix}{message}");
         }
 
+        public void LogError(object message)
+        {
+            #region PREFIX
+            int  parents = 0;
+            Step current = this;
+            
+            while (current.ParentStep != null)
+            {
+                parents++;
+                current = current.ParentStep;
+            }
+            
+            string prefix = new string(' ', parents * 4);
+            #endregion // PREFIX
+            
+            Debug.LogError($"{prefix}{message}");
+            this.StepLog.Add($"[ERROR] {prefix}{message}");
+        }
+        
+        public void LogException(Exception ex)
+        {
+            #region PREFIX
+            int  parents = 0;
+            Step current = this;
+            
+            while (current.ParentStep != null)
+            {
+                parents++;
+                current = current.ParentStep;
+            }
+            
+            string prefix = new string(' ', parents * 4);
+            #endregion // PREFIX
+            
+            Debug.LogError($"{prefix}{ex.ToString()}");
+            this.StepLog.Add($"[EXCEPTION] {prefix}{ex.ToString()}");
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inspector
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

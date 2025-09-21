@@ -1,5 +1,7 @@
 #define GALLEON_DEV
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -58,6 +60,9 @@ namespace Galleon.Checkout
         
         [Header("Tests")]
         public bool IsTest = false;
+        
+        [Header("Sprites")]
+        public List<SpriteResource> Sprites = new();
     }
     
     

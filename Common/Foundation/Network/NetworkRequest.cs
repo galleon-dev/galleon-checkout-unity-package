@@ -15,25 +15,27 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        private UnityWebRequest            UnityWebRequest;
+        private UnityWebRequest             UnityWebRequest;
         
-        public  int                        TimeoutMilliseconds = 5000;
+        public   int                        TimeoutMilliseconds = 5000;
         
-        public string                      URL                 = ""; 
-        public string                      Method              = "";
-        public Dictionary<string, string>  Headers             = new();
-        public EncodingType                EncodingType        = EncodingType.JSON;
+        public  string                      URL                 = ""; 
+        public  string                      Method              = "";
+        public  Dictionary<string, string>  Headers             = new();
+        public  EncodingType                EncodingType        = EncodingType.JSON;
         
-        public object                      Body                = default;
-        public object                      Response            = default;
+        public  object                      Body                = default;
+        public  object                      Response            = default;
         
-        public Type                        RequestBodyType     = default;
-        public Type                        ResponseBodyType    = default;
+        public  Type                        RequestBodyType     = default;
+        public  Type                        ResponseBodyType    = default;
         
-        private Dictionary<string, string> bodyForm            = new();
-        private string                     bodyJson            = null;
+        private Dictionary<string, string> bodyForm             = new();
+        private string                     bodyJson             = null;
         
-        public string                      ResponseText        = "";
+        public  string                      ResponseText        = "";
+        
+        public  NetworkEndpoint             Endpoint            = default;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setters
         
@@ -52,11 +54,15 @@ namespace Galleon.Checkout
         public  NetworkRequest setResponseBodyType   (Type                               type   ) => SET(() => this.ResponseBodyType = type);
         public  NetworkRequest setResponseBodyType<T>(                                          ) => SET(() => this.ResponseBodyType = typeof(T));
         
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
         public async Task<object> SendWebRequest()
         {
+            #if DEBUG
+            if (Endpoint != null)
+                Endpoint.AddToHistory(this);
+            #endif
+            
             try
             {
                 ////////////////////////// Initialize Request
@@ -68,6 +74,10 @@ namespace Galleon.Checkout
                 // Set headers
                 foreach (var header in Headers)
                     this.UnityWebRequest.SetRequestHeader(header.Key, header.Value.ToString());
+                
+                // Setup
+                UnityWebRequest.downloadHandler = new DownloadHandlerBuffer();
+                
                 
                 ////////////////////////// Set Request Body
                 
@@ -103,9 +113,33 @@ namespace Galleon.Checkout
                     {
                         byte[] jsonToSend               = Encoding.UTF8.GetBytes(json);
                         UnityWebRequest.uploadHandler   = new UploadHandlerRaw(jsonToSend);
-                        UnityWebRequest.downloadHandler = new DownloadHandlerBuffer();
                     }
                 }
+                
+                ////////////////////////// Log Outgoing
+                
+                try
+                {
+                    string requestBodyString = "";
+                    if (EncodingType == EncodingType.FormUrlEncoded)
+                    {
+                        var formJson = new JObject();
+                        foreach(var field in bodyForm)
+                            formJson[field.Key] = field.Value;
+                        requestBodyString = formJson.ToString(Formatting.Indented);
+                    }
+                    else if (EncodingType == EncodingType.JSON)
+                    {
+                        requestBodyString = bodyJson ?? (Body != null ? JsonConvert.SerializeObject(Body, Formatting.Indented) : "");
+                    }
+
+                    Debug.Log($">>>".Color(Color.yellow)+$" {Method} {URL} \n{requestBodyString.Color(Color.white)}");
+                }
+                catch (Exception e)
+                {
+                    Debug.Log($">>>".Color(Color.yellow)+$" {Method} {URL}");
+                }
+                
                 
                 ////////////////////////// Send Request
                 
@@ -122,12 +156,36 @@ namespace Galleon.Checkout
                     await Task.Yield();
                 }
                 
+                ////////////////////////// Handle errors
+                
+                if (this.UnityWebRequest.error != null)
+                {
+                    Debug.LogError(this.UnityWebRequest.error);
+                    return default;
+                }
+                
                 ////////////////////////// Handle Response
                 
                 // handle result
                 string responseString = this.UnityWebRequest.downloadHandler.text;
                 this.ResponseText     = responseString;
                 
+                ////////////////////////// Log incoming
+                
+                try
+                {
+                    string formattedResult = JToken.Parse(responseString).ToString(Formatting.Indented);
+                    Debug.Log($"<<<".Color(Color.yellow)+$" ({UnityWebRequest.responseCode}) {URL} \n{formattedResult.Color(Color.white)}");
+
+                }
+                catch (Exception e)
+                {
+                    Debug.Log($"<<<".Color(Color.yellow)+$" ({UnityWebRequest.responseCode}) {URL} \n{responseString}");
+                }
+                
+                ////////////////////////// Done
+                
+                // Return result
                 var     resultObject  = JsonConvert.DeserializeObject<object>(responseString);   
                 return  resultObject;
             }

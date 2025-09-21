@@ -12,7 +12,7 @@ namespace Galleon.Checkout.UI
         public  GameObject SelectPaymentMethodItemPrefab;
         public  GameObject SelectPaymentMethodItemsHolder;
         
-        private int        ScrollRectMaxSize   = 3;
+        private int        ScrollRectMaxSize   = 6;
         private float      PaymentPrefabHeight = 200f;
         private float      SeparatorHeight     = 2f;
         
@@ -71,17 +71,17 @@ namespace Galleon.Checkout.UI
             }
             
             // Add user payment methods children
-            var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
-            foreach (var userPaymentMethod in userPaymentMethods)
-            {
-                var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
-                var item = go.GetComponent<SelectPaymentMethodPanelItem>();
-
-                item.Initialize(userPaymentMethod:userPaymentMethod, this);
-
-                // Add ui separator
-                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
-            }
+            // var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
+            // foreach (var userPaymentMethod in userPaymentMethods)
+            // {
+            //     var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
+            //     var item = go.GetComponent<SelectPaymentMethodPanelItem>();
+            // 
+            //     item.Initialize(userPaymentMethod:userPaymentMethod, this);
+            // 
+            //     // Add ui separator
+            //     Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
+            // }
             
             UpdateScrollRectMaxSize();
         }
@@ -135,10 +135,9 @@ namespace Galleon.Checkout.UI
         
         public void UpdateScrollRectMaxSize()
         {
-            int PaymentMethodsAmount = Math.Max(CHECKOUT.PaymentMethods.UserPaymentMethods.Count + CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.Count
-                                               ,6);
-
-            Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
+            int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count + CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.Count + 1;
+                                               
+            // Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
             if (PaymentMethodsAmount == 0)
             {

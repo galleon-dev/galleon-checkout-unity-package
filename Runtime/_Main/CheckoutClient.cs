@@ -23,6 +23,7 @@ namespace Galleon.Checkout
         public Network                      Network                     = new();
         public Config                       Config                      = new();
         public Analytics                    Analytics                   = new();
+        public Storage                      Storage                     = new();
         public DeepLinkController           DeepLinks                   = new();
         public ExternalURLsController       URLs                        = new();
         
@@ -33,6 +34,7 @@ namespace Galleon.Checkout
       
         // Resources
         public CheckoutResources            Resources                   => CheckoutResources.Instance;
+        public ResourceManager              ResourceManager             = new ResourceManager();
         
         // System
         public NavigationController         Navigation                  = new ();
@@ -102,7 +104,7 @@ namespace Galleon.Checkout
                                   s.AddChildStep(TokenizerController            .Initialize());
                                   s.AddChildStep(PaymentMethodsController       .Initialize());
                                 
-                              //s.AddChildStep(TaxController                  .Initialize());
+                                //s.AddChildStep(TaxController                  .Initialize());
                                   
                                   // Resources
                                   s.AddChildStep(Resources                      .Initialize());
@@ -145,13 +147,14 @@ namespace Galleon.Checkout
         public static Network                   Network         => CheckoutClient.Instance.Network;
         public static Config                    Config          => CheckoutClient.Instance.Config;
         public static Analytics                 Analytics       => CheckoutClient.Instance.Analytics;
+        public static Storage                   Storage         => CheckoutClient.Instance.Storage;
          
         public static CheckoutResources         Resources       => CheckoutClient.Instance.Resources;
         
         public static CheckoutSession           Session         => CheckoutClient.Instance.CurrentSession;
         
-        public static NavigationController      Navigation       => CheckoutClient.Instance.Navigation;
-        public static CheckoutActionsController Actions          => CheckoutClient.Instance.CheckoutActions;
+        public static NavigationController      Navigation      => CheckoutClient.Instance.Navigation;
+        public static CheckoutActionsController Actions         => CheckoutClient.Instance.CheckoutActions;
         
         public static PaymentMethodsController  PaymentMethods  => CheckoutClient.Instance.PaymentMethodsController;
         public static ProductsController        Products        => CheckoutClient.Instance.Products;

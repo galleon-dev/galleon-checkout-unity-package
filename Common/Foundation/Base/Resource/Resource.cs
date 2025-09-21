@@ -4,10 +4,15 @@ namespace Galleon.Checkout.Foundation
 {
     public class Resource : Entity
     {
-        public Dictionary<string, TreeDefinition> TreeDefinitions = new();
+        // public Dictionary<string, TreeOperations> TreeDefinitions = new(); // <A>, <H>
+        // public Entity AssetsTree;
+        // public Entity ElementsTree;
+        // public Entity HierarchyTree;
+        // public Entity DataTree;
+        // public Entity AppTree;
     }
     
-    public class TreeDefinition
+    public class TreeOperations
     {
         public string TreeType;
         
@@ -25,7 +30,8 @@ namespace Galleon.Checkout.Foundation
         public virtual void Scan()   {}
         public virtual void Report() {}
         
-        public virtual void SupportedParents()   {}
+        public virtual void SupportedParents()  {}
+        public virtual void SupportedChildren() {}
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,10 +39,11 @@ namespace Galleon.Checkout.Foundation
     
     public class FolderResource : Resource
     {
-        public class FolderAssetDefinition : TreeDefinition
+        public class FolderAssetOperations : TreeOperations
         {
             
         }
     }
 }
+
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -59,6 +60,24 @@ namespace Galleon.Checkout
         
         //// Transaction Steps
         
+        public PaymentMethodDefinition GetPaymentMethodDefinition()
+        {
+            var myType = this.Data.type == "credit_card" ? "card" : this.Data.type;
+            return CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Data.type == myType);
+        }
+        
+        public List<Step> GetTransactionSteps()
+        {
+            List<string> definitions = GetPaymentMethodDefinition().Data.charge_actions.Select(x => x.action).ToList();
+            List<Step>   steps       = CheckoutClient.Instance.CheckoutActions.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps().Where(s => definitions.Contains(s.Name))).ToList();
+            return steps;
+        }
+        
+        public List<PaymentAction> GetTransactionPaymentActions()
+        {
+            return default;
+        }
+        
         public List<Func<Step>> InitializationSteps  = new ();
         public List<Func<Step>> VaultingSteps        = new ();
         public List<Func<Step>> TransactionSteps     = new ();
@@ -66,3 +85,5 @@ namespace Galleon.Checkout
         
     }
 }
+
+

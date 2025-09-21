@@ -31,14 +31,14 @@ namespace Galleon.Checkout.Foundation.Tests
                             // @$"on 'sample_app_start' do 'print_hello'",
                             //
                             // Test product 1
-                            @$"on 'sample_app_start' do 'test_purchase_product_1'",
+                            @$"on 'sample_app_start'             do 'test_purchase_product_1'",
                             @$"on 'on_view_focus_CheckoutPanel ' do 'checkout_panel_test_confirm_purchase'",
-                            @$"on 'on_view_focus_SuccessPanel' do 'test_close_checkout_screen_clicked'",
+                            @$"on 'on_view_focus_SuccessPanel'   do 'test_close_checkout_screen_clicked'",
                             //
                             // Test Product 2
-                            @$"on 'on_back_to_store_screen' do 'test_purchase_product_2'",
+                            @$"on 'on_back_to_store_screen'      do 'test_purchase_product_2'",
                             @$"on 'on_view_focus_CheckoutPanel ' do 'checkout_panel_test_confirm_purchase'",
-                            @$"on 'on_view_focus_SuccessPanel' do 'test_close_checkout_screen_clicked'",
+                            @$"on 'on_view_focus_SuccessPanel'   do 'test_close_checkout_screen_clicked'",
                         };
 
                         foreach (var rule in rules)
@@ -146,20 +146,24 @@ namespace Galleon.Checkout.Foundation.Tests
         
         public static Rule Parse(string str)
         {
-            // on "bla" do "bla"
+            // Rule text format : on 'bla' do 'bla'
             
-            var parts = str.Split(new[] { "on '", "' do '" }, StringSplitOptions.RemoveEmptyEntries);
+            var pattern = @"on\s*'([^']+)'\s*do\s*'([^']+)'";
+            /// Breakdown:
+            /// on\s*     — expects the lowercase literal on followed by optional whitespace.
+            /// '([^']+)' — captures one or more characters that are not a single quote between single quotes; that becomes EventStepName.
+            /// \s*do\s*  — expects the lowercase literal do with optional whitespace before/after.
+            /// '([^']+)' — same as above for ActionStepPath.
             
-            if (parts.Length != 2 
-            || !parts[1].EndsWith("'"))
+            var match = System.Text.RegularExpressions.Regex.Match(str, pattern);
+
+            if (!match.Success)
                 throw new FormatException("Input string is not in the correct format. Expected format: on 'EventStepName' do 'ActionStepName'");
-            
-            parts[1] = parts[1].TrimEnd('\'');
-            
+
             return new Rule
             {
-                EventStepName  = parts[0],
-                ActionStepPath = parts[1]
+                EventStepName  = match.Groups[1].Value,
+                ActionStepPath = match.Groups[2].Value
             };
         }
         
@@ -169,6 +173,4 @@ namespace Galleon.Checkout.Foundation.Tests
         }
     }
 }
-
-
 

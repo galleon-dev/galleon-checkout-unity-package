@@ -23,7 +23,7 @@ namespace Galleon.Checkout
                                                                                                 is_new_payment_method   = selectedUserPaymentMethod.IsNewPaymentMethod,
                                                                                                 payment_method          = new PaymentMethodDetails()
                                                                                                                         {
-                                                                                                                             id   = "1",
+                                                                                                                             id   = selectedUserPaymentMethod.Data.id,
                                                                                                                              data = new ()
                                                                                                                                   {
                                                                                                                                        { "token", "bla" }
@@ -34,7 +34,7 @@ namespace Galleon.Checkout
                         
                         CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
                                                                                 {
-                                                                                    errors      = new []{"error"},
+                                                                                    errors      = new [] { "error" },
                                                                                     is_canceled = false,
                                                                                     is_success  = true,
                                                                                     charge_id   = "12345",

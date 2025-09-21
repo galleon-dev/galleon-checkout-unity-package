@@ -57,28 +57,8 @@ namespace Galleon.Checkout
         
         private async Task<Sprite> DownloadImageAsync(string url)
         {
-            try
-            {
-                using UnityWebRequest request   = UnityWebRequestTexture.GetTexture(url);
-                var                   operation = request.SendWebRequest();
-                while (!operation.isDone)
-                    await Task.Yield();
-
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-                    return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-            
+            var sprite = await CheckoutClient.Instance.ResourceManager.LoadSprite(name_or_url: url);
+            return sprite;
         }
     }
 }

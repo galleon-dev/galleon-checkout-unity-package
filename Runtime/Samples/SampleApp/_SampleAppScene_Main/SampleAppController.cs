@@ -34,11 +34,11 @@ namespace Galleon.SampleApp
         
         async void Start()
         {
-            //await Task.Yield();
-            //await Task.Yield();
-            //Root.Instance.Runtime.TestController.Test().Execute();
+            // await Task.Yield();
+            // await Task.Yield();
+            // Root.Instance.Runtime.TestController.Test().Execute();
             
-            await CheckoutAPI.Initialize();
+            await CheckoutAPI.Initialize(new CheckoutConfiguration());
             
             if (CHECKOUT.IsTest)
                 await TestCheckout();
@@ -137,4 +137,3 @@ namespace Galleon.SampleApp
         public EntityNode Node { get; set; }
     }
 }
-
