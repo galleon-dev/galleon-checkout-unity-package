@@ -32,7 +32,7 @@ namespace Galleon.Checkout
         public string DisplayName;
         public bool   IsSelected;
         
-        public bool   IsNewPaymentMethod = true;
+        public bool   IsNewPaymentMethod = false;
         
         public UserPaymentMethodData Data;
 

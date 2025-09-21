@@ -26,7 +26,7 @@ namespace Galleon.Checkout
                                                                                                                              id   = selectedUserPaymentMethod.Data.id,
                                                                                                                              data = new ()
                                                                                                                                   {
-                                                                                                                                       { "token", "bla" }
+                                                                                                                             //          { "token", ((CreditCardUserUserPaymentMethod)selectedUserPaymentMethod).TokenID }
                                                                                                                                   }
                                                                                                                         },
                                                                                                 save_payment_method     = selectedUserPaymentMethod.IsNewPaymentMethod,

@@ -16,9 +16,6 @@ public class SettingsPanelView : View
     public GameObject         EmailInputfieldBorder;
     public AdvancedInputField EmailInputField;
 
-    public SuccessPanelView SuccessPanelView;
-    public AdvancedInputField SuccessPanelEmailInputField;
-
     [Header("Payment Methods")]
     public GameObject         SettingsPanelPaymentMethodItemPrefab;
     public GameObject         PaymentMethodsHolder;
@@ -50,23 +47,9 @@ public class SettingsPanelView : View
 
         if (!string.IsNullOrEmpty(Email))
         {
-            if (SuccessPanelEmailInputField)
-            {
-                SuccessPanelEmailInputField.Text = Email;
-            }
-
             if (EmailInputField)
             {
                 EmailInputField.Text = Email;
-            }
-
-            if (string.IsNullOrEmpty(SuccessPanelEmailInputField.Text))
-            {
-                SuccessPanelView.ShowEmail(false);
-            }
-            else
-            {
-                SuccessPanelView.ShowEmail(true);
             }
         }
 
@@ -184,7 +167,7 @@ public class SettingsPanelView : View
         EmailInputField.interactable = false;
         IsEditingEmail = false;
         
-        this.EmailLabel.text = str;
+        this.EmailInputField.Text   = str;
         CHECKOUT.Session.User.Email = str;
         await CHECKOUT.Actions.SetEmail().Execute();
     }

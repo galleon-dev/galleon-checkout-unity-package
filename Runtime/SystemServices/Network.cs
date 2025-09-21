@@ -246,11 +246,23 @@ namespace Galleon.Checkout
                     request.SetRequestHeader(header.Key, header.Value.ToString());
             
             
-            // Send Request
-            //string formattedRequest = JToken.Parse(jsonBody).ToString(Formatting.Indented);
-            //Debug.Log($">>> ({request.method}){request.url}\n{formattedRequest}");
+            // Log outgoing
             var endpointName = request.url.Replace(SERVER_BASE_URL, "");
-            Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}) {endpointName}");
+            if (jsonBody != default)
+            {
+                try
+                {
+                    string formattedBody = JToken.Parse(jsonBody).ToString(Formatting.Indented);
+                    Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}) {endpointName} \n{formattedBody.Color(Color.white)}");
+                }
+                catch (Exception e)
+                {
+                    Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}) {endpointName}");
+                }
+                
+            }
+            
+            /// Send Request
             var op = request.SendWebRequest();
             
             // Wait for request and Handle timeout
