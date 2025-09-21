@@ -129,7 +129,7 @@ namespace Galleon.Checkout
                             Debug.Log($"Body : {body.ToString()}");
                             Debug.Log($"Body.expires_at : {body.expires_at}");
                             Debug.Log($"Body.order : {body.order?.ToString()}");
-                            Debug.Log($"Body.order.sku : {body.order?.ToString()}");
+                            Debug.Log($"Body.order.sku : {body.order?.sku.ToString()}");
                             Debug.Log($"Body.order.amount : {body.order?.amount.ToString()}");
                             Debug.Log($"Body.order.currency : {body.order?.currency?.ToString()}");
                             Debug.Log($"Body.metadata : {body.metadata?.Count}");
