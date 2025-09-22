@@ -55,7 +55,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 73005784283197040}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -266,7 +266,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 555809875636349093}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -296,7 +296,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 555809875636349093}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -945,7 +945,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4231113869606929798}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -1013,7 +1013,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2704805161455889110
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1050,7 +1050,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4460462270670180112}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -1080,7 +1080,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4460462270670180112}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -1419,7 +1419,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5290138321868832504}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -1580,7 +1580,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7362834108634388346}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -1692,7 +1692,7 @@ GameObject:
   - component: {fileID: 2718724994240160254}
   - component: {fileID: 48252169604502607}
   m_Layer: 5
-  m_Name: Header_landscape
+  m_Name: HeaderLeft_landscape
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1744,6 +1744,10 @@ MonoBehaviour:
   BackAndTitlePanel: {fileID: 5290138321868832504}
   XButtonPanel: {fileID: 8035059562386587202}
   PaymentMethodPanel: {fileID: 4231113869606929798}
+  CheckoutAndSettingsPanelRight: {fileID: 0}
+  BackAndTitlePanelRight: {fileID: 0}
+  XButtonPanelRight: {fileID: 0}
+  PaymentMethodPanelRight: {fileID: 0}
 --- !u!114 &2718724994240160254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1800,7 +1804,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7828176988924176267
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2357,6 +2361,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Space
       objectReference: {fileID: 0}
+    - target: {fileID: 1415656391310666612, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
 --- !u!224 &2125579471320472183 stripped
@@ -2374,6 +2382,10 @@ PrefabInstance:
     - target: {fileID: 3590118294016587731, guid: 84d512b144d284a7eb9d34a04bd6065b, type: 3}
       propertyPath: m_Name
       value: Seporator
+      objectReference: {fileID: 0}
+    - target: {fileID: 3590118294016587731, guid: 84d512b144d284a7eb9d34a04bd6065b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8812819041365322646, guid: 84d512b144d284a7eb9d34a04bd6065b, type: 3}
       propertyPath: m_Pivot.x

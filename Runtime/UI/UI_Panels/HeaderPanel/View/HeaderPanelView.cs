@@ -63,6 +63,12 @@ namespace Galleon.Checkout.UI
         public GameObject BackAndTitlePanel;
         public GameObject XButtonPanel;
         public GameObject PaymentMethodPanel;
+
+        // For Landscape Right
+        public GameObject CheckoutAndSettingsPanelRight;
+        public GameObject BackAndTitlePanelRight;
+        public GameObject XButtonPanelRight;
+        public GameObject PaymentMethodPanelRight;
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
@@ -73,18 +79,38 @@ namespace Galleon.Checkout.UI
             if (this.State == STATE.checkout_and_settings.ToString())
             {
                 CheckoutAndSettingsPanel.SetActive(true);
+
+                if(CheckoutAndSettingsPanelRight)
+                {
+                    CheckoutAndSettingsPanelRight.SetActive(true);
+                }
             }
             if (this.State == STATE.back_and_text.ToString())
             {
                 BackAndTitlePanel.SetActive(true);
+
+                if (BackAndTitlePanelRight)
+                {
+                    BackAndTitlePanelRight.SetActive(true);
+                }
             }
             if (this.State == STATE.x_button.ToString())
             {
                 XButtonPanel.SetActive(true);
+
+                if (XButtonPanelRight)
+                {
+                    XButtonPanelRight.SetActive(true);
+                }
             }
             if (this.State == STATE.credit_card_info.ToString())
             {
                 PaymentMethodPanel.SetActive(true);
+
+                if (PaymentMethodPanelRight)
+                {
+                    PaymentMethodPanelRight.SetActive(true);
+                }
             }
         }
         
@@ -96,6 +122,26 @@ namespace Galleon.Checkout.UI
             this.BackAndTitlePanel       .SetActive(false);
             this.XButtonPanel            .SetActive(false);
             this.PaymentMethodPanel      .SetActive(false);
+
+            if (CheckoutAndSettingsPanelRight)
+            {
+                CheckoutAndSettingsPanelRight.SetActive(false);
+            }
+
+            if (BackAndTitlePanelRight)
+            {
+                BackAndTitlePanelRight.SetActive(false);
+            }
+
+            if (XButtonPanelRight)
+            {
+                XButtonPanelRight.SetActive(false);
+            }
+
+            if (PaymentMethodPanelRight)
+            {
+                PaymentMethodPanelRight.SetActive(false);
+            }
         }
     }
 }
