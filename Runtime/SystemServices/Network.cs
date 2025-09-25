@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 using Galleon.Checkout.NETWORK;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
@@ -200,8 +201,21 @@ namespace Galleon.Checkout
                 // Set Body
                 if (body != default)
                 {
+                    {
+                        var type = body.GetType();
+                        Debug.Log($"body.type = {type.Name}");
+                        foreach(var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                            Debug.Log($"- body.{field.Name} = {field.GetValue(body)}");
+                        foreach(var prop in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                            Debug.Log($"- body.{prop.Name} = {prop.GetValue(body)}");
+                    }
+                    
                     jsonBody = JsonConvert.SerializeObject(body);
                     Debug.Log($"- jsonBody : {jsonBody}");
+                }
+                else
+                {
+                    Debug.Log($"body is NULL");
                 }
                 
                 // #if UNITY_6000_0_OR_NEWER
