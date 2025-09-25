@@ -205,9 +205,10 @@ namespace Galleon.Checkout
                         var type = body.GetType();
                         Debug.Log($"body.type = {type.Name}");
                         foreach(var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                            Debug.Log($"- body.{field.Name} = {field.GetValue(body)}");
+                            try { Debug.Log($"- body.{field.Name} = {field.GetValue(body)}"); } catch (Exception e) { Debug.Log($"- error serializing {field.Name}"); }
                         foreach(var prop in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                            Debug.Log($"- body.{prop.Name} = {prop.GetValue(body)}");
+                            try { Debug.Log($"- body.{prop.Name} = {prop.GetValue(body)}"); } catch (Exception e) { Debug.Log($"- error serializing {prop.Name}"); }
+                            
                     }
                     
                     jsonBody = JsonConvert.SerializeObject(body);

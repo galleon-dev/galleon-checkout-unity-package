@@ -218,6 +218,17 @@ namespace Galleon.Checkout
                                        //metadata              = CHECKOUT.Session.Metadata,
                                    };
                         
+                        Debug.Log($"at /charge");
+                        Debug.Log($"body type is                         : {body.GetType().Name}");
+                        Debug.Log($"body.sessionID                       : {body.session_id}");
+                        Debug.Log($"body.is_new_payment_method           : {body.is_new_payment_method}");
+                        Debug.Log($"body.save_payment_method             : {body.save_payment_method}");
+                        Debug.Log($"body.payment_method.type             : {body.payment_method.GetType().Name}");
+                        Debug.Log($"body.payment_method.id               : {body.payment_method.id}");
+                        Debug.Log($"body.payment_method.data.count       : {body.payment_method.data.Count}");
+                        Debug.Log($"body.payment_method.data.first.key   : {body.payment_method.data.First().Key}");
+                        Debug.Log($"body.payment_method.data.first.value : {body.payment_method.data.First().Value}");
+                        
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
                                                                                             {
