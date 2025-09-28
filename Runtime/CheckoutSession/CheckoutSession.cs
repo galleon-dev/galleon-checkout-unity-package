@@ -126,18 +126,18 @@ namespace Galleon.Checkout
 
                         try
                         {
-                            Debug.Log($"Body : {body.ToString()}");
-                            Debug.Log($"Body.expires_at : {body.expires_at}");
-                            Debug.Log($"Body.order : {body.order?.ToString()}");
-                            Debug.Log($"Body.order.sku : {body.order?.sku.ToString()}");
-                            Debug.Log($"Body.order.amount : {body.order?.amount.ToString()}");
-                            Debug.Log($"Body.order.currency : {body.order?.currency?.ToString()}");
-                            Debug.Log($"Body.metadata : {body.metadata?.Count}");
+                            s.Log($"Body : {body.ToString()}");
+                            s.Log($"Body.expires_at : {body.expires_at}");
+                            s.Log($"Body.order : {body.order?.ToString()}");
+                            s.Log($"Body.order.sku : {body.order?.sku.ToString()}");
+                            s.Log($"Body.order.amount : {body.order?.amount.ToString()}");
+                            s.Log($"Body.order.currency : {body.order?.currency?.ToString()}");
+                            s.Log($"Body.metadata : {body.metadata?.Count}");
                             if (body.metadata != null)
                                 foreach (var kvp in body.metadata)
-                                    Debug.Log($"Body.metadata[{kvp.Key}] : {kvp.Value}");
-                            Debug.Log($"Body-Json : {JsonConvert.SerializeObject(body)}");
-                            Debug.Log($"Header : Bearer {CHECKOUT.Network.GalleonUserAccessToken}");
+                                    s.Log($"Body.metadata[{kvp.Key}] : {kvp.Value}");
+                            s.Log($"Body-Json : {JsonConvert.SerializeObject(body)}");
+                            s.Log($"Header : Bearer {CHECKOUT.Network.GalleonUserAccessToken}");
                         }
                         catch (Exception e)
                         {
@@ -152,6 +152,9 @@ namespace Galleon.Checkout
                                                                                            ,body     : body
                                                                                                      );
                         
+                        s.Log($"--> Got Session ID : {response.session_id ?? "NULL"}");
+                        s.Log($"-->current session : {CHECKOUT.Session.ToString() ?? "NULL"} ");
+                        s.Log($"-->current session ID : {CHECKOUT.Session?.SessionID ?? "NULL"} ");
                         
                         this.SessionID = response.session_id;           
                     });
