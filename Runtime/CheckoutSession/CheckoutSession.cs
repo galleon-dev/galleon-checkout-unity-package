@@ -152,11 +152,12 @@ namespace Galleon.Checkout
                                                                                            ,body     : body
                                                                                                      );
                         
+                        this.SessionID = response.session_id;           
+                        
                         s.Log($"--> Got Session ID : {response.session_id ?? "NULL"}");
                         s.Log($"-->current session : {CHECKOUT.Session.ToString() ?? "NULL"} ");
                         s.Log($"-->current session ID : {CHECKOUT.Session?.SessionID ?? "NULL"} ");
                         
-                        this.SessionID = response.session_id;           
                     });
         
         public Step CancelSession() 
