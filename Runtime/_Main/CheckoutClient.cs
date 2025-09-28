@@ -122,12 +122,11 @@ namespace Galleon.Checkout
             new Step(name   : $"run_checkout_session"
                     ,action : async (s) =>
                               {
-                                  // Archive last session
-                                  if (CurrentSession != null)
-                                      CheckoutSessions.Add(CurrentSession);
-                                  
                                   // Create new session
                                   CurrentSession = new CheckoutSession();
+                                  
+                                  // Archive last session Add new session
+                                  CheckoutSessions.Add(CurrentSession);
                                   
                                   // Assign product
                                   CurrentSession.SelectedProduct = product;

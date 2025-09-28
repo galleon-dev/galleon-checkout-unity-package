@@ -198,21 +198,31 @@ namespace Galleon.Checkout
             new Step(name   : $"charge"
                     ,action : async (s) =>
                     {                                               
-                        Debug.Log($"at /charge");
+                        s.Log($"at /charge");
+                        s.Log($"-->current session : {CHECKOUT.Session?.ToString() ?? "NULL"}");
+                        s.Log($"--> Got Session ID : {CHECKOUT.Session?.SessionID ?? "NULL" }");
+                        s.Log($"-->count : {CheckoutClient.Instance.CheckoutSessions.Count}");
+                        foreach (var checkoutSession in CheckoutClient.Instance.CheckoutSessions)
+                        {
+                            s.Log($"-------> session object : {checkoutSession?.ToString() ?? "NULL"}");
+                            s.Log($"-------> session id     : {checkoutSession?.SessionID.ToString() ?? "NULL"}");
+                        }
                         
                         ////////////////////////////////////////////////////////////////// Definitions
                         
                         var upm = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
                         
-                        string sessionID          = CHECKOUT.Session?.SessionID ?? "NULL_SESSION_ID";
+                        var    session            = CHECKOUT.Session;
+                        string sessionID          = session?.SessionID ?? "NULL_SESSION_ID";
                         bool   isNewPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.All(pm => pm.Data.id != upm.Data.id);
                         
                         Debug.Log($"====================================================================================");
                         
-                        Debug.Log($"--> SessionID = {sessionID}");
-                        Debug.Log($"--> isNewPaymentMethod = {isNewPaymentMethod}");
-                        Debug.Log($"--> ump.ID = {upm.Data.id}");
-                        Debug.Log($"--> TokenID = {this.TokenID}");
+                        s.Log($"--> SessionObject = {session.ToString() ?? "NULL"}");
+                        s.Log($"--> SessionID = {sessionID}");
+                        s.Log($"--> isNewPaymentMethod = {isNewPaymentMethod}");
+                        s.Log($"--> ump.ID = {upm.Data.id}");
+                        s.Log($"--> TokenID = {this.TokenID}");
                         
                         Debug.Log($"====================================================================================");
                         
@@ -234,15 +244,15 @@ namespace Galleon.Checkout
                                      //metadata              = CHECKOUT.Session.Metadata,
                                    };
                         
-                        Debug.Log($"body1 type is                         : {body1.GetType().Name}");
-                        Debug.Log($"body1.sessionID                       : {body1.session_id}");
-                        Debug.Log($"body1.is_new_payment_method           : {body1.is_new_payment_method}");
-                        Debug.Log($"body1.save_payment_method             : {body1.save_payment_method}");
-                        Debug.Log($"body1.payment_method.type             : {body1.payment_method.GetType().Name}");
-                        Debug.Log($"body1.payment_method.id               : {body1.payment_method.id}");
-                        Debug.Log($"body1.payment_method.data.count       : {body1.payment_method.data.Count}");
-                        Debug.Log($"body1.payment_method.data.first.key   : {body1.payment_method.data.First().Key}");
-                        Debug.Log($"body1.payment_method.data.first.value : {body1.payment_method.data.First().Value}");
+                        s.Log($"body1 type is                         : {body1.GetType().Name}");
+                        s.Log($"body1.sessionID                       : {body1.session_id}");
+                        s.Log($"body1.is_new_payment_method           : {body1.is_new_payment_method}");
+                        s.Log($"body1.save_payment_method             : {body1.save_payment_method}");
+                        s.Log($"body1.payment_method.type             : {body1.payment_method.GetType().Name}");
+                        s.Log($"body1.payment_method.id               : {body1.payment_method.id}");
+                        s.Log($"body1.payment_method.data.count       : {body1.payment_method.data.Count}");
+                        s.Log($"body1.payment_method.data.first.key   : {body1.payment_method.data.First().Key}");
+                        s.Log($"body1.payment_method.data.first.value : {body1.payment_method.data.First().Value}");
                         
                         Debug.Log($"====================================================================================");
                         
@@ -256,15 +266,15 @@ namespace Galleon.Checkout
                         body2.payment_method.data   = new Dictionary<string, object>();
                         body2.payment_method.data.Add("token", this.TokenID);
                         
-                        Debug.Log($"body2 type is                         : {body2.GetType().Name}");
-                        Debug.Log($"body2.sessionID                       : {body2.session_id}");
-                        Debug.Log($"body2.is_new_payment_method           : {body2.is_new_payment_method}");
-                        Debug.Log($"body2.save_payment_method             : {body2.save_payment_method}");
-                        Debug.Log($"body2.payment_method.type             : {body2.payment_method.GetType().Name}");
-                        Debug.Log($"body2.payment_method.id               : {body2.payment_method.id}");
-                        Debug.Log($"body2.payment_method.data.count       : {body2.payment_method.data.Count}");
-                        Debug.Log($"body2.payment_method.data.first.key   : {body2.payment_method.data.First().Key}");
-                        Debug.Log($"body2.payment_method.data.first.value : {body2.payment_method.data.First().Value}");
+                        s.Log($"body2 type is                         : {body2.GetType().Name}");
+                        s.Log($"body2.sessionID                       : {body2.session_id}");
+                        s.Log($"body2.is_new_payment_method           : {body2.is_new_payment_method}");
+                        s.Log($"body2.save_payment_method             : {body2.save_payment_method}");
+                        s.Log($"body2.payment_method.type             : {body2.payment_method.GetType().Name}");
+                        s.Log($"body2.payment_method.id               : {body2.payment_method.id}");
+                        s.Log($"body2.payment_method.data.count       : {body2.payment_method.data.Count}");
+                        s.Log($"body2.payment_method.data.first.key   : {body2.payment_method.data.First().Key}");
+                        s.Log($"body2.payment_method.data.first.value : {body2.payment_method.data.First().Value}");
                         
                         Debug.Log($"====================================================================================");
                         
