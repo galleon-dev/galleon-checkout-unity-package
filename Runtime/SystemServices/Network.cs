@@ -175,6 +175,7 @@ namespace Galleon.Checkout
             try
             {
                 var responseJson = await Post(url, headers, jsonBody, body, encodingType, formFields);
+                Debug.LogError($"[Response POST] : to string: {responseJson.ToString()}");
                 var result       = JsonConvert.DeserializeObject<T>(responseJson.ToString());
                 return result;
             }
@@ -184,7 +185,7 @@ namespace Galleon.Checkout
                 return default;
             }
         }
-        public async Task<object> Post(string                     url
+        public async Task<string> Post(string                     url
                                       ,Dictionary<string, string> headers      = null
                                       ,string                     jsonBody     = ""
                                       ,object                     body         = default
@@ -283,9 +284,11 @@ namespace Galleon.Checkout
             }
             // Return result
             string result = request.downloadHandler.text;
+            Debug.LogError($"[Result] request.downloadHandler.text: {result}");
+            string formattedResult = result;
             try
             {
-                string formattedResult = JToken.Parse(result).ToString(Formatting.Indented);
+                formattedResult = JToken.Parse(result).ToString(Formatting.Indented);
                 Debug.Log($"<<<".Color(Color.yellow)+$" ({request.responseCode}) {endpointName} \n{formattedResult.Color(Color.white)}");
 
             }
@@ -301,6 +304,7 @@ namespace Galleon.Checkout
             
             // request.Dispose();
             
+            return formattedResult;
             return result;
         }
     }
