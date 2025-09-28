@@ -68,7 +68,7 @@ namespace Galleon.Checkout
             new Step(name   : "get_user_access_token"
                     ,action : async s =>
                     {   
-                        //return;
+                        // return;
                         
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
@@ -299,7 +299,7 @@ namespace Galleon.Checkout
             if (request.result != UnityWebRequest.Result.Success)
                 throw new Exception($"ERROR FOR NETWORK REQUEST : {url}\n{request.error}");
             
-            request.Dispose();
+            // request.Dispose();
             
             return result;
         }
