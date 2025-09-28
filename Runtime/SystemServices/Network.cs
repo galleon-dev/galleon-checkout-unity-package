@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -10,8 +11,10 @@ using Galleon.Checkout.NETWORK;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using UnityEngine;
 using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
 namespace Galleon.Checkout
 {
@@ -68,7 +71,7 @@ namespace Galleon.Checkout
             new Step(name   : "get_user_access_token"
                     ,action : async s =>
                     {   
-                        // return;
+                        return;
                         
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
@@ -175,7 +178,20 @@ namespace Galleon.Checkout
             try
             {
                 var responseJson = await Post(url, headers, jsonBody, body, encodingType, formFields);
-                var result       = JsonConvert.DeserializeObject<T>(responseJson.ToString());
+                Debug.Log($"<<<< {responseJson}");
+                
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.Error                  = (sender, args) =>
+                                                {
+                                                    Debug.Log(($"<<<< Error : {args.ErrorContext.Error.Message} \n {args.ErrorContext.Path} \n sender is {sender?.ToString() ?? "NULL"}"));
+                                                    args.ErrorContext.Handled = false;
+                                                };
+                settings.TraceWriter            = new MemoryTraceWriter() { LevelFilter = TraceLevel.Verbose };
+                                              
+                var    result = JsonConvert.DeserializeObject<T>(responseJson.ToString(), settings);
+                
+                Debug.Log(settings.TraceWriter.ToString());
+                
                 return result;
             }
             catch (Exception e)
