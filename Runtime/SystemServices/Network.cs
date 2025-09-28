@@ -73,8 +73,8 @@ namespace Galleon.Checkout
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
                                                              {
-                                                               //{ "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
-                                                                 { "Authorization", $"Bearer {GalleonUserAccessToken}" }
+                                                               { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
+                                                               //  { "Authorization", $"Bearer {GalleonUserAccessToken}" }
                                                              }
                                                     ,body    : new
                                                              {

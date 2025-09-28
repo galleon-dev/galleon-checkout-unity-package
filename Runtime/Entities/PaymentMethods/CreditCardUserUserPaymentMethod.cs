@@ -172,11 +172,9 @@ namespace Galleon.Checkout
             new Step(name   : $"add_payment_method"
                     ,action : async (s) =>
                     {
-                        var body = new AddPaymentMethodRequest()
-                                   {
-                                       payment_method_definition_type = "credit_card",
-                                       credit_card_token              = this.TokenID,
-                                   };
+                        var body                            = new AddPaymentMethodRequest();
+                        body.payment_method_definition_type = "credit_card";
+                        body.credit_card_token              = this.TokenID;
                         
                         var result = await CHECKOUT.Network.Post<AddPaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/add-payment-method" 
                                                                                           ,headers  : new ()
@@ -184,7 +182,7 @@ namespace Galleon.Checkout
                                                                                                         { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                     }
                                                                                           ,body     : body
-                                                                                            );
+                                                                                          );
 
                         var pendingPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.Data.id == "pending");
                         pendingPaymentMethod.Data.id = result.created_payment_method.id;
@@ -200,9 +198,27 @@ namespace Galleon.Checkout
             new Step(name   : $"charge"
                     ,action : async (s) =>
                     {                                               
+                        Debug.Log($"at /charge");
+                        
+                        ////////////////////////////////////////////////////////////////// Definitions
+                        
                         var upm = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
                         
-                        var body = new Shared.ChargeRequest()
+                        string sessionID          = CHECKOUT.Session?.SessionID ?? "NULL_SESSION_ID";
+                        bool   isNewPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.All(pm => pm.Data.id != upm.Data.id);
+                        
+                        Debug.Log($"====================================================================================");
+                        
+                        Debug.Log($"--> SessionID = {sessionID}");
+                        Debug.Log($"--> isNewPaymentMethod = {isNewPaymentMethod}");
+                        Debug.Log($"--> ump.ID = {upm.Data.id}");
+                        Debug.Log($"--> TokenID = {this.TokenID}");
+                        
+                        Debug.Log($"====================================================================================");
+                        
+                        //////////////////////////////////////////////////////////////////
+                        
+                        var body1 = new Shared.ChargeRequest()
                                    {
                                        session_id            = CHECKOUT.Session.SessionID,
                                        is_new_payment_method = false,
@@ -214,27 +230,86 @@ namespace Galleon.Checkout
                                                                             { "token",  this.TokenID },                                                                                                                                   
                                                                        }
                                                              },
-                                       save_payment_method   = false,
-                                       //metadata              = CHECKOUT.Session.Metadata,
+                                       save_payment_method   = true,
+                                     //metadata              = CHECKOUT.Session.Metadata,
                                    };
                         
-                        Debug.Log($"at /charge");
-                        Debug.Log($"body type is                         : {body.GetType().Name}");
-                        Debug.Log($"body.sessionID                       : {body.session_id}");
-                        Debug.Log($"body.is_new_payment_method           : {body.is_new_payment_method}");
-                        Debug.Log($"body.save_payment_method             : {body.save_payment_method}");
-                        Debug.Log($"body.payment_method.type             : {body.payment_method.GetType().Name}");
-                        Debug.Log($"body.payment_method.id               : {body.payment_method.id}");
-                        Debug.Log($"body.payment_method.data.count       : {body.payment_method.data.Count}");
-                        Debug.Log($"body.payment_method.data.first.key   : {body.payment_method.data.First().Key}");
-                        Debug.Log($"body.payment_method.data.first.value : {body.payment_method.data.First().Value}");
+                        Debug.Log($"body1 type is                         : {body1.GetType().Name}");
+                        Debug.Log($"body1.sessionID                       : {body1.session_id}");
+                        Debug.Log($"body1.is_new_payment_method           : {body1.is_new_payment_method}");
+                        Debug.Log($"body1.save_payment_method             : {body1.save_payment_method}");
+                        Debug.Log($"body1.payment_method.type             : {body1.payment_method.GetType().Name}");
+                        Debug.Log($"body1.payment_method.id               : {body1.payment_method.id}");
+                        Debug.Log($"body1.payment_method.data.count       : {body1.payment_method.data.Count}");
+                        Debug.Log($"body1.payment_method.data.first.key   : {body1.payment_method.data.First().Key}");
+                        Debug.Log($"body1.payment_method.data.first.value : {body1.payment_method.data.First().Value}");
                         
+                        Debug.Log($"====================================================================================");
+                        
+                        
+                        var body2                   = new Shared.ChargeRequest();
+                        body2.session_id            = sessionID;
+                        body2.is_new_payment_method = isNewPaymentMethod;
+                        body2.save_payment_method   = true;
+                        body2.payment_method        = new PaymentMethodDetails();
+                        body2.payment_method.id     = upm.Data.id;
+                        body2.payment_method.data   = new Dictionary<string, object>();
+                        body2.payment_method.data.Add("token", this.TokenID);
+                        
+                        Debug.Log($"body2 type is                         : {body2.GetType().Name}");
+                        Debug.Log($"body2.sessionID                       : {body2.session_id}");
+                        Debug.Log($"body2.is_new_payment_method           : {body2.is_new_payment_method}");
+                        Debug.Log($"body2.save_payment_method             : {body2.save_payment_method}");
+                        Debug.Log($"body2.payment_method.type             : {body2.payment_method.GetType().Name}");
+                        Debug.Log($"body2.payment_method.id               : {body2.payment_method.id}");
+                        Debug.Log($"body2.payment_method.data.count       : {body2.payment_method.data.Count}");
+                        Debug.Log($"body2.payment_method.data.first.key   : {body2.payment_method.data.First().Key}");
+                        Debug.Log($"body2.payment_method.data.first.value : {body2.payment_method.data.First().Value}");
+                        
+                        Debug.Log($"====================================================================================");
+                        
+                        var response1 = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
+                                                                                  ,headers  : new ()
+                                                                                            {
+                                                                                                { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                            }
+                                                                                  ,body     : body1);
+                        
+                        await Task.Delay(2000);
+                                        
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
                                                                                             {
                                                                                                 { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                             }
-                                                                                  ,body     : body);
+                                                                                  ,body     : body2);
+                        
+                        await Task.Delay(2000);
+                        
+                         string jsonBody =  @"{" 
+                                         + $@"    ""session_id""            : ""{sessionID}"",  " 
+                                         + $@"    ""save_payment_method""   : true, " 
+                                         + $@"    ""is_new_payment_method"" : {isNewPaymentMethod.ToString().ToLower()}, " 
+                                         + $@"    ""payment_method""        : " 
+                                         +  @"                              { " 
+                                         + $@"                                ""id"" : ""{upm.Data.id}"" ," 
+                                         + $@"                                ""token"" : ""{this.TokenID}"" " 
+                                         +  @"                              } "
+                                         +  @"}"
+                                         ;
+                        
+                         Debug.Log(jsonBody);
+                         
+                         JObject prettyJson = JObject.Parse(jsonBody);
+                         Debug.Log(prettyJson.ToString(formatting: Formatting.Indented));
+                         
+                        var response3 = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
+                                                                                   ,headers  : new ()
+                                                                                             {
+                                                                                                 { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                             }
+                                                                                   ,jsonBody : jsonBody);
+                        
                         
                         
                         //////////////////////////////////////////////////////////////////////

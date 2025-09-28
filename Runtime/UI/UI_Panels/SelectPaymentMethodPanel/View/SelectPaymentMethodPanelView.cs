@@ -138,7 +138,7 @@ namespace Galleon.Checkout.UI
             int PaymentMethodsAmount = Math.Max(CHECKOUT.PaymentMethods.UserPaymentMethods.Count + CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.Count
                                                ,6);
 
-            Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
+            // Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
             if (PaymentMethodsAmount == 0)
             {
