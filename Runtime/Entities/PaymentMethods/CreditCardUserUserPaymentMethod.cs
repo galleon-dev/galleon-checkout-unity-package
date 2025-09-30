@@ -198,129 +198,27 @@ namespace Galleon.Checkout
             new Step(name   : $"charge"
                     ,action : async (s) =>
                     {                                               
-                        s.Log($"at /charge");
-                        s.Log($"-->current session : {CHECKOUT.Session?.ToString() ?? "NULL"}");
-                        s.Log($"--> Got Session ID : {CHECKOUT.Session?.SessionID ?? "NULL" }");
-                        s.Log($"-->count : {CheckoutClient.Instance.CheckoutSessions.Count}");
-                        foreach (var checkoutSession in CheckoutClient.Instance.CheckoutSessions)
-                        {
-                            s.Log($"-------> session object : {checkoutSession?.ToString() ?? "NULL"}");
-                            s.Log($"-------> session id     : {checkoutSession?.SessionID.ToString() ?? "NULL"}");
-                        }
+                        var    upm                 = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
                         
-                        ////////////////////////////////////////////////////////////////// Definitions
+                        var    session             = CHECKOUT.Session;
+                        string sessionID           = session?.SessionID ?? "NULL_SESSION_ID";
+                        bool   isNewPaymentMethod  = CHECKOUT.PaymentMethods.UserPaymentMethods.All(pm => pm.Data.id != upm.Data.id);
                         
-                        var upm = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
-                        
-                        var    session            = CHECKOUT.Session;
-                        string sessionID          = session?.SessionID ?? "NULL_SESSION_ID";
-                        bool   isNewPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.All(pm => pm.Data.id != upm.Data.id);
-                        
-                        Debug.Log($"====================================================================================");
-                        
-                        s.Log($"--> SessionObject = {session.ToString() ?? "NULL"}");
-                        s.Log($"--> SessionID = {sessionID}");
-                        s.Log($"--> isNewPaymentMethod = {isNewPaymentMethod}");
-                        s.Log($"--> ump.ID = {upm.Data.id}");
-                        s.Log($"--> TokenID = {this.TokenID}");
-                        
-                        Debug.Log($"====================================================================================");
-                        
-                        //////////////////////////////////////////////////////////////////
-                        
-                        var body1 = new Shared.ChargeRequest()
-                                   {
-                                       session_id            = CHECKOUT.Session.SessionID,
-                                       is_new_payment_method = false,
-                                       payment_method        = new PaymentMethodDetails()
-                                                             {
-                                                                  id   = upm.Data.id,
-                                                                  data = new ()
-                                                                       {
-                                                                            { "token",  this.TokenID },                                                                                                                                   
-                                                                       }
-                                                             },
-                                       save_payment_method   = true,
-                                     //metadata              = CHECKOUT.Session.Metadata,
-                                   };
-                        
-                        s.Log($"body1 type is                         : {body1.GetType().Name}");
-                        s.Log($"body1.sessionID                       : {body1.session_id}");
-                        s.Log($"body1.is_new_payment_method           : {body1.is_new_payment_method}");
-                        s.Log($"body1.save_payment_method             : {body1.save_payment_method}");
-                        s.Log($"body1.payment_method.type             : {body1.payment_method.GetType().Name}");
-                        s.Log($"body1.payment_method.id               : {body1.payment_method.id}");
-                        s.Log($"body1.payment_method.data.count       : {body1.payment_method.data.Count}");
-                        s.Log($"body1.payment_method.data.first.key   : {body1.payment_method.data.First().Key}");
-                        s.Log($"body1.payment_method.data.first.value : {body1.payment_method.data.First().Value}");
-                        
-                        Debug.Log($"====================================================================================");
-                        
-                        
-                        var body2                   = new Shared.ChargeRequest();
-                        body2.session_id            = sessionID;
-                        body2.is_new_payment_method = isNewPaymentMethod;
-                        body2.save_payment_method   = true;
-                        body2.payment_method        = new PaymentMethodDetails();
-                        body2.payment_method.id     = upm.Data.id;
-                        body2.payment_method.data   = new Dictionary<string, object>();
-                        body2.payment_method.data.Add("token", this.TokenID);
-                        
-                        s.Log($"body2 type is                         : {body2.GetType().Name}");
-                        s.Log($"body2.sessionID                       : {body2.session_id}");
-                        s.Log($"body2.is_new_payment_method           : {body2.is_new_payment_method}");
-                        s.Log($"body2.save_payment_method             : {body2.save_payment_method}");
-                        s.Log($"body2.payment_method.type             : {body2.payment_method.GetType().Name}");
-                        s.Log($"body2.payment_method.id               : {body2.payment_method.id}");
-                        s.Log($"body2.payment_method.data.count       : {body2.payment_method.data.Count}");
-                        s.Log($"body2.payment_method.data.first.key   : {body2.payment_method.data.First().Key}");
-                        s.Log($"body2.payment_method.data.first.value : {body2.payment_method.data.First().Value}");
-                        
-                        Debug.Log($"====================================================================================");
-                        
-                        var response1 = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
-                                                                                  ,headers  : new ()
-                                                                                            {
-                                                                                                { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
-                                                                                            }
-                                                                                  ,body     : body1);
-                        
-                        await Task.Delay(2000);
-                                        
+                        var body                   = new Shared.ChargeRequest();
+                        body.session_id            = sessionID;
+                        body.is_new_payment_method = isNewPaymentMethod;
+                        body.save_payment_method   = true;
+                        body.payment_method        = new PaymentMethodDetails();
+                        body.payment_method.id     = upm.Data.id;
+                        body.payment_method.data   = new Dictionary<string, object>();
+                        body.payment_method.data.Add("token", this.TokenID);
+                                    
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
                                                                                             {
                                                                                                 { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                             }
-                                                                                  ,body     : body2);
-                        
-                        await Task.Delay(2000);
-                        
-                         string jsonBody =  @"{" 
-                                         + $@"    ""session_id""            : ""{sessionID}"",  " 
-                                         + $@"    ""save_payment_method""   : true, " 
-                                         + $@"    ""is_new_payment_method"" : {isNewPaymentMethod.ToString().ToLower()}, " 
-                                         + $@"    ""payment_method""        : " 
-                                         +  @"                              { " 
-                                         + $@"                                ""id"" : ""{upm.Data.id}"" ," 
-                                         + $@"                                ""token"" : ""{this.TokenID}"" " 
-                                         +  @"                              } "
-                                         +  @"}"
-                                         ;
-                        
-                         Debug.Log(jsonBody);
-                         
-                         JObject prettyJson = JObject.Parse(jsonBody);
-                         Debug.Log(prettyJson.ToString(formatting: Formatting.Indented));
-                         
-                        var response3 = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
-                                                                                   ,headers  : new ()
-                                                                                             {
-                                                                                                 { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
-                                                                                             }
-                                                                                   ,jsonBody : jsonBody);
-                        
-                        
+                                                                                  ,body     : body);
                         
                         //////////////////////////////////////////////////////////////////////
                         ///
