@@ -9,10 +9,26 @@ namespace Galleon.Checkout
 {
     public class PaymentMethodsController : Entity
     {
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
+        
+        public int MAX_LAST_USED_PAYMENT_METHODS = 3;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public Collection<PaymentMethodDefinition> PaymentMethodsDefinitions = new ();
         public Collection<UserPaymentMethod>       UserPaymentMethods        = new ();
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
+        
+        private List<UserPaymentMethod> SpecialUserPaymentMethods   => UserPaymentMethods.Where(x=>x.Type == "native").ToList();
+        private List<UserPaymentMethod> LastUseduserPaymentMethods  => UserPaymentMethods.Except(SpecialUserPaymentMethods).Take(MAX_LAST_USED_PAYMENT_METHODS).ToList();
+        
+        public  List<UserPaymentMethod> UserPaymentMethodsToDisplay => LastUseduserPaymentMethods 
+                                                                       .Union(SpecialUserPaymentMethods)
+                                                                       .OrderBy(x => x.SortOrder)
+                                                                       .ToList();
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
@@ -174,6 +190,15 @@ namespace Galleon.Checkout
                                                         });
                         }
                         
+                        
+                        this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                    {
+                                                        Data               = null,
+                                                        DisplayName        = "Google Play",
+                                                        IsNewPaymentMethod = false,
+                                                        IsSelected         = false,
+                                                        Type               = "native"
+                                                    });
                     });
         
     }

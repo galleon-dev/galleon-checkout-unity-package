@@ -315,7 +315,7 @@ namespace Galleon.Checkout
             if (request.result != UnityWebRequest.Result.Success)
                 throw new Exception($"ERROR FOR NETWORK REQUEST : {url}\n{request.error}");
             
-            // request.Dispose();
+            request.Dispose();
             
             return result;
         }

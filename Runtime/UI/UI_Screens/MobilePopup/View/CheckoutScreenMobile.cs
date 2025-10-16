@@ -117,11 +117,11 @@ namespace Galleon.Checkout.UI
             new Step(name: $"end_checkout_screen_mobile"
                     , action: async (s) =>
                               {
-                                  Debug.Log("CloseCheckoutScreenMobile()");
                                   if (CheckoutClient.Instance.CheckoutScreenMobile == null)
                                       return;
 
-                                  CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(false);
+                                  //CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(false);
+                                  await CheckoutClient.Instance.CheckoutScreenMobile.Close();
                               });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle

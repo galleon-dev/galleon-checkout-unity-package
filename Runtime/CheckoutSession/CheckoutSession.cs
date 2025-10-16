@@ -123,26 +123,6 @@ namespace Galleon.Checkout
                                                                                        },
                                                                           metadata   = CHECKOUT.Session.Metadata
                                                                        };
-
-                        try
-                        {
-                            s.Log($"Body : {body.ToString()}");
-                            s.Log($"Body.expires_at : {body.expires_at}");
-                            s.Log($"Body.order : {body.order?.ToString()}");
-                            s.Log($"Body.order.sku : {body.order?.sku.ToString()}");
-                            s.Log($"Body.order.amount : {body.order?.amount.ToString()}");
-                            s.Log($"Body.order.currency : {body.order?.currency?.ToString()}");
-                            s.Log($"Body.metadata : {body.metadata?.Count}");
-                            if (body.metadata != null)
-                                foreach (var kvp in body.metadata)
-                                    s.Log($"Body.metadata[{kvp.Key}] : {kvp.Value}");
-                            s.Log($"Body-Json : {JsonConvert.SerializeObject(body)}");
-                            s.Log($"Header : Bearer {CHECKOUT.Network.GalleonUserAccessToken}");
-                        }
-                        catch (Exception e)
-                        {
-                            
-                        }
                         
                         var response = await CHECKOUT.Network.Post<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/create"
                                                                                            ,headers  : new ()
@@ -151,15 +131,6 @@ namespace Galleon.Checkout
                                                                                                      }
                                                                                            ,body     : body
                                                                                                      );
-                        
-                        s.Log("Session IDS :");
-                        s.Log(response.session_id);
-                        this.SessionID = response.session_id;           
-                        s.Log(SessionID);
-                        
-                        s.Log($"--> Got Session ID : {response.session_id ?? "NULL"}");
-                        s.Log($"-->current session : {CHECKOUT.Session.ToString() ?? "NULL"} ");
-                        s.Log($"-->current session ID : {CHECKOUT.Session?.SessionID ?? "NULL"} ");
                         
                     });
         
@@ -188,6 +159,17 @@ namespace Galleon.Checkout
             new Step(name   : $"run_transaction"
                     ,action : async (s) =>
                     {
+                        if (User.SelectedUserPaymentMethod.Type == "native")
+                        {
+                            this.PurchaseResult = new PurchaseResult()
+                                                {
+                                                    IsSuccess              = true,
+                                                    DidUserSelectNativeIAP = true,
+                                                };
+                            return;
+                        }
+                        
+                        
                         ////////////////////////////////////////////////////////////// Pre Steps
                         
                         // Show Loading Screen

@@ -27,13 +27,16 @@ namespace Galleon.Checkout
         
         //// Members
         
+        public UserPaymentMethodData Data;
+        
         public string                Type; 
         public string                DisplayName;
         public bool                  IsSelected;
         
         public bool                  IsNewPaymentMethod = true;
         
-        public UserPaymentMethodData Data;
+        public float                 SortOrder = 1f;
+        
 
         //// UI Actions
         

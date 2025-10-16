@@ -80,7 +80,7 @@ namespace Galleon.Checkout.UI
             }
 
             // Add children
-            var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods.Take(3);
+            var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
             foreach (var paymentMethod in paymentMethods)
             {
                 var go   = Instantiate(original : PaymentMethodItemPrefab, parent : PaymentMethodsPanel.transform);

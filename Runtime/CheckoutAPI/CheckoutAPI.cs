@@ -35,15 +35,16 @@ namespace Galleon.Checkout
     
     public class PurchaseResult
     {
-        public string       OrderID    { get; set; }
-        public bool         IsSuccess  { get; set; }
-        public bool         IsCanceled { get; set; }
-        public bool         IsError    { get; set; }
-        public List<string> Errors     { get; set; }
+        public string       OrderID                { get; set; }
+        public bool         IsSuccess              { get; set; }
+        public bool         IsCanceled             { get; set; }
+        public bool         IsError                { get; set; }
+        public List<string> Errors                 { get; set; }
+        public bool         DidUserSelectNativeIAP { get; set; }
 
         public override string ToString()
         {
-            return $"PurchaseResult: OrderID={OrderID} IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, Errors={string.Join(", ", Errors ?? new List<string>())}";
+            return $"PurchaseResult: OrderID={OrderID} IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, Errors={string.Join(", ", Errors ?? new List<string>())}";
         }
     }
 }
