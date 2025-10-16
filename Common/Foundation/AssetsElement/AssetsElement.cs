@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Galleon.Checkout.Assets;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,7 +13,7 @@ namespace Galleon.Checkout.Foundation
 {
     public class Assets : Entity
     {
-        public FolderAsset RootFolderAsset;
+        public Folder rootFolder;
         
         //////////////////////////////////////////////////////////////////////////////////// TEMP
         
@@ -20,7 +21,7 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        var tree = RootFolderAsset.Node.Descendants().OfType<FolderAsset>().ToList();
+                        var tree = rootFolder.Node.Descendants().OfType<Folder>().ToList();
                         foreach (var folder in tree)
                         {
                             s.Log(folder.Path);
@@ -38,27 +39,27 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        this.RootFolderAsset.Node.Scan.Register();
-                        this.RootFolderAsset.Node.Scan.ScanRecursive();
+                        this.rootFolder.Node.Scan.Register();
+                        this.rootFolder.Node.Scan.ScanRecursive();
                     });
         public Step Do_Assets_Plus_Folder() 
         =>
             new Step(action : async (s) =>
                     {
-                        this.RootFolderAsset.Node.Live.Plus(new FolderAsset() { FolderName = "f1" });
+                        this.rootFolder.Node.Live.Plus(new Folder() { FolderName = "f1" });
                     });
         public Step Do_Assets_Equals_Folder() 
         =>
             new Step(action : async (s) =>
                     {
-                        var folder = this.RootFolderAsset.Node.Descendants().OfType<FolderAsset>().First(x => x.FolderName == "f1");
+                        var folder = this.rootFolder.Node.Descendants().OfType<Folder>().First(x => x.FolderName == "f1");
                         folder.Node.Live.Edit("Name", "f1_edited");
                     });
         public Step Do_Assets_Minus_Folder() 
         =>
             new Step(action : async (s) =>
                     {
-                        var folder = this.RootFolderAsset.Node.Descendants().OfType<FolderAsset>().First(x => x.Path.EndsWith("f1"));
+                        var folder = this.rootFolder.Node.Descendants().OfType<Folder>().First(x => x.Path.EndsWith("f1"));
                         folder.Node.Live.Minus();
                         
                         // var folder = this.RootFolderAsset.Node.Descendants().OfType<FolderAsset>().First(x => x.FolderName == "f1");
@@ -68,7 +69,7 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        this.RootFolderAsset.Node.Printing.Print(id: "apf", text: "> Folder f1");
+                        this.rootFolder.Node.Printing.Print(id: "apf", text: "> Folder f1");
                     });
         public Step Do_Export() 
         =>

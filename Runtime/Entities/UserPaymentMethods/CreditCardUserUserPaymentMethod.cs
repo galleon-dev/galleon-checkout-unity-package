@@ -41,12 +41,19 @@ namespace Galleon.Checkout
 
         public CreditCardUserUserPaymentMethod()
         {
-            this.TransactionSteps = new()
-                                    {
-                                        Charge,
-                                      //AwaitSocket
-                                    };
         }
+        
+        // public IEnumerator<Step> GetActualTransactionSteps(string[] stepNames)
+        // {
+        //     foreach (var stepName in stepNames)
+        //     {
+        //         var step = CheckoutClient.Instance.CheckoutActions.Node.Reflection.Steps().FirstOrDefault(s => s.Name == stepName);
+        //         if (step == null)
+        //             continue;
+        //         else
+        //             yield return step;
+        //     }
+        // }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Vaulting Steps
         
@@ -190,89 +197,89 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
-        public Step Charge()
-        =>
-            new Step(name   : $"charge"
-                    ,action : async (s) =>
-                    {                                               
-                        var upm = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
-                        
-                        var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
-                                                                                  ,headers  : new ()
-                                                                                            {
-                                                                                                { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
-                                                                                            }
-                                                                                  ,body     : new Shared.ChargeRequest()
-                                                                                            {
-                                                                                                session_id            = CHECKOUT.Session.SessionID,
-                                                                                                is_new_payment_method = false,
-                                                                                                payment_method        = new PaymentMethodDetails()
-                                                                                                                      {
-                                                                                                                           id   = upm.Data.id,
-                                                                                                                           data = new ()
-                                                                                                                                {
-                                                                                                                                     { "token",  this.TokenID },                                                                                                                                   
-                                                                                                                                }
-                                                                                                                      },
-                                                                                                save_payment_method   = false,
-                                                                                            
-                                                                                            });
-                        
-                        
-                        //////////////////////////////////////////////////////////////////////
-                        ///
-                        // response = new ChargeResponse()
-                        // {
-                        //     result       = null,
-                        //     next_actions = new PaymentAction[]
-                        //                  {
-                        //                      new PaymentAction()
-                        //                      {
-                        //                          action     = "open_url",
-                        //                          parameters = new Dictionary<string, object>()
-                        //                                     {
-                        //                                         { "url",            "https://levan-galleon.github.io/galleon_web_demo?title=Superplay%20Product&price=$4.99" },
-                        //                                         { "deep_link_path", "checkoutapp"                                                                            }
-                        //                                     } 
-                        //                      }
-                        //                  }
-                        // };
-                        ///
-                        //////////////////////////////////////////////////////////////////////
-                        
-                        if (response.next_actions != null)
-                        {
-                            var flow = s.ParentStep;
-                            
-                            foreach (var paymentAction in response.next_actions)
-                            {
-                                if (paymentAction.action == "open_url")
-                                {
-                                    var url          = paymentAction.parameters["url"           ].ToString();
-                                  //var deepLinkPath = paymentAction.parameters["deep_link_path"].ToString();
-                                    string deepLinkPath = "test.app";
-                                    flow.AddChildStep(OpenURL(url,deepLinkPath));
-                                    flow.AddChildStep(CheckStatus());
-                                    
-                                }
-                            }
-                        }
-                        else if (response.result != null)
-                        {    
-                            CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
-                                                                                          {
-                                                                                              errors      = null,
-                                                                                              is_canceled = false,
-                                                                                              is_success  = true,
-                                                                                              charge_id   = response.result.charge_id,
-                                                                                          };
-                        } 
-                        else
-                        {
-                            // NO TRANSACTION RESULT AND NO NEXT ACTION. ERROR.
-                            throw new Exception("Charge: No result or next action");
-                        }
-                    });   
+        // public Step Charge()
+        // =>
+        //     new Step(name   : $"charge"
+        //             ,action : async (s) =>
+        //             {                                               
+        //                 var upm = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
+        //                 
+        //                 var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
+        //                                                                           ,headers  : new ()
+        //                                                                                     {
+        //                                                                                         { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+        //                                                                                     }
+        //                                                                           ,body     : new Shared.ChargeRequest()
+        //                                                                                     {
+        //                                                                                         session_id            = CHECKOUT.Session.SessionID,
+        //                                                                                         is_new_payment_method = false,
+        //                                                                                         payment_method        = new PaymentMethodDetails()
+        //                                                                                                               {
+        //                                                                                                                    id   = upm.Data.id,
+        //                                                                                                                    data = new ()
+        //                                                                                                                         {
+        //                                                                                                                              { "token",  this.TokenID },                                                                                                                                   
+        //                                                                                                                         }
+        //                                                                                                               },
+        //                                                                                         save_payment_method   = false,
+        //                                                                                     
+        //                                                                                     });
+        //                 
+        //                 
+        //                 //////////////////////////////////////////////////////////////////////
+        //                 ///
+        //                 // response = new ChargeResponse()
+        //                 // {
+        //                 //     result       = null,
+        //                 //     next_actions = new PaymentAction[]
+        //                 //                  {
+        //                 //                      new PaymentAction()
+        //                 //                      {
+        //                 //                          action     = "open_url",
+        //                 //                          parameters = new Dictionary<string, object>()
+        //                 //                                     {
+        //                 //                                         { "url",            "https://levan-galleon.github.io/galleon_web_demo?title=Superplay%20Product&price=$4.99" },
+        //                 //                                         { "deep_link_path", "checkoutapp"                                                                            }
+        //                 //                                     } 
+        //                 //                      }
+        //                 //                  }
+        //                 // };
+        //                 ///
+        //                 //////////////////////////////////////////////////////////////////////
+        //                 
+        //                 if (response.next_actions != null)
+        //                 {
+        //                     var flow = s.ParentStep;
+        //                     
+        //                     foreach (var paymentAction in response.next_actions)
+        //                     {
+        //                         if (paymentAction.action == "open_url")
+        //                         {
+        //                             var url          = paymentAction.parameters["url"           ].ToString();
+        //                           //var deepLinkPath = paymentAction.parameters["deep_link_path"].ToString();
+        //                             string deepLinkPath = "test.app";
+        //                             flow.AddChildStep(OpenURL(url,deepLinkPath));
+        //                             flow.AddChildStep(CheckStatus());
+        //                             
+        //                         }
+        //                     }
+        //                 }
+        //                 else if (response.result != null)
+        //                 {    
+        //                     CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+        //                                                                                   {
+        //                                                                                       errors      = null,
+        //                                                                                       is_canceled = false,
+        //                                                                                       is_success  = true,
+        //                                                                                       charge_id   = response.result.charge_id,
+        //                                                                                   };
+        //                 } 
+        //                 else
+        //                 {
+        //                     // NO TRANSACTION RESULT AND NO NEXT ACTION. ERROR.
+        //                     throw new Exception("Charge: No result or next action");
+        //                 }
+        //             });   
         
         public Step OpenURL(string url, string deepLinkPath = null) 
         =>

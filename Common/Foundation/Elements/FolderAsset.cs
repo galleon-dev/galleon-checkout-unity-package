@@ -11,9 +11,9 @@ using UnityEngine.UIElements;
 using UnityEditor;
 #endif
 
-namespace Galleon.Checkout.Foundation
+namespace Galleon.Checkout.Assets
 {
-    public class FolderAsset : Asset
+    public class Folder : Asset
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
@@ -27,7 +27,7 @@ namespace Galleon.Checkout.Foundation
                                     //    set => Rename(value); 
                                     //}
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// CRUD Actions
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Physical Actions
         
         public bool DoesFolderExist()
         {
@@ -60,14 +60,14 @@ namespace Galleon.Checkout.Foundation
             this.Path = System.IO.Path.Combine(parentAsset.Path, this.FolderName);
         }
         
-        public void Rename(string folderName)
+        public void Rename(string newFolderName)
         {
             //Debug.Log($"Renaming {FolderName} to {folderName}");
             
             //////////////////////////////////////////
             
             var oldPath = Path;
-            var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(oldPath) ?? string.Empty, folderName);
+            var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(oldPath) ?? string.Empty, newFolderName);
             
             if (Directory.Exists(newPath))
                 Debug.Log("Destination already exists!");
@@ -103,7 +103,7 @@ namespace Galleon.Checkout.Foundation
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// CRUD Handler
         
-        public class FolderCrudHandler : CrudHandler<FolderAsset>
+        public class FolderCrudHandler : CrudHandler<Folder>
         {
             public override void Create()                          => target.CreateFolder();
             public override void Delete()                          => target.DeleteFolder();
@@ -113,7 +113,7 @@ namespace Galleon.Checkout.Foundation
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Scan Handler
         
-        public class FolderScanHandler : ScanHandler<FolderAsset>
+        public class FolderScanHandler : ScanHandler<Folder>
         {
             public override void Scan()
             {
@@ -141,11 +141,11 @@ namespace Galleon.Checkout.Foundation
                 
                 void HandleItemScanned(object parent, string itemCategory, object item)
                 {
-                    if (parent      is FolderAsset parentFolder
+                    if (parent      is Folder parentFolder
                     && itemCategory == "folder"
                     && item         is string path)
                     {
-                        var child = new FolderAsset() { FolderPath = path, Path = path };
+                        var child = new Folder() { FolderPath = path, Path = path };
                         parentFolder.Node.AddChild(child);
                     }
                 }
@@ -154,7 +154,7 @@ namespace Galleon.Checkout.Foundation
     }
 }
 
-
+#region OLD
 //     public class FolderElement : Entity
 //     {
 //         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
@@ -423,3 +423,4 @@ namespace Galleon.Checkout.Foundation
 //         
 //     }
 // }
+#endregion // OLD

@@ -104,7 +104,7 @@ namespace Galleon.Checkout.Foundation
                             var typeName      = node.TextNode.LineWords.First();
                             var assetTypeName = $"{typeName}Asset";
                             
-                            var commonName = node.TextNode.LineWords.ElementAt(1);
+                            var commonName    = node.TextNode.LineWords.ElementAt(1);
                             
                             var assetType     = Type.GetType($"Galleon.Checkout.Foundation.{assetTypeName}");
                             var asset         = Activator.CreateInstance(assetType) as IEntity;
@@ -144,9 +144,7 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Phase Helpers
         
         public async Task PostPhase()
-        {
-            
+        {   
         }
     }
 }
-

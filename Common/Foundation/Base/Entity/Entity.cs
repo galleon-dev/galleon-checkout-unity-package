@@ -292,7 +292,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Reflection
         
         public        EntityReflection Reflection => new(Entity);
-        public struct EntityReflection
+        public class EntityReflection
         {
             private IEntity Entity;
             public  EntityReflection(IEntity entity) => Entity = entity;
@@ -655,10 +655,29 @@ namespace Galleon.Checkout
             public IEntity GetDefinition()   { return default; }
             public IEntity GetElement()      { return default; }
             public IEntity GetAssetsFolder() { return default; }
+            
+            // Scan
+            public void Scan() {}
+            
+            // CRUD
+            public void Create() {}
+            public void Delete() {}
+            public void Update() {}
+            public void OpenForEdit()  {}
+            public void CloseForEdit() {}
+            
+            // Live
+            public void Plus()   {}
+            public void Minus()  {}
+            public void Equals() {}
+            
+            // Print
+            public void Print() {}
+            
+            // Extras
+            public object MCVParent() => default;
         }
             
-        public Resource GetResource() => new Resource();
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live Tree
      
         public        LIVE Live => new(Entity);
@@ -758,7 +777,4 @@ namespace Galleon.Checkout
             set => base.target = value;
         }
     }
-    
-    /////////////////////////////////////////////////
 }
-

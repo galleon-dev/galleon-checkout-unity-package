@@ -11,10 +11,11 @@ namespace Galleon.Checkout
 {
     public class UserPaymentMethod : Entity
     {
-        //// Types
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
         
         public enum PaymentMethodType
         {
+            Native,
             Card,
             Visa,
             MasterCard,
@@ -23,20 +24,30 @@ namespace Galleon.Checkout
             Discover,
             GPay,
             PayPal,
-            Apple
+            Apple,
         }
         
-        //// Members
+        public class BonusData
+        {
+            public string displayText;
+            public string reward_type;
+        }
         
-        public string Type; 
-        public string DisplayName;
-        public bool   IsSelected;
-        
-        public bool   IsNewPaymentMethod = false;
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public UserPaymentMethodData Data;
+        
+        public string                Type; 
+        public string                DisplayName;
+        public bool                  IsSelected;
+        
+        public float                 SortOrder = 1f;
+        
+        public bool                  IsNewPaymentMethod = false;
 
-        //// UI Actions
+        
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
         
         public void Select()
         {
@@ -48,17 +59,23 @@ namespace Galleon.Checkout
             this.IsSelected = false;
         }
         
-        //// Vaulting
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Vaulting
+        
+        public List<Step> GetVaultingSteps()
+        {
+            List<string> definitions = GetPaymentMethodDefinition().Data.vaulting_actions.Select(x => x.action).ToList();
+            List<Step>   steps       = CheckoutClient.Instance.CheckoutActions.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps().Where(s => definitions.Contains(s.Name))).ToList();
+            return steps;
+        }
         
         public virtual Step RunVaultingSteps() 
         =>
             new Step(name   : $"run_vaulting_steps"
                     ,action : async (s) =>
                     {
-                        
                     });
         
-        //// Transaction Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
         public PaymentMethodDefinition GetPaymentMethodDefinition()
         {
@@ -77,13 +94,6 @@ namespace Galleon.Checkout
         {
             return default;
         }
-        
-        public List<Func<Step>> InitializationSteps  = new ();
-        public List<Func<Step>> VaultingSteps        = new ();
-        public List<Func<Step>> TransactionSteps     = new ();
-        public List<Func<Step>> PostTransactionSteps = new ();
-        
     }
 }
-
 

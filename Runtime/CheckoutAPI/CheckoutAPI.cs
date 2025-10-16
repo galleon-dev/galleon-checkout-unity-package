@@ -6,6 +6,8 @@ namespace Galleon.Checkout
 {
     public class CheckoutAPI
     {   
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main API
+        
         public static async Task<InitializationResult> Initialize(CheckoutConfiguration configuration)
         {
             await CheckoutClient.Instance.SystemInitFlow().Execute();
@@ -18,6 +20,8 @@ namespace Galleon.Checkout
             return CheckoutClient.Instance.CurrentSession.PurchaseResult;
         }
     }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types
     
     public class CheckoutConfiguration
     {
@@ -32,14 +36,15 @@ namespace Galleon.Checkout
     
     public class PurchaseResult
     {
-        public bool         IsSuccess  { get; set; }
-        public bool         IsCanceled { get; set; }
-        public bool         IsError    { get; set; }
-        public List<string> Errors     { get; set; }
+        public bool         IsSuccess              { get; set; }
+        public bool         IsCanceled             { get; set; }
+        public bool         IsError                { get; set; }
+        public List<string> Errors                 { get; set; }
+        public bool         DidUserSelectNativeIAP { get; set; }
 
         public override string ToString()
         {
-            return $"PurchaseResult: IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, Errors={string.Join(", ", Errors ?? new List<string>())}";
+            return $"PurchaseResult: IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, Errors={string.Join(", ", Errors ?? new List<string>())}";
         }
     }
 }

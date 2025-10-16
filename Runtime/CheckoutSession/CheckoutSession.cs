@@ -34,9 +34,9 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public CheckoutClient                     Client                => CheckoutClient.Instance;
-        public User                               User                  => Client.CurrentUser;
-        public Transaction                        CurrentTransaction    => User.CurrentTransaction;
+        public CheckoutClient                     Client                    => CheckoutClient.Instance;
+        public User                               User                      => Client.CurrentUser;
+        public Transaction                        CurrentTransaction        => User.CurrentTransaction;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
         
@@ -123,6 +123,7 @@ namespace Galleon.Checkout
                                                                                                                        currency = "USD",
                                                                                                                    },
                                                                                                         expires_at = DateTime.UtcNow.AddDays(1),
+                                                                                                        metadata   = new Dictionary<string, string>() { }
                                                                                                      });
                         
                         
@@ -152,6 +153,16 @@ namespace Galleon.Checkout
             new Step(name   : $"run_transaction"
                     ,action : async (s) =>
                     {
+                        if (User.SelectedUserPaymentMethod.Type == "native")
+                        {
+                            this.PurchaseResult = new PurchaseResult()
+                                                {
+                                                    IsSuccess              = true,
+                                                    DidUserSelectNativeIAP = true,
+                                                };
+                            return;
+                        }
+                        
                         ////////////////////////////////////////////////////////////// Pre Steps
                         
                         // Show Loading Screen
@@ -236,7 +247,17 @@ namespace Galleon.Checkout
                                                   IsError     = result.errors?.Length > 0,
                                               };
                     });
-        
     }
 }
+
+/// CheckoutClient
+///     Init
+///     Purchase
+///         Session
+///             Open
+///             Menu
+///             Transaction
+///                 Charge
+///                 Actions
+///             Close
 

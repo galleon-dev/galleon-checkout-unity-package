@@ -96,11 +96,11 @@ namespace Galleon.Checkout.UI
             new Step(name: $"end_checkout_screen_mobile"
                     , action: async (s) =>
                               {
-                                  Debug.Log("CloseCheckoutScreenMobile()");
                                   if (CheckoutClient.Instance.CheckoutScreenMobile == null)
                                       return;
 
-                                  CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(false);
+                                  //CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(false);
+                                  await CheckoutClient.Instance.CheckoutScreenMobile.Close();
                               });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -124,7 +124,7 @@ namespace Galleon.Checkout.UI
         {
             // Start "closed"
             RectTransform parentTransform = ParentPanel.transform as RectTransform;
-            parentTransform.sizeDelta = new Vector2(parentTransform.sizeDelta.x, 0);
+            parentTransform.sizeDelta     = new Vector2(parentTransform.sizeDelta.x, 0);
         }
 
         public void ResetState()
@@ -202,8 +202,8 @@ namespace Galleon.Checkout.UI
 
             public Page(string name, string header, string panel, string footer, Action<Page> setup = null)
             {
-                this.Name  = name;
-                this.Setup = setup;
+                this.Name        = name;
+                this.Setup       = setup;
 
                 this.headerState = header;
                 this.panelState  = panel;
@@ -452,7 +452,6 @@ namespace Galleon.Checkout.UI
                 return keyboardHeight;
             }
 
-
             #elif UNITY_ANDROID && !UNITY_EDITOR
             
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -462,6 +461,7 @@ namespace Galleon.Checkout.UI
                 AndroidJavaObject rect = new AndroidJavaObject("android.graphics.Rect");
                 view.Call("getWindowVisibleDisplayFrame", rect);
                 int visibleHeight = rect.Call<int>("height");
+            
                 return UnityEngine.Screen.height - visibleHeight;
             }
             
@@ -709,6 +709,7 @@ namespace Galleon.Checkout.UI
             this.gameObject.SetActive(false);
             //Destroy(this.gameObject);   
         }
+        
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper UI Actions
 

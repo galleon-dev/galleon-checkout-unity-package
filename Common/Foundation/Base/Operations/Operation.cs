@@ -16,21 +16,21 @@ namespace Galleon.Checkout.Foundation
     {
         //////////////////////////////////////////////////////////////////////////// Members
         
-        public OPERATION_STATE operationState = new OPERATION_STATE();
-        public Step  Flow;
+        public OPERATION_STATE OperationState = new OPERATION_STATE();
+        public Step            Flow;
         
         //////////////////////////////////////////////////////////////////////////// Properties
         
         public string ID
         {
-            get => operationState.Op.ID;
-            set => operationState.Op.ID = value;
+            get => OperationState.Op.ID;
+            set => OperationState.Op.ID = value;
         }
         
         public Dictionary<string, object> Data
         {
-            get => operationState.Data;
-            set => operationState.Data = value;
+            get => OperationState.Data;
+            set => OperationState.Data = value;
         }
         
         //////////////////////////////////////////////////////////////////////////// State
@@ -46,8 +46,8 @@ namespace Galleon.Checkout.Foundation
         [Serializable]
         public class OperationData
         {
-            public string       ID               { get; set; } = "";
-            public List<string> CompletedStepIDs { get; set; } = new();
+            public string                     ID               { get; set; } = "";
+            public List<string>               CompletedStepIDs { get; set; } = new();
         }
         
         //////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -58,7 +58,7 @@ namespace Galleon.Checkout.Foundation
             this.Flow                     = new Step(name: $"operation_{ID}");
             this.Flow.PreChildStepAction  = (completedChildStep) =>
                                           {       
-                                              this.operationState.Op.CompletedStepIDs.Add(completedChildStep.Name);
+                                              this.OperationState.Op.CompletedStepIDs.Add(completedChildStep.Name);
                                               this.Save();
                                               Root.Instance.Context.Operations.Save();
                                               
@@ -107,7 +107,7 @@ namespace Galleon.Checkout.Foundation
         
         public void Save()
         {
-            var json = JsonConvert.SerializeObject(this.operationState);
+            var json = JsonConvert.SerializeObject(this.OperationState);
             var path = Path.Combine(Application.dataPath, OperationStateFileRelativePath);
             File.WriteAllText(path, json);
         }
@@ -120,12 +120,12 @@ namespace Galleon.Checkout.Foundation
             if (!File.Exists(path))
                 throw new Exception($"operation {ID} state file not found at path: " + path);
 
-            var json = File.ReadAllText(path);
-            operation.operationState = JsonConvert.DeserializeObject<OPERATION_STATE>(json);
+            var json                 = File.ReadAllText(path);
+            operation.OperationState = JsonConvert.DeserializeObject<OPERATION_STATE>(json);
 
             foreach (var step in operation.Flow.ChildSteps)
             {
-                if (operation.operationState.Op.CompletedStepIDs.Contains(step.Name))
+                if (operation.OperationState.Op.CompletedStepIDs.Contains(step.Name))
                     step.StepState = Step.STEP_STATE.PreviouslyCompleted;
             }
             

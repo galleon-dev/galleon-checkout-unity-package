@@ -33,7 +33,7 @@ namespace Galleon.Checkout.Foundation.Tests
                             // Test product 1
                             @$"on 'sample_app_start'             do 'test_purchase_product_1'",
                             @$"on 'on_view_focus_CheckoutPanel ' do 'checkout_panel_test_confirm_purchase'",
-                            @$"on 'on_view_focus_SuccessPanel'   do 'test_close_checkout_screen_clicked'",
+                            @$"on 'on_view_focus_SuccessPanel'   do 'fill_test_email' and 'test_click_send_receipt'", // and 'test_close_checkout_screen_clicked'",
                             //
                             // Test Product 2
                             @$"on 'on_back_to_store_screen'      do 'test_purchase_product_2'",
@@ -90,28 +90,36 @@ namespace Galleon.Checkout.Foundation.Tests
     {
         public Collection<Rule> Rules             = new();
         public int              CurrentRuleIndex;
-        public Rule             CurrentRule       => Rules.Count > 0 ? Rules[CurrentRuleIndex] : null;
+        public Rule             CurrentRule       => (Rules.Count > 0 && CurrentRuleIndex >= 0 && CurrentRuleIndex < Rules.Count) ? Rules[CurrentRuleIndex] : null;
         
         public void RegisterScenarioRules()
         {
             Step.OnPreStepExecute += async s =>
-                                  {
-                                      string rule_eventStepName  = CurrentRule.EventStepName;
-                                      string rule_actionStepPath = CurrentRule.ActionStepPath;
-                                      
-                                      if (s.Name == CurrentRule.EventStepName)
-                                      {
-                                          // DynamicExpression.Evaluate<Step>(Root.Instance.Runtime, rule.ActionStepPath);
-                                          var step = FindStep(CurrentRule.ActionStepPath);
-                                          if (step != null)
-                                          {
-                                              await Task.Delay(1000);
-                                              step.Execute();
-                                              CurrentRuleIndex++;
-                                          }
-                                      }
-                                  };
-           
+            {
+                if (Rules.Count == 0 || CurrentRuleIndex < 0 || CurrentRuleIndex >= Rules.Count)
+                    return;
+
+                var current = CurrentRule;
+                string rule_eventStepName = current.EventStepName;
+
+                if (s.Name == rule_eventStepName)
+                {
+                    // Execute all actions in order
+                    if (current.ActionStepPaths != null && current.ActionStepPaths.Count > 0)
+                    {
+                        foreach (var actionPath in current.ActionStepPaths)
+                        {
+                            var step = FindStep(actionPath);
+                            if (step != null)
+                            {
+                                await Task.Delay(1000);
+                                step.Execute();
+                            }
+                        }
+                    }
+                    CurrentRuleIndex++;
+                }
+            };
         }
         
         private Step FindStep(string stepName)
@@ -128,7 +136,7 @@ namespace Galleon.Checkout.Foundation.Tests
                 }
                 catch (Exception e)
                 {
-                    int x = 4;
+                    
                 }
             }
             
@@ -142,34 +150,41 @@ namespace Galleon.Checkout.Foundation.Tests
     public class Rule
     {
         public string EventStepName;
-        public string ActionStepPath;
+        public List<string> ActionStepPaths = new List<string>();
         
         public static Rule Parse(string str)
         {
-            // Rule text format : on 'bla' do 'bla'
+            // Rule text formats:
+            // - on 'event' do 'action'
+            // - on 'event' do 'action1' and 'action2' and 'action3'
             
-            var pattern = @"on\s*'([^']+)'\s*do\s*'([^']+)'";
-            /// Breakdown:
-            /// on\s*     — expects the lowercase literal on followed by optional whitespace.
-            /// '([^']+)' — captures one or more characters that are not a single quote between single quotes; that becomes EventStepName.
-            /// \s*do\s*  — expects the lowercase literal do with optional whitespace before/after.
-            /// '([^']+)' — same as above for ActionStepPath.
-            
-            var match = System.Text.RegularExpressions.Regex.Match(str, pattern);
+            var mainMatch = System.Text.RegularExpressions.Regex.Match(str, @"on\s*'([^']+)'\s*do\s*(.+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (!mainMatch.Success)
+                throw new FormatException("Input string is not in the correct format. Expected format: on 'EventStepName' do 'ActionStepName' [and 'ActionStepName2' ...]");
 
-            if (!match.Success)
-                throw new FormatException("Input string is not in the correct format. Expected format: on 'EventStepName' do 'ActionStepName'");
+            var eventName     = mainMatch.Groups[1].Value;
+            var actionsPart   = mainMatch.Groups[2].Value;
+            var actionMatches = System.Text.RegularExpressions.Regex.Matches(actionsPart, @"'([^']+)'");
+            var actions       = new List<string>();
+            foreach (System.Text.RegularExpressions.Match m in actionMatches)
+            {
+                if (m.Success)
+                    actions.Add(m.Groups[1].Value);
+            }
+            if (actions.Count == 0)
+                throw new FormatException("No actions found. Expected at least one action in single quotes after do.");
 
             return new Rule
             {
-                EventStepName  = match.Groups[1].Value,
-                ActionStepPath = match.Groups[2].Value
+                EventStepName   = eventName,
+                ActionStepPaths = actions
             };
         }
         
         public override string ToString()
         {
-            return $"Rule: On {EventStepName} Do {ActionStepPath}";
+            var actions = ActionStepPaths != null && ActionStepPaths.Count > 0 ? string.Join(" and ", ActionStepPaths) : "";
+            return $"Rule: On {EventStepName} Do {actions}";
         }
     }
 }
