@@ -27,11 +27,11 @@ namespace Galleon.Checkout
         
         //// Members
         
-        public string Type; 
-        public string DisplayName;
-        public bool   IsSelected;
+        public string                Type; 
+        public string                DisplayName;
+        public bool                  IsSelected;
         
-        public bool   IsNewPaymentMethod = true;
+        public bool                  IsNewPaymentMethod = true;
         
         public UserPaymentMethodData Data;
 
@@ -66,3 +66,4 @@ namespace Galleon.Checkout
         
     }
 }
+

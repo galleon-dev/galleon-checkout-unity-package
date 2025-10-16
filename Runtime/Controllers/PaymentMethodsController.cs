@@ -23,7 +23,7 @@ namespace Galleon.Checkout
                     ,action : async s =>
                     {
                         PaymentMethodsDefinitions.Node.DisplayName = "Payment Method Definitions";
-                        UserPaymentMethods.Node.DisplayName        = "User Payment Methods";
+                        UserPaymentMethods       .Node.DisplayName = "User Payment Methods";
                         
                         s.AddChildStep(GetPaymentMethodDefinitions());
                         s.AddChildStep(GetUserPaymentMethods());
@@ -44,9 +44,9 @@ namespace Galleon.Checkout
                         
                        this.PaymentMethodsDefinitions.Add(new CreditCardPaymentMethodDefinition()
                                                           {
-                                                              Type             = "credit_card",
-                                                              VaultingSteps    = { "get_tokenizer", "tokenize" },
-                                                              TransactionSteps = { "charge" },
+                                                              Type                 = "credit_card",
+                                                              VaultingSteps        = { "get_tokenizer", "tokenize" },
+                                                              TransactionSteps     = { "charge" },
                                                           });
                         
                         this.PaymentMethodsDefinitions.Add(new GooglePayPaymentMethodDefinition()
@@ -178,4 +178,5 @@ namespace Galleon.Checkout
         
     }
 }
+
 

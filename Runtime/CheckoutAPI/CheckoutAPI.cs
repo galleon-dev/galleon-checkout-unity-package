@@ -22,7 +22,7 @@ namespace Galleon.Checkout
                 metadata = new Dictionary<string, string>();
             
             await  CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
-            CheckoutClient.Instance.CurrentSession.Metadata = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                   CheckoutClient.Instance.CurrentSession.Metadata = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             await  CheckoutClient.Instance.RunCheckoutSession().Execute();
             return CheckoutClient.Instance.CurrentSession.PurchaseResult;
         }

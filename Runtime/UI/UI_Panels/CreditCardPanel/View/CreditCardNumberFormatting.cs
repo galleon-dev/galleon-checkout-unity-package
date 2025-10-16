@@ -9,25 +9,26 @@ using UnityEngine;
 
 namespace AdvancedInputFieldPlugin
 {
-    /// <summary>Class to format text as credit card number separated by spaces every 4 numbers</summary>
+    /// Class to format text as credit card number separated by spaces every 4 numbers
     public class CreditCardNumberFormatting : LiveDecorationFilter
     {
         
-        public AdvancedInputField CreditCardAdvancedInputField;
-        public CreditCardInfoPanelView CreditCardInfoPanelView;
+        public AdvancedInputField          CreditCardAdvancedInputField;
+        public CreditCardInfoPanelView     CreditCardInfoPanelView;
         CreditCardInfoPanelView.CardFormat cardFormat;
 
-        /// <summary>The maximum amount of separator characters to use</summary>
+        /// The maximum amount of separator characters to use
         private int MAX_SEPARATOR_CHARACTERS = 3;
         private int MaxInputFieldLimit = 16;
-        /// <summary>The character used to separate groups of 4 numbers</summary>
+        
+        /// The character used to separate groups of 4 numbers
         [SerializeField]
         private string separatorCharacter = " - ";
 
-        /// <summary>The StringBuilder</summary>
+        /// The StringBuilder
         private StringBuilder stringBuilder;
 
-        /// <summary>The StringBuilder</summary>
+        /// The StringBuilder
         public StringBuilder StringBuilder
         {
             get
@@ -55,7 +56,7 @@ namespace AdvancedInputFieldPlugin
             else
             {
                 StringBuilder.Length = 0; //Clears the contents of the StringBuilder
-                int numberCount = 0;
+                int numberCount    = 0;
                 int separatorCount = 0;
 
 
@@ -86,9 +87,9 @@ namespace AdvancedInputFieldPlugin
                             // Set Limit
                             if (CreditCardAdvancedInputField)
                             {
-                                MaxInputFieldLimit = cardFormat.MaxLength;
+                                MaxInputFieldLimit       = cardFormat.MaxLength;
                                 MAX_SEPARATOR_CHARACTERS = cardFormat.GroupSizes.Length; //cardFormat.MaxLength;
-                               // Debug.Log("SET LIMIT: " + cardFormat.MaxLength);
+                                // Debug.Log("SET LIMIT: " + cardFormat.MaxLength);
                             }
                         }
 
@@ -117,11 +118,11 @@ namespace AdvancedInputFieldPlugin
 
         public override int DetermineProcessedCaret(string text, int caretPosition, string processedText)
         {
-           // Debug.Log("DetermineProcessedCaret(), caretPosition: " + caretPosition + " processedText: " + processedText.Length + " Only Numbers: " + CreditCardAdvancedInputField.Text.Length);
+            // Debug.Log("DetermineProcessedCaret(), caretPosition: " + caretPosition + " processedText: " + processedText.Length + " Only Numbers: " + CreditCardAdvancedInputField.Text.Length);
 
             if (caretPosition == 0)
             {
-               return 0;
+                return 0;
             }
 
             int length = processedText.Length;
@@ -151,7 +152,7 @@ namespace AdvancedInputFieldPlugin
 
         public override int DetermineCaret(string text, string processedText, int processedCaretPosition)
         {
-           //Debug.Log("DetermineCaret(), processedCaretPosition: " + processedCaretPosition + " processedText: " + processedText.Length + " Only Numbers: " + CreditCardAdvancedInputField.Text.Length);
+            //Debug.Log("DetermineCaret(), processedCaretPosition: " + processedCaretPosition + " processedText: " + processedText.Length + " Only Numbers: " + CreditCardAdvancedInputField.Text.Length);
 
             if (processedCaretPosition == 0)
             {
