@@ -191,21 +191,22 @@ public class SettingsPanelView : View
         EmailInputField.interactable = false;
         IsEditingEmail = false;
         
-        if(SuccessPanelEmailInputField)
-        {
-            SuccessPanelEmailInputField.Text = EmailInputField.Text;
-
-            if(string.IsNullOrEmpty(SuccessPanelEmailInputField.Text))
-            {
-                SuccessPanelView.ShowEmail(false);
-            } else
-            {
-                SuccessPanelView.ShowEmail(true);
-            }
-            PlayerPrefs.SetString("Email", SuccessPanelEmailInputField.Text);
-            PlayerPrefs.Save();
-        } 
-       // this.EmailLabel.text = str;
+        // if (SuccessPanelEmailInputField)
+        // {
+        //     SuccessPanelEmailInputField.Text = EmailInputField.Text;
+        // 
+        //     if(string.IsNullOrEmpty(SuccessPanelEmailInputField.Text))
+        //     {
+        //         SuccessPanelView.ShowEmail(false);
+        //     } else
+        //     {
+        //         SuccessPanelView.ShowEmail(true);
+        //     }
+        //     PlayerPrefs.SetString("Email", SuccessPanelEmailInputField.Text);
+        //     PlayerPrefs.Save();
+        // }
+        
+        // this.EmailLabel.text = str;
         this.EmailInputField.Text   = str;
         CHECKOUT.Session.User.Email = str;
         await CHECKOUT.Actions.SetEmail().Execute();

@@ -8,22 +8,15 @@ namespace Galleon.Checkout.UI
     public class SelectPaymentMethodPanelView : View
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
-
-        public  GameObject SelectPaymentMethodItemPrefab;
-        public  GameObject SelectPaymentMethodItemsHolder;
-
-        private int       ScrollRectMaxSize   = 3;
-        private float      PaymentPrefabHeight = 200f;
-        private float      SeparatorHeight     = 2f;
         
         public GameObject SelectPaymentMethodItemPrefab;
         public GameObject SelectPaymentMethodItemsHolder;
 
-        private int ScrollRectMaxSize = 3;
-        private int ScrollRectMaxSizeLandscape = 6;
-        private float PaymentPrefabHeight = 200f;
+        private int   ScrollRectMaxSize            = 3;
+        private int   ScrollRectMaxSizeLandscape   = 6;
+        private float PaymentPrefabHeight          = 200f;
         private float PaymentPrefabHeightLandscape = 125f;
-        private float SeparatorHeight = 2f;
+        private float SeparatorHeight              = 2f;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 

@@ -16,11 +16,11 @@ namespace Galleon.Checkout.UI
        
         [Header("Taxes")]
         public List<GameObject> TaxesPanels;
-        public GameObject TaxesContainer;
-        public GameObject TaxPrefab;
-        public TextMeshProUGUI SubtotalPriceText;
-        public TextMeshProUGUI TotalPriceText;
-        bool IsUSAorCanadaUser = true;
+        public GameObject       TaxesContainer;
+        public GameObject       TaxPrefab;
+        public TextMeshProUGUI  SubtotalPriceText;
+        public TextMeshProUGUI  TotalPriceText;
+        bool                    IsUSAorCanadaUser = true;
 
         public override void Initialize()
         {
@@ -33,7 +33,7 @@ namespace Galleon.Checkout.UI
             if (CheckoutClient.Instance.CurrentSession == null) return;
 
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
-            this.PriceText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
 
             if (TaxesContainer != null)
             {
@@ -56,10 +56,10 @@ namespace Galleon.Checkout.UI
 
             // These are Taxes added only for testing. Should be commented out later on
             taxes.Clear();
-            taxes.Add("VAT", new Shared.TaxItem { tax_amount = 9.90m, inclusive = false });
-            taxes.Add("IRS", new Shared.TaxItem { tax_amount = 5.50m, inclusive = false });
-            taxes.Add("CUSTOMS", new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
-            taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m, inclusive = false });
+            taxes.Add("VAT",          new Shared.TaxItem { tax_amount = 9.90m,  inclusive  = false });
+            taxes.Add("IRS",          new Shared.TaxItem { tax_amount = 5.50m,  inclusive  = false });
+            taxes.Add("CUSTOMS",      new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
+            taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m,  inclusive  = false });
             //#endif
 
             if (Checkout.CheckoutClient.Instance != null)
@@ -108,8 +108,6 @@ namespace Galleon.Checkout.UI
                     this.PriceText.text = $"${SubTotal.ToString(CultureInfo.InvariantCulture)}";
                 }
             }
-
-            CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
         }
 
         void CreateTaxPrefab(string taxName, string taxAmount)
