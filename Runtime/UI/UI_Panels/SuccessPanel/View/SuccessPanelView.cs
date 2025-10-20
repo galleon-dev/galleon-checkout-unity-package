@@ -65,6 +65,7 @@ namespace Galleon.Checkout.UI
 
         public void ShowEmail(bool Status)
         {
+            Status = true;
             EmailInputFieldText.SetActive(Status);
             Gap.SetActive(Status);
             EmailInputFieldContainer.SetActive(Status);

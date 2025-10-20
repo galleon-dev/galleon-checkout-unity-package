@@ -13,7 +13,7 @@ using UnityEditor;
 
 namespace Galleon.Checkout.Assets
 {
-    public class Folder : Asset
+    public class    Folder : Asset
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         

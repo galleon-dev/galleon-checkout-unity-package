@@ -17,7 +17,7 @@ namespace Galleon.Checkout.UI
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 
-        public ViewResult Result = ViewResult.None;
+        public      ViewResult Result = ViewResult.None;
         public enum ViewResult
         {
             None,
@@ -250,42 +250,12 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
 
-        public void ShowPurchaseButton()
+        public void SetPurchaseButtonSprite(Sprite sprite)
         {
-            //Debug.Log("ShowPurchaseButton()");
-            GooglePayButton.SetActive(false);
-            PurchaseButton.SetActive(true);
-            PaypalPayButton.SetActive(false);
-            ApplePayButton.SetActive(false);
+            var image = this.PurchaseButton.GetComponentInChildren<Image>();
+            image.sprite = sprite;
         }
-
-        public void ShowGooglePayButton()
-        {
-            //Debug.Log("ShowGooglePayButton()");
-            GooglePayButton .SetActive(true);
-            PurchaseButton  .SetActive(false);
-            PaypalPayButton .SetActive(false);
-            ApplePayButton  .SetActive(false);
-        }
-
-        public void ShowPaypalPayButton()
-        {
-            //Debug.Log("ShowPaypalPayButton()");
-            GooglePayButton .SetActive(false);
-            PurchaseButton  .SetActive(false);
-            PaypalPayButton .SetActive(true);
-            ApplePayButton  .SetActive(false);
-        }
-
-        public void ShowApplePayButton()
-        {
-            //Debug.Log("ShowApplePayButton()");
-            GooglePayButton .SetActive(false);
-            PurchaseButton  .SetActive(false);
-            PaypalPayButton .SetActive(false);
-            ApplePayButton  .SetActive(true);
-        }
-
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
         public TestScenario scenario_1        => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase     )}()" });
@@ -299,6 +269,18 @@ namespace Galleon.Checkout.UI
         
         /// Test Rule : On_Next("checkoutPanel").Do("confirm_purchase")
         /// Test Rule : On_ALL ("whatever")     .Do("confirm_purchase")
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test
+        
+        public Step TEST_CHANGE_TAX_VIEW() 
+        =>
+            new Step(name   : $"TEST_CHANGE_TAX_VIEW"
+                    ,action : async (s) =>
+                              {
+                                 IsUSAorCanadaUser = !IsUSAorCanadaUser;
+                                 this.Refresh();
+                              });
     }
 }
 

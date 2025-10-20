@@ -23,7 +23,7 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         var creditCard = CHECKOUT.User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
-                      
+                        
                         var card = new 
                         {
                             Number = creditCard.CardNumber,

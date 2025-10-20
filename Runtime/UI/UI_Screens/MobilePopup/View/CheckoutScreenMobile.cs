@@ -19,9 +19,6 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
         // UI
-        
-        [Header("General")]
-        public bool                         IsLandscape = false;
 
         [Header("Parent Panel")]
         public ParentPanel                  ParentPanel;
@@ -55,6 +52,12 @@ namespace Galleon.Checkout.UI
         public  int                         CloseAnimationDurationMS = 300;
         public  float                       SafeAreaHeight           = 0f;
 
+        // Propertiews
+        
+        public bool                         IsLandscape => UnityEngine.Screen.orientation == ScreenOrientation.LandscapeLeft
+                                                        || UnityEngine.Screen.orientation == ScreenOrientation.LandscapeRight;
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
 
         public static Step InitializeCheckoutScreenMobile()

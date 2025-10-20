@@ -62,7 +62,7 @@ namespace Galleon.Checkout
         public bool IsTest = false;
         
         [Header("Sprites")]
-        public List<SpriteResource> Sprites = new();
+        public CheckoutSprites Sprites;
     }
     
     

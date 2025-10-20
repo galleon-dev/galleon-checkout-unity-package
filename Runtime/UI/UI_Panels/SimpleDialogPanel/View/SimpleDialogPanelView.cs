@@ -20,11 +20,6 @@ namespace Galleon.Checkout.UI
         public Image      RemovePaymentMethodIcon;
         public TMP_Text   RemovePaymentMethodLabel;
         
-        [Header("Remove Payment Method - Sprites")]
-        public Sprite   VisaSprite;
-        public Sprite   MasterCardSprite;
-        public Sprite   GPaySprite;
-        public Sprite   PaypalSprite;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Result
         
@@ -43,14 +38,7 @@ namespace Galleon.Checkout.UI
             var paymentMethod                  = CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete;
             this.RemovePaymentMethodLabel.text = paymentMethod.DisplayName;
             
-            if      (paymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
-                this.RemovePaymentMethodIcon.sprite = VisaSprite;
-            else if (paymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
-                this.RemovePaymentMethodIcon.sprite = MasterCardSprite;
-            else if (paymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
-                this.RemovePaymentMethodIcon.sprite = GPaySprite;
-            else if (paymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
-                this.RemovePaymentMethodIcon.sprite = PaypalSprite;
+            this.RemovePaymentMethodIcon.sprite = paymentMethod.GetIconSprite();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events

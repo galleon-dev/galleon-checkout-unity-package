@@ -46,7 +46,6 @@ namespace Galleon.Checkout
         public bool                  IsNewPaymentMethod = false;
 
         
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
         
         public void Select()
@@ -79,8 +78,16 @@ namespace Galleon.Checkout
         
         public PaymentMethodDefinition GetPaymentMethodDefinition()
         {
-            var myType = this.Data.type == "credit_card" ? "card" : this.Data.type;
-            return CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Data.type == myType);
+            try
+            {
+                var myType = this.Data.type == "credit_card" ? "card" : this.Data.type;
+                return CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Data.type == myType);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return null;
+            }
         }
         
         public List<Step> GetTransactionSteps()
@@ -93,6 +100,25 @@ namespace Galleon.Checkout
         public List<PaymentAction> GetTransactionPaymentActions()
         {
             return default;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Helper Methods
+        
+        public string GetPaymentMethodTypeeActual()
+        {
+            if (this is CreditCardUserUserPaymentMethod cc)
+                return cc.CreditCardType.ToLower();
+            else return this.Type.ToLower();
+        }
+        
+        public Sprite GetIconSprite()
+        {
+            return CHECKOUT.Sprites.GetIconSprite(GetPaymentMethodTypeeActual());
+        }
+        
+        public Sprite GetButtonSprite()
+        {
+            return CHECKOUT.Sprites.GetButtonSprite(GetPaymentMethodTypeeActual());
         }
     }
 }

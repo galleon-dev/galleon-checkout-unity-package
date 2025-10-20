@@ -30,7 +30,7 @@ namespace Galleon.Checkout
 
     public partial class EntityNode
     {
-        ///////////////////////////////////////////////////////////////////////// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public EntityNode(IEntity entity
                         ,[CallerMemberName] string callerName = ""
@@ -54,7 +54,7 @@ namespace Galleon.Checkout
                 child.Node.Setup();
         }
         
-        ///////////////////////////////////////////////////////////////////////// Setup
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setup
         
         public void Setup()
         {
@@ -291,7 +291,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Reflection
         
-        public        EntityReflection Reflection => new(Entity);
+        public       EntityReflection Reflection => new(Entity);
         public class EntityReflection
         {
             private IEntity Entity;
@@ -530,8 +530,7 @@ namespace Galleon.Checkout
         public       EditorExtras editorExtras = new EditorExtras();
         public class EditorExtras
         {
-            public string HeaderAttributeText;
-            
+            public string HeaderAttributeText;   
         }
         
         #endif // UNITY_EDITOR
@@ -702,6 +701,66 @@ namespace Galleon.Checkout
             public void Edit(string path, string value)
             {
                 Entity.Node.Crud.Update(path, value);
+            }
+            
+            ////////////////////////////////////////////////
+            
+            public async Task CRUD_PLUS(IEntity entity)
+            {
+                this.Entity.Node.AddChild(entity);
+                entity.Node.Crud.OnAddedToParent(parent : this.Entity);
+                entity.Node.Crud.Create();
+            }
+            public async Task STEP_PLUS(IEntity entity)
+            {
+                var Parent = this.Entity;
+                
+                Step plus = new Step(name : "plus"
+                                    ,action : async s =>
+                                    {
+                                        s.AddChildStep(name   : "add_child"
+                                                      ,action : async x =>
+                                                              {
+                                                                  Parent.Node     .AddChild       (child  : entity);
+                                                                  Parent.Node.Crud.OnAddedToParent(parent : Parent);
+                                                              });
+                                        
+                                        s.AddChildStep(name    : "create"
+                                                      ,action : async x =>
+                                                                {
+                                                                    entity.Node.Crud.Create();
+                                                                });
+                                    });
+                
+                await plus.Execute();
+            }
+            public async Task OP_PLUS(IEntity entity)
+            {
+                var Parent = this.Entity;
+                var op     = new Operation(ID:"op_id");
+                
+                op.Flow.AddChildStep(name   : "add_child"
+                                    ,action : async x =>
+                                            {
+                                                Parent.Node     .AddChild       (child  : entity);
+                                                Parent.Node.Crud.OnAddedToParent(parent : Parent);
+                                            });
+                
+                op.Flow.AddChildStep(name   : "create"
+                                    ,action : async x =>
+                                            {
+                                                entity.Node.Crud.Create();
+                                            });
+            }
+            public async Task P_OP_PLUS(IEntity entity)
+            {
+                var op = new PrintOperation(ID     : "op_id"
+                                           ,parent : this.Entity
+                                           ,text   : "op_text");;
+            }
+            public async Task LIVE_PLUS(IEntity entity)
+            {
+                
             }
         }    
         

@@ -150,6 +150,7 @@ namespace Galleon.Checkout
         public static Storage                   Storage         => CheckoutClient.Instance.Storage;
          
         public static CheckoutResources         Resources       => CheckoutClient.Instance.Resources;
+        public static CheckoutSprites           Sprites         => Resources.Sprites;
         
         public static CheckoutSession           Session         => CheckoutClient.Instance.CurrentSession;
         

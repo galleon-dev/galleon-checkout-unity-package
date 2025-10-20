@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.Assets;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -61,7 +62,6 @@ namespace Galleon.Checkout.Foundation
                                               this.OperationState.Op.CompletedStepIDs.Add(completedChildStep.Name);
                                               this.Save();
                                               Root.Instance.Context.Operations.Save();
-                                              
                                           };
             this.Flow.PostStepAction      = (completedStep) =>
                                           {
@@ -131,6 +131,60 @@ namespace Galleon.Checkout.Foundation
             
             return operation;
         }
+        
+        public async void Test()
+        {
+            /// a.crud_plus(f1)
+            ///     add_child()
+            ///     create()
+            ///
+            /// a.op_plus(f1)
+            ///     new step("plus")
+            ///         new step("add_child")
+            ///         new step("create")
+            ///
+            
+            await this.Node.Live.CRUD_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live.STEP_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live.P_OP_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live.OP_PLUS  (new Folder() {FolderName = "f1"});
+            await this.Node.Live.LIVE_PLUS(new Folder() {FolderName = "f1"});
+        }
+    }
+    
+    //
+    
+    
+    public class TreeOperation
+    {
+        public AIONode topNode;
+        
+        TextNode tree;
+        
+        public void SaveWithNode(){}
+        public void LoadWithNode(){}
+        
+        public async Task ExecuteAll()
+        {
+            foreach (var textnode in tree.Node.Descendants().OfType<TextNode>())
+            {
+                var aioNode = AIONode.Parse(textnode.FullText);
+                await aioNode.DoAction().Execute();
+            }    
+        }
+    }
+    
+    public class AIONode : Entity
+    {
+        public string Save() { return "string"; }
+        public static AIONode Parse(string text){return default;}
+        
+        public Step DoAction() 
+        =>
+            new Step(name   : $"DoAction"
+                    ,action : async (s) =>
+                    {
+                        
+                    });
     }
 }
-

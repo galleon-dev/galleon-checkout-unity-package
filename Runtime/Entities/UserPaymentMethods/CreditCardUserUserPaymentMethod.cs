@@ -27,7 +27,7 @@ namespace Galleon.Checkout
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        public string CreditCardType; 
+        public string CreditCardType => Data?.credit_card_type ?? ""; 
         
         public string CardNumber;
         public string CardMonth;
@@ -41,6 +41,7 @@ namespace Galleon.Checkout
 
         public CreditCardUserUserPaymentMethod()
         {
+            this.Data = new();
         }
         
         // public IEnumerator<Step> GetActualTransactionSteps(string[] stepNames)

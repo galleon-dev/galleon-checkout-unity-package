@@ -12,32 +12,41 @@ namespace Galleon.Checkout
 {
     public class PaymentMethodDefinition : Entity
     {
-        //// Consts
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
         public const string PAYMENT_METHOD_TYPE_CREDIT_CARD = "card";
         public const string PAYMENT_METHOD_TYPE_PAYPAL      = "paypal";
         public const string PAYMENT_METHOD_TYPE_GOOGLE_PAY  = "google_pay";
         
-        //// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public string                             Type;
+        public string Type
+        {
+            get => Data.type;
+            set => Data.type = value;       
+        }
         public Shared.PaymentMethodDefinitionData Data;
         
         public Sprite IconSprite;
         public Sprite LogoSprite;
         
-        //// Properties
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public string DisplayName => Data?.type ?? Type.ToString();
         
-        //// Transaction Steps
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
         public List<string> InitializationSteps  = new();
         public List<string> VaultingSteps        = new();
         public List<string> TransactionSteps     = new();
         public List<string> PostTransactionSteps = new();
      
-        //// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public PaymentMethodDefinition()
+        {
+            this.Data = new();
+        }
         
         public Step Initialize() 
         =>
@@ -53,11 +62,20 @@ namespace Galleon.Checkout
                         this.LogoSprite  = await DownloadImageAsync(logo_url);            
                     });
         
-        //// Helpers
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
+        
+        public Sprite GetIconSprite()
+        {
+            string type = this.Type.ToLower();
+            return CHECKOUT.Sprites.GetIconSprite(type);    
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
         
         private async Task<Sprite> DownloadImageAsync(string url)
         {
-            var sprite = await CheckoutClient.Instance.ResourceManager.LoadSprite(name_or_url: url);
+            var sprite = await CheckoutClient.Instance.Resources.Sprites.LoadSprite(name_or_url: url);
             return sprite;
         }
     }

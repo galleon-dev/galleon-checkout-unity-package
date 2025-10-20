@@ -125,39 +125,6 @@ namespace Galleon.Checkout
                                                     });
                     });
         
-        public Step TestPopulateUnifiedPaymentMethods() 
-        =>
-            new Step(name   : $"test_populate_unified_payment_methods"
-                    ,action : async (s) =>
-                    {
-                        this.PaymentMethods.Add(new PaymentMethod(new PaymentMethodData()
-                                                    {
-                                                        payment_method_type = "credit_card",
-                                                        data_type           = "definition_data",
-                                                        data                = new CreditCardPaymentMethodDefinitionData()
-                                                                            {
-                                                                                type                 = "credit_card",
-                                                                                icon_url             = "123",
-                                                                                logo_url             = "123",
-                                                                                supported_card_types = new []{ "visa", "mastercard" },
-                                                                            }
-                                                    })
-                                                );
-                        this.PaymentMethods.Add(new PaymentMethod(new PaymentMethodData()
-                                                    {
-                                                        payment_method_type = "credit_card",
-                                                        data_type           = "user_data",
-                                                        data                = new UserPaymentMethodData()
-                                                                            {
-                                                                                type             = "credit_card",
-                                                                                id               = "123",
-                                                                                credit_card_type = "master_card",
-                                                                                display_name     = "MasterCard - **** - 4587",
-                                                                            }
-                                                    })
-                                                );
-                    });
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Storage
         
         public async Task Save()

@@ -2,17 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
 using Galleon.Checkout.UI;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Serialization;
 
 namespace Galleon.Checkout
 {
@@ -249,15 +241,3 @@ namespace Galleon.Checkout
                     });
     }
 }
-
-/// CheckoutClient
-///     Init
-///     Purchase
-///         Session
-///             Open
-///             Menu
-///             Transaction
-///                 Charge
-///                 Actions
-///             Close
-
