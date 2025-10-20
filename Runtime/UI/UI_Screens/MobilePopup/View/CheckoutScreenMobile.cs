@@ -63,15 +63,17 @@ namespace Galleon.Checkout.UI
         private void OnDisable()
         {
             ShowLoaderOnce = true;
+            HeaderPanelView.EnableCheckoutHeader(false);
         }
 
         public void ShowInitialCheckoutPanelLoader()
         {
-
-            Debug.Log("ShowInitialCheckoutPanelLoader()");
+            Debug.Log("<color=green>ShowInitialCheckoutPanelLoader()</color>");
             StopAllCoroutines();
             if (ShowLoaderOnce)
             {
+                // Hide Header
+                HeaderPanelView.EnableCheckoutHeader(false);
                 CheckoutLoadingPanelView.gameObject.SetActive(true);
                 CheckoutPanel.gameObject.SetActive(false);
                 StartCoroutine(DisableInitialLoader(1f));
@@ -83,6 +85,12 @@ namespace Galleon.Checkout.UI
             yield return new WaitForSeconds(delay);
             CheckoutLoadingPanelView.gameObject.SetActive(false);
             CheckoutPanel.gameObject.SetActive(true);
+           
+            Debug.Log("<color=red>ENABLE HEADER HERE</color>");
+
+            // Show Header
+            HeaderPanelView.EnableCheckoutHeader(true);
+
             ShowLoaderOnce = false;
         }
 

@@ -30,6 +30,8 @@ namespace Galleon.Checkout.UI
         public TMP_Text ErrorText;
         public TMP_Text MainText;
 
+        public GameObject SuccessEmailContainer;
+        public GameObject SuccessTextOnlyContainer;
         //////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public override void Initialize()
@@ -68,6 +70,29 @@ namespace Galleon.Checkout.UI
             EmailInputFieldText.SetActive(Status);
             Gap.SetActive(Status);
             EmailInputFieldContainer.SetActive(Status);
+
+            if(Status)
+            {
+                if (SuccessEmailContainer)
+                {
+                    SuccessEmailContainer.SetActive(true);
+                }
+                if (SuccessTextOnlyContainer)
+                {
+                    SuccessTextOnlyContainer.SetActive(false);
+                }
+
+            } else
+            {
+                if (SuccessEmailContainer)
+                {
+                    SuccessEmailContainer.SetActive(false);
+                }
+                if (SuccessTextOnlyContainer)
+                {
+                    SuccessTextOnlyContainer.SetActive(true);
+                }
+            }
         }
         //////////////////////////////////////////////////////////////////////////// View Flow
 

@@ -6,25 +6,25 @@ using UnityEngine.Serialization;
 namespace Galleon.Checkout.UI
 {
     public class HeaderPanelView : View
-    {   
+    {
         /////////////////////////////////////////////////////// UI Events
-        
+
         public async void OnGearsButtonClick()
         {
             Debug.Log("Gears button clicked");
             CheckoutClient.Instance.CheckoutScreenMobile.On_SettingsClicked();
         }
-        
+
         public async void OnGalleonLogoClick()
         {
             CheckoutClient.Instance.CheckoutScreenMobile.On_GalleonLogoClicked();
         }
-        
+
         public async void OnXButtonClicked()
         {
             CheckoutClient.Instance.CheckoutScreenMobile.On_CloseClicked();
         }
-        
+
         public async void OnBackButtonClicked()
         {
             CheckoutClient.Instance.CheckoutScreenMobile.On_BackClicked();
@@ -32,7 +32,7 @@ namespace Galleon.Checkout.UI
 
         public async void OnAddPaymentMethodClicked()
         {
-          //  CheckoutClient.Instance.CheckoutScreenMobile.UI_PaymentMethods();
+            //  CheckoutClient.Instance.CheckoutScreenMobile.UI_PaymentMethods();
             CheckoutClient.Instance.CheckoutScreenMobile.On_BackFromCreditCardInfo();
         }
 
@@ -40,14 +40,14 @@ namespace Galleon.Checkout.UI
 
         public Step OpenCheckoutSettingsView()
         =>
-            new Step(name   : $"open_checkout_settings_view"
-                    ,action : async (s) =>
+            new Step(name: $"open_checkout_settings_view"
+                    , action: async (s) =>
                     {
-                        
+
                     });
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// State
-        
+
         public enum STATE
         {
             none,
@@ -56,10 +56,10 @@ namespace Galleon.Checkout.UI
             x_button,
             credit_card_info
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
-        
-        public GameObject CheckoutAndSettingsPanel; 
+
+        public GameObject CheckoutAndSettingsPanel;
         public GameObject BackAndTitlePanel;
         public GameObject XButtonPanel;
         public GameObject PaymentMethodPanel;
@@ -69,18 +69,22 @@ namespace Galleon.Checkout.UI
         public GameObject BackAndTitlePanelRight;
         public GameObject XButtonPanelRight;
         public GameObject PaymentMethodPanelRight;
+
+        // To avoid inconsistencies with header apperance, I've added a container that I can hide/unhide during loading panel appearance, otherwise RefreshStates are triggered multiple times during the galleon button click and screen states switches in between 
+        public GameObject HeaderContainerLeft;
+        public GameObject HeaderContainerRight;
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
         {
-            Debug.Log("HEADER - RefreshState: " + this.State);
+            Debug.Log("<color=orange>HEADER - RefreshState: " + this.State + "</color>");
             DisableAllPanels();
 
             if (this.State == STATE.checkout_and_settings.ToString())
             {
                 CheckoutAndSettingsPanel.SetActive(true);
 
-                if(CheckoutAndSettingsPanelRight)
+                if (CheckoutAndSettingsPanelRight)
                 {
                     CheckoutAndSettingsPanelRight.SetActive(true);
                 }
@@ -113,15 +117,15 @@ namespace Galleon.Checkout.UI
                 }
             }
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
-        
+
         private void DisableAllPanels()
         {
             this.CheckoutAndSettingsPanel.SetActive(false);
-            this.BackAndTitlePanel       .SetActive(false);
-            this.XButtonPanel            .SetActive(false);
-            this.PaymentMethodPanel      .SetActive(false);
+            this.BackAndTitlePanel.SetActive(false);
+            this.XButtonPanel.SetActive(false);
+            this.PaymentMethodPanel.SetActive(false);
 
             if (CheckoutAndSettingsPanelRight)
             {
@@ -143,5 +147,25 @@ namespace Galleon.Checkout.UI
                 PaymentMethodPanelRight.SetActive(false);
             }
         }
+
+        public void EnableCheckoutHeader(bool enabled)
+        {
+            if(HeaderContainerLeft) 
+                HeaderContainerLeft.SetActive(enabled);
+
+            if (HeaderContainerRight)
+                HeaderContainerRight.SetActive(enabled);
+
+            if(enabled == true)
+            {
+                this.CheckoutAndSettingsPanel.SetActive(true);
+
+                if (CheckoutAndSettingsPanelRight)
+                {
+                    CheckoutAndSettingsPanelRight.SetActive(true);
+                }
+            }
+        }
+
     }
 }

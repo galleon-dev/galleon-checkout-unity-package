@@ -104,7 +104,10 @@ namespace Galleon.Checkout.UI
             }
 
             // Add defult add card button
-            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
+            if (AddCreditCardButtonElement)
+            {
+                this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
+            }
 
             // Set Dropdown Options
             if (DropdownMenu)

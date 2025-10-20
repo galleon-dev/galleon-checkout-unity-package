@@ -260,7 +260,6 @@ GameObject:
   - component: {fileID: 2089053995956458226}
   - component: {fileID: 1223203501944479088}
   - component: {fileID: 4433176526351464619}
-  - component: {fileID: 1229653169167389758}
   - component: {fileID: 4353202362198740562}
   - component: {fileID: 1722310148078303432}
   m_Layer: 5
@@ -360,20 +359,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1229653169167389758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2173674183449034153}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 769a30ff688d0c54b8f0faf3981b25c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  checkoutPanelPaymentMethodItemView: {fileID: 4813803210644325854}
-  CheckoutPanelView: {fileID: 0}
 --- !u!114 &4353202362198740562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -940,8 +925,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 68.95001, y: -0.5}
-  m_SizeDelta: {x: -187.89996, y: -13}
+  m_AnchoredPosition: {x: 81.25001, y: -0.5}
+  m_SizeDelta: {x: -212.49998, y: -13}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7651698697013061032
 CanvasRenderer:
@@ -1946,7 +1931,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -56.4, y: 0}
+  m_AnchoredPosition: {x: -41.4, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &6552433775199319003
