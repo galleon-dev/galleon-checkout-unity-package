@@ -38,6 +38,7 @@ namespace Galleon.Checkout.UI
 
         public void Initialize(UserPaymentMethod paymentMethod, CheckoutPanelView CheckoutPanelView)
         {
+            Debug.Log("paymentMethod: " + paymentMethod.DisplayName);
             this.PaymentMethod     = paymentMethod;
             this.CheckoutPanelView = CheckoutPanelView;
             Refresh();
@@ -49,6 +50,7 @@ namespace Galleon.Checkout.UI
         {
             if (CheckoutPanelView == null)
             {
+                Debug.Log("RefreshState(): " + this.name);
                 this.Icon.sprite = AddCardSprite;
                 this.Label.text  = "Add Credit Card";
                 return;
@@ -138,6 +140,47 @@ namespace Galleon.Checkout.UI
         {
             this.PaymentMethod?.Unselect();
             Refresh();
+        }
+
+        // For Dropdown Menu
+        public void SelectDropdownPaymentMethod(UserPaymentMethod paymentMethod, CheckoutPanelView CheckoutPanelView)
+        {
+            Debug.Log("SetPaymentMethod: " + paymentMethod.Type + "  CheckoutPanelView: " + CheckoutPanelView);
+         
+            this.PaymentMethod = paymentMethod;
+            
+            this.CheckoutPanelView = CheckoutPanelView;
+
+            this.PaymentMethod?.Select();
+
+            // Refresh();
+
+            if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
+            {
+                if (this.PaymentMethod.IsSelected)
+                    CheckoutPanelView.ShowPurchaseButton();
+            }
+            else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
+            {
+                if (this.PaymentMethod.IsSelected)
+                    CheckoutPanelView.ShowPurchaseButton();
+            }
+            else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
+            {
+                if (this.PaymentMethod.IsSelected)
+                    CheckoutPanelView.ShowGooglePayButton();
+            }
+            else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
+            {
+                if (this.PaymentMethod.IsSelected)
+                    CheckoutPanelView.ShowPaypalPayButton();
+            }
+            else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
+            {
+                if (this.PaymentMethod.IsSelected)
+                    CheckoutPanelView.ShowApplePayButton();
+            }
+           
         }
     }
 }

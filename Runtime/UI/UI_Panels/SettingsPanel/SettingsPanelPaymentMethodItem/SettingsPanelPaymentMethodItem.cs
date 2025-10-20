@@ -68,9 +68,9 @@ namespace Galleon.Checkout.UI
             else if (this.UserPaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
                 this.Icon.sprite = AppleSprite;
         }
-        
+
         //// UI Events
-        
+
         public void On_Delete_Clicked()
         {
             Debug.Log((this.UserPaymentMethod?.DisplayName??"NULL") + "_delete clicked");

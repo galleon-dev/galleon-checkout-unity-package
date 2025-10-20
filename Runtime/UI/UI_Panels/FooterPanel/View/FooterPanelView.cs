@@ -46,8 +46,11 @@ namespace Galleon.Checkout.UI
         
         private void DisableAllPanels()
         {
-            this.TermsPrivacyReturnElement.SetActive(false);
-            this.LongTermsOfServiceelement.SetActive(false);
+            if (CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape == false)
+            {
+                this.TermsPrivacyReturnElement.SetActive(false);
+                this.LongTermsOfServiceelement.SetActive(false);
+            }
         }
 
         public void ShowViewPaymentMethods(bool _Status)

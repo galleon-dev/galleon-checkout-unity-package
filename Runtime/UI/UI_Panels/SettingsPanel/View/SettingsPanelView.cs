@@ -26,6 +26,7 @@ public class SettingsPanelView : View
     public ViewResult         Result = ViewResult.None;
     
     public  LayoutElement     ScrollRectLayoutElement;
+    public ScrollRect         ScrollRect;
     private int               ScrollRectMaxSize   = 6;
     private float             PaymentPrefabHeight = 175f;
     private float             SeparatorHeight     = 2f;
@@ -126,17 +127,40 @@ public class SettingsPanelView : View
 
         // Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
+        if (PaymentMethodsAmount <= 1)
+        {
+            if (ScrollRect)
+            {
+                ScrollRect.vertical = false;
+            }
+        } else
+        {
+            if (ScrollRect)
+            {
+                ScrollRect.vertical = true;
+            }
+        }
+
         if (PaymentMethodsAmount == 0)
         {
-            ScrollRectLayoutElement.preferredHeight = 0;
+            if (ScrollRectLayoutElement)
+            {
+                ScrollRectLayoutElement.preferredHeight = 0;
+            }
         }
         else if (PaymentMethodsAmount <= ScrollRectMaxSize)
         {
-            ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 2;
+            if (ScrollRectLayoutElement)
+            {
+                ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 2;
+            }
         }
         else
         {
-            ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 2;
+            if (ScrollRectLayoutElement)
+            {
+                ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 2;
+            }
         }
     }
 
@@ -167,6 +191,21 @@ public class SettingsPanelView : View
         EmailInputField.interactable = false;
         IsEditingEmail = false;
         
+        if(SuccessPanelEmailInputField)
+        {
+            SuccessPanelEmailInputField.Text = EmailInputField.Text;
+
+            if(string.IsNullOrEmpty(SuccessPanelEmailInputField.Text))
+            {
+                SuccessPanelView.ShowEmail(false);
+            } else
+            {
+                SuccessPanelView.ShowEmail(true);
+            }
+            PlayerPrefs.SetString("Email", SuccessPanelEmailInputField.Text);
+            PlayerPrefs.Save();
+        } 
+       // this.EmailLabel.text = str;
         this.EmailInputField.Text   = str;
         CHECKOUT.Session.User.Email = str;
         await CHECKOUT.Actions.SetEmail().Execute();

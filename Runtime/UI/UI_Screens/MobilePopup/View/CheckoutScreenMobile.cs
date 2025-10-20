@@ -59,9 +59,55 @@ namespace Galleon.Checkout.UI
 
         public static Step InitializeCheckoutScreenMobile()
         =>
-            new Step(name: $"initialize_checkout_screen_mobile"
-                    , action: async (s) =>
+            new Step(name   : $"initialize_checkout_screen_mobile"
+                    ,action : async (s) =>
                               {
+								  GameObject Prefab = null; // For Portrait or Landscape Mode
+                                  bool IsLandscapeMode = false;
+
+                                  if (UnityEngine.Device.Screen.orientation == ScreenOrientation.Portrait || UnityEngine.Device.Screen.orientation == ScreenOrientation.PortraitUpsideDown)
+                                  {
+                                      Debug.Log("Device is in Portrait mode");
+                                      Prefab = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
+                                  }
+                                  else if (UnityEngine.Device.Screen.orientation == ScreenOrientation.LandscapeLeft || UnityEngine.Device.Screen.orientation == ScreenOrientation.LandscapeRight)
+                                  {
+                                      Debug.Log("Device is in Landscape mode");
+                                      Prefab = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
+                                      IsLandscapeMode = true;
+                                  }
+
+
+                                  #if UNITY_EDITOR
+                                  
+                                  if (UnityEngine.Device.Screen.width > UnityEngine.Device.Screen.height)
+                                  {
+                                      Debug.Log("Device is in Landscape mode");
+                                      Prefab = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
+                                      IsLandscapeMode = true;
+                                  }
+                                  else
+                                  {
+                                      Debug.Log("Device is in Portrait mode");
+                                      Prefab = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
+                                  } 
+                                  
+								  #endif
+
+                                  Debug.Log("Orientation In Landscape? " + IsLandscapeMode + "  Prefab Selected: " + Prefab.name);
+
+                                  // Instantiate screen
+                                  var CheckoutScreenMobileGO = GameObject.Instantiate(original : Prefab
+                                                                                     ,position : new Vector3(0, 0, 9999)
+                                                                                     ,rotation : Quaternion.identity);
+
+
+                                  CheckoutScreenMobileGO.SetActive(false);
+                                  DontDestroyOnLoad(CheckoutScreenMobileGO);
+                                  
+                                  CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>();
+								  
+								  /*
                                   // Instantiate screen
                                   var CheckoutScreenMobileGO = GameObject.Instantiate(original : CheckoutClient.Instance.Resources.CheckoutPopupPrefab
                                                                                      ,position : new Vector3(0, 0, 9999)
@@ -72,6 +118,7 @@ namespace Galleon.Checkout.UI
 
                                   // Assign instance
                                   CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>();
+								  */
                               });
 
 
