@@ -20430,12 +20430,8 @@ MonoBehaviour:
   - {fileID: 1556441314933409432}
   - {fileID: 812324432629526114}
   ExtraSeparators: []
-  VisaSprite: {fileID: 21300000, guid: 4fdfdd2d9de2748bd8dc4797f96e6e49, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 2071f4506384e4c91b416dd6a1807ef1, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
-  AddCardSprite: {fileID: 21300000, guid: 93b7ecb463b5c48ea96479da9799136f, type: 3}
+  SelectedOptionColor: {r: 0.2862745, g: 0.7411765, b: 0.9529412, a: 1}
+  UnselectedOptionColor: {r: 0.8679245, g: 0.8679245, b: 0.8679245, a: 1}
 --- !u!1 &412623273898606916
 GameObject:
   m_ObjectHideFlags: 0
@@ -25548,12 +25544,8 @@ MonoBehaviour:
   - {fileID: 2192552725019292571}
   - {fileID: 50068407794473825}
   ExtraSeparators: []
-  VisaSprite: {fileID: 21300000, guid: 4fdfdd2d9de2748bd8dc4797f96e6e49, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 2071f4506384e4c91b416dd6a1807ef1, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
-  AddCardSprite: {fileID: 21300000, guid: 93b7ecb463b5c48ea96479da9799136f, type: 3}
+  SelectedOptionColor: {r: 0.2862745, g: 0.7411765, b: 0.9529412, a: 1}
+  UnselectedOptionColor: {r: 0.8679245, g: 0.8679245, b: 0.8679245, a: 1}
 --- !u!224 &1032666422798937380
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31451,7 +31443,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   State: 
   Style: 
-  IsLandscape: 0
   ParentPanel: {fileID: 1142855890183214255}
   contentTransform: {fileID: 6575324228728416706}
   HeaderPanelView: {fileID: 3388707829296265645}
@@ -51652,10 +51643,12 @@ MonoBehaviour:
   State: 
   Style: 
   Result: 0
+  EmailInputFieldText: {fileID: 0}
+  Gap: {fileID: 0}
+  EmailInputFieldContainer: {fileID: 0}
   EmailInputField: {fileID: 4353701065506354197}
   ErrorText: {fileID: 6231880457752063708}
   MainText: {fileID: 0}
-  IsCompleted: 0
 --- !u!114 &4138699839991472224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56373,7 +56366,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   State: 
   Style: 
-  EmailLabel: {fileID: 7629595513518019715}
   EmailInputfieldBorder: {fileID: 7642204836012600883}
   EmailInputField: {fileID: 7753043050513211531}
   SettingsPanelPaymentMethodItemPrefab: {fileID: 7680502671548463619, guid: da7a41d3f25e8457a8a9ab74c32a6da1, type: 3}
@@ -58641,6 +58633,11 @@ MonoBehaviour:
   GooglePayButton: {fileID: 3249413874033062433}
   PaypalPayButton: {fileID: 4511482862361912625}
   ApplePayButton: {fileID: 4533719719978595236}
+  TaxesPanels: []
+  TaxesContainer: {fileID: 0}
+  TaxPrefab: {fileID: 0}
+  SubtotalPriceText: {fileID: 0}
+  TotalPriceText: {fileID: 0}
 --- !u!1 &4853091396116679770
 GameObject:
   m_ObjectHideFlags: 0
@@ -60509,15 +60506,6 @@ MonoBehaviour:
   Style: 
   Icon: {fileID: 4329338422432163249}
   Label: {fileID: 777759728179350619}
-  AddCreditCardSprite: {fileID: 0}
-  VisaSprite: {fileID: 21300000, guid: 54af3a5b0ad25486686bf58f83e5febb, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 060266ce6dce0453e9d1bddca94041bd, type: 3}
-  AmexSprite: {fileID: 21300000, guid: 8cfabe0a540fd40efa7d818a3fd60580, type: 3}
-  DinersSprite: {fileID: 21300000, guid: 9399fe7c601404a018819aaee499a096, type: 3}
-  DiscoverSprite: {fileID: 21300000, guid: 3dc754117a52c4dedb763e81096a0f8e, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
 --- !u!1 &5108451126813375680
 GameObject:
   m_ObjectHideFlags: 0
@@ -72197,15 +72185,6 @@ MonoBehaviour:
   Style: 
   Icon: {fileID: 2440338065387856796}
   Label: {fileID: 1657918996629310070}
-  AddCreditCardSprite: {fileID: 0}
-  VisaSprite: {fileID: 21300000, guid: 54af3a5b0ad25486686bf58f83e5febb, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 060266ce6dce0453e9d1bddca94041bd, type: 3}
-  AmexSprite: {fileID: 21300000, guid: 8cfabe0a540fd40efa7d818a3fd60580, type: 3}
-  DinersSprite: {fileID: 21300000, guid: 9399fe7c601404a018819aaee499a096, type: 3}
-  DiscoverSprite: {fileID: 21300000, guid: 3dc754117a52c4dedb763e81096a0f8e, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
 --- !u!114 &6574408082099453808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72635,15 +72614,6 @@ MonoBehaviour:
   Style: 
   Icon: {fileID: 2806098731393173739}
   Label: {fileID: 1166025401146122497}
-  AddCreditCardSprite: {fileID: 0}
-  VisaSprite: {fileID: 21300000, guid: 54af3a5b0ad25486686bf58f83e5febb, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 060266ce6dce0453e9d1bddca94041bd, type: 3}
-  AmexSprite: {fileID: 21300000, guid: 8cfabe0a540fd40efa7d818a3fd60580, type: 3}
-  DinersSprite: {fileID: 21300000, guid: 9399fe7c601404a018819aaee499a096, type: 3}
-  DiscoverSprite: {fileID: 21300000, guid: 3dc754117a52c4dedb763e81096a0f8e, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
 --- !u!222 &6632407667772847759
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -73643,10 +73613,6 @@ MonoBehaviour:
   RemovePaymentMethodGameObject: {fileID: 412623273898606916}
   RemovePaymentMethodIcon: {fileID: 5721138107056321954}
   RemovePaymentMethodLabel: {fileID: 2794649497370451835}
-  VisaSprite: {fileID: 21300000, guid: 54af3a5b0ad25486686bf58f83e5febb, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 060266ce6dce0453e9d1bddca94041bd, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
   Result: 0
 --- !u!224 &6745965971597247094
 RectTransform:
@@ -74722,6 +74688,11 @@ MonoBehaviour:
   GooglePayButton: {fileID: 0}
   PaypalPayButton: {fileID: 0}
   ApplePayButton: {fileID: 0}
+  TaxesPanels: []
+  TaxesContainer: {fileID: 0}
+  TaxPrefab: {fileID: 0}
+  SubtotalPriceText: {fileID: 0}
+  TotalPriceText: {fileID: 0}
 --- !u!222 &6883483881747362296
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -78705,15 +78676,6 @@ MonoBehaviour:
   Style: 
   Icon: {fileID: 4838969607081302642}
   Label: {fileID: 2955282764748189370}
-  AddCreditCardSprite: {fileID: 21300000, guid: 93b7ecb463b5c48ea96479da9799136f, type: 3}
-  VisaSprite: {fileID: 21300000, guid: 54af3a5b0ad25486686bf58f83e5febb, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 060266ce6dce0453e9d1bddca94041bd, type: 3}
-  AmexSprite: {fileID: 21300000, guid: 8cfabe0a540fd40efa7d818a3fd60580, type: 3}
-  DinersSprite: {fileID: 21300000, guid: 9399fe7c601404a018819aaee499a096, type: 3}
-  DiscoverSprite: {fileID: 21300000, guid: 3dc754117a52c4dedb763e81096a0f8e, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
 --- !u!1 &7353562063495049533
 GameObject:
   m_ObjectHideFlags: 0
@@ -84118,15 +84080,6 @@ MonoBehaviour:
   Style: 
   Icon: {fileID: 5433402281620382581}
   Label: {fileID: 2396880003647133629}
-  AddCreditCardSprite: {fileID: 21300000, guid: 93b7ecb463b5c48ea96479da9799136f, type: 3}
-  VisaSprite: {fileID: 21300000, guid: 54af3a5b0ad25486686bf58f83e5febb, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 060266ce6dce0453e9d1bddca94041bd, type: 3}
-  AmexSprite: {fileID: 21300000, guid: 8cfabe0a540fd40efa7d818a3fd60580, type: 3}
-  DinersSprite: {fileID: 21300000, guid: 9399fe7c601404a018819aaee499a096, type: 3}
-  DiscoverSprite: {fileID: 21300000, guid: 3dc754117a52c4dedb763e81096a0f8e, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
 --- !u!224 &7947847699745587333
 RectTransform:
   m_ObjectHideFlags: 0
@@ -91263,15 +91216,6 @@ MonoBehaviour:
   Style: 
   Icon: {fileID: 6423247404029964936}
   Label: {fileID: 3677130027515741760}
-  AddCreditCardSprite: {fileID: 21300000, guid: 93b7ecb463b5c48ea96479da9799136f, type: 3}
-  VisaSprite: {fileID: 21300000, guid: 54af3a5b0ad25486686bf58f83e5febb, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 060266ce6dce0453e9d1bddca94041bd, type: 3}
-  AmexSprite: {fileID: 21300000, guid: 8cfabe0a540fd40efa7d818a3fd60580, type: 3}
-  DinersSprite: {fileID: 21300000, guid: 9399fe7c601404a018819aaee499a096, type: 3}
-  DiscoverSprite: {fileID: 21300000, guid: 3dc754117a52c4dedb763e81096a0f8e, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
 --- !u!222 &8954068867978346483
 CanvasRenderer:
   m_ObjectHideFlags: 0

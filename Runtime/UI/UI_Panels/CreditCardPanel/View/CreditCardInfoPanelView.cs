@@ -171,25 +171,21 @@ namespace Galleon.Checkout.UI
             if (IsCorrectInputFields())
             {
                 var card = new CreditCardUserUserPaymentMethod();
-
                 
-                card.Type        = CurrentCardFormat.Name;
-                card.DisplayName = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
+                card.Type                  = CurrentCardFormat.Name;
+                card.DisplayName           = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
 
-                card.CardHolderName = NameInputField.Text;
-                card.CardNumber     = CreditCardNumberField.Text;
-                card.CardCCV        = CVVInputField.Text;
-                card.CardMonth      = DateInputField.Text.Substring(0, 2);
-                card.CardYear       = DateInputField.Text.Substring(2, 2);
+                card.CardHolderName        = NameInputField.Text;
+                card.CardNumber            = CreditCardNumberField.Text;
+                card.CardCCV               = CVVInputField.Text;
+                card.CardMonth             = DateInputField.Text.Substring(0, 2);
+                card.CardYear              = DateInputField.Text.Substring(2, 2);
 
                 card.Data.type             = "credit_card";
                 card.Data.credit_card_type = card.Type;
                 
-                await card.RunVaultingSteps().Execute();
+                await CHECKOUT.PaymentMethods.AddNewUserPaymentMethod(card).Execute();
                 
-                CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod(card);
-                CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(card);
-
                 this.Result = ViewResult.Confirm;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
             }

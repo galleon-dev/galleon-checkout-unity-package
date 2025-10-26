@@ -53,26 +53,7 @@ public class SettingsPanelView : View
             }
         }
 
-        // Remove children (if any)
-        foreach (Transform child in PaymentMethodsHolder.transform)
-        {
-            Debug.Log($"-Removing Item {child.gameObject.name}");
-            Destroy(child.gameObject);
-        }
-        
-        // Add children
-        var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
-        foreach (var paymentMethod in paymentMethods)
-        {
-            var go   = Instantiate(original : SettingsPanelPaymentMethodItemPrefab, parent : PaymentMethodsHolder.transform);
-            var item = go.GetComponent<SettingsPanelPaymentMethodItem>();
-            item.Initialize(paymentMethod, this);
-            
-            // Add ui separator
-            Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsHolder.transform);
-        }
-
-        UpdateScrollRectMaxSize();
+        RefreshState();
     }
         
     //////////////////////////////////////////////////////////////////////////// View Flow
@@ -106,7 +87,7 @@ public class SettingsPanelView : View
         }
         
         // Add children
-        var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
+        var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods.Except(CHECKOUT.PaymentMethods.SpecialUserPaymentMethods);
         foreach (var paymentMethod in paymentMethods)
         {
             var go   = Instantiate(original : SettingsPanelPaymentMethodItemPrefab, parent : PaymentMethodsHolder.transform);

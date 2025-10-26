@@ -134,13 +134,13 @@ namespace Galleon.Checkout.UI
         {
             var user = CheckoutClient.Instance.CurrentSession.User;
 
-            // Deselect Payment Method
-            foreach (var paymentMethod in CHECKOUT.PaymentMethods.UserPaymentMethods)
-                paymentMethod.Unselect();
-
-            // Select First payment method by default
-            if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count > 0)
-                CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
+            // // Deselect Payment Method
+            // foreach (var paymentMethod in CHECKOUT.PaymentMethods.UserPaymentMethods)
+            //     paymentMethod.Unselect();
+            // 
+            // // Select First payment method by default
+            // if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count > 0)
+            //     CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
 
         }
 

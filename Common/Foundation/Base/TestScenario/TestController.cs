@@ -166,11 +166,13 @@ namespace Galleon.Checkout.Foundation.Tests
             var actionsPart   = mainMatch.Groups[2].Value;
             var actionMatches = System.Text.RegularExpressions.Regex.Matches(actionsPart, @"'([^']+)'");
             var actions       = new List<string>();
+            
             foreach (System.Text.RegularExpressions.Match m in actionMatches)
             {
                 if (m.Success)
                     actions.Add(m.Groups[1].Value);
             }
+            
             if (actions.Count == 0)
                 throw new FormatException("No actions found. Expected at least one action in single quotes after do.");
 

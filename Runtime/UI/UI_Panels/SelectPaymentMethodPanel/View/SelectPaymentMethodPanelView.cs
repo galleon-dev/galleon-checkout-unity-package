@@ -59,12 +59,15 @@ namespace Galleon.Checkout.UI
 
             // Add payment method definitions children
             var paymentMethodDefinitions = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions;
-            foreach (var paymentMethod in paymentMethodDefinitions)
+            foreach (var definition in paymentMethodDefinitions)
             {
+                if (definition.Type == "card")
+                    continue;
+                
                 var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
 
-                item.Initialize(paymentMethodDefinition:paymentMethod, this);
+                item.Initialize(paymentMethodDefinition:definition, this);
 
                 // Add ui separator
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
@@ -118,12 +121,14 @@ namespace Galleon.Checkout.UI
         {
             if (item.PaymentMethodDefinition != null)
             {
+                CHECKOUT.PaymentMethods.SelectPaymentMethodDefinition(item.PaymentMethodDefinition);
+                
                 this.Result = ViewResult.SelectedNew;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());   
             }
             else if (item.UserPaymentMethod != null)
             {
-                CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(item.UserPaymentMethod);
+                CHECKOUT.PaymentMethods.SelectUserPaymentMethod(item.UserPaymentMethod);
                 
                 this.Result = ViewResult.SelectedExisting;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());

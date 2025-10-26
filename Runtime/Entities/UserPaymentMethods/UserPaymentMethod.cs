@@ -12,21 +12,7 @@ namespace Galleon.Checkout
     public class UserPaymentMethod : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
-        
-        public enum PaymentMethodType
-        {
-            Native,
-            Card,
-            Visa,
-            MasterCard,
-            Amex,
-            Diners,
-            Discover,
-            GPay,
-            PayPal,
-            Apple,
-        }
-        
+                
         public class BonusData
         {
             public string displayText;
@@ -35,9 +21,12 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public UserPaymentMethodData Data;
+        public UserPaymentMethodData Data = new();
         
-        public string                Type; 
+        public string                Type;
+        
+        public string                ID => this.Data?.id ?? "";
+        
         public string                DisplayName;
         public bool                  IsSelected;
         
@@ -45,7 +34,6 @@ namespace Galleon.Checkout
         
         public bool                  IsNewPaymentMethod = false;
 
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
         
         public void Select()
@@ -101,6 +89,19 @@ namespace Galleon.Checkout
         {
             return default;
         }
+        
+        public Dictionary<string, object> GetDataForCharge()
+        {
+            Dictionary<string, object> data       = new();
+            var                        definition = this.GetPaymentMethodDefinition();
+            var                        providers  = definition.Data.providers;
+            
+            foreach (var provider in providers)
+                data.Add("provider", provider);
+            
+            return data;
+        }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Helper Methods
         

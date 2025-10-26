@@ -140,6 +140,11 @@ namespace Galleon.Checkout
 
         public void AddChild(IEntity child)
         {
+            if (child.Node.Parent != null)
+            {
+                child.Node.Parent.Node.RemoveChild(child);
+            }
+            
             this.Children.Add(child);
             child.Node.SetParent(this.Entity);
         }

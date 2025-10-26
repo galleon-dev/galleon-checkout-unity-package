@@ -34,9 +34,13 @@ namespace Galleon.Checkout.UI
 
         public override void Initialize()
         {
-            this.ErrorText.gameObject.SetActive(false);
+            this.ErrorText.gameObject.SetActive(false);     
         }
 
+        private void Update()
+        {
+            EmailInputField.Text = EmailInputField.Text;
+        }
 
         private void OnEnable()
         {
@@ -158,7 +162,6 @@ namespace Galleon.Checkout.UI
                         this.EmailInputField.Text = "levan@galleon.so";
                     });
         
-        
         public Step TEST_SendReceiptClicked() 
         =>
             new Step(name   : $"test_click_send_receipt"
@@ -168,3 +171,4 @@ namespace Galleon.Checkout.UI
                     });
     }
 }
+

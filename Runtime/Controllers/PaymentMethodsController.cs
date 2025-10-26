@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AdvancedInputFieldSamples;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
@@ -12,7 +13,7 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
-        public int MAX_LAST_USED_PAYMENT_METHODS = 3;
+        public int                                 MAX_LAST_USED_PAYMENT_METHODS = 3;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
@@ -25,13 +26,13 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        private List<UserPaymentMethod> SpecialUserPaymentMethods   => UserPaymentMethods.Where(x=>x.Type == "native").ToList();
-        private List<UserPaymentMethod> LastUseduserPaymentMethods  => UserPaymentMethods.Except(SpecialUserPaymentMethods).Take(MAX_LAST_USED_PAYMENT_METHODS).ToList();
+        public  List<UserPaymentMethod>             SpecialUserPaymentMethods   => UserPaymentMethods.Where(x=>x.Type == "native").ToList();
+        public  List<UserPaymentMethod>             LastUsedUserPaymentMethods  => GetLastUsedUserPaymentMethods();
         
-        public  List<UserPaymentMethod> UserPaymentMethodsToDisplay => LastUseduserPaymentMethods 
-                                                                       .Union(SpecialUserPaymentMethods)
-                                                                       .OrderBy(x => x.SortOrder)
-                                                                       .ToList();
+        public  List<UserPaymentMethod>            UserPaymentMethodsToDisplay => LastUsedUserPaymentMethods 
+                                                                                  .Union(SpecialUserPaymentMethods)
+                                                                                  .OrderBy(x => x.SortOrder)
+                                                                                  .ToList();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
@@ -51,101 +52,55 @@ namespace Galleon.Checkout
                         // s.AddChildStep(TestPopulateUserPaymentMethods());
 
                         s.AddChildStep(InitializeDefinitions());
-                        
                         s.AddChildStep(LoadLastUsedUserPaymentMethods());
                     });
+
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
-        public Step TestPopulatePaymentMethodDefinitions()
+        public Step AddNewUserPaymentMethod(UserPaymentMethod upm) 
         =>
-            new Step(name   : $"test_populate_payment_method_definitions"
+            new Step(name   : $"add_new_user_payment_method"
                     ,action : async (s) =>
                     {
+                        foreach (var vaultingStep in upm.GetVaultingSteps())
+                            s.AddChildStep(vaultingStep);
                         
-                       this.PaymentMethodsDefinitions.Add(new CreditCardPaymentMethodDefinition()
-                                                          {
-                                                              Type             = "credit_card",
-                                                              VaultingSteps    = { "get_tokenizer", "tokenize" },
-                                                              TransactionSteps = { "charge" },
-                                                          });
-                        
-                        this.PaymentMethodsDefinitions.Add(new GooglePayPaymentMethodDefinition()
-                                                           {
-                                                               Type                = "google_pay",
-                                                               InitializationSteps = { "check_availability" },
-                                                               TransactionSteps    =
-                                                                                   {
-                                                                                        "create_order",
-                                                                                        "open_url",
-                                                                                   },
-                                                           });
-                        
-                        this.PaymentMethodsDefinitions.Add(new PayPalPaymentMethodDefinition()
-                                                           {
-                                                               Type                = "paypal",
-                                                               InitializationSteps = { "check_availability" },
-                                                               TransactionSteps    =
-                                                                                   {
-                                                                                        "create_order",
-                                                                                        "open_url",
-                                                                                   },
-                                                           });
-                        
+                        s.AddPostStep(name : "finish_adding_user_payment_method"
+                                     ,action: async step =>
+                                              {
+                                                  CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod(upm);
+                                                  CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
+                                              });
                     });
         
-        public Step TestPopulateUserPaymentMethods()
-        =>
-            new Step(name   : $"test_populate_user_payment_method"
-                    ,action : async (s) =>
-                    {
-                        this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
-                                                    {
-                                                        Type        = UserPaymentMethod.PaymentMethodType.MasterCard.ToString(),
-                                                        DisplayName = "MasterCard - **** - 4587",
-                                                        Data        = new()
-                                                                    {
-                                                                        type             = "credit_card",
-                                                                        credit_card_type = "mastercard",
-                                                                        display_name     = "MasterCard - **** - 4587",
-                                                                        id               = "master_card",
-                                                                    }
-                                                    });
-                        
-                        this.UserPaymentMethods.Add(new GooglePayUserPaymentMethod()
-                                                    {
-                                                        Type        = UserPaymentMethod.PaymentMethodType.PayPal.ToString(),
-                                                        DisplayName = "PayPal - **** - 7348",
-                                                    });
-                        
-                        this.UserPaymentMethods.Add(new PaypalUserUserPaymentMethod()
-                                                    {
-                                                        Type        = UserPaymentMethod.PaymentMethodType.GPay.ToString(),
-                                                        DisplayName = "Google Pay - **** - 9101",
-                                                    });
-                    });
+        public void SelectPaymentMethodDefinition(PaymentMethodDefinition definition)
+        {
+            var upm = definition.CreateLocalUserPaymentMethod();
+            UserPaymentMethods.Add(upm);
+            upm.Node.Tags.Add("local");
+            upm.Data.id = $"local_pm_id_{upm.Type}";
+            CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);            
+        }
+        
+        public void SelectUserPaymentMethod(UserPaymentMethod upm)
+        {
+            CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Storage
         
         public async Task Save()
         {
-            var selectedPaymentMethodIDs = this.UserPaymentMethods.Take(3).Select(x => x.Data.id).ToList();
-            
             CHECKOUT.Storage.Write(key   : "saved_payment_methods"
-                                  ,value : selectedPaymentMethodIDs);
+                                  ,value : LastUsedUserPaymentMethodIDs);
         }
         
         public async Task Load()
         {
-           var savedPaymentMethods = CHECKOUT.Storage.Read<List<string>>(key : "saved_payment_methods");
-
-           foreach (var upm in CHECKOUT.PaymentMethods.UserPaymentMethods)
-           {
-               if (upm.Data.id != null && savedPaymentMethods.Contains(upm.Data.id))
-               {
-                   // mark as featured 3
-               }
-           }
+            this.LastUsedUserPaymentMethodIDs.Clear();
+            var saved = CHECKOUT.Storage.Read<List<string>>(key : "saved_payment_methods");
+            this.LastUsedUserPaymentMethodIDs.AddRange(saved);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last used
@@ -162,19 +117,8 @@ namespace Galleon.Checkout
                         if (this.LastUsedUserPaymentMethodIDs.Count > MAX_LAST_USED_PAYMENT_METHODS)
                             this.LastUsedUserPaymentMethodIDs.RemoveAt(0);
                         
-                        bool forceGooglePay = true;
-                        if (forceGooglePay)
-                        {
-                            var googlePayUpmID = this.UserPaymentMethods.FirstOrDefault(x => x.Type == "google_pay")?.Data.id;
-                            if (googlePayUpmID == null)
-                                return;
-                            
-                            if (!this.LastUsedUserPaymentMethodIDs.Contains(googlePayUpmID))
-                            {
-                                this.LastUsedUserPaymentMethodIDs.RemoveAt(0);
-                                this.LastUsedUserPaymentMethodIDs.Add(googlePayUpmID);
-                            }
-                        }
+                        Save();
+                        
                     });
         
         public Step LoadLastUsedUserPaymentMethods() 
@@ -182,7 +126,7 @@ namespace Galleon.Checkout
             new Step(name   : $"load_last_used_user_payment_methods"
                     ,action : async (s) =>
                     {
-                        this.Load();
+                        this.GetLastUsedUserPaymentMethods();
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Definitions
@@ -257,15 +201,131 @@ namespace Galleon.Checkout
                                                         });
                         }
                         
+                        string nativeDisplayName = "";
+                        #if UNITY_ANDROID
+                        nativeDisplayName = "Google Play";
+                        #elif UNITY_IOS
+                        nativeDisplayName = "Apple Pay";
+                        #endif
                         this.UserPaymentMethods.Add(new UserPaymentMethod()
                                                     {
                                                         Data               = null,
-                                                        DisplayName        = "Google Play",
+                                                        DisplayName        = nativeDisplayName,
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
                                                         Type               = "native"
                                                     });
                         
                     });
+        
+                
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
+        
+        public List<UserPaymentMethod> GetLastUsedUserPaymentMethods()
+        {
+            Load();
+            
+            var lastUsedUpmID = this.LastUsedUserPaymentMethodIDs.Last();
+            List<UserPaymentMethod> result = new List<UserPaymentMethod>();
+            
+            foreach (var id in  this.LastUsedUserPaymentMethodIDs)
+            {
+                var upm = this.UserPaymentMethods.Except(SpecialUserPaymentMethods).FirstOrDefault(x => x.Data.id == id);
+                if (upm != null)
+                {
+                    result.Add(UserPaymentMethods.FirstOrDefault(upm => upm.ID == lastUsedUpmID));
+                }
+                else if (id.StartsWith("local_pm_id"))
+                {
+                    var definition = this.PaymentMethodsDefinitions.FirstOrDefault(x => x.LocalID == id);
+                    if (definition is null) continue;
+                    upm = definition.CreateLocalUserPaymentMethod();
+                    
+                    this.UserPaymentMethods.Add(upm);
+                    if (upm.ID == lastUsedUpmID)
+                        upm.Select();
+                    
+                    result.Add(upm);
+                }
+            }
+            
+            if (result.Count < MAX_LAST_USED_PAYMENT_METHODS)
+            {
+                int diff = MAX_LAST_USED_PAYMENT_METHODS - result.Count;
+                result.AddRange(UserPaymentMethods.Except(result).Take(diff));
+            }
+            
+            return result.Take(MAX_LAST_USED_PAYMENT_METHODS).ToList();
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Mock for testing
+        
+        public Step TestPopulatePaymentMethodDefinitions()
+        =>
+            new Step(name   : $"test_populate_payment_method_definitions"
+                    ,action : async (s) =>
+                    {   
+                       this.PaymentMethodsDefinitions.Add(new CreditCardPaymentMethodDefinition()
+                                                          {
+                                                              Type             = "credit_card",
+                                                              VaultingSteps    = { "get_tokenizer", "tokenize" },
+                                                              TransactionSteps = { "charge" },
+                                                          });
+                        
+                        this.PaymentMethodsDefinitions.Add(new GooglePayPaymentMethodDefinition()
+                                                           {
+                                                               Type                = "google_pay",
+                                                               InitializationSteps = { "check_availability" },
+                                                               TransactionSteps    =
+                                                                                   {
+                                                                                        "create_order",
+                                                                                        "open_url",
+                                                                                   },
+                                                           });
+                        
+                        this.PaymentMethodsDefinitions.Add(new PayPalPaymentMethodDefinition()
+                                                           {
+                                                               Type                = "paypal",
+                                                               InitializationSteps = { "check_availability" },
+                                                               TransactionSteps    =
+                                                                                   {
+                                                                                        "create_order",
+                                                                                        "open_url",
+                                                                                   },
+                                                           });
+                        
+                    });
+        
+        public Step TestPopulateUserPaymentMethods()
+        =>
+            new Step(name   : $"test_populate_user_payment_method"
+                    ,action : async (s) =>
+                    {
+                        this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
+                                                    {
+                                                        Type        = "credit_card",
+                                                        DisplayName = "MasterCard - **** - 4587",
+                                                        Data        = new()
+                                                                    {
+                                                                        type             = "credit_card",
+                                                                        credit_card_type = "mastercard",
+                                                                        display_name     = "MasterCard - **** - 4587",
+                                                                        id               = "master_card",
+                                                                    }
+                                                    });
+                        
+                        this.UserPaymentMethods.Add(new GooglePayUserPaymentMethod()
+                                                    {
+                                                        Type        = "paypal",
+                                                        DisplayName = "PayPal - **** - 7348",
+                                                    });
+                        
+                        this.UserPaymentMethods.Add(new PaypalUserUserPaymentMethod()
+                                                    {
+                                                        Type        = "google_pay",
+                                                        DisplayName = "Google Pay - **** - 9101",
+                                                    });
+                    });
+        
     }
 }

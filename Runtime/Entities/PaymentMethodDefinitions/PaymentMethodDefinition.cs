@@ -34,6 +34,8 @@ namespace Galleon.Checkout
         
         public string DisplayName => Data?.type ?? Type.ToString();
         
+        public string LocalID => $"local_pm_id_{this.Type}";
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
         public List<string> InitializationSteps  = new();
@@ -62,6 +64,26 @@ namespace Galleon.Checkout
                         this.LogoSprite  = await DownloadImageAsync(logo_url);            
                     });
         
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Payment Method Methods
+        
+        public virtual UserPaymentMethod CreateLocalUserPaymentMethod()
+        {
+            UserPaymentMethod userPaymentMethod = new()
+                                                {
+                                                    Data               = new UserPaymentMethodData()
+                                                                       {
+                                                                           type = this.Type,
+                                                                           id   = this.LocalID,
+                                                                       },
+                                                    DisplayName        = this.DisplayName,
+                                                    IsNewPaymentMethod = true,
+                                                    IsSelected         = false,
+                                                    Type               = this.Type,
+                                                };
+            
+            return userPaymentMethod;
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
         

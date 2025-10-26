@@ -25,6 +25,10 @@ namespace Galleon.Checkout
         public Sprite GPlayIconSprite;
         public Sprite PaypalIconSprite;
         public Sprite AppleIconSprite;
+        public Sprite KlarnaIconSprite;
+        public Sprite WebCheckoutIconSprite;
+        public Sprite CashAppIconSprite;
+        public Sprite AmazonPayIconSprite;
         // Buttons
         public Sprite CheckoutButtonSprite;
         public Sprite GpaybuttonSprite;
@@ -46,16 +50,20 @@ namespace Galleon.Checkout
             {
                 switch (paymentMethodActualType)
                 {
-                    case "card" :       return AddCreditCardIconSprite;   
-                    case "visa":        return VisaIconSprite;
-                    case "mastercard":  return MasterCardIconSprite;
-                    case "amex":        return AmexIconSprite;
-                    case "diners":      return DinersIconSprite;
-                    case "discover":    return DiscoverIconSprite;
-                    case "google_pay":  return GPayIconSprite;
-                    case "google_play": return GPlayIconSprite;
-                    case "paypal":      return PaypalIconSprite;
-                    case "apple":       return AppleIconSprite;
+                    case "card" :        return AddCreditCardIconSprite;   
+                    case "visa":         return VisaIconSprite;
+                    case "mastercard":   return MasterCardIconSprite;
+                    case "amex":         return AmexIconSprite;
+                    case "diners":       return DinersIconSprite;
+                    case "discover":     return DiscoverIconSprite;
+                    case "google_pay":   return GPayIconSprite;
+                    case "google_play":  return GPlayIconSprite;
+                    case "paypal":       return PaypalIconSprite;
+                    case "apple":        return AppleIconSprite;
+                    case "klarna":       return KlarnaIconSprite;
+                    case "web_checkout": return WebCheckoutIconSprite;
+                    case "cashapp":      return CashAppIconSprite;
+                    case "amazon_pay":   return AmazonPayIconSprite;
                     case "native":
                         #if UNITY_ANDROID
                             return GPlayIconSprite;

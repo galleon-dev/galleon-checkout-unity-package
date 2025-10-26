@@ -56,9 +56,12 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////////// Steps
                         
-                        // View CheckoutPage
+                        // Get Tax Info
+                        
                       //s.AddChildStep(CheckoutClient.Instance.TaxController.GetTaxInfo());
                       //s.AddChildStep("wait",        async x => await Task.Delay(1000));
+                        
+                        // View CheckoutPage
                         s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                         
@@ -159,6 +162,8 @@ namespace Galleon.Checkout
                         
                         // Show Loading Screen
                         s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.LoadingPage));
+                        
+                        // Start Transaction
                         s.AddPreStep(StartTransaction());
                         
                         ////////////////////////////////////////////////////////////// Transaction Steps
@@ -174,8 +179,6 @@ namespace Galleon.Checkout
                         ////////////////////////////////////////////////////////////// Final Navigation Step
                         
                         // Navigate
-                        //s.AddChildStep("wait",        async x => await Task.Delay(1000));
-                      //s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.SuccessPage));
                         s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.NavigationNext = "Success");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                        
@@ -209,15 +212,6 @@ namespace Galleon.Checkout
             new Step(name   : $"start_transaction"
                     ,action : async (s) =>
                     {
-                        var card        = User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
-                      //card.CardNumber = "4242424242424242";
-                      //card.CardMonth  = "12";
-                      //card.CardYear   = "2026";
-                      //card.CardCCV    = "123";
-                      //await card.GetTokenizer().Execute();
-                      //await card.Tokenize()    .Execute();
-                        
-                        var cardToken = card.TokenID;
                     });
         
         public Step HandleTransactionResult()

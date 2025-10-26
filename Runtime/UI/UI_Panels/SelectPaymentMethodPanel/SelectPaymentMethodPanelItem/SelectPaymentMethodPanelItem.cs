@@ -81,7 +81,9 @@ namespace Galleon.Checkout.UI
         {
             if (this.PaymentMethodDefinition == null
             &&  this.UserPaymentMethod       == null)
+            {
                 this.SelectPaymentMethodPanelView.On_NewCardClicked();
+            }
             else
             {
                 this.SelectPaymentMethodPanelView.On_Select(this);
