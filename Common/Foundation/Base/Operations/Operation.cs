@@ -154,7 +154,10 @@ namespace Galleon.Checkout.Foundation
     }
     
     //
-    
+    //
+    //
+    //
+    //
     
     public class LiveOperation
     {
@@ -368,4 +371,3 @@ namespace Galleon.Checkout.Foundation
         }
     }
 }
-

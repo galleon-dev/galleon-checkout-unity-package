@@ -24,7 +24,6 @@ namespace Galleon.Checkout
         public Config                       Config                      = new();
         public Analytics                    Analytics                   = new();
         public Storage                      Storage                     = new();
-        public DeepLinkController           DeepLinks                   = new();
         public ExternalURLsController       URLs                        = new();
         
         // APIs

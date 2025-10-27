@@ -28,7 +28,7 @@ namespace Galleon.Checkout.UI
             OtherPaymentMethods,
         }
 
-        //////////////////////////////////////////////////////////////////////////// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
         public PositionLayoutGroup PositionLayoutGroup;
 
@@ -218,8 +218,8 @@ namespace Galleon.Checkout.UI
             }
             
             //ShowPurchaseButton();
-            //var image = PurchaseButton.gameObject.GetComponent<Image>();
-            //image.sprite = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.First().LogoSprite;
+            var image = PurchaseButton.gameObject.GetComponent<Image>();
+            image.sprite = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.First().LogoSprite;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events

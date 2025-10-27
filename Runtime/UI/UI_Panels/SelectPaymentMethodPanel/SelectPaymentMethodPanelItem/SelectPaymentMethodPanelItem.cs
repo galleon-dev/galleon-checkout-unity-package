@@ -42,7 +42,6 @@ namespace Galleon.Checkout.UI
             Refresh();
         }
         
-        
         //// Refresh
         
         public override async void RefreshState()
@@ -70,7 +69,7 @@ namespace Galleon.Checkout.UI
             //////////////////////////////////////////////// UserPaymentMethods
             else if (this.UserPaymentMethod != null)
             {
-                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                this.Label.text  = "**** - " + this.UserPaymentMethod.DisplayName;
                 this.Icon.sprite = this.UserPaymentMethod.GetIconSprite();
             }
         }
@@ -91,6 +90,3 @@ namespace Galleon.Checkout.UI
         }
     }
 }
-
-
-

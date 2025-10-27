@@ -13,6 +13,7 @@ using StepAction=System.Func<Galleon.Checkout.Step,System.Threading.Tasks.Task>;
 
 namespace Galleon.Checkout
 {
+    [DebuggerDisplay("{DebugDisplay}")]
     public class Step : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
@@ -46,6 +47,9 @@ namespace Galleon.Checkout
         public static event Action<Step>     OnPreStepExecute;
         public static event Func<Step, Task> OnStepExecuted;
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug Display
+        
+        public string DebugDisplay => $"Step | {Name}";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
         
@@ -266,7 +270,12 @@ namespace Galleon.Checkout
             Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
             AddChildStep(tempStep);
         }
-        
+        public void InsertChildStep(int index, Step step)
+        {
+            this.ChildSteps.Insert(index, step);
+            step.ParentStep = this;
+            this.Node.AddLinkedChild(step);
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Pre Steps
         
@@ -297,6 +306,48 @@ namespace Galleon.Checkout
             AddChildStep(tempStep);
         }
         
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flow Methods
+        
+        public int GetStepIndexInParentFlow()
+        {
+            return ParentStep.ChildSteps.IndexOf(this);
+        }
+        
+        public void AddNextStepInParentFlow(Step step)
+        {
+            if (ParentStep == null)
+                return;
+
+            var currentIndex = GetStepIndexInParentFlow();
+            ParentStep.InsertChildStep(currentIndex+1, step);
+        }
+        
+        public void AddNextStepsInParentFlow(params Step[] steps)
+        {
+            for (int i = steps.Count() - 1; i >= 0; i--)
+            {
+                AddNextStepInParentFlow(steps.ElementAt(i));
+            }
+        }
+        
+        public List<Step> GetStepsAfterThisInParentFlow()
+        {
+            if (ParentStep == null)
+                return new List<Step>();
+            
+            var currentIndex = GetStepIndexInParentFlow();
+            return ParentStep.ChildSteps.Skip(currentIndex+1).ToList();
+        }
+        
+        public void RemoveStepsAfterThisInParentFlow()
+        {
+            if (ParentStep == null)
+                return;
+            
+            var currentIndex = GetStepIndexInParentFlow();
+            ParentStep.ChildSteps.RemoveRange(currentIndex+1, ParentStep.ChildSteps.Count - currentIndex - 1);
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Log Methods
         

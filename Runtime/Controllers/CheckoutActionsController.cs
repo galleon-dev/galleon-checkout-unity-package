@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
+using Galleon.Checkout.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -167,7 +168,7 @@ namespace Galleon.Checkout
                                                                                                                              id   = selectedUserPaymentMethod.Data.id,
                                                                                                                              data = selectedUserPaymentMethod.GetDataForCharge(),
                                                                                                                         },
-                                                                                                save_payment_method     = selectedUserPaymentMethod.IsNewPaymentMethod,
+                                                                                                save_payment_method     = selectedUserPaymentMethod.ShouldSavePaymentMethod,
                                                                                             });
                         
                         CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
@@ -177,6 +178,20 @@ namespace Galleon.Checkout
                                                                                     is_success  = true,
                                                                                     charge_id   = "12345",
                                                                                 };
+                        
+                        //////////////////////////////////////////////////////
+                        bool hasErrors = false;
+                        if (hasErrors)
+                        {
+                            s.RemoveStepsAfterThisInParentFlow();
+                            
+                            s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
+                                                      ,CheckoutClient.Instance.CheckoutScreenMobile.Navigate()
+                                                      );
+                            
+                            return;
+                        }
+                        //////////////////////////////////////////////////////
                         
                         if (response.next_actions != null)
                         {
@@ -194,7 +209,9 @@ namespace Galleon.Checkout
                                 {
                                     var    url          = paymentAction.parameters["url"           ].ToString();
                                   //var    deepLinkPath = paymentAction.parameters["deep_link_path"].ToString();
-                                    string deepLinkPath = "test.app";
+                                    string deepLinkPath = "https://test.app";
+                                    
+                                    // url = "https://levan-galleon.github.io/galleon_web_demo/";
                                     
                                     flow.AddChildStep(OpenURL(url,deepLinkPath));
                                     flow.AddChildStep(CheckStatus());

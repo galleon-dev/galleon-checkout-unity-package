@@ -32,7 +32,8 @@ namespace Galleon.Checkout
         
         public float                 SortOrder = 1f;
         
-        public bool                  IsNewPaymentMethod = false;
+        public bool                  IsNewPaymentMethod      = false;
+        public bool                  ShouldSavePaymentMethod = false;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
         

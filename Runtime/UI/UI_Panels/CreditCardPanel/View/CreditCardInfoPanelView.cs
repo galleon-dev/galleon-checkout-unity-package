@@ -170,22 +170,28 @@ namespace Galleon.Checkout.UI
         {
             if (IsCorrectInputFields())
             {
-                var card = new CreditCardUserUserPaymentMethod();
+                // Create payment method object
+                var card                   = new CreditCardUserUserPaymentMethod();
+                card.Data.type             = "credit_card";
+                card.Data.credit_card_type = card.Type;
                 
+                // Set card Data
                 card.Type                  = CurrentCardFormat.Name;
                 card.DisplayName           = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
-
                 card.CardHolderName        = NameInputField.Text;
                 card.CardNumber            = CreditCardNumberField.Text;
                 card.CardCCV               = CVVInputField.Text;
                 card.CardMonth             = DateInputField.Text.Substring(0, 2);
                 card.CardYear              = DateInputField.Text.Substring(2, 2);
 
-                card.Data.type             = "credit_card";
-                card.Data.credit_card_type = card.Type;
+                // Set additional data
+                card.IsNewPaymentMethod      = true;
+                card.ShouldSavePaymentMethod = cbx_SaveCardDetails.IsChecked;
                 
+                // Add payment method
                 await CHECKOUT.PaymentMethods.AddNewUserPaymentMethod(card).Execute();
                 
+                // Finish viewing this screen
                 this.Result = ViewResult.Confirm;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
             }

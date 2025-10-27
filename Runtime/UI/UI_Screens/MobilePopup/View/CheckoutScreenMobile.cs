@@ -181,6 +181,7 @@ namespace Galleon.Checkout.UI
         {
             Back,
             Close,
+            Error,
             Settings,
             Confirm,
         }
@@ -275,6 +276,7 @@ namespace Galleon.Checkout.UI
 
                         page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
                         page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
+                        page.NavigationMap[NavigationStates.Error   .ToString()] = ViewPage(ErrorPage);
                         page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
 
                         ///////////////////////// Handle Result
@@ -335,6 +337,7 @@ namespace Galleon.Checkout.UI
 
                         page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
                         page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
+                        page.NavigationMap[NavigationStates.Error   .ToString()] = ViewPage(ErrorPage);
                         page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
 
                         ///////////////////////// Handle Navigation Next
@@ -403,7 +406,6 @@ namespace Galleon.Checkout.UI
         {
             GalleonLogoClicked?.Invoke();
         }
-
 
         public void OnPageFinishedWithResult(string result)
         {

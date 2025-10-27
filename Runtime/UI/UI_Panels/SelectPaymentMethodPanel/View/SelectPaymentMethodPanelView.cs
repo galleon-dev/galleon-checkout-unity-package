@@ -40,6 +40,8 @@ namespace Galleon.Checkout.UI
 
         public override void RefreshState()
         {
+            /////////////////////
+            
             // Remove children (if any)
             foreach (Transform child in SelectPaymentMethodItemsHolder.transform)
             {
@@ -47,6 +49,8 @@ namespace Galleon.Checkout.UI
                 Destroy(child.gameObject);
             }
 
+            /////////////////////
+            
             // Add first child (with null payment method = "Add new credit card")
             {
                 var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
@@ -56,11 +60,14 @@ namespace Galleon.Checkout.UI
                 // Add ui separator
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
             }
+            
+            /////////////////////
 
             // Add payment method definitions children
             var paymentMethodDefinitions = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions;
             foreach (var definition in paymentMethodDefinitions)
             {
+                // Skip credit card - we already have it as the first item
                 if (definition.Type == "card")
                     continue;
                 
@@ -73,18 +80,22 @@ namespace Galleon.Checkout.UI
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
             }
             
+            /////////////////////
+            
             // Add user payment methods children
-            // var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
-            // foreach (var userPaymentMethod in userPaymentMethods)
-            // {
-            //     var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
-            //     var item = go.GetComponent<SelectPaymentMethodPanelItem>();
-            // 
-            //     item.Initialize(userPaymentMethod:userPaymentMethod, this);
-            // 
-            //     // Add ui separator
-            //     Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
-            // }
+            var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
+            foreach (var userPaymentMethod in userPaymentMethods)
+            {
+                var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
+                var item = go.GetComponent<SelectPaymentMethodPanelItem>();
+            
+                item.Initialize(userPaymentMethod:userPaymentMethod, this);
+            
+                // Add ui separator
+                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
+            }
+            
+            /////////////////////
             
             UpdateScrollRectMaxSize();
         }
@@ -136,7 +147,6 @@ namespace Galleon.Checkout.UI
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
-        
         
         public void UpdateScrollRectMaxSize()
         {

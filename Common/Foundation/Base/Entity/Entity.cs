@@ -32,10 +32,10 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public EntityNode(IEntity entity
-                        ,[CallerMemberName] string callerName = ""
-                        ,[CallerLineNumber] int    callerLine = 0
-                        ,[CallerFilePath  ] string callerPath = "")
+        public EntityNode(                  IEntity entity
+                        ,[CallerMemberName] string  callerName = ""
+                        ,[CallerLineNumber] int     callerLine = 0
+                        ,[CallerFilePath  ] string  callerPath = "")
         {
             if (entity == null)
                 throw new Exception("entity is null in EntityNode constructor");
@@ -72,10 +72,28 @@ namespace Galleon.Checkout
 
         [SerializeReference] [HideInInspector] public IEntity Entity;
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Info
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - ID
 
-        public EntityID ID   = new EntityID();
-        public Tags     Tags = new Tags();
+        public EntityID ID => new EntityID(this.Entity);
+        
+        public struct EntityID
+        {
+            private IEntity Entity; 
+            public  EntityID(IEntity entity) { this.Entity = entity; }
+            
+            public string SelfPathID  => this.Entity.Node.DisplayName;
+            public string PathID      => string.Join(".", Entity.Node.Ancestors()
+                                                          .Reverse()
+                                                          .ToList()
+                                                          .Select(p => p.Node.ID.SelfPathID)
+                                                          );
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Tags
+        
+        public Tags Tags = new Tags();
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Info
         
         public string DisplayName;
         
@@ -257,13 +275,8 @@ namespace Galleon.Checkout
             }
         }
 
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Storage
         
-        public string _SelfPathID = null;
-        public string SelfPathID  => _SelfPathID ?? this.Entity.GetType().Name;
-        public string PathID      => string.Join(".", Ancestors().Skip(1).Reverse().ToList().Select(p => p.Node.SelfPathID).Concat(new[] { SelfPathID }));
-            
         public        EntityStorage Storage => new(Entity);
         public struct EntityStorage
         {

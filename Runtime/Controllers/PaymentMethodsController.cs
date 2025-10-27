@@ -80,6 +80,10 @@ namespace Galleon.Checkout
             UserPaymentMethods.Add(upm);
             upm.Node.Tags.Add("local");
             upm.Data.id = $"local_pm_id_{upm.Type}";
+            
+            upm.IsNewPaymentMethod      = true;
+            upm.ShouldSavePaymentMethod = true;
+            
             CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);            
         }
         
@@ -329,3 +333,4 @@ namespace Galleon.Checkout
         
     }
 }
+
