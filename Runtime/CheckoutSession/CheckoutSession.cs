@@ -124,6 +124,7 @@ namespace Galleon.Checkout
                                                                                                         expires_at = DateTime.UtcNow.AddDays(1),
                                                                                                         metadata   = new Dictionary<string, string>() { }
                                                                                                      });
+                        this.SessionID = response.session_id; 
                         
                     });
         
