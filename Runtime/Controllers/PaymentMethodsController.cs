@@ -17,8 +17,6 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public Collection<PaymentMethod>           PaymentMethods               = new ();
-        
         public Collection<PaymentMethodDefinition> PaymentMethodsDefinitions    = new ();
         public Collection<UserPaymentMethod>       UserPaymentMethods           = new ();
         

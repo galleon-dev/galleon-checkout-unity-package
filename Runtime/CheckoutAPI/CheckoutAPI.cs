@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace Galleon.Checkout
         
         public static async Task<InitializationResult> Initialize(CheckoutConfiguration configuration)
         {
-            CheckoutClient.Instance.Network.GalleonUserAccessToken = jwt;
+            CheckoutClient.Instance.Network.GalleonUserAccessToken = configuration.JWT;
             
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             
@@ -32,24 +33,28 @@ namespace Galleon.Checkout
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types
     
+    [Serializable]
     public class CheckoutConfiguration
     {
         public string JWT;
         public string Country;
     }
     
+    [Serializable]
     public class InitializationResult
     {
-        public bool IsSuccess { get; set; }
+        public bool IsSuccess;
     }
     
+    [Serializable]
     public class PurchaseResult
     {
-        public bool         IsSuccess              { get; set; }
-        public bool         IsCanceled             { get; set; }
-        public bool         IsError                { get; set; }
-        public List<string> Errors                 { get; set; }
-        public bool         DidUserSelectNativeIAP { get; set; }
+        public string       OrderID;
+        public bool         IsSuccess;
+        public bool         IsCanceled;
+        public bool         IsError;
+        public List<string> Errors;
+        public bool         DidUserSelectNativeIAP;
 
         public override string ToString()
         {

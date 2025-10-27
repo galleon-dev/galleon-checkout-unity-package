@@ -285,23 +285,6 @@ namespace Galleon.Checkout
                 
             }
             
-            
-            // Log outgoing
-            var endpointName = request.url.Replace(SERVER_BASE_URL, "");
-            if (jsonBody != default)
-            {
-                try
-                {
-                    string formattedBody = JToken.Parse(jsonBody).ToString(Formatting.Indented);
-                    Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}) {endpointName} \n{formattedBody.Color(Color.white)}");
-                }
-                catch (Exception e)
-                {
-                    Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}) {endpointName}");
-                }
-                
-            }
-            
             /// Send Request
             var op = request.SendWebRequest();
             
