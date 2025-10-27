@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 using Galleon.Checkout.NETWORK;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using UnityEngine;
 using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
 namespace Galleon.Checkout
 {
@@ -66,34 +70,19 @@ namespace Galleon.Checkout
         =>
             new Step(name   : "get_user_access_token"
                     ,action : async s =>
-                    {
-                        //return;
+                    {   
+                        return;
                         
-                        string appID  = "test.app-1";
-                        string id     = "test.app-1";
-                        string device = "local_unity_test_client";
-                        
-                        s.Log($"Getting Galleon User Access Token.");
-                        s.Log($"AppID  = {appID}");
-                        s.Log($"ID     = {id}");
-                        s.Log($"Device = {device}");
-                        
-                      //var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
                                                              {
-                                                                 { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
+                                                               { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
+                                                               //  { "Authorization", $"Bearer {GalleonUserAccessToken}" }
                                                              }
                                                     ,body    : new
                                                              {
-                                                                 app_user_id = "test",
-                                                                 AppId       = appID,
-                                                                 Id          = id,
-                                                                 Device      = device,
+                                                                 app_user_id = "test_vadimski"
                                                              });
-                        
-                      //await Post(url  : $"{SERVER_BASE_URL}/development/seed");                      
-                        
                         
                         /// Response Example :
                         /// {
@@ -189,7 +178,20 @@ namespace Galleon.Checkout
             try
             {
                 var responseJson = await Post(url, headers, jsonBody, body, encodingType, formFields);
-                var result       = JsonConvert.DeserializeObject<T>(responseJson.ToString());
+                Debug.Log($"<<<< {responseJson}");
+                
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.Error                  = (sender, args) =>
+                                                {
+                                                    Debug.Log(($"<<<< Error : {args.ErrorContext.Error.Message} \n {args.ErrorContext.Path} \n sender is {sender?.ToString() ?? "NULL"}"));
+                                                    args.ErrorContext.Handled = false;
+                                                };
+                settings.TraceWriter            = new MemoryTraceWriter() { LevelFilter = TraceLevel.Verbose };
+                                              
+                var    result = JsonConvert.DeserializeObject<T>(responseJson.ToString(), settings);
+                
+                Debug.Log(settings.TraceWriter.ToString());
+                
                 return result;
             }
             catch (Exception e)
@@ -210,17 +212,37 @@ namespace Galleon.Checkout
             
             if (encodingType == RequestEncodingType.JSON)
             {
+                Debug.Log($"- Post request with JSON body");
+                
                 // Set Body
                 if (body != default)
+                {
+                    {
+                        var type = body.GetType();
+                        Debug.Log($"body.type = {type.Name}");
+                        foreach(var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                            try { Debug.Log($"- body.{field.Name} = {field.GetValue(body)}"); } catch (Exception e) { Debug.Log($"- error serializing {field.Name}"); }
+                        foreach(var prop in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                            try { Debug.Log($"- body.{prop.Name} = {prop.GetValue(body)}"); } catch (Exception e) { Debug.Log($"- error serializing {prop.Name}"); }
+                            
+                    }
+                    
                     jsonBody = JsonConvert.SerializeObject(body);
+                    Debug.Log($"- jsonBody : {jsonBody}");
+                }
+                else
+                {
+                    Debug.Log($"body is NULL");
+                }
                 
-                #if UNITY_6000_0_OR_NEWER
-                request = UnityWebRequest.Post(uri         : url
-                                              ,postData    : jsonBody
-                                              ,contentType : "application/json");
-                #else
-              //request = UnityWebRequest.Post(uri        : url
-              //                              ,postData    : jsonBody);
+                // #if UNITY_6000_0_OR_NEWER
+                // Debug.Log($"- creating post request UNITY 6");
+                // 
+                // request = UnityWebRequest.Post(uri         : url
+                //                               ,postData    : jsonBody
+                //                               ,contentType : "application/json");
+                // #else
+                Debug.Log($"- creating post request");
                 
                 request                 = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
                 byte[] jsonToSend       = Encoding.UTF8.GetBytes(jsonBody);
@@ -228,10 +250,12 @@ namespace Galleon.Checkout
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
 
-                #endif
+                // #endif
             }
             else if (encodingType == RequestEncodingType.FormUrlEncoded)
             {
+                Debug.Log($"- Post request URL encoded");
+                
                 WWWForm form = new WWWForm();
                 foreach (var field in formFields)
                     form.AddField(field.Key, field.Value);
@@ -244,6 +268,22 @@ namespace Galleon.Checkout
             if (headers != null)
                 foreach (var header in headers)
                     request.SetRequestHeader(header.Key, header.Value.ToString());
+                        
+            // Log outgoing
+            var endpointName = request.url.Replace(SERVER_BASE_URL, "");
+            if (jsonBody != default)
+            {
+                try
+                {
+                    string formattedBody = JToken.Parse(jsonBody).ToString(Formatting.Indented);
+                    Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}) {endpointName} \n{formattedBody.Color(Color.white)}");
+                }
+                catch (Exception e)
+                {
+                    Debug.Log($">>>".Color(Color.yellow)+$" ({request.method}) {endpointName}");
+                }
+                
+            }
             
             
             // Log outgoing
@@ -290,7 +330,7 @@ namespace Galleon.Checkout
             if (!request.error.IsNullOrEmpty())
                 Debug.LogError(request.error);
             if (request.result != UnityWebRequest.Result.Success)
-                throw new Exception($"ERROR FOR NETWORK REQUEST : {url}");
+                throw new Exception($"ERROR FOR NETWORK REQUEST : {url}\n{request.error}");
             
             request.Dispose();
             

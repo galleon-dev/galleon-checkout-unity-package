@@ -396,7 +396,7 @@ namespace Galleon.Checkout.UI
 
         public void OnCVVValueChanged(string digits)
         {
-            Debug.Log("<color=green>OnCVVValueChanged. rawInput: " + digits + "</color>");
+            // Debug.Log("<color=green>OnCVVValueChanged. rawInput: " + digits + "</color>");
 
             bool isAmex = CreditCardNumberField.Text.Replace(" ", "").StartsWith("34") ||
             CreditCardNumberField.Text.Replace(" ", "").StartsWith("37");
@@ -454,12 +454,12 @@ namespace Galleon.Checkout.UI
         int MaxLength;
         void FormatCreditCardInput(string rawInput)
         {
-            Debug.Log("FormatCreditCardInput: " + rawInput);
+            // Debug.Log("FormatCreditCardInput: " + rawInput);
             MaxLength = GetFormatForDigits(rawInput).MaxLength;
             if (rawInput.Length > MaxLength)
             {
                 rawInput = rawInput.Remove(rawInput.Length - 1);
-                Debug.Log("Updated RawInput: " + rawInput);
+                // Debug.Log("Updated RawInput: " + rawInput);
             }
 
             CheckLuhnOnEndEdit(rawInput);

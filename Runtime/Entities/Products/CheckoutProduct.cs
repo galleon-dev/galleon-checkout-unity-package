@@ -6,5 +6,9 @@ namespace Galleon.Checkout
     {
         public string DisplayName = "my product";
         public string PriceText   = "$24.90";
+        
+        public string  Sku;
+        public decimal Amount;
+        public string  Currency;
     }
 }

@@ -19,6 +19,8 @@ namespace Galleon.Checkout
         public CheckoutProduct                    SelectedProduct;
         public PurchaseResult                     PurchaseResult        = default;
         
+        public Dictionary<string, string>         Metadata              = new();
+        
         // Simple Dialog Panel data
         public string                             LastDialogRequest         = null;
         public SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
@@ -89,6 +91,7 @@ namespace Galleon.Checkout
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                   {
+                                                      OrderID    = CHECKOUT.Session?.SessionID ?? "NULL",
                                                       IsSuccess  = false,
                                                       IsCanceled = true,
                                                       IsError    = false,
@@ -104,6 +107,7 @@ namespace Galleon.Checkout
             new Step(name   : $"start_session"
                     ,action : async (s) =>
                     {   
+
                         var response = await CHECKOUT.Network.Post<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/create"
                                                                                            ,headers  : new ()
                                                                                                      {
@@ -121,8 +125,6 @@ namespace Galleon.Checkout
                                                                                                         metadata   = new Dictionary<string, string>() { }
                                                                                                      });
                         
-                        
-                        this.SessionID = response.session_id;           
                     });
         
         public Step CancelSession() 
@@ -130,15 +132,17 @@ namespace Galleon.Checkout
             new Step(name   : $"cancel_session"
                     ,action : async (s) =>
                     {
+                        var body = new Shared.CancelCheckoutSessionRequest()
+                                   {
+                                      session_id = CHECKOUT.Session.SessionID,
+                                   };
+                        
                         var response = await CHECKOUT.Network.Post<CancelCheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/cancel"
                                                                                                  ,headers  : new ()
                                                                                                            {
                                                                                                                { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                            }
-                                                                                                 ,body     : new Shared.CancelCheckoutSessionRequest()
-                                                                                                           {
-                                                                                                              session_id = CHECKOUT.Session.SessionID,
-                                                                                                           });
+                                                                                                 ,body     : body);
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// transaction Steps
@@ -227,6 +231,7 @@ namespace Galleon.Checkout
                         
                         this.PurchaseResult = new PurchaseResult()
                                               {
+                                                  OrderID     = CHECKOUT.Session?.SessionID ?? "NULL",
                                                   IsSuccess   = result.is_success,
                                                   IsCanceled  = result.is_canceled,
                                                   Errors      = result.errors?.ToList(),

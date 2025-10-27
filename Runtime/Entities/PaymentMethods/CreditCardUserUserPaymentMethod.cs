@@ -1,20 +1,65 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
-using Galleon.Checkout.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class CheckoutActionsController : Entity
+    public class CreditCardUserUserPaymentMethod : UserPaymentMethod
     {
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
+        
+        public enum CREDIT_CARD_TYPE
+        {
+            MasterCard,
+            Visa,
+            Amex,
+            Diners,
+            Discover,
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        public string CreditCardType; 
+        
+        public string CardNumber;
+        public string CardMonth;
+        public string CardYear;
+        public string CardCCV;
+        public string CardHolderName;
+        
+        public string TokenID;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Initialization
+
+        public CreditCardUserUserPaymentMethod()
+        {
+            this.TransactionSteps = new()
+                                    {
+                                        Charge,
+                                      //AwaitSocket
+                                    };
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Vaulting Steps
+        
+        public override Step RunVaultingSteps() 
+        =>
+            new Step(name   : $"run_vaulting_steps"
+                    ,action : async (s) =>
+                    {
+                        s.AddChildStep(GetTokenizer());
+                        s.AddChildStep(Tokenize());
+                        s.AddChildStep(AddPaymentMethod());
+                        
+                    });
         
         public Step GetTokenizer()
         =>
@@ -24,20 +69,11 @@ namespace Galleon.Checkout
                         await CheckoutClient.Instance.TokenizerController.GetTokenizer().Execute();                        
                     });
         
-        public Step TokenizeCreditCard()
+        public Step Tokenize()
         =>
-            new Step(name   : $"tokenize_credit_card"
+            new Step(name   : $"tokenize"
                     ,action : async (s) =>
                     {
-                        var creditCard = CHECKOUT.User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
-                        
-                        var card = new 
-                        {
-                            Number = creditCard.CardNumber,
-                            Month  = creditCard.CardMonth,
-                            Year   = creditCard.CardYear,
-                            Cvc    = creditCard.CardCCV,
-                        };
                       //var card = new 
                       //           {
                       //               Number = "4242424242424242",
@@ -45,6 +81,15 @@ namespace Galleon.Checkout
                       //               Year   = 2026,
                       //               Cvc    = "123"
                       //           };
+                      
+                        var card = new 
+                        {
+                            Number = CardNumber,
+                            Month  = CardMonth,
+                            Year   = CardYear,
+                            Cvc    = CardCCV,
+                        };
+                        
                         
                         var Tokenizer           = CheckoutClient.Instance.TokenizerController.Tokenizer;
 
@@ -115,32 +160,33 @@ namespace Galleon.Checkout
                         ///                      }
                         /// }
 
-                        var    jsonObject  = JsonConvert.DeserializeObject<JObject>(cardTokenResponse.ToString());
-                        string tokenID     = jsonObject["id"]?.ToString();
+                        var    jsonObject = JsonConvert.DeserializeObject<JObject>(cardTokenResponse.ToString());
+                        string tokenID    = jsonObject["id"]?.ToString();
                         
-                        creditCard.TokenID = tokenID;
+                        this.TokenID      = tokenID;
                     });
+
         
-        
-        public Step AddCreditCardPaymentMethod()
+        public Step AddPaymentMethod()
         =>
-            new Step(name   : $"add_credit_card_payment_method"
+            new Step(name   : $"add_payment_method"
                     ,action : async (s) =>
                     {
-                        var creditCard = CHECKOUT.User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
+                        var body                            = new AddPaymentMethodRequest();
+                        body.payment_method_definition_type = "credit_card";
+                        body.credit_card_token              = this.TokenID;
                         
                         var result = await CHECKOUT.Network.Post<AddPaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/add-payment-method" 
                                                                                           ,headers  : new ()
                                                                                                     {
                                                                                                         { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                     }
-                                                                                          ,body     : new AddPaymentMethodRequest()
-                                                                                                    {
-                                                                                                        payment_method_definition_type = "credit_card",
-                                                                                                        credit_card_token              = creditCard.TokenID,
-                                                                                                    }
-                                                                                            );
+                                                                                          ,body     : body
+                                                                                          );
 
+                        var pendingPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.Data.id == "pending");
+                        pendingPaymentMethod.Data.id = result.created_payment_method.id;
+                        
                         s.Log(result.created_payment_method.id);     
                     });
         
@@ -152,78 +198,81 @@ namespace Galleon.Checkout
             new Step(name   : $"charge"
                     ,action : async (s) =>
                     {                                               
-                        var selectedUserPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
-
+                        var    upm                 = CHECKOUT.PaymentMethods.UserPaymentMethods.First();
+                        
+                        var    session             = CHECKOUT.Session;
+                        string sessionID           = session?.SessionID ?? "NULL_SESSION_ID";
+                        bool   isNewPaymentMethod  = CHECKOUT.PaymentMethods.UserPaymentMethods.All(pm => pm.Data.id != upm.Data.id);
+                        
+                        var body                   = new Shared.ChargeRequest();
+                        body.session_id            = sessionID;
+                        body.is_new_payment_method = isNewPaymentMethod;
+                        body.save_payment_method   = true;
+                        body.payment_method        = new PaymentMethodDetails();
+                        body.payment_method.id     = upm.Data.id;
+                        body.payment_method.data   = new Dictionary<string, object>();
+                        body.payment_method.data.Add("token", this.TokenID);
+                                    
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
                                                                                             {
                                                                                                 { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                             }
-                                                                                  ,body     : new Shared.ChargeRequest()
-                                                                                            {
-                                                                                                session_id              = CHECKOUT.Session.SessionID,
-                                                                                                is_new_payment_method   = selectedUserPaymentMethod.IsNewPaymentMethod,
-                                                                                                payment_method          = new PaymentMethodDetails()
-                                                                                                                        {
-                                                                                                                             id   = selectedUserPaymentMethod.Data.id,
-                                                                                                                             data = selectedUserPaymentMethod.GetDataForCharge(),
-                                                                                                                        },
-                                                                                                save_payment_method     = selectedUserPaymentMethod.ShouldSavePaymentMethod,
-                                                                                            });
+                                                                                  ,body     : body);
                         
-                        CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
-                                                                                {
-                                                                                    errors      = new [] { "error" },
-                                                                                    is_canceled = false,
-                                                                                    is_success  = true,
-                                                                                    charge_id   = "12345",
-                                                                                };
-                        
-                        //////////////////////////////////////////////////////
-                        bool hasErrors = false;
-                        if (hasErrors)
-                        {
-                            s.RemoveStepsAfterThisInParentFlow();
-                            
-                            s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
-                                                      ,CheckoutClient.Instance.CheckoutScreenMobile.Navigate()
-                                                      );
-                            
-                            return;
-                        }
-                        //////////////////////////////////////////////////////
+                        //////////////////////////////////////////////////////////////////////
+                        ///
+                        // response = new ChargeResponse()
+                        // {
+                        //     result       = null,
+                        //     next_actions = new PaymentAction[]
+                        //                  {
+                        //                      new PaymentAction()
+                        //                      {
+                        //                          action     = "open_url",
+                        //                          parameters = new Dictionary<string, object>()
+                        //                                     {
+                        //                                         { "url",            "https://levan-galleon.github.io/galleon_web_demo?title=Superplay%20Product&price=$4.99" },
+                        //                                         { "deep_link_path", "checkoutapp"                                                                            }
+                        //                                     } 
+                        //                      }
+                        //                  }
+                        // };
+                        ///
+                        //////////////////////////////////////////////////////////////////////
                         
                         if (response.next_actions != null)
                         {
-                            var        flow        = s;//.ParentStep;
-                            List<Step> nextActions = new();
-
-                            // foreach (var step in nextActions)
-                            // {
-                            //     flow.AddChildStep(step);
-                            // }
+                            var flow = s.ParentStep;
                             
                             foreach (var paymentAction in response.next_actions)
                             {
                                 if (paymentAction.action == "open_url")
                                 {
-                                    var    url          = paymentAction.parameters["url"           ].ToString();
-                                  //var    deepLinkPath = paymentAction.parameters["deep_link_path"].ToString();
-                                    string deepLinkPath = "https://test.app";
-                                    
-                                    // url = "https://levan-galleon.github.io/galleon_web_demo/";
-                                    
+                                    var url          = paymentAction.parameters["url"           ].ToString();
+                                  //var deepLinkPath = paymentAction.parameters["deep_link_path"].ToString();
+                                    string deepLinkPath = "test.app";
                                     flow.AddChildStep(OpenURL(url,deepLinkPath));
                                     flow.AddChildStep(CheckStatus());
-                                                 
                                 }
-                            }   
+                            }
                         }
+                        else if (response.result != null)
+                        {    
+                            CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+                                                                                          {
+                                                                                              errors      = null,
+                                                                                              is_canceled = false,
+                                                                                              is_success  = true,
+                                                                                              charge_id   = response.result.charge_id,
+                                                                                          };
+                        } 
                         else
                         {
-                            // NO TRANSACTION RESULT AND NO NEXT ACTION . ERROR .
+                            // NO TRANSACTION RESULT AND NO NEXT ACTION. ERROR.
+                            throw new Exception("Charge: No result or next action");
                         }
-                    });      
+                    });   
         
         public Step OpenURL(string url, string deepLinkPath = null) 
         =>
@@ -274,7 +323,6 @@ namespace Galleon.Checkout
                                       Debug.Log("max reattempts reached - transaction failed.");
                                   }
                               });
-        
         
         public Step AwaitSocket()
         =>
@@ -350,30 +398,6 @@ namespace Galleon.Checkout
                             }
                         }
                         
-                    });
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Email Steps
-        
-        public Step SetEmail() 
-        =>
-            new Step(name   : $"set_email"
-                    ,action : async (s) =>
-                    {
-                        var email     = CHECKOUT.Session.User.Email;
-                        var sessionID = CHECKOUT.Session.SessionID;
-                        
-                        var body = new Shared.UpdateEmailRequest()
-                                   {
-                                       email      = email,
-                                       session_id = sessionID,
-                                   };
-                        
-                        var response  = await CHECKOUT.Network.Post<UpdateEmailResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/update-email"
-                                                                                        ,headers  : new ()
-                                                                                                  {
-                                                                                                      { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
-                                                                                                  }
-                                                                                        ,body     : body);
                     });
     }
 }

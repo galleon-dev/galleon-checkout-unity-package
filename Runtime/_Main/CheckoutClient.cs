@@ -118,21 +118,26 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow Steps
 
-        public Step RunCheckoutSession(CheckoutProduct product)
+        public Step CreateCheckoutSession(CheckoutProduct product)
         =>
             new Step(name   : $"run_checkout_session"
                     ,action : async (s) =>
                               {
-                                  // Archive last session
-                                  if (CurrentSession != null)
-                                      CheckoutSessions.Add(CurrentSession);
-                                  
                                   // Create new session
                                   CurrentSession = new CheckoutSession();
                                   
+                                  // Archive last session Add new session
+                                  CheckoutSessions.Add(CurrentSession);
+                                  
                                   // Assign product
                                   CurrentSession.SelectedProduct = product;
-                                  
+                              });
+        
+        public Step RunCheckoutSession()
+        =>
+            new Step(name   : $"run_checkout_session"
+                    ,action : async (s) =>
+                              {
                                   // Start Session
                                   await CurrentSession.Flow().Execute();
                               });
