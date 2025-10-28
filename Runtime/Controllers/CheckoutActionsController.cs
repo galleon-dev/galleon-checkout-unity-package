@@ -169,6 +169,7 @@ namespace Galleon.Checkout
                                                                                                                              data = selectedUserPaymentMethod.GetDataForCharge(),
                                                                                                                         },
                                                                                                 save_payment_method     = selectedUserPaymentMethod.ShouldSavePaymentMethod,
+                                                                                                return_url              = CheckoutClient.Instance.URLs.AppDeepLinkReturnURL
                                                                                             });
                         
                         CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
@@ -208,8 +209,7 @@ namespace Galleon.Checkout
                                 if (paymentAction.action == "open_url")
                                 {
                                     var    url          = paymentAction.parameters["url"           ].ToString();
-                                  //var    deepLinkPath = paymentAction.parameters["deep_link_path"].ToString();
-                                    string deepLinkPath = "https://test.app";
+                                    string deepLinkPath = CheckoutClient.Instance.URLs.AppDeepLinkReturnURL;
                                     
                                     // url = "https://levan-galleon.github.io/galleon_web_demo/";
                                     

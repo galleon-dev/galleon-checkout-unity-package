@@ -121,7 +121,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4637649579193913730}
   m_HandleRect: {fileID: 2761690249487818590}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -362,7 +362,7 @@ MonoBehaviour:
   m_Content: {fileID: 2541380735028685113}
   m_Horizontal: 0
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
@@ -2982,7 +2982,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   State: 
   Style: 
-  EmailLabel: {fileID: 0}
   EmailInputfieldBorder: {fileID: 1345701573732870026}
   EmailInputField: {fileID: 1385458519224035634}
   SettingsPanelPaymentMethodItemPrefab: {fileID: 7680502671548463619, guid: da7a41d3f25e8457a8a9ab74c32a6da1, type: 3}
@@ -4554,11 +4553,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114144264706263598, guid: deebc71ec8266c3479b5eb85f824776b, type: 3}
       propertyPath: m_Size
-      value: 0.9999998
+      value: 0.9999999
       objectReference: {fileID: 0}
     - target: {fileID: 114144264706263598, guid: deebc71ec8266c3479b5eb85f824776b, type: 3}
       propertyPath: m_Value
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114175153124422988, guid: deebc71ec8266c3479b5eb85f824776b, type: 3}
       propertyPath: m_Enabled
@@ -4686,7 +4685,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 224006926777043856, guid: deebc71ec8266c3479b5eb85f824776b, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.00012207031
+      value: 0.000030517578
       objectReference: {fileID: 0}
     - target: {fileID: 224006926777043856, guid: deebc71ec8266c3479b5eb85f824776b, type: 3}
       propertyPath: m_AnchoredPosition.y
