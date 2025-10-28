@@ -56,6 +56,15 @@ namespace Galleon.Checkout
             return request;
         }
         
+        public NetworkRequest Request(object body)
+        {
+            var request = Request()
+                          .setBody(body);
+            
+            return request;
+        }
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// history
         
         public void AddToHistory(NetworkRequest request)

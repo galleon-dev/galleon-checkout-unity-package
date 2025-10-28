@@ -843,15 +843,13 @@ namespace Galleon.Checkout
             new Step(name   : $"test_endpoints"
                     ,action : async (s) =>
                     {
-                        var request = TestEndpoint.Request()
-                                      .setBody(new
-                                               {
-                                                   app_user_id = "test",
-                                                   AppId       = "test.app-1",
-                                                   Id          = "test.app-1",
-                                                   Device      = "local_unity_test_client",
-                                               })
-                                      ;
+                        var request = TestEndpoint.Request(body : new
+                                                                {
+                                                                    app_user_id = "test",
+                                                                    AppId       = "test.app-1",
+                                                                    Id          = "test.app-1",
+                                                                    Device      = "local_unity_test_client",
+                                                                });
                         
                         var result  = await request.SendWebRequest();
                         

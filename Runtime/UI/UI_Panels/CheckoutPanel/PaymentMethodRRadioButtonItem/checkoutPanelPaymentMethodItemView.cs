@@ -117,31 +117,31 @@ namespace Galleon.Checkout.UI
 
             // Refresh();
 
-            if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
-            {
-                if (this.PaymentMethod.IsSelected)
-                    CheckoutPanelView.ShowPurchaseButton();
-            }
-            else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
-            {
-                if (this.PaymentMethod.IsSelected)
-                    CheckoutPanelView.ShowPurchaseButton();
-            }
-            else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
-            {
-                if (this.PaymentMethod.IsSelected)
-                    CheckoutPanelView.ShowGooglePayButton();
-            }
-            else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
-            {
-                if (this.PaymentMethod.IsSelected)
-                    CheckoutPanelView.ShowPaypalPayButton();
-            }
-            else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
-            {
-                if (this.PaymentMethod.IsSelected)
-                    CheckoutPanelView.ShowApplePayButton();
-            }
+            // if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
+            // {
+            //     if (this.PaymentMethod.IsSelected)
+            //         CheckoutPanelView.ShowPurchaseButton();
+            // }
+            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
+            // {
+            //     if (this.PaymentMethod.IsSelected)
+            //         CheckoutPanelView.ShowPurchaseButton();
+            // }
+            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
+            // {
+            //     if (this.PaymentMethod.IsSelected)
+            //         CheckoutPanelView.ShowGooglePayButton();
+            // }
+            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
+            // {
+            //     if (this.PaymentMethod.IsSelected)
+            //         CheckoutPanelView.ShowPaypalPayButton();
+            // }
+            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
+            // {
+            //     if (this.PaymentMethod.IsSelected)
+            //         CheckoutPanelView.ShowApplePayButton();
+            // }
            
         }
     }

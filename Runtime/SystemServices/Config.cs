@@ -14,17 +14,17 @@ namespace Galleon.Checkout
         
         public Step Initialize()
         => 
-        new Step(name   : "initialize_config"
-                ,tags   : new[] { "init" }
-                ,action : async s =>
-                {
-                    //var result = await CHECKOUT.Network.Get("http://localhost:5007/config");
-                    //
-                    //var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToString());
-                    //
-                    //foreach (var pair in dictionary)
-                    //    this.ConfigData.Add(pair.Key, pair.Value);
-                });
+            new Step(name   : "initialize_config"
+                    ,tags   : new[] { "init" }
+                    ,action : async s =>
+                    {
+                        //var result = await CHECKOUT.Network.Get("http://localhost:5007/config");
+                        //
+                        //var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToString());
+                        //
+                        //foreach (var pair in dictionary)
+                        //    this.ConfigData.Add(pair.Key, pair.Value);
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flow
         

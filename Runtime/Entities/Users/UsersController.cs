@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using Galleon.Checkout.Foundation;
 using UnityEngine;
 
 namespace Galleon.Checkout
 {
     public class UsersController : Entity
     {
-        public List<User> Users = new();
+        public Collection<User> Users = new();
         
         public Step Initialize()
         => 
@@ -15,6 +16,8 @@ namespace Galleon.Checkout
                     {
                         CheckoutClient.Instance.CurrentUser = new User();
                         CheckoutClient.Instance.Users.Users.Add(CheckoutClient.Instance.CurrentUser);
+                        
+                        s.AddChildStep(CheckoutClient.Instance.CurrentUser.Initialize());
                     });
     }
 }

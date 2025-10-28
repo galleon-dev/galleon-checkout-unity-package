@@ -11,17 +11,11 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
        
-        public string                Email = "";
+        public Shared.UserInfo       UserInfo;
+        public string                Email => UserInfo.email;
  
-        public List<CreditCardToken> Tokens                 = new();
-        
         public List<Transaction>     Transactions           = new();
-        
         public Transaction           CurrentTransaction;
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
-        
-        public CreditCardToken       MainToken    => Tokens.FirstOrDefault();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -29,6 +23,15 @@ namespace Galleon.Checkout
         {
         }
 
+        public Step Initialize()
+        => 
+            new Step(name   : "initialize_user"
+                    ,tags   : new[] { "init" }
+                    ,action : async s =>
+                    {
+                        s.AddChildStep(CHECKOUT.Actions.GetUserInfo());
+                    });
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
         
         public UserPaymentMethod SelectedUserPaymentMethod => CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
