@@ -113,44 +113,7 @@ namespace Galleon.Checkout.UI
             // Set Dropdown Options
             if (DropdownMenu)
             {
-                DropdownMenu.ClearOptions();
-
-                ManagePaymentSprites ManagePaymentSprites = DropdownMenu.gameObject.GetComponent<ManagePaymentSprites>();
-
-                paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
-
-                // Add Dropdown Options
-                int i = 0;
-                foreach (var paymentMethod in paymentMethods)
-                {
-                   
-                    Sprite Icon = null;
-
-                    if (ManagePaymentSprites)
-                    {
-                        Icon = ManagePaymentSprites.GetPaymentIcon(paymentMethod);
-                    }
-
-                    var newOption = new TMP_Dropdown.OptionData(paymentMethod.DisplayName, Icon);
-
-                    DropdownMenu.options.Add(newOption);
-
-                    if (paymentMethod.IsSelected)
-                    {
-                        DropdownMenu.value = i;
-                    }
-
-                    i++;
-                }
-               
-                Debug.Log("Set Dropdown 1st Option");
-               
-                // ForceReselect
-                DropdownMenu.onValueChanged.Invoke(DropdownMenu.value); // Forces the event
-                DropdownMenu.RefreshShownValue();
-
-                // Hide Dropdown if no Payments are available
-                DropdownMenu.gameObject.SetActive(paymentMethods.Count() > 0);
+                SetDropdown();
             }
 
             ///////////////
@@ -306,6 +269,50 @@ namespace Galleon.Checkout.UI
         {
             var image = this.PurchaseButton.GetComponentInChildren<Image>();
             image.sprite = sprite;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
+        
+        public void SetDropdown()
+        {
+            DropdownMenu.ClearOptions();
+
+                ManagePaymentSprites ManagePaymentSprites = DropdownMenu.gameObject.GetComponent<ManagePaymentSprites>();
+
+                var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
+
+                // Add Dropdown Options
+                int i = 0;
+                foreach (var paymentMethod in paymentMethods)
+                {
+                   
+                    Sprite Icon = null;
+
+                    if (ManagePaymentSprites)
+                    {
+                        Icon = ManagePaymentSprites.GetPaymentIcon(paymentMethod);
+                    }
+
+                    var newOption = new TMP_Dropdown.OptionData(paymentMethod.DisplayName, Icon);
+
+                    DropdownMenu.options.Add(newOption);
+
+                    if (paymentMethod.IsSelected)
+                    {
+                        DropdownMenu.value = i;
+                    }
+
+                    i++;
+                }
+               
+                Debug.Log("Set Dropdown 1st Option");
+               
+                // ForceReselect
+                DropdownMenu.onValueChanged.Invoke(DropdownMenu.value); // Forces the event
+                DropdownMenu.RefreshShownValue();
+
+                // Hide Dropdown if no Payments are available
+                DropdownMenu.gameObject.SetActive(paymentMethods.Count() > 0);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios

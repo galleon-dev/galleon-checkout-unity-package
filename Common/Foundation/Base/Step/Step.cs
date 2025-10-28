@@ -42,6 +42,13 @@ namespace Galleon.Checkout
         public Action<Step>       PreChildStepAction          = null;
         public Action<Step>       PostChildStepAction         = null;
         
+        public int                CurrentChildStepIndex       = -1;
+        public int                CurrentPreStepIndex         = -1;
+        public int                CurrentPostStepIndex        = -1;
+        public Step               CurrentPreStep              = default;
+        public Step               CurrentChildStep            = default;
+        public Step               CurrentPostStep             = default;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
         
         public static event Action<Step>     OnPreStepExecute;
@@ -190,43 +197,43 @@ namespace Galleon.Checkout
                 ////////////////////////////////////////////////
                 
                 // Execute Pre Steps
-                for (int i = 0; i < PreSteps.Count; i++)
+                for (CurrentPreStepIndex = 0; CurrentPreStepIndex < PreSteps.Count; CurrentPreStepIndex++)
                 {
-                    var   preStep = PreSteps[i];
+                    CurrentPreStep = PreSteps[CurrentPreStepIndex];
                     
-                    PreChildStepAction?.Invoke(preStep);
+                    PreChildStepAction?.Invoke(CurrentPreStep);
                     
-                    await preStep.Execute();
+                    await CurrentPreStep.Execute();
                     
-                    PostChildStepAction?.Invoke(preStep);
+                    PostChildStepAction?.Invoke(CurrentPreStep);
                 }
                 
                 ////////////////////////////////////////////////
                 
                 // Execute Child Steps
-                for (int i = 0; i < ChildSteps.Count; i++)
+                for (CurrentChildStepIndex = 0; CurrentChildStepIndex < ChildSteps.Count; CurrentChildStepIndex++)
                 {
-                    var child = ChildSteps[i];
+                    CurrentChildStep = ChildSteps[CurrentChildStepIndex];
                     
-                    PreChildStepAction?.Invoke(child);
+                    PreChildStepAction?.Invoke(CurrentChildStep);
                     
-                    await child.Execute();
+                    await CurrentChildStep.Execute();
                     
-                    PostChildStepAction?.Invoke(child);
+                    PostChildStepAction?.Invoke(CurrentChildStep);
                 }
                 
                 ////////////////////////////////////////////////
                 
                 // Execute Post Steps
-                for (int i = 0; i < PostSteps.Count; i++)
+                for (CurrentPostStepIndex = 0; CurrentPostStepIndex < PostSteps.Count; CurrentPostStepIndex++)
                 {
-                    var   postStep = PostSteps[i];
+                    CurrentPostStep = PostSteps[CurrentPostStepIndex];
                     
-                    PreChildStepAction?.Invoke(postStep);
+                    PreChildStepAction?.Invoke(CurrentPostStep);
                     
-                    await postStep.Execute();
+                    await CurrentPostStep.Execute();
                     
-                    PostChildStepAction?.Invoke(postStep);
+                    PostChildStepAction?.Invoke(CurrentPostStep);
                 }
                 
                 ////////////////////////////////////////////////

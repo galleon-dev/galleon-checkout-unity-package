@@ -9,18 +9,18 @@ namespace Galleon.Checkout.UI
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
-        public GameObject SelectPaymentMethodItemPrefab;
-        public GameObject SelectPaymentMethodItemsHolder;
+        public  GameObject SelectPaymentMethodItemPrefab;
+        public  GameObject SelectPaymentMethodItemsHolder;
 
-        private int ScrollRectMaxSize = 3;
-        private int ScrollRectMaxSizeLandscape = 6;
-        private float PaymentPrefabHeight = 200f;
-        private float PaymentPrefabHeightLandscape = 125f;
-        private float SeparatorHeight = 2f;
+        private int        ScrollRectMaxSize            = 6;
+        private int        ScrollRectMaxSizeLandscape   = 6;
+        private float      PaymentPrefabHeight          = 200f;
+        private float      PaymentPrefabHeightLandscape = 125f;
+        private float      SeparatorHeight              = 2f;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 
-        public ViewResult Result = ViewResult.None;
+        public ViewResult                   Result = ViewResult.None;
         public UnityEngine.UI.LayoutElement ScrollRectLayoutElement;
 
         public enum ViewResult
@@ -108,19 +108,19 @@ namespace Galleon.Checkout.UI
         public bool IsCompleted = false;
 
         public Step View()
-        =>
+            =>
             new Step(name   : $"view_select_payment_methods_panel"
                     ,action : async (s) =>
-                    {
-                        IsCompleted = false;
+                              {
+                                  IsCompleted = false;
 
-                        this.gameObject.SetActive(true);
+                                  this.gameObject.SetActive(true);
 
-                        while (!IsCompleted)
-                            await Task.Yield();
+                                  while (!IsCompleted)
+                                      await Task.Yield();
 
-                        this.gameObject.SetActive(false);
-                    });
+                                  this.gameObject.SetActive(false);
+                              });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
 
@@ -148,6 +148,12 @@ namespace Galleon.Checkout.UI
             }
         }
 
+        public void On_Select()
+        {
+            this.Result = ViewResult.SelectedExisting;
+            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
         
         public void UpdateScrollRectMaxSize()
@@ -158,7 +164,7 @@ namespace Galleon.Checkout.UI
 
             if (CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape)
             {
-                PrefabHeight = PaymentPrefabHeightLandscape;
+                PrefabHeight      = PaymentPrefabHeightLandscape;
                 ScrollRectMaxSize = ScrollRectMaxSizeLandscape;
             }
 

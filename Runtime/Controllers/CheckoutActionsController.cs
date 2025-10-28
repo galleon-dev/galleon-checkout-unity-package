@@ -153,6 +153,10 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {                                               
                         var selectedUserPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
+                        
+                        bool isNewPaymentMethod = (selectedUserPaymentMethod is CreditCardUserUserPaymentMethod)
+                                                ? selectedUserPaymentMethod.ShouldSavePaymentMethod
+                                                : false;
 
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
@@ -168,7 +172,7 @@ namespace Galleon.Checkout
                                                                                                                              id   = selectedUserPaymentMethod.Data.id,
                                                                                                                              data = selectedUserPaymentMethod.GetDataForCharge(),
                                                                                                                         },
-                                                                                                save_payment_method     = selectedUserPaymentMethod.ShouldSavePaymentMethod,
+                                                                                                save_payment_method     = isNewPaymentMethod,
                                                                                                 return_url              = CheckoutClient.Instance.URLs.AppDeepLinkReturnURL
                                                                                             });
                         
@@ -249,7 +253,7 @@ namespace Galleon.Checkout
             new Step(name   : $"check_status_attempt_{attemptNumber}"
                     ,action : async (s) =>
                               {
-                                  int maxAttempts = 5;
+                                  int maxAttempts = 3;
                                   
                                   var response = await CHECKOUT.Network.Get<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/{CHECKOUT.Session.SessionID}"
                                                                                                     ,headers  : new ()
@@ -272,6 +276,11 @@ namespace Galleon.Checkout
                                   else
                                   {
                                       Debug.Log("max reattempts reached - transaction failed.");
+                                      s.RemoveStepsAfterThisInParentFlow();
+                                      s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
+                                                                ,CheckoutClient.Instance.CheckoutScreenMobile.Navigate()
+                                                                );
+                                        
                                   }
                               });
         
@@ -354,6 +363,32 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Email Steps
         
+        public Step GetUserInfo() 
+        =>
+            new Step(name   : $"get_user_data"
+                    ,action : async (s) =>
+                    {
+                        var response = await CHECKOUT.Network.Get<UserInfo>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/user-info"
+                                                                           ,headers  : new ()
+                                                                                     {
+                                                                                         { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                     });
+                        CHECKOUT.User.UserInfo = response;
+                    });
+        
+        public Step SetUserInfo() 
+        =>
+            new Step(name   : $"set_user_data"
+                    ,action : async (s) =>
+                    {
+                        var response = await CHECKOUT.Network.Post<UserInfo>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/user-info"
+                                                                            ,headers  : new ()
+                                                                                      {
+                                                                                          { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                      }
+                                                                            ,body     : CHECKOUT.User.UserInfo);
+                    });
+        
         public Step SetEmail() 
         =>
             new Step(name   : $"set_email"
@@ -362,11 +397,11 @@ namespace Galleon.Checkout
                         var email     = CHECKOUT.Session.User.Email;
                         var sessionID = CHECKOUT.Session.SessionID;
                         
-                        var body = new Shared.UpdateEmailRequest()
-                                   {
-                                       email      = email,
-                                       session_id = sessionID,
-                                   };
+                        var body      = new Shared.UpdateEmailRequest()
+                                      {
+                                          email      = email,
+                                          session_id = sessionID,
+                                      };
                         
                         var response  = await CHECKOUT.Network.Post<UpdateEmailResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/update-email"
                                                                                         ,headers  : new ()
