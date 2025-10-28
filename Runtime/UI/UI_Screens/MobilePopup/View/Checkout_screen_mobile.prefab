@@ -274,8 +274,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3475622572209059376}
   m_HandleRect: {fileID: 3367263749950714740}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.7227885
+  m_Value: 1.0000002
+  m_Size: 0.7227886
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1364,7 +1364,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 4976091989052601655}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.5380209
+  m_Size: 0.538021
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14614,7 +14614,8 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 789761483153506072, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
 --- !u!224 &17682982471564704 stripped
 RectTransform:
@@ -16673,6 +16674,10 @@ PrefabInstance:
     - target: {fileID: 4706069808008115370, guid: 3f8ef2926adda4fb89f2897d642573d8, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4797209116521310898, guid: 3f8ef2926adda4fb89f2897d642573d8, type: 3}
+      propertyPath: m_fontSize
+      value: 37.85
       objectReference: {fileID: 0}
     - target: {fileID: 4946177760431748666, guid: 3f8ef2926adda4fb89f2897d642573d8, type: 3}
       propertyPath: m_AnchorMax.y
