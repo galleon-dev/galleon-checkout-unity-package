@@ -5,7 +5,6 @@ using UnityEngine;
 
 using Galleon.Checkout.UI;
 using System.Text;
-using UnityEngine;
 
 namespace AdvancedInputFieldPlugin
 {
@@ -189,4 +188,6 @@ namespace AdvancedInputFieldPlugin
             return (c >= '0' && c <= '9');
         }
     }
+
+    #endif
 }

@@ -42,6 +42,8 @@ namespace Galleon.Checkout.UI
         public GameObject           PaymentMethodItemPrefab;        
         public GameObject           AddCreditCardButtonElement;
 
+        public TMP_Dropdown DropdownMenu;
+
         [Header("Payment Buttons")]
         public GameObject           PurchaseButton;
         public GameObject           GooglePayButton;
@@ -65,6 +67,7 @@ namespace Galleon.Checkout.UI
 
         public override void Initialize()
         {
+            Debug.Log("CheckoutPanelView --> Initialize()");
             RefreshState();
         }
 
@@ -102,8 +105,54 @@ namespace Galleon.Checkout.UI
             }
 
             // Add defult add card button
-            this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
-            
+            if (AddCreditCardButtonElement)
+            {
+                this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
+            }
+
+            // Set Dropdown Options
+            if (DropdownMenu)
+            {
+                DropdownMenu.ClearOptions();
+
+                ManagePaymentSprites ManagePaymentSprites = DropdownMenu.gameObject.GetComponent<ManagePaymentSprites>();
+
+                paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
+
+                // Add Dropdown Options
+                int i = 0;
+                foreach (var paymentMethod in paymentMethods)
+                {
+                   
+                    Sprite Icon = null;
+
+                    if (ManagePaymentSprites)
+                    {
+                        Icon = ManagePaymentSprites.GetPaymentIcon(paymentMethod);
+                    }
+
+                    var newOption = new TMP_Dropdown.OptionData(paymentMethod.DisplayName, Icon);
+
+                    DropdownMenu.options.Add(newOption);
+
+                    if (paymentMethod.IsSelected)
+                    {
+                        DropdownMenu.value = i;
+                    }
+
+                    i++;
+                }
+               
+                Debug.Log("Set Dropdown 1st Option");
+               
+                // ForceReselect
+                DropdownMenu.onValueChanged.Invoke(DropdownMenu.value); // Forces the event
+                DropdownMenu.RefreshShownValue();
+
+                // Hide Dropdown if no Payments are available
+                DropdownMenu.gameObject.SetActive(paymentMethods.Count() > 0);
+            }
+
             ///////////////
             // checkoutPanelPaymentMethodItemView[] methods = this.gameObject.GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
             // foreach (var method in methods)
@@ -111,7 +160,10 @@ namespace Galleon.Checkout.UI
 
             //CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
 
-            GenerateTaxes();
+            if (TaxesContainer != null)
+            {
+                GenerateTaxes();
+            }
         }
 
         void GenerateTaxes()

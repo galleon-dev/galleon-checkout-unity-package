@@ -36,9 +36,9 @@ namespace Galleon.Checkout.UI
             this.Label.text  = UserPaymentMethod?.DisplayName;
             this.Icon.sprite = this.UserPaymentMethod?.GetIconSprite();
         }
-        
+
         //// UI Events
-        
+
         public void On_Delete_Clicked()
         {
             Debug.Log((this.UserPaymentMethod?.DisplayName??"NULL") + "_delete clicked");

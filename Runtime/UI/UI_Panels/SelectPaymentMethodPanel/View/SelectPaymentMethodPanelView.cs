@@ -9,16 +9,18 @@ namespace Galleon.Checkout.UI
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
-        public  GameObject SelectPaymentMethodItemPrefab;
-        public  GameObject SelectPaymentMethodItemsHolder;
-        
-        private int        ScrollRectMaxSize   = 6;
-        private float      PaymentPrefabHeight = 200f;
-        private float      SeparatorHeight     = 2f;
-        
+        public GameObject SelectPaymentMethodItemPrefab;
+        public GameObject SelectPaymentMethodItemsHolder;
+
+        private int ScrollRectMaxSize = 3;
+        private int ScrollRectMaxSizeLandscape = 6;
+        private float PaymentPrefabHeight = 200f;
+        private float PaymentPrefabHeightLandscape = 125f;
+        private float SeparatorHeight = 2f;
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 
-        public ViewResult                   Result = ViewResult.None;
+        public ViewResult Result = ViewResult.None;
         public UnityEngine.UI.LayoutElement ScrollRectLayoutElement;
 
         public enum ViewResult
@@ -53,10 +55,10 @@ namespace Galleon.Checkout.UI
             
             // Add first child (with null payment method = "Add new credit card")
             {
-                var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
+                var go = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
-                item.Initialize(paymentMethodDefinition:null, SelectPaymentMethodPanelView: this);
-                
+                item.Initialize(paymentMethodDefinition: null, SelectPaymentMethodPanelView: this);
+
                 // Add ui separator
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
             }
@@ -86,7 +88,7 @@ namespace Galleon.Checkout.UI
             var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
             foreach (var userPaymentMethod in userPaymentMethods)
             {
-                var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
+                var go = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
             
                 item.Initialize(userPaymentMethod:userPaymentMethod, this);
@@ -145,13 +147,21 @@ namespace Galleon.Checkout.UI
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
             }
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
         
         public void UpdateScrollRectMaxSize()
         {
             int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count + CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.Count + 1;
-                                               
+
+            float PrefabHeight = PaymentPrefabHeight;
+
+            if (CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape)
+            {
+                PrefabHeight = PaymentPrefabHeightLandscape;
+                ScrollRectMaxSize = ScrollRectMaxSizeLandscape;
+            }
+
             // Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
             if (PaymentMethodsAmount == 0)
@@ -160,21 +170,27 @@ namespace Galleon.Checkout.UI
             }
             else if (PaymentMethodsAmount <= ScrollRectMaxSize)
             {
-                ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 2;
+
+                ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PrefabHeight + SeparatorHeight) + 2;
+
+                if (CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape)
+                {
+                    ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PrefabHeight + SeparatorHeight) + 2;
+                }
             }
             else
             {
-                ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 2;
+                ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PrefabHeight + SeparatorHeight) + 2;
             }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
-        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_add_new_card)}()"     });
-        //public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_back_to_checkout)}()" });
+        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_add_new_card)}()" });
+        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_back_to_checkout)}()" });
         
         public Step test_add_new_card()     => new Step(action : async (s) => { On_NewCardClicked(); });
-        //public Step test_back_to_checkout() => new Step(action : async (s) => { On_Select();     });
+        public Step test_back_to_checkout() => new Step(action : async (s) => { On_Select();         });
         
     }
 }
