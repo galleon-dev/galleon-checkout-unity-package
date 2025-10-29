@@ -13,6 +13,9 @@ namespace GalleonDatePicker.Samples
         [SerializeField] private AdvancedInputField DateAdvancedInputField;
         private IDatePicker _datePicker;
         public DatePickiOS DatePickiOS;
+
+        private DateTime lastDate = DateTime.Now;
+
         private void Start()
         {
             _button.onClick.AddListener(OnDateButtonClicked);
@@ -27,7 +30,7 @@ namespace GalleonDatePicker.Samples
         private void OnDateButtonClicked()
         {
 #if UNITY_ANDROID
-            _datePicker?.Show(DateTime.Now, OnAndroidDateSelected);           
+            _datePicker?.Show(lastDate, OnAndroidDateSelected);           
 #elif UNITY_IOS
             DatePickiOS.OniOSDateSelected();
 #endif
@@ -35,6 +38,7 @@ namespace GalleonDatePicker.Samples
 
         private void OnAndroidDateSelected(DateTime value)
         {
+            lastDate = value;
             Debug.Log($"Date selected: {value.ToShortDateString()}");
             Debug.Log($"Date selected: {value.ToString("MM/yy")}");
             if (DateAdvancedInputField)
