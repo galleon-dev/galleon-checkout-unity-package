@@ -145,11 +145,11 @@ namespace Galleon.Checkout.Foundation
             ///         new step("create")
             ///
             
-            await this.Node.Live.CRUD_PLUS(new Folder() {FolderName = "f1"});
-            await this.Node.Live.STEP_PLUS(new Folder() {FolderName = "f1"});
-            await this.Node.Live.P_OP_PLUS(new Folder() {FolderName = "f1"});
-            await this.Node.Live.OP_PLUS  (new Folder() {FolderName = "f1"});
-            await this.Node.Live.LIVE_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live2.CRUD_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live2.STEP_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live2.P_OP_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live2.OP_PLUS  (new Folder() {FolderName = "f1"});
+            await this.Node.Live2.LIVE_PLUS(new Folder() {FolderName = "f1"});
         }
     }
     
@@ -167,13 +167,20 @@ namespace Galleon.Checkout.Foundation
         public LiveNode VirtualTree;
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public LiveOperation(string id, IEntity parent, LiveNode definition)
+        {
+            
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         public void SaveWithNode(){}
         public void LoadWithNode(){}
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        public async Task ExecuteLiveOp()
+        public async Task Execute()
         {
             await CreateVirtualTree();
             await CreateActualContent();
@@ -260,7 +267,10 @@ namespace Galleon.Checkout.Foundation
     {   
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public string Content;
+        public string Text;
+        
+        public string TargetText;
+        public string ActionText;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Action
         
@@ -276,12 +286,35 @@ namespace Galleon.Checkout.Foundation
         public        string   Save ()            { return "string"; }
         public static LiveNode Parse(string text) { return default;  }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API Methods
+        
+        public void DoPlusCreateAfterVTree()
+        {
+            IEntity Parent = this.GetParent();
+            IEntity target = Activator.CreateInstance(typeof(Folder)) as IEntity;
+            
+            Parent.Node.AddChild(target);
+            target.Node.Crud.Create();
+        }
+        
+        /// [plus1]   -> simple-op + 1 node + direct-action.
+        /// [plus1e]  -> plus1 + element + live + node + code.
+        /// [plus1ev] -> plus1e + vtree.
+        /// [...]     -> test. save-load. 2 nodes. n nodes. suger/refs.
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Node Methods
+        
+        private IEntity GetParent()
+        {
+            return default;
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Category Methods
         
         public bool IsCategoryNode()
         {
-            if (Content.Trim().StartsWith("(") 
-            &&  Content.Trim().EndsWith(")"))
+            if (Text.Trim().StartsWith("(") 
+            &&  Text.Trim().EndsWith(")"))
             {
                 return true;
             }
@@ -293,7 +326,7 @@ namespace Galleon.Checkout.Foundation
         {
             if (IsCategoryNode())
             {
-                return Content.Trim().Substring(1, Content.Trim().Length - 2);
+                return Text.Trim().Substring(1, Text.Trim().Length - 2);
             }
             
             return "";

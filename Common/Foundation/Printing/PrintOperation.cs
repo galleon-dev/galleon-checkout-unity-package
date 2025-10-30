@@ -111,7 +111,7 @@ namespace Galleon.Checkout.Foundation
                             
                             asset.Node.CRUDCommonName = commonName;
                             
-                            this.Parent.Node.Live.Plus(asset as IEntity);
+                            this.Parent.Node.Live2.Plus(asset as IEntity);
                             
                             node.CreatedEntity = asset as IEntity;
                         }

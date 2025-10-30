@@ -154,9 +154,10 @@ namespace Galleon.Checkout
                     {                                               
                         var selectedUserPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
                         
+                        // ReSharper disable once SimplifyConditionalTernaryExpression
                         bool isNewPaymentMethod = (selectedUserPaymentMethod is CreditCardUserUserPaymentMethod)
-                                                ? selectedUserPaymentMethod.ShouldSavePaymentMethod
-                                                : false;
+                                                  ? selectedUserPaymentMethod.ShouldSavePaymentMethod
+                                                  : false;
 
                         var response = await CHECKOUT.Network.Post<ChargeResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/charge"
                                                                                   ,headers  : new ()
