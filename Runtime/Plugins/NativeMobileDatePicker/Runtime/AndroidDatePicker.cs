@@ -26,7 +26,7 @@ namespace GalleonDatePicker
                             _initDate.Year,
                             _initDate.Month - 1,
                             new DateCallback(this),
-                            "Select Month and Year"
+                            "Select Year and Month"
                         );
 
                     dialog.Call("show");
