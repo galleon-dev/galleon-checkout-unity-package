@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 
 public class MonthYearPicker {
 
-    public static DatePickerDialog create(Context context, int year, int month, DatePickerDialog.OnDateSetListener listener) {
+    public static DatePickerDialog create(Context context, int year, int month, DatePickerDialog.OnDateSetListener listener, String title) {
         // Force spinner mode
         DatePickerDialog dialog = new DatePickerDialog(context, android.R.style.Theme_Holo_Light_Dialog_NoActionBar, listener, year, month, 1);
         try {
@@ -24,6 +24,9 @@ public class MonthYearPicker {
         } catch (Exception e) {
             e.printStackTrace();
         }
+		
+		 dialog.setTitle(title);
+		 
         return dialog;
     }
 }
