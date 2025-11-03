@@ -560,18 +560,32 @@ namespace Galleon.Checkout
         {
             IEntity Entity; public LIVE(IEntity entity) => this.Entity = entity;
             
-            public void Plus(string text)
+            public async Task Plus()
             {
-                IEntity entity = new Entity();
-                Plus(entity);
-            }
-            public async Task Plus(IEntity child)
-            {
-                var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_{child.Node.ID.SelfPathID}"
-                                                       ,parent     : child
-                                                       ,definition : new LiveNode());
+                var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
+                                                       ,parent     : this.Entity
+                                                       ,definition : new LiveNode() { TargetText = "Assets.Folder f1", ActionText = "plus" });
                 
-                await plusOperation.Execute();
+                await plusOperation.ExecuteAPF();
+            }
+            
+            public LiveHandler LiveHandler
+            {
+                get
+                {
+                    var liveHandlerType = Entity.GetType()
+                                                .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
+                                                .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveHandler)));
+
+                    if (liveHandlerType != null)
+                    {
+                        var liveHandler = (LiveHandler)Activator.CreateInstance(liveHandlerType);
+                        liveHandler.SetTarget(this.Entity);
+                        return liveHandler;
+                    }
+
+                    return null;
+                }
             }
         }
     }    

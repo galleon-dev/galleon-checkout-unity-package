@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    [CreateAssetMenu(menuName = "Galleon/Checkout/Bonus Resources")]
-    public class BonusResources : ScriptableObject
+    [CreateAssetMenu(menuName = "Galleon/Checkout/Checkout Assets")]
+    public class CheckoutAssets : ScriptableObject
     {
         public string           VariantID = "default";
         public RewardResource[] RewardResources;

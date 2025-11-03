@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
 using Galleon.Checkout.UI;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
@@ -138,7 +139,7 @@ namespace Galleon.Checkout.UI
 
                                   CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(true);
                                   CheckoutClient.Instance.CheckoutScreenMobile.ResetState();
-                                  CheckoutClient.Instance.CheckoutScreenMobile.SetPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage).Execute();
+                                //CheckoutClient.Instance.CheckoutScreenMobile.SetPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage).Execute();
                               });
 
         public static Step EndCheckoutScreenMobile()
@@ -246,12 +247,14 @@ namespace Galleon.Checkout.UI
             public string FooterState;
 
             public string PageResult;
+            
+            public string panelConfiguration;
 
             public Action<Page> Setup;
 
             public Dictionary<string, Step> NavigationMap = new();
 
-            public Page(string name, string header, string panel, string footer, Action<Page> setup = null)
+            public Page(string name, string header, string panel, string footer, Action<Page> setup = null, string panelConfiguration = null)
             {
                 this.Name        = name;
                 this.Setup       = setup;
@@ -259,6 +262,8 @@ namespace Galleon.Checkout.UI
                 this.headerState = header;
                 this.panelState  = panel;
                 this.FooterState = footer;
+                
+                this.panelConfiguration = panelConfiguration;
             }
         }
 
@@ -271,8 +276,8 @@ namespace Galleon.Checkout.UI
 
         public Step ViewPage(Page page)
         =>
-            new Step(name: $"View_{page.Name}_page"
-                    , action: async (s) =>
+            new Step(name   : $"View_{page.Name}_page"
+                    ,action : async (s) =>
                     {
                         ///////////////////////// Setup
 
@@ -284,6 +289,13 @@ namespace Galleon.Checkout.UI
                         this.State                 = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
 
+
+                        ///////////////////////// Page
+
+                        IsPageActive = true;
+                        CurrentPage  = page;
+                        NavigationHistory.Add(page);
+                        
                         ///////////////////////// Refresh
                         
                         RefreshState();
@@ -293,12 +305,6 @@ namespace Galleon.Checkout.UI
                         View[] views = this.GetComponentsInChildren<View>();
                         foreach (var view in views)
                             view.Refresh();
-
-                        ///////////////////////// Definitions
-
-                        IsPageActive = true;
-                        CurrentPage  = page;
-                        NavigationHistory.Add(page);
                         
                         ///////////////////////// Focus
                         
@@ -355,6 +361,12 @@ namespace Galleon.Checkout.UI
                         this.State                 = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
 
+                        ///////////////////////// Page
+
+                        IsPageActive = true;
+                        CurrentPage = page;
+                        NavigationHistory.Add(page);
+                        
                         ///////////////////////// Refresh
 
                         RefreshState();
@@ -365,11 +377,6 @@ namespace Galleon.Checkout.UI
                         foreach (var view in views)
                             view.Refresh();
 
-                        ///////////////////////// Definitions
-
-                        IsPageActive = true;
-                        CurrentPage = page;
-                        NavigationHistory.Add(page);
                     });
 
 
@@ -621,8 +628,24 @@ namespace Galleon.Checkout.UI
                                                        ,setup : page =>
                                                               {
                                                                   page.NavigationMap["checkout"] = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                  page.NavigationMap["choice"]   = page.screen.ViewPage(page.screen.ChoicePage);
                                                               });
-                                                       
+                    
+        
+        public Page ChoicePage               = new Page(name  : "choice"
+                                                       ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                       ,panel : CheckoutScreenMobile.STATE.checkout_panel       .ToString()
+                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
+                                                       ,panelConfiguration: JsonConvert.SerializeObject(new CheckoutPanelView.Config(){ShowMinimalOptions = true})
+                                                       ,setup : page =>
+                                                              {
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap["test_1"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap["test_2"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                              }
+                                                        );
                     
         public Page CheckoutPage             = new Page(name  : "checkout"
                                                        ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
@@ -786,6 +809,7 @@ namespace Galleon.Checkout.UI
 
             if      (this.State == STATE.test_panel                  .ToString()) TestPanelView               .gameObject.SetActive(true);
             else if (this.State == STATE.checkout_panel              .ToString()) CheckoutPanel               .gameObject.SetActive(true);
+            else if (this.State == "choice"                          .ToString()) CheckoutPanel               .gameObject.SetActive(true);
             else if (this.State == STATE.success_panel               .ToString()) SuccessPanelView            .gameObject.SetActive(true);
             else if (this.State == STATE.error_panel                 .ToString()) ErrorPanelView              .gameObject.SetActive(true);
             else if (this.State == STATE.credit_card_panel           .ToString()) CreditCardPanel             .gameObject.SetActive(true);

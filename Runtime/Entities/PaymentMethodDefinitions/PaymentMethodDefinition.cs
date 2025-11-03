@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
@@ -30,11 +31,14 @@ namespace Galleon.Checkout
         public Sprite IconSprite;
         public Sprite LogoSprite;
         
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public string DisplayName => Data?.type ?? Type.ToString();
+        public string       DisplayName => Data?.type ?? Type.ToString();
         
-        public string LocalID => $"local_pm_id_{this.Type}";
+        public string       LocalID     => $"local_pm_id_{this.Type}";
+        
+        public BonusData    BonusData   => CHECKOUT.Session.BonusData.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
@@ -47,7 +51,8 @@ namespace Galleon.Checkout
 
         public PaymentMethodDefinition()
         {
-            this.Data = new();
+            this.Data      = new();
+            this.Data.type = "";
         }
         
         public Step Initialize() 

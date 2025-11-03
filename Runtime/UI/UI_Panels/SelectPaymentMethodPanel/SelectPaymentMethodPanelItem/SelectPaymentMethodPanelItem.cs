@@ -11,26 +11,38 @@ namespace Galleon.Checkout.UI
 {
     public class SelectPaymentMethodPanelItem : View
     {
-        //// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         [Header("UI")]
-        public Image    Icon;
-        public TMP_Text Label;
+        public Image                        Icon;
+        public TMP_Text                     Label;
         
-        //// Properties
+        [Header("Bonus")]
+        public GameObject                   BonusContainer;
+        public BonusRewardView              BonusRewardView;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public PaymentMethodDefinition      PaymentMethodDefinition      { get; set; }
         public UserPaymentMethod            UserPaymentMethod            { get; set; }
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView { get; set; }
         
         
-        //// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public void Initialize(PaymentMethodDefinition      paymentMethodDefinition, 
                                SelectPaymentMethodPanelView SelectPaymentMethodPanelView)
         {
             this.PaymentMethodDefinition      = paymentMethodDefinition;
             this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
+            
+            var bonusData = (PaymentMethodDefinition != null) ? PaymentMethodDefinition?.BonusData 
+                          : (UserPaymentMethod       != null) ? UserPaymentMethod?.GetPaymentMethodDefinition()?.BonusData 
+                          : null;
+            
+            if (bonusData != null)
+                InitializeBonus(bonusData);
+            
             Refresh();
         }
         
@@ -39,10 +51,25 @@ namespace Galleon.Checkout.UI
         {
             this.UserPaymentMethod            = userPaymentMethod;
             this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
+            
+            if (this.UserPaymentMethod != null
+            &&  this.UserPaymentMethod.Type == "native")
+                this.BonusRewardView.gameObject.SetActive(false);
+            
+            if (userPaymentMethod.GetPaymentMethodDefinition()?.BonusData != null)
+                InitializeBonus(userPaymentMethod.GetPaymentMethodDefinition().BonusData);
+            
             Refresh();
         }
         
-        //// Refresh
+        private void InitializeBonus(BonusData bonusData)
+        {
+            // var prefab           = bonusData.BonusPrefab;
+            // var bonusGO          = Instantiate(original : prefab, parent: BonusContainer.transform);
+            // this.BonusRewardView = bonusGO.GetComponent<BonusRewardView>();
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
         
         public override async void RefreshState()
         {    
@@ -72,9 +99,15 @@ namespace Galleon.Checkout.UI
                 this.Label.text  = "**** - " + this.UserPaymentMethod.DisplayName;
                 this.Icon.sprite = this.UserPaymentMethod.GetIconSprite();
             }
+            
+            // Bonus
+            if (this.BonusRewardView != null)
+            {    
+                BonusRewardView.Close();
+            }
         }
 
-        //// UI Events
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
         
         public void On_Click()
         {

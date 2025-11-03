@@ -13,24 +13,24 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
-        public int                                 MAX_LAST_USED_PAYMENT_METHODS = 3;
+        public int                                  MAX_LAST_USED_PAYMENT_METHODS = 3;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public Collection<PaymentMethodDefinition> PaymentMethodsDefinitions    = new ();
-        public Collection<UserPaymentMethod>       UserPaymentMethods           = new ();
+        public Collection<PaymentMethodDefinition>  PaymentMethodsDefinitions    = new ();
+        public Collection<UserPaymentMethod>        UserPaymentMethods           = new ();
         
-        public List<string>                        LastUsedUserPaymentMethodIDs = new ();
+        public List<string>                         LastUsedUserPaymentMethodIDs = new ();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public  List<UserPaymentMethod>             SpecialUserPaymentMethods   => UserPaymentMethods.Where(x=>x.Type == "native").ToList();
-        public  List<UserPaymentMethod>             LastUsedUserPaymentMethods  => GetLastUsedUserPaymentMethods();
+        public  List<UserPaymentMethod>             SpecialUserPaymentMethods    => UserPaymentMethods.Where(x=>x.Type == "native").ToList();
+        public  List<UserPaymentMethod>             LastUsedUserPaymentMethods   => GetLastUsedUserPaymentMethods();
         
-        public  List<UserPaymentMethod>            UserPaymentMethodsToDisplay => LastUsedUserPaymentMethods 
-                                                                                  .Union(SpecialUserPaymentMethods)
-                                                                                  .OrderBy(x => x.SortOrder)
-                                                                                  .ToList();
+        public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods 
+                                                                                    .Union(SpecialUserPaymentMethods)
+                                                                                    .OrderBy(x => x.SortOrder)
+                                                                                    .ToList();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
@@ -331,5 +331,3 @@ namespace Galleon.Checkout
         
     }
 }
-
-

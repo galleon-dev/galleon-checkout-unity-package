@@ -15,6 +15,15 @@ namespace Galleon.Checkout.Foundation
     {
         public Folder rootFolder;
         
+        //////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public Assets()
+        {
+            rootFolder            = new Folder();
+            rootFolder.Path       = Folder.PACKAGE_ROOT_FOLDER_PATH;
+            rootFolder.FolderName = "package1";
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////// TEMP
         
         public Step Report() 
@@ -38,7 +47,7 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        this.rootFolder.Node.Live2.Plus(new Folder() { FolderName = "f1" });
+                        this.rootFolder.Node.Live.Plus();
                     });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector

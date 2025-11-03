@@ -8,22 +8,25 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Galleon.Checkout.UI
-{
+{   
     public class checkoutPanelPaymentMethodItemView : View
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
         [Header("UI")]
-        public Image       Icon;
-        public TMP_Text    Label;
-        public Image       CheckedImage;
-        public Image       UncheckedImage;
-        public List<Image> Separators;
-        public List<Image> ExtraSeparators;
-        
-        public Color       SelectedOptionColor   = new Color(0.2862745f, 0.7411765f, 0.9529412f, 1);
-        public Color       UnselectedOptionColor = new Color(0.8679245f, 0.8679245f, 0.8679245f, 1);
+        public Image           Icon;
+        public TMP_Text        Label;
+        public Image           CheckedImage;
+        public Image           UncheckedImage;
+        public List<Image>     Separators;
+        public List<Image>     ExtraSeparators;
+        public Color           SelectedOptionColor   = new Color(0.2862745f, 0.7411765f, 0.9529412f, 1);
+        public Color           UnselectedOptionColor = new Color(0.8679245f, 0.8679245f, 0.8679245f, 1);
 
+        [Header("Bonus")]
+        public GameObject      BonusContainer;
+        public BonusRewardView BonusRewardView;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
         public UserPaymentMethod PaymentMethod     { get; set; }
@@ -36,6 +39,15 @@ namespace Galleon.Checkout.UI
             Debug.Log("paymentMethod: " + paymentMethod.DisplayName);
             this.PaymentMethod     = paymentMethod;
             this.CheckoutPanelView = CheckoutPanelView;
+            
+            // if (this.PaymentMethod.GetPaymentMethodDefinition().BonusData != null)
+            // {
+            //     var bonusData        = this.PaymentMethod.GetPaymentMethodDefinition().BonusData;
+            //     var prefab           = bonusData.BonusPrefab;
+            //     var bonusGO          = Instantiate(original : prefab, parent: BonusContainer.transform);
+            //     this.BonusRewardView = bonusGO.GetComponent<BonusRewardView>();
+            // }
+            
             Refresh();
         }
 
@@ -50,7 +62,7 @@ namespace Galleon.Checkout.UI
                 return;
             }
 
-            this.Label.text = PaymentMethod.DisplayName;
+            this.Label.text    = PaymentMethod.DisplayName;
             this.CheckedImage  .gameObject.SetActive( this.PaymentMethod.IsSelected);
             this.UncheckedImage.gameObject.SetActive(!this.PaymentMethod.IsSelected);
             
@@ -68,9 +80,18 @@ namespace Galleon.Checkout.UI
                 SetSeperatorColor(SelectedOptionColor, true);
             else
                 SetSeperatorColor(UnselectedOptionColor, false);
+            
+            // Bonus
+            if (this.BonusRewardView != null)
+            {    
+                if (this.PaymentMethod.IsSelected) BonusRewardView.Open();
+                else                               BonusRewardView.Close();
+                
+                if (this.PaymentMethod.Type == "native")
+                    BonusRewardView.gameObject.SetActive(false);
+            }
         }
-
-
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
 
         public void On_Click()

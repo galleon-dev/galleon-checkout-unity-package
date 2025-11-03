@@ -11,18 +11,18 @@ using UnityEngine.UIElements;
 using UnityEditor;
 #endif
 
-namespace Galleon.Checkout.Assets
+namespace   Galleon.Checkout.Assets
 {
     [Element("Folder")]
     public class Folder : Asset
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
-        public static readonly string PackageRootFolderPath = Application.dataPath + "/" + "package1/";
+        public static readonly string PACKAGE_ROOT_FOLDER_PATH = Application.dataPath + "/" + "package1/";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-         public string FolderName   { get; set; } = "new_folder";
+        public string FolderName   { get; set; } = "new_folder";
                                     //{
                                     //    get => System.IO.Path.GetFileName(Path);
                                     //    set => Rename(value); 
@@ -53,7 +53,7 @@ namespace Galleon.Checkout.Assets
         public void OnAddedToParent(IEntity parent)
         {
             if (parent is not Asset parentAsset)
-                throw new Exception("FolderElement.OnAddedToParent: Parent is not Asset");
+                throw new Exception("FolderAsset.OnAddedToParent: Parent is not Asset");
 
             if (this.Node.CRUDCommonName != null)
                 this.FolderName = this.Node.CRUDCommonName;
@@ -100,6 +100,14 @@ namespace Galleon.Checkout.Assets
             }
             
             //////////////////////////////////////////
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Live Handler
+        
+        public class LiveHandler : Foundation.LiveHandler<Folder> 
+        {
+            public override void Create()                        => Target.CreateFolder();
+            public override void OnAddedToParent(IEntity Parent) => Target.OnAddedToParent(Parent);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// CRUD Handler

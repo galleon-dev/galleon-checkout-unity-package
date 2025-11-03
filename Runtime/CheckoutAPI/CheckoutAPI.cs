@@ -19,14 +19,21 @@ namespace Galleon.Checkout
             return new InitializationResult() { IsSuccess = true };
         }
         
-        public static async Task<PurchaseResult> Purchase(CheckoutProduct product, Dictionary<string, string> metadata = null)
+        public static async Task<PurchaseResult> Purchase(CheckoutProduct product, Dictionary<string, string> metadata = null, List<BonusData> bonusData = null)
         {
-            if (metadata == null)
-                metadata = new Dictionary<string, string>();
+            // Safty
+            if (metadata  == null) metadata  = new Dictionary<string, string>();
+            if (bonusData == null) bonusData = new List<BonusData>();
             
-            await  CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
-                   CheckoutClient.Instance.CurrentSession.Metadata = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            // Create and setup session
+            await CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
+            CheckoutClient.Instance.CurrentSession.Metadata  = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            CheckoutClient.Instance.CurrentSession.BonusData = bonusData;
+                   
+            // Run Session
             await  CheckoutClient.Instance.RunCheckoutSession().Execute();
+            
+            // Return result
             return CheckoutClient.Instance.CurrentSession.PurchaseResult;
         }
     }

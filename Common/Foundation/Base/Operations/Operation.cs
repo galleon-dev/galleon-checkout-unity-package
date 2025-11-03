@@ -166,11 +166,17 @@ namespace Galleon.Checkout.Foundation
         public LiveNode OriginalTree;
         public LiveNode VirtualTree;
         
+        public string   ID;
+        public IEntity  Parent;
+        
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public LiveOperation(string id, IEntity parent, LiveNode definition)
         {
-            
+            this.ID           = id;
+            this.Parent       = parent;
+            this.OriginalTree = definition;
+            this.OriginalTree.Operation = this;
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,6 +185,12 @@ namespace Galleon.Checkout.Foundation
         public void LoadWithNode(){}
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        public async Task ExecuteAPF()
+        {
+            var node = this.OriginalTree;
+            node.DoPlusCreateAfterVTree();
+        }
         
         public async Task Execute()
         {
@@ -272,13 +284,15 @@ namespace Galleon.Checkout.Foundation
         public string TargetText;
         public string ActionText;
         
+        public LiveOperation Operation;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Action
         
         public Step DoAction() 
         =>
             new Step(name   : $"DoAction"
                     ,action : async (s) =>
-                    {                
+                    {
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lave Load
@@ -290,24 +304,24 @@ namespace Galleon.Checkout.Foundation
         
         public void DoPlusCreateAfterVTree()
         {
-            IEntity Parent = this.GetParent();
-            IEntity target = Activator.CreateInstance(typeof(Folder)) as IEntity;
+            IEntity Parent     = this.Operation.Parent;
+            
+            string  type       = this.TargetText.Split(' ').First(); // "Folder"
+            Type    targetType = Type.GetType("Galleon.Checkout." + type);
+            
+            IEntity target     = (IEntity)Activator.CreateInstance(targetType);
             
             Parent.Node.AddChild(target);
-            target.Node.Crud.Create();
+            target.Node.Live.LiveHandler.OnAddedToParent(Parent);
+            target.Node.Live.LiveHandler.Create();
+            
         }
         
         /// [plus1]   -> simple-op + 1 node + direct-action.
         /// [plus1e]  -> plus1 + element + live + node + code.
         /// [plus1ev] -> plus1e + vtree.
         /// [...]     -> test. save-load. 2 nodes. n nodes. suger/refs.
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Node Methods
         
-        private IEntity GetParent()
-        {
-            return default;
-        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Category Methods
         
@@ -391,6 +405,12 @@ namespace Galleon.Checkout.Foundation
         }
     }
     
+    ///
+    ///
+    ///
+    ///
+    ///
+    
     public class LiveElement
     {
         public bool SupportsCategory(string categoryName)
@@ -404,3 +424,5 @@ namespace Galleon.Checkout.Foundation
         }
     }
 }
+
+
