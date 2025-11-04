@@ -7,7 +7,7 @@ namespace Galleon.Checkout
     [CreateAssetMenu(menuName = "Galleon/Checkout/Checkout Assets")]
     public class CheckoutAssets : ScriptableObject
     {
-        public string           VariantID = "default";
+        public GameObject       BonusItemPrefab;
         public RewardResource[] RewardResources;
     }
     

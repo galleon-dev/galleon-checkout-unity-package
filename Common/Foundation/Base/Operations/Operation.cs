@@ -313,8 +313,7 @@ namespace Galleon.Checkout.Foundation
             
             Parent.Node.AddChild(target);
             target.Node.Live.LiveHandler.OnAddedToParent(Parent);
-            target.Node.Live.LiveHandler.Create();
-            
+            target.Node.Live.LiveHandler.Create();            
         }
         
         /// [plus1]   -> simple-op + 1 node + direct-action.

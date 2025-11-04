@@ -64,6 +64,30 @@ namespace Galleon.Checkout
         
         [Header("Sprites")]
         public CheckoutSprites Sprites;
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////// Public Assets
+        
+        private CheckoutAssets _checkoutAssets;
+        public  CheckoutAssets CheckoutAssets
+        {
+            get
+            {
+                // Check Cache
+                if (_checkoutAssets != null)
+                    return _checkoutAssets;
+                
+                // Load
+                var assets = Resources.LoadAll<CheckoutAssets>("CheckoutAssets");
+                
+                // Validations
+                if (assets.Length < 1) throw new Exception("No CheckoutAssets found");
+                if (assets.Length > 1) throw new Exception("More than one CheckoutAssets found");
+                
+                // Result
+                this._checkoutAssets = assets.First();
+                return _checkoutAssets;
+            }
+        }
     }
     
     

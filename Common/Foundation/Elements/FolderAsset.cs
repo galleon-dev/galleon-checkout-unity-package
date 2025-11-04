@@ -55,9 +55,6 @@ namespace   Galleon.Checkout.Assets
             if (parent is not Asset parentAsset)
                 throw new Exception("FolderAsset.OnAddedToParent: Parent is not Asset");
 
-            if (this.Node.CRUDCommonName != null)
-                this.FolderName = this.Node.CRUDCommonName;
-            
             this.Path = System.IO.Path.Combine(parentAsset.Path, this.FolderName);
         }
         

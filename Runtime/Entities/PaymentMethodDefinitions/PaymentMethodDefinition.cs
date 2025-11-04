@@ -38,7 +38,7 @@ namespace Galleon.Checkout
         
         public string       LocalID     => $"local_pm_id_{this.Type}";
         
-        public BonusData    BonusData   => CHECKOUT.Session.BonusData.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
+        public BonusData    BonusData   => CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         

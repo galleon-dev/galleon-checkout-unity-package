@@ -69,7 +69,7 @@ namespace Galleon.Checkout
         {
             try
             {
-                var myType = this.Data.type == "credit_card" ? "card" : this.Data.type;
+                var myType = this.Data?.type == "credit_card" ? "card" : this.Data?.type;
                 return CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Data.type == myType);
             }
             catch (Exception e)

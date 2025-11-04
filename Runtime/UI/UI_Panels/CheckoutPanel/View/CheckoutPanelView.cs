@@ -79,7 +79,7 @@ namespace Galleon.Checkout.UI
         public override void Initialize()
         {
             Debug.Log("CheckoutPanelView --> Initialize()");
-            RefreshState();
+          //RefreshState();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
@@ -88,17 +88,17 @@ namespace Galleon.Checkout.UI
         {
             if (CheckoutClient.Instance.CurrentSession == null) return;
             
-            // Panel config
-            var configText = CheckoutClient.Instance.CheckoutScreenMobile.CurrentPage.panelConfiguration;
-            if (configText != null)
-                this.Configutation = JsonConvert.DeserializeObject<Config>(configText);
-            if (this.Configutation == null)
-                this.Configutation = new Config() { ShowMinimalOptions = false };
-            
-            if (this.Configutation.ShowMinimalOptions)
-            {
-                this.TaxesContainer.SetActive(false);
-            }
+            // // Panel config
+            // var configText = CheckoutClient.Instance.CheckoutScreenMobile.CurrentPage.panelConfiguration;
+            // if (configText != null)
+            //     this.Configutation = JsonConvert.DeserializeObject<Config>(configText);
+            // if (this.Configutation == null)
+            //     this.Configutation = new Config() { ShowMinimalOptions = false };
+            // 
+            // if (this.Configutation.ShowMinimalOptions)
+            // {
+            //     this.TaxesContainer.SetActive(false);
+            // }
             
             // Debug.Log("<color=green>RefreshState</color>");
             
@@ -119,8 +119,8 @@ namespace Galleon.Checkout.UI
             var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
             foreach (var paymentMethod in paymentMethods)
             {
-                if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
-                    if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
+                // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
+                //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
                 
                 var go   = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();

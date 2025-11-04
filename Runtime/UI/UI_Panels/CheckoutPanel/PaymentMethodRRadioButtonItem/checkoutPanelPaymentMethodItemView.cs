@@ -25,7 +25,7 @@ namespace Galleon.Checkout.UI
 
         [Header("Bonus")]
         public GameObject      BonusContainer;
-        public BonusRewardView BonusRewardView;
+        public BonusItemView   bonusItemView;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
@@ -36,18 +36,21 @@ namespace Galleon.Checkout.UI
 
         public void Initialize(UserPaymentMethod paymentMethod, CheckoutPanelView CheckoutPanelView)
         {
-            Debug.Log("paymentMethod: " + paymentMethod.DisplayName);
+            // "log"
+            this.gameObject.name += $"_{paymentMethod.Type}";
+            
+            // Definitions
             this.PaymentMethod     = paymentMethod;
             this.CheckoutPanelView = CheckoutPanelView;
             
-            // if (this.PaymentMethod.GetPaymentMethodDefinition().BonusData != null)
-            // {
-            //     var bonusData        = this.PaymentMethod.GetPaymentMethodDefinition().BonusData;
-            //     var prefab           = bonusData.BonusPrefab;
-            //     var bonusGO          = Instantiate(original : prefab, parent: BonusContainer.transform);
-            //     this.BonusRewardView = bonusGO.GetComponent<BonusRewardView>();
-            // }
+            // Bonus
+            if (this.bonusItemView != null && CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
+            {
+                Destroy(this.bonusItemView.gameObject); // destroy placeholder
+                this.bonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<BonusItemView>();
+            }
             
+            // Refresh
             Refresh();
         }
 
@@ -82,13 +85,13 @@ namespace Galleon.Checkout.UI
                 SetSeperatorColor(UnselectedOptionColor, false);
             
             // Bonus
-            if (this.BonusRewardView != null)
+            if (this.bonusItemView != null)
             {    
-                if (this.PaymentMethod.IsSelected) BonusRewardView.Open();
-                else                               BonusRewardView.Close();
+                if (this.PaymentMethod.IsSelected) bonusItemView.Open();
+                else                               bonusItemView.Close();
                 
                 if (this.PaymentMethod.Type == "native")
-                    BonusRewardView.gameObject.SetActive(false);
+                    bonusItemView.gameObject.SetActive(false);
             }
         }
         

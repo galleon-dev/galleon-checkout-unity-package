@@ -162,7 +162,8 @@ namespace Galleon.Checkout.UI
 
             float PrefabHeight = PaymentPrefabHeight;
 
-            if (CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape)
+            if (CheckoutClient.Instance.CheckoutScreenMobile != null 
+            &&  CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape)
             {
                 PrefabHeight      = PaymentPrefabHeightLandscape;
                 ScrollRectMaxSize = ScrollRectMaxSizeLandscape;
@@ -179,7 +180,8 @@ namespace Galleon.Checkout.UI
 
                 ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PrefabHeight + SeparatorHeight) + 2;
 
-                if (CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape)
+                if (CheckoutClient.Instance.CheckoutScreenMobile != null
+                &&  CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape)
                 {
                     ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PrefabHeight + SeparatorHeight) + 2;
                 }

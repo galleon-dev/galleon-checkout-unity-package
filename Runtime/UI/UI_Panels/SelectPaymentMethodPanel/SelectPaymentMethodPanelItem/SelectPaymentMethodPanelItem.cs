@@ -19,7 +19,7 @@ namespace Galleon.Checkout.UI
         
         [Header("Bonus")]
         public GameObject                   BonusContainer;
-        public BonusRewardView              BonusRewardView;
+        public BonusItemView              bonusItemView;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -54,7 +54,7 @@ namespace Galleon.Checkout.UI
             
             if (this.UserPaymentMethod != null
             &&  this.UserPaymentMethod.Type == "native")
-                this.BonusRewardView.gameObject.SetActive(false);
+                this.bonusItemView?.gameObject.SetActive(false);
             
             if (userPaymentMethod.GetPaymentMethodDefinition()?.BonusData != null)
                 InitializeBonus(userPaymentMethod.GetPaymentMethodDefinition().BonusData);
@@ -101,9 +101,9 @@ namespace Galleon.Checkout.UI
             }
             
             // Bonus
-            if (this.BonusRewardView != null)
+            if (this.bonusItemView != null)
             {    
-                BonusRewardView.Close();
+                bonusItemView.Close();
             }
         }
 
