@@ -1,0 +1,100 @@
+
+This is an instruction file for AI.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// code standards for small class
+
+public class SmallClass
+{
+    //// Consts
+    
+    public const int MY_CONST = 4;
+    
+    //// Members
+    
+    public  int     myInt            = 4;
+    public  string  myString         = "bla"";
+    private float   myFloat          = 1.2f;
+    
+    public  double  MyProperty       => 4.0;
+    public  bool    MyOtherProperty  => true;
+    
+    //// Lifecycle
+    
+    public SmallClass()
+    {
+        // ctor logic here
+    }
+    
+    //// API Methods
+    
+    public void DoTheThing()
+    {
+        ActuallyToDoTheThing();
+    }
+    
+    //// helper Methods
+    
+    private void ActuallyToDoTheThing()
+    {
+        // Logic here
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// code standards for medium class
+
+public class MediumClass
+{
+    //////////////////////////////////////////////////////////////// Members
+    
+    public  int          myInt     = 4;
+    public  string       myString  = "bla"";
+    private float        myFloat   = 1.2f;
+    
+    public  event Action MyEvent;
+    
+    //////////////////////////////////////////////////////////////// Lifecycle
+    
+    public MediumClass()
+    {
+        // ctor logic here
+    }
+    
+    //////////////////////////////////////////////////////////////// API Methods
+    
+    public void DoTheThing()
+    {
+        ActuallyToDoTheThing();
+    }
+    
+    //////////////////////////////////////////////////////////////// helper Methods
+    
+    private void ActuallyToDoTheThing()
+    {
+        // Logic here
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// code standards for big class
+
+public class BigClass
+{
+    
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Project
+
+> Entities and Nodes
+> Root and Structure
+> Steps and Flows
+> Elements & Live
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Foundation
+
+> Explorer
+> Notion & Dashboard page
+> Test & Report
+> Pipeline
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Elements
+
+

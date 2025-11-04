@@ -5,7 +5,6 @@ using UnityEngine;
 
 using Galleon.Checkout.UI;
 using System.Text;
-using UnityEngine;
 
 namespace AdvancedInputFieldPlugin
 {

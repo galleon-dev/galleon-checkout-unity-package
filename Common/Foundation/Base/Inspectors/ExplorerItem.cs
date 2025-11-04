@@ -212,9 +212,7 @@ namespace Galleon.Checkout
                 this.ButtonFoldout.Text = e.Node.DisplayName;
                 
                 e.Node.Inspector?.OnExplorerItemAutoRefresh();
-            }
-            
-            
+            }            
         }
     }
 }
@@ -246,4 +244,36 @@ namespace Galleon.Checkout
         VisualElement WidgetsElement;
     }
 }
+
+
+/// > Explorer Window
+///     - Create an editor window called EditorExplorer
+///    (- Create a runtime ui doc called RuntimeExplorer)
+/// > Explorer
+///     - Create a VisualElement called Explorer
+///       - the explorer will show the entity tree, and will contain the root visual element that will handle its children, etc.
+/// > Explorer Modes
+///     - Tree
+///     - Split Portrait
+///     - Split Landscape
+/// > Widget
+///     > Widget UI
+///         - Create a VisualElement class called "Widget"
+///         - it acts similar to a foldout, where it has a main item (button) and content that you can toggle, but more complicated then a foldout.
+///         - the main item :
+///             - Children Foldout Button
+///             - Main button )opens content foldout)
+///             - Extras
+///                 - Indicators
+///         - Children foldout
+///         - Content foldout
+///             - Inspectors
+///             - Entity Inspector
+///             - Raw Inspector
+///     > Widget Code
+///         - Data
+///         - Refresh
+/// > Explorer Item
+///     - Create a Class called ExplorerItem
+
 

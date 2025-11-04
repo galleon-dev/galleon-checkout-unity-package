@@ -11,37 +11,38 @@ namespace Galleon.Checkout.UI
 {
     public class SelectPaymentMethodPanelItem : View
     {
-        //// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         [Header("UI")]
-        public Image    Icon;
-        public TMP_Text Label;
+        public Image                        Icon;
+        public TMP_Text                     Label;
         
-        [Header("Sprites")]
-        public Sprite   AddCreditCardSprite;
-        public Sprite   VisaSprite;
-        public Sprite   MasterCardSprite;
-        public Sprite   AmexSprite;
-        public Sprite   DinersSprite;
-        public Sprite   DiscoverSprite;
-        public Sprite   GPaySprite;
-        public Sprite   PaypalSprite;
-        public Sprite   AppleSprite;
+        [Header("Bonus")]
+        public GameObject                   BonusContainer;
+        public BonusItemView              bonusItemView;
         
-        //// Properties
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public PaymentMethodDefinition      PaymentMethodDefinition      { get; set; }
         public UserPaymentMethod            UserPaymentMethod            { get; set; }
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView { get; set; }
         
         
-        //// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public void Initialize(PaymentMethodDefinition      paymentMethodDefinition, 
                                SelectPaymentMethodPanelView SelectPaymentMethodPanelView)
         {
             this.PaymentMethodDefinition      = paymentMethodDefinition;
             this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
+            
+            var bonusData = (PaymentMethodDefinition != null) ? PaymentMethodDefinition?.BonusData 
+                          : (UserPaymentMethod       != null) ? UserPaymentMethod?.GetPaymentMethodDefinition()?.BonusData 
+                          : null;
+            
+            if (bonusData != null)
+                InitializeBonus(bonusData);
+            
             Refresh();
         }
         
@@ -50,11 +51,25 @@ namespace Galleon.Checkout.UI
         {
             this.UserPaymentMethod            = userPaymentMethod;
             this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
+            
+            if (this.UserPaymentMethod != null
+            &&  this.UserPaymentMethod.Type == "native")
+                this.bonusItemView?.gameObject.SetActive(false);
+            
+            if (userPaymentMethod.GetPaymentMethodDefinition()?.BonusData != null)
+                InitializeBonus(userPaymentMethod.GetPaymentMethodDefinition().BonusData);
+            
             Refresh();
         }
         
+        private void InitializeBonus(BonusData bonusData)
+        {
+            // var prefab           = bonusData.BonusPrefab;
+            // var bonusGO          = Instantiate(original : prefab, parent: BonusContainer.transform);
+            // this.BonusRewardView = bonusGO.GetComponent<BonusRewardView>();
+        }
         
-        //// Refresh
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
         
         public override async void RefreshState()
         {    
@@ -68,81 +83,39 @@ namespace Galleon.Checkout.UI
             &&  this.UserPaymentMethod            == null)
             {
                 this.Label.text  = "Add Credit or Debit Card";
-                this.Icon.sprite = AddCreditCardSprite;
+                this.Icon.sprite = CHECKOUT.Sprites.AddCreditCardIconSprite;
             }
             //////////////////////////////////////////////// Payment Method Definitions
             else if (this.PaymentMethodDefinition != null)
             {
+                this.Icon.sprite = this.PaymentMethodDefinition.GetIconSprite();
+
                 if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)
-                {
                     this.Label.text  = "Add Credit or Debit Card";
-                    this.Icon.sprite = AddCreditCardSprite;
-                }
-                else if (this.PaymentMethodDefinition != null
-                     &&  this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_GOOGLE_PAY)
-                {
-                    this.Icon.sprite = GPaySprite;
-                }
-                else if (this.PaymentMethodDefinition != null
-                     &&  this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_PAYPAL)
-                {
-                    this.Icon.sprite = PaypalSprite;
-                }
             }
             //////////////////////////////////////////////// UserPaymentMethods
-            else if (this.UserPaymentMethod != null
-                 &&  this.UserPaymentMethod.Data is CreditCardUserPaymentMethodData cd)
+            else if (this.UserPaymentMethod != null)
             {
-                 if (cd.credit_card_type == nameof(UserPaymentMethod.PaymentMethodType.MasterCard))
-                 {
-                     this.Label.text  = this.UserPaymentMethod.DisplayName;
-                     this.Icon.sprite = this.MasterCardSprite;
-                 }
-                 else if (cd.credit_card_type == nameof(UserPaymentMethod.PaymentMethodType.Visa))
-                 {
-                     this.Label.text  = this.UserPaymentMethod.DisplayName;
-                     this.Icon.sprite = this.VisaSprite;
-                 }
-                 else if (cd.credit_card_type == nameof(UserPaymentMethod.PaymentMethodType.Amex))
-                 {
-                     this.Label.text  = this.UserPaymentMethod.DisplayName;
-                     this.Icon.sprite = this.AmexSprite;
-                 }
-                 else if (cd.credit_card_type == nameof(UserPaymentMethod.PaymentMethodType.Diners))
-                 {
-                     this.Label.text  = this.UserPaymentMethod.DisplayName;
-                     this.Icon.sprite = this.DinersSprite;
-                 }
-                 else if (cd.credit_card_type == nameof(UserPaymentMethod.PaymentMethodType.Discover))
-                 {
-                     this.Label.text  = this.UserPaymentMethod.DisplayName;
-                     this.Icon.sprite = this.DiscoverSprite;
-                 }
-                 else if (cd.credit_card_type == nameof(UserPaymentMethod.PaymentMethodType.GPay))
-                 {
-                     this.Label.text  = this.UserPaymentMethod.DisplayName;
-                     this.Icon.sprite = this.GPaySprite;
-                 }
-                 else if (cd.credit_card_type == nameof(UserPaymentMethod.PaymentMethodType.PayPal))
-                 {
-                     this.Label.text  = this.UserPaymentMethod.DisplayName;
-                     this.Icon.sprite = this.PaypalSprite;
-                 }
-                 else if (cd.credit_card_type == nameof(UserPaymentMethod.PaymentMethodType.Apple))
-                 {
-                     this.Label.text  = this.UserPaymentMethod.DisplayName;
-                     this.Icon.sprite = this.AppleSprite;
-                 }
+                this.Label.text  = "**** - " + this.UserPaymentMethod.DisplayName;
+                this.Icon.sprite = this.UserPaymentMethod.GetIconSprite();
+            }
+            
+            // Bonus
+            if (this.bonusItemView != null)
+            {    
+                bonusItemView.Close();
             }
         }
 
-        //// UI Events
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
         
         public void On_Click()
         {
             if (this.PaymentMethodDefinition == null
             &&  this.UserPaymentMethod       == null)
+            {
                 this.SelectPaymentMethodPanelView.On_NewCardClicked();
+            }
             else
             {
                 this.SelectPaymentMethodPanelView.On_Select(this);
@@ -150,6 +123,3 @@ namespace Galleon.Checkout.UI
         }
     }
 }
-
-
-

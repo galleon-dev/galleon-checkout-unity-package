@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.Assets;
 using Newtonsoft.Json;
 using UnityEngine;
+using Random = System.Random;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,26 +16,26 @@ namespace Galleon.Checkout.Foundation
 {
     public class Operation : Entity
     {
-        //////////////////////////////////////////////////////////////////////////// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public OPERATION_STATE operationState = new OPERATION_STATE();
-        public Step  Flow;
+        public OPERATION_STATE OperationState = new OPERATION_STATE();
+        public Step            Flow;
         
-        //////////////////////////////////////////////////////////////////////////// Properties
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public string ID
         {
-            get => operationState.Op.ID;
-            set => operationState.Op.ID = value;
+            get => OperationState.Op.ID;
+            set => OperationState.Op.ID = value;
         }
         
         public Dictionary<string, object> Data
         {
-            get => operationState.Data;
-            set => operationState.Data = value;
+            get => OperationState.Data;
+            set => OperationState.Data = value;
         }
         
-        //////////////////////////////////////////////////////////////////////////// State
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// State
         
         public string OperationStateFileRelativePath => $"TEMP/operation_{ID}_state.json";
         
@@ -46,11 +48,11 @@ namespace Galleon.Checkout.Foundation
         [Serializable]
         public class OperationData
         {
-            public string       ID               { get; set; } = "";
-            public List<string> CompletedStepIDs { get; set; } = new();
+            public string                     ID               { get; set; } = "";
+            public List<string>               CompletedStepIDs { get; set; } = new();
         }
         
-        //////////////////////////////////////////////////////////////////////////// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public Operation(string ID)
         {
@@ -58,10 +60,9 @@ namespace Galleon.Checkout.Foundation
             this.Flow                     = new Step(name: $"operation_{ID}");
             this.Flow.PreChildStepAction  = (completedChildStep) =>
                                           {       
-                                              this.operationState.Op.CompletedStepIDs.Add(completedChildStep.Name);
+                                              this.OperationState.Op.CompletedStepIDs.Add(completedChildStep.Name);
                                               this.Save();
                                               Root.Instance.Context.Operations.Save();
-                                              
                                           };
             this.Flow.PostStepAction      = (completedStep) =>
                                           {
@@ -76,7 +77,7 @@ namespace Galleon.Checkout.Foundation
             return this;
         }
         
-        //////////////////////////////////////////////////////////////////////////// API
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
         public async Task Execute()
         {
@@ -91,7 +92,7 @@ namespace Galleon.Checkout.Foundation
         }
         
         
-        //////////////////////////////////////////////////////////////////////////// Events
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
         
         #if UNITY_EDITOR
         [InitializeOnLoadMethod]
@@ -103,11 +104,11 @@ namespace Galleon.Checkout.Foundation
             // Debug.Log("OperationController.InitializeOnLoad()");
         }
         
-        //////////////////////////////////////////////////////////////////////////// Storage
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Storage
         
         public void Save()
         {
-            var json = JsonConvert.SerializeObject(this.operationState);
+            var json = JsonConvert.SerializeObject(this.OperationState);
             var path = Path.Combine(Application.dataPath, OperationStateFileRelativePath);
             File.WriteAllText(path, json);
         }
@@ -120,17 +121,307 @@ namespace Galleon.Checkout.Foundation
             if (!File.Exists(path))
                 throw new Exception($"operation {ID} state file not found at path: " + path);
 
-            var json = File.ReadAllText(path);
-            operation.operationState = JsonConvert.DeserializeObject<OPERATION_STATE>(json);
+            var json                 = File.ReadAllText(path);
+            operation.OperationState = JsonConvert.DeserializeObject<OPERATION_STATE>(json);
 
             foreach (var step in operation.Flow.ChildSteps)
             {
-                if (operation.operationState.Op.CompletedStepIDs.Contains(step.Name))
+                if (operation.OperationState.Op.CompletedStepIDs.Contains(step.Name))
                     step.StepState = Step.STEP_STATE.PreviouslyCompleted;
             }
             
             return operation;
         }
+        
+        public async void Test()
+        {
+            /// a.crud_plus(f1)
+            ///     add_child()
+            ///     create()
+            ///
+            /// a.op_plus(f1)
+            ///     new step("plus")
+            ///         new step("add_child")
+            ///         new step("create")
+            ///
+            
+            await this.Node.Live2.CRUD_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live2.STEP_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live2.P_OP_PLUS(new Folder() {FolderName = "f1"});
+            await this.Node.Live2.OP_PLUS  (new Folder() {FolderName = "f1"});
+            await this.Node.Live2.LIVE_PLUS(new Folder() {FolderName = "f1"});
+        }
+    }
+    
+    //
+    //
+    //
+    //
+    //
+    
+    public class LiveOperation
+    {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        public LiveNode OriginalTree;
+        public LiveNode VirtualTree;
+        
+        public string   ID;
+        public IEntity  Parent;
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public LiveOperation(string id, IEntity parent, LiveNode definition)
+        {
+            this.ID           = id;
+            this.Parent       = parent;
+            this.OriginalTree = definition;
+            this.OriginalTree.Operation = this;
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        public void SaveWithNode(){}
+        public void LoadWithNode(){}
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        public async Task ExecuteAPF()
+        {
+            var node = this.OriginalTree;
+            node.DoPlusCreateAfterVTree();
+        }
+        
+        public async Task Execute()
+        {
+            await CreateVirtualTree();
+            await CreateActualContent();
+        }
+        
+        public async Task CreateVirtualTree()
+        {
+            // Create virtual tree
+            VirtualTree = new LiveNode();
+            
+            // With Parent
+            LiveNode Parent = new LiveNode();
+            VirtualTree.Node.AddChild(Parent);
+            
+            // Find categories
+            List<string> categories = new();
+            foreach (var child in OriginalTree.Node.Descendants().OfType<LiveNode>())
+                if (child.ToString() == "(category)")
+                    categories.Add(child.ToString());
+            
+            // Clone Categories sub-trees
+            foreach (var category in categories)
+            {
+                var originalSubTreeRoot = OriginalTree.Node.Descendants().OfType<LiveNode>().FirstOrDefault(x => x.ToString() == category);
+                var clonedTreeRoot      = originalSubTreeRoot.CloneTree();
+                var TargetTreeRoot      = Parent;
+
+                TargetTreeRoot.Node.AddChild(clonedTreeRoot);
+            }
+            
+            // Remove irrelevant nodes per category
+            foreach (var lineNode in VirtualTree.Node.Descendants().OfType<LiveNode>())
+            {
+                // Get Category
+                var category = lineNode.GetCategoryName();
+                if (category == null) continue;
+                
+                // is supported in category
+                var element      = lineNode.GetElement();
+                var isInCategory = element.SupportsCategory(category);
+                
+                // Remove node if not in category
+                if (!isInCategory)
+                {
+                    // Get Parent
+                    var parent = lineNode.Node.Parent as LiveNode;
+                    
+                    // Move all of my children to my parent
+                    foreach (var child in lineNode.Node.Children)
+                        parent.Node.AddChild(child);
+                    
+                    // remove this node
+                    parent.Node.RemoveChild(lineNode);
+                }
+            }
+        }
+        
+        public async Task CreateActualContent()
+        {
+            var virtualTreeRoot = VirtualTree;
+
+            foreach (var liveNode in virtualTreeRoot.Node.Descendants().OfType<LiveNode>())
+            {
+                if (liveNode.IsDraft())
+                {
+                    var virtualParent = liveNode.Node.Parent as LiveNode;
+                    var actualParent  = virtualParent.GetActualEntity().Node;
+                    
+                    var actualNode = liveNode.GetElement().CreateActualNode();
+                    actualParent.AddChild(actualNode);
+                    actualNode.Node.Crud.Create();
+                }
+            }
+        }
+    }
+    
+    ///
+    ///
+    ///
+    ///
+    /// 
+    
+    public class LiveNode : Entity
+    {   
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+        
+        public string Text;
+        
+        public string TargetText;
+        public string ActionText;
+        
+        public LiveOperation Operation;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Action
+        
+        public Step DoAction() 
+        =>
+            new Step(name   : $"DoAction"
+                    ,action : async (s) =>
+                    {
+                    });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lave Load
+        
+        public        string   Save ()            { return "string"; }
+        public static LiveNode Parse(string text) { return default;  }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API Methods
+        
+        public void DoPlusCreateAfterVTree()
+        {
+            IEntity Parent     = this.Operation.Parent;
+            
+            string  type       = this.TargetText.Split(' ').First(); // "Folder"
+            Type    targetType = Type.GetType("Galleon.Checkout." + type);
+            
+            IEntity target     = (IEntity)Activator.CreateInstance(targetType);
+            
+            Parent.Node.AddChild(target);
+            target.Node.Live.LiveHandler.OnAddedToParent(Parent);
+            target.Node.Live.LiveHandler.Create();            
+        }
+        
+        /// [plus1]   -> simple-op + 1 node + direct-action.
+        /// [plus1e]  -> plus1 + element + live + node + code.
+        /// [plus1ev] -> plus1e + vtree.
+        /// [...]     -> test. save-load. 2 nodes. n nodes. suger/refs.
+        
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Category Methods
+        
+        public bool IsCategoryNode()
+        {
+            if (Text.Trim().StartsWith("(") 
+            &&  Text.Trim().EndsWith(")"))
+            {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        public string GetCategoryName()
+        {
+            if (IsCategoryNode())
+            {
+                return Text.Trim().Substring(1, Text.Trim().Length - 2);
+            }
+            
+            return "";
+        }
+        
+        public string GetNodeCategory()
+        {
+            foreach (var parentNode in this.Node.Ancestors().OfType<LiveNode>())
+            {
+                if (parentNode.IsCategoryNode())
+                    return parentNode.GetCategoryName();
+            }
+            
+            return null;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Real Tree Methods
+        
+        public bool IsDraft()
+        {
+            return true;
+        }
+        
+        public Entity GetActualEntity()
+        {
+            return null;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Clone Methods
+        
+        public LiveNode CloneNode()
+        {
+            return new LiveNode();
+        }
+        
+        public LiveNode CloneTree()
+        {
+            var nodeMap   = new Dictionary<LiveNode, LiveNode>();
+            var clone     = this.CloneNode();
+            nodeMap[this] = clone;
+
+            foreach (var descendant in this.Node.Descendants().OfType<LiveNode>())
+            {
+                var descendantClone = descendant.CloneNode();
+                nodeMap[descendant] = descendantClone;
+
+                var parent = descendant.Node.Parent as LiveNode;
+                if (parent != null && nodeMap.ContainsKey(parent))
+                {
+                    nodeMap[parent].Node.AddChild(descendantClone);
+                }
+            }
+
+            return clone;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Element
+        
+        public LiveElement GetElement()
+        {
+            return new LiveElement();
+        }
+    }
+    
+    ///
+    ///
+    ///
+    ///
+    ///
+    
+    public class LiveElement
+    {
+        public bool SupportsCategory(string categoryName)
+        {
+            return new Random().Next(2) == 1;
+        }
+        
+        public Entity CreateActualNode()
+        {
+            return default;
+        }
     }
 }
+
 

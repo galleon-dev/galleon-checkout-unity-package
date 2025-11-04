@@ -1,5 +1,7 @@
 #define GALLEON_DEV
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -52,12 +54,40 @@ namespace Galleon.Checkout
         
         [Header("Screens")]
         public GameObject CheckoutPopupPrefab;
+		public GameObject CheckoutPopupLandscapePrefab;
         
         [Header("UI Elements")]
         public GameObject UI_Seporator;
         
         [Header("Tests")]
         public bool IsTest = false;
+        
+        [Header("Sprites")]
+        public CheckoutSprites Sprites;
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////// Public Assets
+        
+        private CheckoutAssets _checkoutAssets;
+        public  CheckoutAssets CheckoutAssets
+        {
+            get
+            {
+                // Check Cache
+                if (_checkoutAssets != null)
+                    return _checkoutAssets;
+                
+                // Load
+                var assets = Resources.LoadAll<CheckoutAssets>("CheckoutAssets");
+                
+                // Validations
+                if (assets.Length < 1) throw new Exception("No CheckoutAssets found");
+                if (assets.Length > 1) throw new Exception("More than one CheckoutAssets found");
+                
+                // Result
+                this._checkoutAssets = assets.First();
+                return _checkoutAssets;
+            }
+        }
     }
     
     

@@ -30,12 +30,12 @@ namespace Galleon.Checkout
 
     public partial class EntityNode
     {
-        ///////////////////////////////////////////////////////////////////////// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public EntityNode(IEntity entity
-                        ,[CallerMemberName] string callerName = ""
-                        ,[CallerLineNumber] int    callerLine = 0
-                        ,[CallerFilePath  ] string callerPath = "")
+        public EntityNode(                  IEntity entity
+                        ,[CallerMemberName] string  callerName = ""
+                        ,[CallerLineNumber] int     callerLine = 0
+                        ,[CallerFilePath  ] string  callerPath = "")
         {
             if (entity == null)
                 throw new Exception("entity is null in EntityNode constructor");
@@ -54,7 +54,7 @@ namespace Galleon.Checkout
                 child.Node.Setup();
         }
         
-        ///////////////////////////////////////////////////////////////////////// Setup
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setup
         
         public void Setup()
         {
@@ -72,10 +72,28 @@ namespace Galleon.Checkout
 
         [SerializeReference] [HideInInspector] public IEntity Entity;
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Info
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - ID
 
-        public EntityID ID   = new EntityID();
-        public Tags     Tags = new Tags();
+        public EntityID ID => new EntityID(this.Entity);
+        
+        public struct EntityID
+        {
+            private IEntity Entity; 
+            public  EntityID(IEntity entity) { this.Entity = entity; }
+            
+            public string SelfPathID  => this.Entity.Node.DisplayName;
+            public string PathID      => string.Join(".", Entity.Node.Ancestors()
+                                                          .Reverse()
+                                                          .ToList()
+                                                          .Select(p => p.Node.ID.SelfPathID)
+                                                          );
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Tags
+        
+        public Tags Tags = new Tags();
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Info
         
         public string DisplayName;
         
@@ -117,15 +135,15 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Node
 
-        [SerializeReference] public IEntity          Parent     = null;
-                             public EntityNode       ParentNode => Parent.Node;
-        [SerializeReference] public List<IEntity>    Children   = new();
-                             public List<EntityNode> ChildNodes => Children.Select(c => c.Node).ToList();
+        [SerializeReference] public IEntity             Parent          = null;
+                             public EntityNode          ParentNode      => Parent.Node;
+        [SerializeReference] public List<IEntity>       Children        = new();
+                             public List<EntityNode>    ChildNodes      => Children.Select(c => c.Node).ToList();
         
-        public List<WeakReference<IEntity>>       LinkedChildren { get; set; } = new();
+        public List<WeakReference<IEntity>>             LinkedChildren  { get; set; } = new();
 
-        public IEnumerable<IEntity>               Ancestors()   => EnumerateUp  (this.Entity);
-        public IEnumerable<IEntity>               Descendants() => EnumerateDown(this.Entity);
+        public IEnumerable<IEntity>                     Ancestors()     => EnumerateUp  (this.Entity);
+        public IEnumerable<IEntity>                     Descendants()   => EnumerateDown(this.Entity);
 
         public void SetParent(IEntity parent)
         {
@@ -140,6 +158,11 @@ namespace Galleon.Checkout
 
         public void AddChild(IEntity child)
         {
+            if (child.Node.Parent != null)
+            {
+                child.Node.Parent.Node.RemoveChild(child);
+            }
+            
             this.Children.Add(child);
             child.Node.SetParent(this.Entity);
         }
@@ -252,13 +275,8 @@ namespace Galleon.Checkout
             }
         }
 
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Storage
         
-        public string _SelfPathID = null;
-        public string SelfPathID  => _SelfPathID ?? this.Entity.GetType().Name;
-        public string PathID      => string.Join(".", Ancestors().Skip(1).Reverse().ToList().Select(p => p.Node.SelfPathID).Concat(new[] { SelfPathID }));
-            
         public        EntityStorage Storage => new(Entity);
         public struct EntityStorage
         {
@@ -291,8 +309,8 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Reflection
         
-        public        EntityReflection Reflection => new(Entity);
-        public struct EntityReflection
+        public       EntityReflection Reflection => new(Entity);
+        public class EntityReflection
         {
             private IEntity Entity;
             public  EntityReflection(IEntity entity) => Entity = entity;
@@ -530,235 +548,45 @@ namespace Galleon.Checkout
         public       EditorExtras editorExtras = new EditorExtras();
         public class EditorExtras
         {
-            public string HeaderAttributeText;
-            
+            public string HeaderAttributeText;   
         }
         
         #endif // UNITY_EDITOR
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - self CRUD
-        
-        public bool IsCrudDraft = true;
-        public string CRUDCommonName;
-        
-        public        CRUD Crud => new(Entity);
-        public struct CRUD
-        {
-            public IEntity Entity;
-            public CRUD(IEntity entity) => this.Entity = entity;
-            
-            public bool isDraft => Entity.Node.Tags.Contains("crud_draft") || Entity.Node.IsCrudDraft;
-            
-            public bool SupportsCRUD => Entity.GetType().GetNestedTypes().Any(x => x.IsSubclassOf(typeof(CrudHandler)));
-            
-            public void Create()
-            {
-                GetCrudHandler().Create();
-            }
-            
-            public void OnAddedToParent(IEntity parent)
-            {
-                GetCrudHandler().OnAddedToParent(parent);
-            }
-            
-            public void Delete()
-            {
-                GetCrudHandler().Delete();
-            }
-            
-            public void Update(string path, string value)
-            {
-                GetCrudHandler().Update(path, value);
-            }
-            
-            public bool DoesExist()
-            {
-                return GetCrudHandler().DoesExist();
-            }
-            
-            public void OpenForEdit()  {}
-            public void CloseForEdit() {}
-            
-            ////////////////////////////// Helpers
-            
-            public CrudHandler GetCrudHandler()
-            {
-                if (!SupportsCRUD)
-                    throw new Exception($"type {Entity.GetType().FullName} does not support CRUD");
-                
-                var type            = Entity.GetType();
-                var crudType        = type.GetNestedTypes().FirstOrDefault(x => x.IsSubclassOf(typeof(CrudHandler)));
-                var crudInstance    = Activator.CreateInstance(crudType, true) as CrudHandler;
-                crudInstance.target = Entity;
-                
-                return crudInstance;
-            }
-        }
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Scan
-        
-        public        SCAN Scan => new(Entity);
-        public struct SCAN
-        {
-            IEntity Entity;
-            public SCAN(IEntity entity) => this.Entity = entity;
-            
-            public bool SupportsScan => Entity.GetType().GetNestedTypes().Any(x => x.IsSubclassOf(typeof(ScanHandler)));
-            
-            public ScanHandler GetScanHandler()
-            {
-                if (!SupportsScan)
-                    throw new Exception($"type {Entity.GetType().FullName} does not support Scan");
-                
-                var type            = Entity.GetType();
-                var scanType        = type.GetNestedTypes().FirstOrDefault(x => x.IsSubclassOf(typeof(ScanHandler)));
-                var scanInstance    = Activator.CreateInstance(scanType, true) as ScanHandler;
-                scanInstance.target = Entity;
-                
-                return scanInstance;
-            }
-            
-            public void Register()
-            {
-                var scanHandler = GetScanHandler();
-                scanHandler.Register();
-            }
-            public void ScanSelf()
-            {
-                var scanHandler = GetScanHandler();
-                scanHandler.Scan();
-            }
-            public void ScanRecursive()
-            {
-                this.ScanSelf();
-                
-                var children = this.Entity?.Node?.Children;
-                if (children == null) return;
-
-                foreach (var child in children)
-                {
-                    if (child == null) continue;
-                    child.Node.Scan.ScanRecursive();
-                }
-            }
-        }
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element
-     
-        public        ELEMENT Element => new(Entity);
-        public struct ELEMENT
-        {
-            IEntity Entity;
-            public ELEMENT(IEntity entity) => this.Entity = entity;
-            
-            // Definitions
-            public IEntity GetDefinition()   { return default; }
-            public IEntity GetElement()      { return default; }
-            public IEntity GetAssetsFolder() { return default; }
-        }
-            
-        public Resource GetResource() => new Resource();
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live Tree
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
      
         public        LIVE Live => new(Entity);
         public struct LIVE
         {
-            IEntity Entity;
-            public LIVE(IEntity entity) => this.Entity = entity;
+            IEntity Entity; public LIVE(IEntity entity) => this.Entity = entity;
             
-            public void Plus(IEntity entity)
+            public async Task Plus()
             {
-                entity.Node.IsCrudDraft = true;
-                this.Entity.Node.AddChild(entity);
-                entity.Node.Crud.OnAddedToParent(parent : this.Entity);
-                entity.Node.Crud.Create();
-                entity.Node.IsCrudDraft = false;
+                var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
+                                                       ,parent     : this.Entity
+                                                       ,definition : new LiveNode() { TargetText = "Assets.Folder f1", ActionText = "plus" });
+                
+                await plusOperation.ExecuteAPF();
             }
-            public void Minus()
-            {
-                Entity.Node.Crud.Delete();
-                Entity.Node.ParentNode.RemoveChild(Entity);
-            }
-            public void Edit(string path, string value)
-            {
-                Entity.Node.Crud.Update(path, value);
-            }
-        }    
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Print
-     
-        
-        public        PRINTING Printing => new(Entity);
-        public struct PRINTING
-        {
-            IEntity Entity;
-            public PRINTING(IEntity entity) => this.Entity = entity;
             
-            public async void Print(string id, string text)
+            public LiveHandler LiveHandler
             {
-                var   op = new PrintOperation(ID:id, parent:Entity, text:text);
-                await op.Print().Execute();   
-            }
-        }
-    }
-    
-    /////////////////////////////////////////////////
-    
-    public class CrudHandler
-    {
-        public object target; 
-        public virtual void Create()    {}
-        public virtual void Delete()    {}
-        public virtual bool DoesExist() { return default; }
-        
-        public virtual void Update(string path, object value)
-        {
-            DynamicExpression.SetValue(origin:target, expression:path, value:value);
-        }
-        
-        public virtual void OnAddedToParent(IEntity Parent) {}
-    }
-    public class CrudHandler<T> : CrudHandler where T : class
-    {
-        public new T target
-        {
-            get => base.target as T;
-            set => base.target = value;
-        }
-    }
-    
-    /////////////////////////////////////////////////
-    
-    public class ScanHandler
-    {
-        public object target;
-        
-        public delegate void OnItemScannedDelegate(object parent, string itemCategory, object item);
-        public static event  OnItemScannedDelegate OnItemScanned; 
-        
-        public virtual void Scan()
-        {
-        }
-        
-        public void EmitScannedItem(object parent, string itemCategory, object item)
-        {
-            OnItemScanned?.Invoke(parent, itemCategory, item);
-        }
-        
-        public virtual void Register()
-        {
-        }
-    }
-    public class ScanHandler<T> : ScanHandler where T : class
-    {
-        public new T target
-        {
-            get => base.target as T;
-            set => base.target = value;
-        }
-    }
-    
-    /////////////////////////////////////////////////
-}
+                get
+                {
+                    var liveHandlerType = Entity.GetType()
+                                                .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
+                                                .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveHandler)));
 
+                    if (liveHandlerType != null)
+                    {
+                        var liveHandler = (LiveHandler)Activator.CreateInstance(liveHandlerType);
+                        liveHandler.SetTarget(this.Entity);
+                        return liveHandler;
+                    }
+
+                    return null;
+                }
+            }
+        }
+    }    
+}

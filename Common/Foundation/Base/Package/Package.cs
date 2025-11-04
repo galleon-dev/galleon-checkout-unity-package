@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 #if UNITY_EDITOR
+using Galleon.Checkout.Assets;
 using UnityEditor;
 #endif
 
@@ -21,11 +22,11 @@ namespace Galleon.Checkout.Foundation
         {
             #if UNITY_EDITOR
           
-            var rootFolderPath          = Application.dataPath + "/" + "package1/";
-            this.Assets.RootFolderAsset = new FolderAsset() { Path = rootFolderPath };
+            var rootFolderPath     = Application.dataPath + "/" + "package1/";
+            this.Assets.rootFolder = new Folder() { Path = rootFolderPath };
             
-            if (!this.Assets.RootFolderAsset.DoesFolderExist())
-                this.Assets.RootFolderAsset.CreateFolder();
+            if (!this.Assets.rootFolder.DoesFolderExist())
+                this.Assets.rootFolder.CreateFolder();
             
             #endif
         }

@@ -1,4 +1,4 @@
-namespace Galleon.Checkout.Foundation
+namespace Galleon.Checkout.Assets
 {
     public class Asset : Entity
     {

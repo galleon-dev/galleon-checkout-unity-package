@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
@@ -12,32 +13,47 @@ namespace Galleon.Checkout
 {
     public class PaymentMethodDefinition : Entity
     {
-        //// Consts
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
         public const string PAYMENT_METHOD_TYPE_CREDIT_CARD = "card";
         public const string PAYMENT_METHOD_TYPE_PAYPAL      = "paypal";
         public const string PAYMENT_METHOD_TYPE_GOOGLE_PAY  = "google_pay";
         
-        //// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public string                             Type;
+        public string Type
+        {
+            get => Data.type;
+            set => Data.type = value;       
+        }
         public Shared.PaymentMethodDefinitionData Data;
         
         public Sprite IconSprite;
         public Sprite LogoSprite;
         
-        //// Properties
         
-        public string DisplayName => Data?.type ?? Type.ToString();
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        //// Transaction Steps
+        public string       DisplayName => Data?.type ?? Type.ToString();
+        
+        public string       LocalID     => $"local_pm_id_{this.Type}";
+        
+        public BonusData    BonusData   => CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
         public List<string> InitializationSteps  = new();
         public List<string> VaultingSteps        = new();
         public List<string> TransactionSteps     = new();
         public List<string> PostTransactionSteps = new();
      
-        //// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public PaymentMethodDefinition()
+        {
+            this.Data      = new();
+            this.Data.type = "";
+        }
         
         public Step Initialize() 
         =>
@@ -53,32 +69,41 @@ namespace Galleon.Checkout
                         this.LogoSprite  = await DownloadImageAsync(logo_url);            
                     });
         
-        //// Helpers
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Payment Method Methods
+        
+        public virtual UserPaymentMethod CreateLocalUserPaymentMethod()
+        {
+            UserPaymentMethod userPaymentMethod = new()
+                                                {
+                                                    Data               = new UserPaymentMethodData()
+                                                                       {
+                                                                           type = this.Type,
+                                                                           id   = this.LocalID,
+                                                                       },
+                                                    DisplayName        = this.DisplayName,
+                                                    IsNewPaymentMethod = true,
+                                                    IsSelected         = false,
+                                                    Type               = this.Type,
+                                                };
+            
+            return userPaymentMethod;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
+        
+        public Sprite GetIconSprite()
+        {
+            string type = this.Type.ToLower();
+            return CHECKOUT.Sprites.GetIconSprite(type);    
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
         
         private async Task<Sprite> DownloadImageAsync(string url)
         {
-            try
-            {
-                using UnityWebRequest request   = UnityWebRequestTexture.GetTexture(url);
-                var                   operation = request.SendWebRequest();
-                while (!operation.isDone)
-                    await Task.Yield();
-
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-                    return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-            
+            var sprite = await CheckoutClient.Instance.Resources.Sprites.LoadSprite(name_or_url: url);
+            return sprite;
         }
     }
 }

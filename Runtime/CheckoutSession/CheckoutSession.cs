@@ -2,17 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
 using Galleon.Checkout.UI;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Serialization;
 
 namespace Galleon.Checkout
 {
@@ -34,11 +26,14 @@ namespace Galleon.Checkout
         public SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
         public UserPaymentMethod                  userPaymentMethodToDelete = null;
         
+        // Bonus Data
+        public List<BonusData>                    BonusData                  = new();
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public CheckoutClient                     Client                => CheckoutClient.Instance;
-        public User                               User                  => Client.CurrentUser;
-        public Transaction                        CurrentTransaction    => User.CurrentTransaction;
+        public CheckoutClient                     Client                    => CheckoutClient.Instance;
+        public User                               User                      => Client.CurrentUser;
+        public Transaction                        CurrentTransaction        => User.CurrentTransaction;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
         
@@ -66,9 +61,13 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////////// Steps
                         
-                        // View CheckoutPage
+                        // Get Tax Info
+                        
                       //s.AddChildStep(CheckoutClient.Instance.TaxController.GetTaxInfo());
                       //s.AddChildStep("wait",        async x => await Task.Delay(1000));
+                        
+                        // View CheckoutPage
+                      //s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "choice");
                         s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                         
@@ -112,25 +111,24 @@ namespace Galleon.Checkout
             new Step(name   : $"start_session"
                     ,action : async (s) =>
                     {   
-                        
-                        var body = new Shared.CheckoutSessionRequest() {
-                                                                          expires_at = DateTime.UtcNow.AddDays(1),
-                                                                          order      = new OrderDetails()
-                                                                                       {
-                                                                                           sku      = "sku-1-3DS", // SelectedProduct.DisplayName,
-                                                                                           amount   = 100,
-                                                                                           currency = "USD",
-                                                                                       },
-                                                                          metadata   = CHECKOUT.Session.Metadata
-                                                                       };
-                        
+
                         var response = await CHECKOUT.Network.Post<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/create"
                                                                                            ,headers  : new ()
                                                                                                      {
                                                                                                          { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                      }
-                                                                                           ,body     : body
-                                                                                                     );
+                                                                                           ,body     : new Shared.CheckoutSessionRequest()
+                                                                                                     {
+                                                                                                        order      = new OrderDetails()
+                                                                                                                   {
+                                                                                                                       sku      = "sku-1-3DS", // SelectedProduct.DisplayName,
+                                                                                                                       amount   = 100,
+                                                                                                                       currency = "USD",
+                                                                                                                   },
+                                                                                                        expires_at = DateTime.UtcNow.AddDays(1),
+                                                                                                        metadata   = new Dictionary<string, string>() { }
+                                                                                                     });
+                        this.SessionID = response.session_id; 
                         
                     });
         
@@ -169,26 +167,19 @@ namespace Galleon.Checkout
                             return;
                         }
                         
-                        
                         ////////////////////////////////////////////////////////////// Pre Steps
                         
                         // Show Loading Screen
                         s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.LoadingPage));
+                        
+                        // Start Transaction
                         s.AddPreStep(StartTransaction());
                         
                         ////////////////////////////////////////////////////////////// Transaction Steps
                         
                         // Setup Transaction Steps
                         User.CurrentTransaction = new Transaction();
-                        foreach (var stepFunc in User.SelectedUserPaymentMethod.TransactionSteps)
-                        {
-                            var step = stepFunc?.Invoke();
-                            s.Log($"adding transaction step : {step.Name}");
-                            User.CurrentTransaction.TransactionSteps.Add(step);
-                        }
-                        
-                        // Add Child Transaction Steps
-                        foreach (var transactionStep in User.CurrentTransaction.TransactionSteps)
+                        foreach (var transactionStep in User.SelectedUserPaymentMethod.GetTransactionSteps())
                         {
                             s.Log($"scheduling transaction step : {transactionStep.Name}");
                             s.AddChildStep(transactionStep);
@@ -197,8 +188,6 @@ namespace Galleon.Checkout
                         ////////////////////////////////////////////////////////////// Final Navigation Step
                         
                         // Navigate
-                        //s.AddChildStep("wait",        async x => await Task.Delay(1000));
-                      //s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.SuccessPage));
                         s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.NavigationNext = "Success");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                        
@@ -212,9 +201,18 @@ namespace Galleon.Checkout
                                                  is_canceled = false,
                                                  charge_id   = "test_transaction",
                                               };
+                        /////////
+                        
+                        s.AddPostStep(name   : "save_used_payment_method_if_success"
+                                     ,action : async x =>
+                                               {
+                                                   if (this.lastChargeResult.is_success)
+                                                       x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
+                                               });
                         
                         // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());
+                        
                     });
         
         
@@ -223,15 +221,6 @@ namespace Galleon.Checkout
             new Step(name   : $"start_transaction"
                     ,action : async (s) =>
                     {
-                        var card        = User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
-                      //card.CardNumber = "4242424242424242";
-                      //card.CardMonth  = "12";
-                      //card.CardYear   = "2026";
-                      //card.CardCCV    = "123";
-                      //await card.GetTokenizer().Execute();
-                      //await card.Tokenize()    .Execute();
-                        
-                        var cardToken = card.TokenID;
                     });
         
         public Step HandleTransactionResult()
@@ -254,6 +243,5 @@ namespace Galleon.Checkout
                                                   IsError     = result.errors?.Length > 0,
                                               };
                     });
-        
     }
 }

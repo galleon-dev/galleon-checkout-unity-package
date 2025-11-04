@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
 using Galleon.Checkout.UI;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
@@ -19,9 +20,6 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
         // UI
-        
-        [Header("General")]
-        public bool                         IsLandscape = false;
 
         [Header("Parent Panel")]
         public ParentPanel                  ParentPanel;
@@ -55,34 +53,65 @@ namespace Galleon.Checkout.UI
         public  int                         CloseAnimationDurationMS = 300;
         public  float                       SafeAreaHeight           = 0f;
 
+        // Propertiews
+        
+        public bool                         IsLandscape => UnityEngine.Screen.orientation == ScreenOrientation.LandscapeLeft
+                                                        || UnityEngine.Screen.orientation == ScreenOrientation.LandscapeRight;
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
-
-        bool ShowLoaderOnce = true;
-
-        public void ShowInitialCheckoutPanelLoader()
-        {
-            StopAllCoroutines();
-            if (ShowLoaderOnce)
-            {
-                CheckoutLoadingPanelView.gameObject.SetActive(true);
-                CheckoutPanel.gameObject.SetActive(false);
-                StartCoroutine(DisableInitialLoader(1f));
-            }
-        }
-
-        IEnumerator DisableInitialLoader(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            CheckoutLoadingPanelView.gameObject.SetActive(false);
-            CheckoutPanel.gameObject.SetActive(true);
-            ShowLoaderOnce = false;
-        }
 
         public static Step InitializeCheckoutScreenMobile()
         =>
-            new Step(name: $"initialize_checkout_screen_mobile"
-                    , action: async (s) =>
+            new Step(name   : $"initialize_checkout_screen_mobile"
+                    ,action : async (s) =>
                               {
+								  GameObject Prefab = null; // For Portrait or Landscape Mode
+                                  bool IsLandscapeMode = false;
+
+                                  if (UnityEngine.Device.Screen.orientation == ScreenOrientation.Portrait || UnityEngine.Device.Screen.orientation == ScreenOrientation.PortraitUpsideDown)
+                                  {
+                                      Debug.Log("Device is in Portrait mode");
+                                      Prefab = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
+                                  }
+                                  else if (UnityEngine.Device.Screen.orientation == ScreenOrientation.LandscapeLeft || UnityEngine.Device.Screen.orientation == ScreenOrientation.LandscapeRight)
+                                  {
+                                      Debug.Log("Device is in Landscape mode");
+                                      Prefab = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
+                                      IsLandscapeMode = true;
+                                  }
+
+
+                                  #if UNITY_EDITOR
+                                  
+                                  if (UnityEngine.Device.Screen.width > UnityEngine.Device.Screen.height)
+                                  {
+                                      Debug.Log("Device is in Landscape mode");
+                                      Prefab = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
+                                      IsLandscapeMode = true;
+                                  }
+                                  else
+                                  {
+                                      Debug.Log("Device is in Portrait mode");
+                                      Prefab = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
+                                  } 
+                                  
+								  #endif
+
+                                  Debug.Log("Orientation In Landscape? " + IsLandscapeMode + "  Prefab Selected: " + Prefab.name);
+
+                                  // Instantiate screen
+                                  var CheckoutScreenMobileGO = GameObject.Instantiate(original : Prefab
+                                                                                     ,position : new Vector3(0, 0, 9999)
+                                                                                     ,rotation : Quaternion.identity);
+
+
+                                  CheckoutScreenMobileGO.SetActive(false);
+                                  DontDestroyOnLoad(CheckoutScreenMobileGO);
+                                  
+                                  CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>();
+								  
+								  /*
                                   // Instantiate screen
                                   var CheckoutScreenMobileGO = GameObject.Instantiate(original : CheckoutClient.Instance.Resources.CheckoutPopupPrefab
                                                                                      ,position : new Vector3(0, 0, 9999)
@@ -93,6 +122,7 @@ namespace Galleon.Checkout.UI
 
                                   // Assign instance
                                   CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>();
+								  */
                               });
 
 
@@ -109,7 +139,7 @@ namespace Galleon.Checkout.UI
 
                                   CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(true);
                                   CheckoutClient.Instance.CheckoutScreenMobile.ResetState();
-                                  CheckoutClient.Instance.CheckoutScreenMobile.SetPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage).Execute();
+                                //CheckoutClient.Instance.CheckoutScreenMobile.SetPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage).Execute();
                               });
 
         public static Step EndCheckoutScreenMobile()
@@ -145,20 +175,20 @@ namespace Galleon.Checkout.UI
         {
             // Start "closed"
             RectTransform parentTransform = ParentPanel.transform as RectTransform;
-            parentTransform.sizeDelta = new Vector2(parentTransform.sizeDelta.x, 0);
+            parentTransform.sizeDelta     = new Vector2(parentTransform.sizeDelta.x, 0);
         }
 
         public void ResetState()
         {
             var user = CheckoutClient.Instance.CurrentSession.User;
 
-            // Deselect Payment Method
-            foreach (var paymentMethod in CHECKOUT.PaymentMethods.UserPaymentMethods)
-                paymentMethod.Unselect();
-
-            // Select First payment method by default
-            if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count > 0)
-                CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
+            // // Deselect Payment Method
+            // foreach (var paymentMethod in CHECKOUT.PaymentMethods.UserPaymentMethods)
+            //     paymentMethod.Unselect();
+            // 
+            // // Select First payment method by default
+            // if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count > 0)
+            //     CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
 
         }
 
@@ -199,6 +229,7 @@ namespace Galleon.Checkout.UI
         {
             Back,
             Close,
+            Error,
             Settings,
             Confirm,
         }
@@ -216,19 +247,23 @@ namespace Galleon.Checkout.UI
             public string FooterState;
 
             public string PageResult;
+            
+            public string panelConfiguration;
 
             public Action<Page> Setup;
 
             public Dictionary<string, Step> NavigationMap = new();
 
-            public Page(string name, string header, string panel, string footer, Action<Page> setup = null)
+            public Page(string name, string header, string panel, string footer, Action<Page> setup = null, string panelConfiguration = null)
             {
-                this.Name  = name;
-                this.Setup = setup;
+                this.Name        = name;
+                this.Setup       = setup;
 
                 this.headerState = header;
                 this.panelState  = panel;
                 this.FooterState = footer;
+                
+                this.panelConfiguration = panelConfiguration;
             }
         }
 
@@ -241,8 +276,8 @@ namespace Galleon.Checkout.UI
 
         public Step ViewPage(Page page)
         =>
-            new Step(name: $"View_{page.Name}_page"
-                    , action: async (s) =>
+            new Step(name   : $"View_{page.Name}_page"
+                    ,action : async (s) =>
                     {
                         ///////////////////////// Setup
 
@@ -254,6 +289,13 @@ namespace Galleon.Checkout.UI
                         this.State                 = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
 
+
+                        ///////////////////////// Page
+
+                        IsPageActive = true;
+                        CurrentPage  = page;
+                        NavigationHistory.Add(page);
+                        
                         ///////////////////////// Refresh
                         
                         RefreshState();
@@ -263,12 +305,6 @@ namespace Galleon.Checkout.UI
                         View[] views = this.GetComponentsInChildren<View>();
                         foreach (var view in views)
                             view.Refresh();
-
-                        ///////////////////////// Definitions
-
-                        IsPageActive = true;
-                        CurrentPage  = page;
-                        NavigationHistory.Add(page);
                         
                         ///////////////////////// Focus
                         
@@ -293,6 +329,7 @@ namespace Galleon.Checkout.UI
 
                         page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
                         page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
+                        page.NavigationMap[NavigationStates.Error   .ToString()] = ViewPage(ErrorPage);
                         page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
 
                         ///////////////////////// Handle Result
@@ -324,6 +361,12 @@ namespace Galleon.Checkout.UI
                         this.State                 = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
 
+                        ///////////////////////// Page
+
+                        IsPageActive = true;
+                        CurrentPage = page;
+                        NavigationHistory.Add(page);
+                        
                         ///////////////////////// Refresh
 
                         RefreshState();
@@ -334,11 +377,6 @@ namespace Galleon.Checkout.UI
                         foreach (var view in views)
                             view.Refresh();
 
-                        ///////////////////////// Definitions
-
-                        IsPageActive = true;
-                        CurrentPage = page;
-                        NavigationHistory.Add(page);
                     });
 
 
@@ -353,6 +391,7 @@ namespace Galleon.Checkout.UI
 
                         page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
                         page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
+                        page.NavigationMap[NavigationStates.Error   .ToString()] = ViewPage(ErrorPage);
                         page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
 
                         ///////////////////////// Handle Navigation Next
@@ -422,7 +461,6 @@ namespace Galleon.Checkout.UI
             GalleonLogoClicked?.Invoke();
         }
 
-
         public void OnPageFinishedWithResult(string result)
         {
             IsPageActive = false;
@@ -473,7 +511,6 @@ namespace Galleon.Checkout.UI
                 return keyboardHeight;
             }
 
-
             #elif UNITY_ANDROID && !UNITY_EDITOR
             
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -483,6 +520,7 @@ namespace Galleon.Checkout.UI
                 AndroidJavaObject rect = new AndroidJavaObject("android.graphics.Rect");
                 view.Call("getWindowVisibleDisplayFrame", rect);
                 int visibleHeight = rect.Call<int>("height");
+            
                 return UnityEngine.Screen.height - visibleHeight;
             }
             
@@ -590,8 +628,24 @@ namespace Galleon.Checkout.UI
                                                        ,setup : page =>
                                                               {
                                                                   page.NavigationMap["checkout"] = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                  page.NavigationMap["choice"]   = page.screen.ViewPage(page.screen.ChoicePage);
                                                               });
-                                                       
+                    
+        
+        public Page ChoicePage               = new Page(name  : "choice"
+                                                       ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                       ,panel : CheckoutScreenMobile.STATE.checkout_panel       .ToString()
+                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
+                                                       ,panelConfiguration: JsonConvert.SerializeObject(new CheckoutPanelView.Config(){ShowMinimalOptions = true})
+                                                       ,setup : page =>
+                                                              {
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap["test_1"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                                  page.NavigationMap["test_2"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
+                                                              }
+                                                        );
                     
         public Page CheckoutPage             = new Page(name  : "checkout"
                                                        ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
@@ -730,6 +784,7 @@ namespace Galleon.Checkout.UI
             this.gameObject.SetActive(false);
             //Destroy(this.gameObject);   
         }
+        
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper UI Actions
 
@@ -754,6 +809,7 @@ namespace Galleon.Checkout.UI
 
             if      (this.State == STATE.test_panel                  .ToString()) TestPanelView               .gameObject.SetActive(true);
             else if (this.State == STATE.checkout_panel              .ToString()) CheckoutPanel               .gameObject.SetActive(true);
+            else if (this.State == "choice"                          .ToString()) CheckoutPanel               .gameObject.SetActive(true);
             else if (this.State == STATE.success_panel               .ToString()) SuccessPanelView            .gameObject.SetActive(true);
             else if (this.State == STATE.error_panel                 .ToString()) ErrorPanelView              .gameObject.SetActive(true);
             else if (this.State == STATE.credit_card_panel           .ToString()) CreditCardPanel             .gameObject.SetActive(true);

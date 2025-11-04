@@ -6,6 +6,7 @@ namespace Galleon.Footer
     public class CheckFooterTerms : MonoBehaviour
     {
         public FooterPanelView FooterPanelView;
+        
         private void OnEnable()
         {
             if (FooterPanelView)

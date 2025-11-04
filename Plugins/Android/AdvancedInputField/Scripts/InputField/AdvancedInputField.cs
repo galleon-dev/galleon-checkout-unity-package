@@ -1181,7 +1181,7 @@ namespace AdvancedInputFieldPlugin
 			set
 			{
 				if(value == null) { value = string.Empty; }
-				SetText(value);
+					SetText(value);
 			}
 		}
 

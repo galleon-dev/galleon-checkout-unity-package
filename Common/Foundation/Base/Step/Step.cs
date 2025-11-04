@@ -13,6 +13,7 @@ using StepAction=System.Func<Galleon.Checkout.Step,System.Threading.Tasks.Task>;
 
 namespace Galleon.Checkout
 {
+    [DebuggerDisplay("{DebugDisplay}")]
     public class Step : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
@@ -41,11 +42,21 @@ namespace Galleon.Checkout
         public Action<Step>       PreChildStepAction          = null;
         public Action<Step>       PostChildStepAction         = null;
         
+        public int                CurrentChildStepIndex       = -1;
+        public int                CurrentPreStepIndex         = -1;
+        public int                CurrentPostStepIndex        = -1;
+        public Step               CurrentPreStep              = default;
+        public Step               CurrentChildStep            = default;
+        public Step               CurrentPostStep             = default;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
         
         public static event Action<Step>     OnPreStepExecute;
         public static event Func<Step, Task> OnStepExecuted;
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug Display
+        
+        public string DebugDisplay => $"Step | {Name}";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
         
@@ -102,20 +113,21 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setters
         
-        private Step SET         (Action            setter   ) {  setter?.Invoke(); return this; }
-        public  Step setName     (string            name     ) => SET(() => this.Name      = name);
-        public  Step setTags     (params string[]   tags     ) => SET(() => this.Tags      .AddRange(tags)); 
-        public  Step setAction   (StepAction        action   ) => SET(() => this.Action    = action);
+        private Step SET         (Action            setter) {  setter?.Invoke(); return this; }
+        public  Step setName     (string            name  ) => SET(() => this.Name   = name);
+        public  Step setTags     (params string[]   tags  ) => SET(() => this.Tags   .AddRange(tags)); 
+        public  Step setAction   (StepAction        action) => SET(() => this.Action = action);
         
         public Step Temp()
         =>
             new Step()
-           .setName  ("name")
-           .setTags  ("bla", "bli")
-           .setAction(async s =>
+            .setName  ("name")
+            .setTags  ("bla", "bli")
+            .setAction(async s =>
                       {
                           s.Log("step action");
-                      });
+                      })
+            ;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Methods
         
@@ -185,43 +197,43 @@ namespace Galleon.Checkout
                 ////////////////////////////////////////////////
                 
                 // Execute Pre Steps
-                for (int i = 0; i < PreSteps.Count; i++)
+                for (CurrentPreStepIndex = 0; CurrentPreStepIndex < PreSteps.Count; CurrentPreStepIndex++)
                 {
-                    var   preStep = PreSteps[i];
+                    CurrentPreStep = PreSteps[CurrentPreStepIndex];
                     
-                    PreChildStepAction?.Invoke(preStep);
+                    PreChildStepAction?.Invoke(CurrentPreStep);
                     
-                    await preStep.Execute();
+                    await CurrentPreStep.Execute();
                     
-                    PostChildStepAction?.Invoke(preStep);
+                    PostChildStepAction?.Invoke(CurrentPreStep);
                 }
                 
                 ////////////////////////////////////////////////
                 
                 // Execute Child Steps
-                for (int i = 0; i < ChildSteps.Count; i++)
+                for (CurrentChildStepIndex = 0; CurrentChildStepIndex < ChildSteps.Count; CurrentChildStepIndex++)
                 {
-                    var child = ChildSteps[i];
+                    CurrentChildStep = ChildSteps[CurrentChildStepIndex];
                     
-                    PreChildStepAction?.Invoke(child);
+                    PreChildStepAction?.Invoke(CurrentChildStep);
                     
-                    await child.Execute();
+                    await CurrentChildStep.Execute();
                     
-                    PostChildStepAction?.Invoke(child);
+                    PostChildStepAction?.Invoke(CurrentChildStep);
                 }
                 
                 ////////////////////////////////////////////////
                 
                 // Execute Post Steps
-                for (int i = 0; i < PostSteps.Count; i++)
+                for (CurrentPostStepIndex = 0; CurrentPostStepIndex < PostSteps.Count; CurrentPostStepIndex++)
                 {
-                    var   postStep = PostSteps[i];
+                    CurrentPostStep = PostSteps[CurrentPostStepIndex];
                     
-                    PreChildStepAction?.Invoke(postStep);
+                    PreChildStepAction?.Invoke(CurrentPostStep);
                     
-                    await postStep.Execute();
+                    await CurrentPostStep.Execute();
                     
-                    PostChildStepAction?.Invoke(postStep);
+                    PostChildStepAction?.Invoke(CurrentPostStep);
                 }
                 
                 ////////////////////////////////////////////////
@@ -265,7 +277,12 @@ namespace Galleon.Checkout
             Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
             AddChildStep(tempStep);
         }
-        
+        public void InsertChildStep(int index, Step step)
+        {
+            this.ChildSteps.Insert(index, step);
+            step.ParentStep = this;
+            this.Node.AddLinkedChild(step);
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Pre Steps
         
@@ -297,6 +314,48 @@ namespace Galleon.Checkout
         }
         
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flow Methods
+        
+        public int GetStepIndexInParentFlow()
+        {
+            return ParentStep.ChildSteps.IndexOf(this);
+        }
+        
+        public void AddNextStepInParentFlow(Step step)
+        {
+            if (ParentStep == null)
+                return;
+
+            var currentIndex = GetStepIndexInParentFlow();
+            ParentStep.InsertChildStep(currentIndex+1, step);
+        }
+        
+        public void AddNextStepsInParentFlow(params Step[] steps)
+        {
+            for (int i = steps.Count() - 1; i >= 0; i--)
+            {
+                AddNextStepInParentFlow(steps.ElementAt(i));
+            }
+        }
+        
+        public List<Step> GetStepsAfterThisInParentFlow()
+        {
+            if (ParentStep == null)
+                return new List<Step>();
+            
+            var currentIndex = GetStepIndexInParentFlow();
+            return ParentStep.ChildSteps.Skip(currentIndex+1).ToList();
+        }
+        
+        public void RemoveStepsAfterThisInParentFlow()
+        {
+            if (ParentStep == null)
+                return;
+            
+            var currentIndex = GetStepIndexInParentFlow();
+            ParentStep.ChildSteps.RemoveRange(currentIndex+1, ParentStep.ChildSteps.Count - currentIndex - 1);
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Log Methods
         
         public void Log(object message)
@@ -318,6 +377,44 @@ namespace Galleon.Checkout
             this.StepLog.Add($"{prefix}{message}");
         }
 
+        public void LogError(object message)
+        {
+            #region PREFIX
+            int  parents = 0;
+            Step current = this;
+            
+            while (current.ParentStep != null)
+            {
+                parents++;
+                current = current.ParentStep;
+            }
+            
+            string prefix = new string(' ', parents * 4);
+            #endregion // PREFIX
+            
+            Debug.LogError($"{prefix}{message}");
+            this.StepLog.Add($"[ERROR] {prefix}{message}");
+        }
+        
+        public void LogException(Exception ex)
+        {
+            #region PREFIX
+            int  parents = 0;
+            Step current = this;
+            
+            while (current.ParentStep != null)
+            {
+                parents++;
+                current = current.ParentStep;
+            }
+            
+            string prefix = new string(' ', parents * 4);
+            #endregion // PREFIX
+            
+            Debug.LogError($"{prefix}{ex.ToString()}");
+            this.StepLog.Add($"[EXCEPTION] {prefix}{ex.ToString()}");
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inspector
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
