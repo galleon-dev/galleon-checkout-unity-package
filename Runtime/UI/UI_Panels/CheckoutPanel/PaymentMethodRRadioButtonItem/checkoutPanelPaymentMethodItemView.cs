@@ -44,13 +44,14 @@ namespace Galleon.Checkout.UI
             this.CheckoutPanelView = CheckoutPanelView;
             
             // Bonus
-            if (this.bonusItemView != null && CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
-            {
+            if (this.bonusItemView != null)
                 Destroy(this.bonusItemView.gameObject); // destroy placeholder
+            if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
+            {
                 this.bonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<BonusItemView>();
+                var bonus = this.bonusItemView.gameObject.GetComponentInChildren<IBonusItemView>();
+                bonus.Initialize("Extra", "1000");
             }
-            var bonus = this.bonusItemView.gameObject.GetComponentInChildren<IBonusItemView>();
-            bonus.Initialize("Extra", "1000");
             
             // Refresh
             Refresh();
