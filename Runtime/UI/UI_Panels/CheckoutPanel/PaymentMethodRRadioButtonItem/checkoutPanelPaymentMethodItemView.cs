@@ -26,6 +26,7 @@ namespace Galleon.Checkout.UI
         [Header("Bonus")]
         public GameObject      BonusContainer;
         public BonusItemView   bonusItemView;
+        public IBonusItemView  IBonusItemView;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
@@ -48,9 +49,8 @@ namespace Galleon.Checkout.UI
                 Destroy(this.bonusItemView.gameObject); // destroy placeholder
             if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
             {
-                this.bonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<BonusItemView>();
-                var bonus = this.bonusItemView.gameObject.GetComponentInChildren<IBonusItemView>();
-                bonus.Initialize("Extra", "1000");
+                this.IBonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<IBonusItemView>();
+                this.IBonusItemView.Initialize("Extra", "1000");
             }
             
             // Refresh
@@ -90,8 +90,8 @@ namespace Galleon.Checkout.UI
             // Bonus
             if (this.bonusItemView != null)
             {    
-                if (this.PaymentMethod.IsSelected) bonusItemView.Open();
-                else                               bonusItemView.Close();
+                if (this.PaymentMethod.IsSelected) IBonusItemView.Open();
+                else                               IBonusItemView.Close();
                 
                 if (this.PaymentMethod.Type == "native")
                     bonusItemView.gameObject.SetActive(false);
