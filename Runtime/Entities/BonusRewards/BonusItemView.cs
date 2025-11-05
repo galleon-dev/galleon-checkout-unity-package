@@ -6,8 +6,8 @@ namespace Galleon.Checkout
     public interface IBonusItemView
     {
         public void Initialize(string mainText, string rewardText);
-        public Task Open();
-        public Task Close();
+        public void Open();
+        public void Close();
     }
     
     public class BonusItemView : MonoBehaviour, IBonusItemView
@@ -33,7 +33,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////// Methods
         
         [ContextMenu("open")]
-        public async Task Open()
+        public void Open()
         {
             IsOpen = true;
             closedImage.SetActive(false);
@@ -41,7 +41,7 @@ namespace Galleon.Checkout
         }
         
         [ContextMenu("close")]
-        public async Task Close()
+        public void Close()
         {
             IsOpen = false;
             closedImage.SetActive(true);
