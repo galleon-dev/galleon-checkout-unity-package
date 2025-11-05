@@ -227,6 +227,9 @@ namespace Galleon.Checkout
         {
             Load();
             
+            if (this.LastUsedUserPaymentMethodIDs.Count == 0)
+                return new List<UserPaymentMethod>();
+            
             var lastUsedUpmID = this.LastUsedUserPaymentMethodIDs.Last();
             List<UserPaymentMethod> result = new List<UserPaymentMethod>();
             
