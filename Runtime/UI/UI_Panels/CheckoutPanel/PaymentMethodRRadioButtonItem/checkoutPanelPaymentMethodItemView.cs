@@ -49,6 +49,8 @@ namespace Galleon.Checkout.UI
                 Destroy(this.bonusItemView.gameObject); // destroy placeholder
                 this.bonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<BonusItemView>();
             }
+            var bonus = this.bonusItemView.gameObject.GetComponentInChildren<IBonusItemView>();
+            bonus.Initialize("Extra", "1000");
             
             // Refresh
             Refresh();

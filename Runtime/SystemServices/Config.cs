@@ -18,12 +18,27 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
-                        //var result = await CHECKOUT.Network.Get("http://localhost:5007/config");
-                        //
-                        //var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToString());
-                        //
-                        //foreach (var pair in dictionary)
-                        //    this.ConfigData.Add(pair.Key, pair.Value);
+                        var result = await CHECKOUT.Network.Post(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/config"
+                                                                ,headers  : new ()
+                                                                          {
+                                                                              { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                          }
+                                                                ,body     : new 
+                                                                          {
+                                                                              device_ip           = "192.168.1.1",
+                                                                              device_platform     = "ios",
+                                                                              os                  = "ios_25",
+                                                                              app_version         = "1.0.0",
+                                                                              galleon_sdk_version = "2.0.0",
+                                                                              timezone            = "America/New_York"
+                                                                          });
+                        
+                        var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToString());
+                        
+                        foreach (var pair in dictionary)
+                            this.ConfigData.Add(pair.Key, pair.Value);
+                        
+                        
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flow

@@ -84,9 +84,30 @@ public class BigClass
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Project
 
 > Entities and Nodes
+    > Everything sits in a tree of entities.
+    > IEntity interface, Entity class, and Entity Node.
+    > Aspects of Entity
+
 > Root and Structure
+    > Tree
+    > Root, context, Project, Runtime, Package
+    > Client/App (runtime) > Stuff
+    > Project, Packages, Elements, Assets, H, Etc. 
+
 > Steps and Flows
+    > Example Step Code
+    > Step capabilities
+    > Step is Flow
+        > Child Steps, Pre+Post Steps
+
 > Elements & Live
+    > Elements
+        > Definitions, Assets, H, App, Etc.
+        > Manager, Pool, Settings, Data, Etc.
+    > Live
+        > Scan, Plus, Minus, Equals, Print
+        > Operations, VTree
+    
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Foundation
 
