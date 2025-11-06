@@ -94,7 +94,7 @@ namespace Galleon.Checkout.UI
                 else                               IBonusItemView.Close();
                 
                 if (this.PaymentMethod.Type == "native")
-                    bonusItemView.gameObject.SetActive(false);
+                    (IBonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
             }
         }
         

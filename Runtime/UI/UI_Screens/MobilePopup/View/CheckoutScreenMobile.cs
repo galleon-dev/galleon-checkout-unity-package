@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
@@ -32,6 +31,7 @@ namespace Galleon.Checkout.UI
         [Header("Panels")]
         public CheckoutPanelView            CheckoutPanel;
         public CreditCardInfoPanelView      CreditCardPanel;
+        public PreselectionPanelView        PreselectionPanelView;
         public SettingsPanelView            SettingsPanelView;
         public SuccessPanelView             SuccessPanelView;
         public ErrorPanelView               ErrorPanelView;
@@ -215,6 +215,7 @@ namespace Galleon.Checkout.UI
         {
             test_panel,
             checkout_panel,
+            preselection_panel,
             success_panel,
             error_panel,
             credit_card_panel,
@@ -617,7 +618,6 @@ namespace Galleon.Checkout.UI
                                                        ,setup  : page =>
                                                                {
                                                                    page.NavigationMap[TestPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                   page.NavigationMap["test_1"]                                    = page.screen.ViewPage(page.screen.CheckoutPage);
                                                                }
                                                         );
 
@@ -627,23 +627,20 @@ namespace Galleon.Checkout.UI
                                                        ,footer: FooterPanelView     .STATE.none                  .ToString()
                                                        ,setup : page =>
                                                               {
-                                                                  page.NavigationMap["checkout"] = page.screen.ViewPage(page.screen.CheckoutPage);
-                                                                  page.NavigationMap["choice"]   = page.screen.ViewPage(page.screen.ChoicePage);
+                                                                  page.NavigationMap["checkout"]     = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                  page.NavigationMap["preselection"] = page.screen.ViewPage(page.screen.PreselectionPage);
                                                               });
                     
         
-        public Page ChoicePage               = new Page(name  : "choice"
+        public Page PreselectionPage         = new Page(name  : "preselection"
                                                        ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
-                                                       ,panel : CheckoutScreenMobile.STATE.checkout_panel       .ToString()
+                                                       ,panel : CheckoutScreenMobile.STATE.preselection_panel   .ToString()
                                                        ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
-                                                       ,panelConfiguration: JsonConvert.SerializeObject(new CheckoutPanelView.Config(){ShowMinimalOptions = true})
                                                        ,setup : page =>
                                                               {
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
-                                                                  page.NavigationMap["test_1"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
-                                                                  page.NavigationMap["test_2"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                               }
                                                         );
                     
@@ -656,8 +653,6 @@ namespace Galleon.Checkout.UI
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
-                                                                  page.NavigationMap["test_1"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
-                                                                  page.NavigationMap["test_2"]                                                    = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                               }
                                                         );
 
@@ -679,7 +674,6 @@ namespace Galleon.Checkout.UI
                                                                {
                                                                    #if UNITY_ANDROID || UNITY_EDITOR
                                                                    page.NavigationMap[CreditCardInfoPanelView.ViewResult.Confirm.ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
-                                                                   page.NavigationMap["test_1"]                                              = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage); // was CheckoutPage
                                                                    #endif
                                                                }
                                                        );
@@ -693,7 +687,6 @@ namespace Galleon.Checkout.UI
                                                                   page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.NewCard         .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
                                                                   page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.SelectedNew     .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                                   page.NavigationMap[Checkout.UI.SelectPaymentMethodPanelView.ViewResult.SelectedExisting.ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
-                                                                  page.NavigationMap["test_1"]                                                                        = page.screen.ViewPage(page.screen.CreditCardPage);
                                                               }
                                                         );
 
@@ -705,7 +698,6 @@ namespace Galleon.Checkout.UI
                                                        ,setup : page =>
                                                               {
                                                                   page.NavigationMap[SettingsPanelView.ViewResult.DeletePaymentMethod.ToString()] = page.screen.ViewPage(page.screen.SimpleDialogPage);
-                                                                  page.NavigationMap["test_1"]                                                    = page.screen.ViewPage(page.screen.SimpleDialogPage);
                                                               }
                                                         );
 
@@ -720,7 +712,6 @@ namespace Galleon.Checkout.UI
                                                                    {
                                                                        page.NavigationMap[SimpleDialogPanelView.DialogResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.SettingsPage);
                                                                        page.NavigationMap[SimpleDialogPanelView.DialogResult.Decline.ToString()] = page.screen.ViewPage(page.screen.SettingsPage);
-                                                                       page.NavigationMap["test_1"]                                              = page.screen.ViewPage(page.screen.CheckoutPage);
                                                                    }
                                                                }
                                                         );
@@ -733,7 +724,6 @@ namespace Galleon.Checkout.UI
                                                                {
                                                                    page.NavigationMap[LoadingPanelView.ViewResult.Success.ToString()] = page.screen.ViewPage(page.screen.SuccessPage);
                                                                    page.NavigationMap[LoadingPanelView.ViewResult.Error  .ToString()] = page.screen.ViewPage(page.screen.ErrorPage);
-                                                                   page.NavigationMap["test_1"]                                       = page.screen.ViewPage(page.screen.SuccessPage);
                                                                }
                                                         );
 
@@ -792,6 +782,7 @@ namespace Galleon.Checkout.UI
         {
             CheckoutPanel               .gameObject.SetActive(false);
             CreditCardPanel             .gameObject.SetActive(false);
+            PreselectionPanelView       .gameObject.SetActive(false);
             SettingsPanelView           .gameObject.SetActive(false);
             SuccessPanelView            .gameObject.SetActive(false);
             ErrorPanelView              .gameObject.SetActive(false);
@@ -809,7 +800,7 @@ namespace Galleon.Checkout.UI
 
             if      (this.State == STATE.test_panel                  .ToString()) TestPanelView               .gameObject.SetActive(true);
             else if (this.State == STATE.checkout_panel              .ToString()) CheckoutPanel               .gameObject.SetActive(true);
-            else if (this.State == "choice"                          .ToString()) CheckoutPanel               .gameObject.SetActive(true);
+            else if (this.State == STATE.preselection_panel          .ToString()) PreselectionPanelView       .gameObject.SetActive(true);
             else if (this.State == STATE.success_panel               .ToString()) SuccessPanelView            .gameObject.SetActive(true);
             else if (this.State == STATE.error_panel                 .ToString()) ErrorPanelView              .gameObject.SetActive(true);
             else if (this.State == STATE.credit_card_panel           .ToString()) CreditCardPanel             .gameObject.SetActive(true);
@@ -831,3 +822,4 @@ namespace Galleon.Checkout.UI
                     });
     }
 }
+

@@ -67,7 +67,7 @@ namespace Galleon.Checkout
                       //s.AddChildStep("wait",        async x => await Task.Delay(1000));
                         
                         // View CheckoutPage
-                      //s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "choice");
+                      //s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "preselection");
                         s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                         

@@ -221,7 +221,6 @@ namespace Galleon.Checkout
                         
                     });
         
-                
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
         
         public List<UserPaymentMethod> GetLastUsedUserPaymentMethods()
@@ -335,3 +334,4 @@ namespace Galleon.Checkout
         
     }
 }
+
