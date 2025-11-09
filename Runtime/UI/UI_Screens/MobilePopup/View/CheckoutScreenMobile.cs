@@ -638,9 +638,7 @@ namespace Galleon.Checkout.UI
                                                        ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
                                                        ,setup : page =>
                                                               {
-                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
-                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
-                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
                                                               }
                                                         );
                     

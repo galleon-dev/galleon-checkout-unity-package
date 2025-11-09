@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Galleon.Checkout.UI
 {   
-    public class checkoutPanelPaymentMethodItemView : View
+    public class PreselectionPanelItemView : View
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
@@ -50,8 +50,7 @@ namespace Galleon.Checkout.UI
             if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
             {
                 this.IBonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<IBonusItemView>();
-                var bonusItem = CHECKOUT.Session.BonusData.FirstOrDefault() ?? new BonusItem() { BonusMainText = "Extra", BonusRewardText = "1000k" };
-                this.IBonusItemView.Initialize(bonusItem.BonusMainText, bonusItem.BonusRewardText);
+                this.IBonusItemView.Initialize("Extra", "1000");
             }
             
             // Refresh
@@ -110,9 +109,9 @@ namespace Galleon.Checkout.UI
 
         public void Select()
         {
-            this.PaymentMethod?.Select();
-            this.CheckoutPanelView.OnRadiobuttonSelected(this);
-            Refresh();
+            // this.PaymentMethod?.Select();
+            // this.CheckoutPanelView.OnRadiobuttonSelected(this);
+            // Refresh();
         }
 
         public void Unselect()

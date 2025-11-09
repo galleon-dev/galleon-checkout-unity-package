@@ -34,10 +34,7 @@ namespace Galleon.Checkout.UI
 
         [Header("Payment Methods")]
         public GameObject           PaymentMethodsPanel;
-        public GameObject           PaymentMethodItemPrefab;        
-        public GameObject           AddCreditCardButtonElement;
-
-        public TMP_Dropdown         DropdownMenu;
+        public GameObject           PreselectionItemPrefab;        
 
         [Header("Payment Buttons")]
         public GameObject           PurchaseButton;
@@ -91,47 +88,28 @@ namespace Galleon.Checkout.UI
 
             ///////////////
 
-            // Remove children (if any)
-            // Debug.Log("<color=orange>- Removing Payment Methods</color>");
-            foreach (Transform child in PaymentMethodsPanel.transform)
-            {
-                // Debug.Log($"-Removing Item {child.gameObject.name}");
-                Destroy(child.gameObject);
-            }
+            // // Remove children (if any)
+            // // Debug.Log("<color=orange>- Removing Payment Methods</color>");
+            // foreach (Transform child in PaymentMethodsPanel.transform)
+            // {
+            //     // Debug.Log($"-Removing Item {child.gameObject.name}");
+            //     Destroy(child.gameObject);
+            // }
 
-            // Add children
-            var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
-            foreach (var paymentMethod in paymentMethods)
-            {
-                // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
-                //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
-                
-                var go   = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
-                var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
-              //item.Initialize(paymentMethod, this);
-
-                // Add ui separator
-                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
-            }
-
-            // Add defult add card button
-            if (AddCreditCardButtonElement)
-            {
-                this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
-            }
-
-            // Set Dropdown Options
-            if (DropdownMenu)
-            {
-                SetDropdown();
-            }
-
-            ///////////////
-            // checkoutPanelPaymentMethodItemView[] methods = this.gameObject.GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
-            // foreach (var method in methods)
-            //     method.Refresh();
-
-            //CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
+            // // Add children
+            // var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
+            // foreach (var paymentMethod in paymentMethods)
+            // {
+            //     // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
+            //     //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
+            //     
+            //     var go   = Instantiate(original: PreselectionItemPrefab, parent: PaymentMethodsPanel.transform);
+            //     var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
+            //   //item.Initialize(paymentMethod, this);
+            // 
+            //     // Add ui separator
+            //     Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
+            // }
 
         }
 
@@ -187,49 +165,6 @@ namespace Galleon.Checkout.UI
             image.sprite = sprite;
         }
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
-        
-        public void SetDropdown()
-        {
-            DropdownMenu.ClearOptions();
-
-                ManagePaymentSprites ManagePaymentSprites = DropdownMenu.gameObject.GetComponent<ManagePaymentSprites>();
-
-                var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
-
-                // Add Dropdown Options
-                int i = 0;
-                foreach (var paymentMethod in paymentMethods)
-                {
-                   
-                    Sprite Icon = null;
-
-                    if (ManagePaymentSprites)
-                    {
-                        Icon = ManagePaymentSprites.GetPaymentIcon(paymentMethod);
-                    }
-
-                    var newOption = new TMP_Dropdown.OptionData(paymentMethod.DisplayName, Icon);
-
-                    DropdownMenu.options.Add(newOption);
-
-                    if (paymentMethod.IsSelected)
-                    {
-                        DropdownMenu.value = i;
-                    }
-
-                    i++;
-                }
-               
-                Debug.Log("Set Dropdown 1st Option");
-               
-                // ForceReselect
-                DropdownMenu.onValueChanged.Invoke(DropdownMenu.value); // Forces the event
-                DropdownMenu.RefreshShownValue();
-
-                // Hide Dropdown if no Payments are available
-                DropdownMenu.gameObject.SetActive(paymentMethods.Count() > 0);
-        }
     }
 }
 

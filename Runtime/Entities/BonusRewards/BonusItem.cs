@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout 
 {
-    public class BonusData : Entity
+    public class BonusItem : Entity
     {
         public string                PaymentMethodType;
         public string                BonusMainText;

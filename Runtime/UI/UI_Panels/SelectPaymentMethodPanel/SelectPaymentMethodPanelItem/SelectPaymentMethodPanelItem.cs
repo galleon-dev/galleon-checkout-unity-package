@@ -36,8 +36,8 @@ namespace Galleon.Checkout.UI
             this.PaymentMethodDefinition      = paymentMethodDefinition;
             this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
             
-            var bonusData = (PaymentMethodDefinition != null) ? PaymentMethodDefinition?.BonusData 
-                          : (UserPaymentMethod       != null) ? UserPaymentMethod?.GetPaymentMethodDefinition()?.BonusData 
+            var bonusData = (PaymentMethodDefinition != null) ? PaymentMethodDefinition?.BonusItem 
+                          : (UserPaymentMethod       != null) ? UserPaymentMethod?.GetPaymentMethodDefinition()?.BonusItem 
                           : null;
             
             if (bonusData != null)
@@ -56,13 +56,13 @@ namespace Galleon.Checkout.UI
             &&  this.UserPaymentMethod.Type == "native")
                 this.bonusItemView?.gameObject.SetActive(false);
             
-            if (userPaymentMethod.GetPaymentMethodDefinition()?.BonusData != null)
-                InitializeBonus(userPaymentMethod.GetPaymentMethodDefinition().BonusData);
+            if (userPaymentMethod.GetPaymentMethodDefinition()?.BonusItem != null)
+                InitializeBonus(userPaymentMethod.GetPaymentMethodDefinition().BonusItem);
             
             Refresh();
         }
         
-        private void InitializeBonus(BonusData bonusData)
+        private void InitializeBonus(BonusItem bonusItem)
         {
             // var prefab           = bonusData.BonusPrefab;
             // var bonusGO          = Instantiate(original : prefab, parent: BonusContainer.transform);
