@@ -13,8 +13,9 @@ namespace Galleon.Checkout.Foundation
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public Assets Assets = new Assets();
-        public Core   Core   = new Core();
+        public Elements Elements = new Elements();
+        public Assets   Assets   = new Assets();
+        public Core     Core     = new Core();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 

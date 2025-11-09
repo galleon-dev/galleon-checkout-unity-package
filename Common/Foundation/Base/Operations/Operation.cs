@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Assets;
+using Galleon.Checkout.Foundation;
 using Newtonsoft.Json;
 using UnityEngine;
 using Random = System.Random;
@@ -166,6 +167,8 @@ namespace Galleon.Checkout.Foundation
         public LiveNode OriginalTree;
         public LiveNode VirtualTree;
         
+        public TextNode OriginalTextNode;
+        
         public string   ID;
         public IEntity  Parent;
         
@@ -178,25 +181,56 @@ namespace Galleon.Checkout.Foundation
             this.OriginalTree = definition;
             this.OriginalTree.Operation = this;
         }
+        public LiveOperation(string id, IEntity parent, string text)
+        {
+            this.ID                     = id;
+            this.Parent                 = parent;
+            this.OriginalTree.Operation = this;
+            
+            this.OriginalTextNode = TextNode.Parse(text);
+        }
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         public void SaveWithNode(){}
         public void LoadWithNode(){}
         
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        public async Task ExecuteAPF()
-        {
-            var node = this.OriginalTree;
-            node.DoPlusCreateAfterVTree();
-        }
-        
         public async Task Execute()
         {
             await CreateVirtualTree();
             await CreateActualContent();
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
+        
+        public async Task ExecuteAPF()
+        {
+            OriginalTree.DO_APF();
+        }
+        public async Task ExecuteAPF_E()
+        {
+            /// - this node is ["> Folder f1"]
+            ///   i.e. an Element node.
+            ///
+            /// - the parent node is an Assets.Folder Node
+            ///
+            /// - so, we need to take the element node,
+            ///   split it to its categorie (it has only 1 - "Assets"),
+            ///   and also take all the categories of the parent (again, only "Assets"),
+            ///   and foreach node in each category - add the node under the relevent category of the parent.
+            
+            OriginalTree.DO_APFE_CreateVTree();
+
+            foreach (var vNode in VirtualTree.Node.Descendants().OfType<LiveNode>())
+            {
+                if (vNode.APFE_DoesNeedToDoAction)
+                    vNode.DO_APFE_PLusAction();
+            }
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
         
         public async Task CreateVirtualTree()
         {
@@ -279,7 +313,13 @@ namespace Galleon.Checkout.Foundation
     {   
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public string Text;
+        public TextNode TextNode = new TextNode();
+        public string   Text
+        {
+            get => TextNode.FullText;
+            set => TextNode.RawText = value;
+        }
+        
         
         public string TargetText;
         public string ActionText;
@@ -304,6 +344,18 @@ namespace Galleon.Checkout.Foundation
         
         public void DoPlusCreateAfterVTree()
         {
+                        
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
+
+        //////////////////////////////////// A_p_F
+        
+        
+        public void DO_APF()
+        {
             IEntity Parent     = this.Operation.Parent;
             
             string  type       = this.TargetText.Split(' ').First(); // "Folder"
@@ -316,10 +368,52 @@ namespace Galleon.Checkout.Foundation
             target.Node.Live.LiveHandler.Create();            
         }
         
+        //////////////////////////////////// A_p_FE
+        
+        public void DO_APFE_CreateVTree()
+        {
+            // Notes
+            // this node is        : ["> Folder f1"]
+            // Operation.Parent is : Root.Instance.Context.Package1.Assets.rootFolder
+            
+            // Definitions
+            string targetElementName = this.TextNode.LineWords.First();
+            
+            // Get Target Element
+            Collection<Element> AllElements   = new(); // Root.Instance.Context.Package1.Elements.Collection;
+            Element             targetElement = AllElements.Single(x => x.Name == targetElementName);
+            
+            // Add Folder Asset Live Node To VTree
+            LiveNode folderAssetLiveNode = targetElement.APFE_Get_AssetFolderNode();
+        }
+        public void DO_APFE_PLusAction()
+        {
+            if (!this.APFE_DoesNeedToDoAction) 
+                return;
+            
+            IEntity Parent     = this.Operation.Parent;
+            
+            string  type       = this.TargetText.Split(' ').First(); // "Folder"
+            Type    targetType = Type.GetType("Galleon.Checkout." + type);
+            
+            IEntity target     = (IEntity)Activator.CreateInstance(targetType);
+            
+            Parent.Node.AddChild(target);
+            target.Node.Live.LiveHandler.OnAddedToParent(Parent);
+            target.Node.Live.LiveHandler.Create();            
+        }
+        public bool APFE_DoesNeedToDoAction => false;
+        
         /// [plus1]   -> simple-op + 1 node + direct-action.
-        /// [plus1e]  -> plus1 + element + live + node + code.
+        /// [plus1e]  -> plus1 + element + live + node + code + fake vtree.
+        ///     AF + EF
+        ///     EF + EF
         /// [plus1ev] -> plus1e + vtree.
         /// [...]     -> test. save-load. 2 nodes. n nodes. suger/refs.
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
         
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Category Methods
@@ -422,6 +516,14 @@ namespace Galleon.Checkout.Foundation
             return default;
         }
     }
+    
 }
 
+namespace Galleon.Checkout
+{
+    public partial class Element
+    {
+        public LiveNode APFE_Get_AssetFolderNode() =>  new LiveNode() { Text = "Assets.Folder f1" };
+    }
+}
 

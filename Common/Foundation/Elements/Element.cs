@@ -8,17 +8,21 @@ using UnityEngine;
 namespace Galleon.Checkout
 {
     [Element("element")]   
-    public class Element : Entity
-    {        
-        // Scan
+    public partial class Element : Entity
+    {
+        //// Members
         
-        // CRUD
-        
-        // Live
-        
-        // Print
+        public string Name;
 
+        //// Lifecycle
+        
+        public Element(string name)
+        {
+            this.Name = name;
+        }
     }
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     [AttributeUsage(AttributeTargets.All)]
     public class ElementAttribute : Attribute
@@ -30,7 +34,6 @@ namespace Galleon.Checkout
             this.ElementName = ElementName;
         }
     }
-    
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     #region BS

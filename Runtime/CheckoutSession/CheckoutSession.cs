@@ -27,7 +27,7 @@ namespace Galleon.Checkout
         public UserPaymentMethod                  userPaymentMethodToDelete = null;
         
         // Bonus Data
-        public List<BonusData>                    BonusData                  = new();
+        public List<BonusItem>                    BonusData                 = new();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -67,8 +67,8 @@ namespace Galleon.Checkout
                       //s.AddChildStep("wait",        async x => await Task.Delay(1000));
                         
                         // View CheckoutPage
-                      //s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "choice");
-                        s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
+                        s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "preselection");
+                      //s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                         
                         /////////////////////////////////////// Post Steps

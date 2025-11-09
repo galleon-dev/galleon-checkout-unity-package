@@ -3,15 +3,37 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class BonusItemView : MonoBehaviour
+    public interface IBonusItemView
     {
+        public void Initialize(string mainText, string rewardText);
+        public void Open();
+        public void Close();
+    }
+    
+    public class BonusItemView : MonoBehaviour, IBonusItemView
+    {
+        //////////////////////////////////////////////////////////////////////// Members
+        
         public GameObject closedImage;
         public GameObject openImage;
         
-        public bool IsOpen;
+        public bool       IsOpen;
+       
+        public string     MainText;
+        public string     RewardText;
+        
+        //////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public void Initialize(string mainText, string rewardText)
+        {
+            this.MainText   = mainText;
+            this.RewardText = rewardText;
+        }
+        
+        //////////////////////////////////////////////////////////////////////// Methods
         
         [ContextMenu("open")]
-        public async Task Open()
+        public void Open()
         {
             IsOpen = true;
             closedImage.SetActive(false);
@@ -19,7 +41,7 @@ namespace Galleon.Checkout
         }
         
         [ContextMenu("close")]
-        public async Task Close()
+        public void Close()
         {
             IsOpen = false;
             closedImage.SetActive(true);

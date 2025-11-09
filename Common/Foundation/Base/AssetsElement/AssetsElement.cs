@@ -47,7 +47,7 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        this.rootFolder.Node.Live.Plus();
+                        await this.rootFolder.Node.Live.Plus("> Folder f1");
                     });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector

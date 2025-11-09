@@ -465,12 +465,12 @@ namespace Galleon.Checkout
                 foldout.contentContainer.style.backgroundColor = new Color(0.3f,0.3f,0.3f);
                 
                 // Breadcrumbs
-                var breadcrumbsFolderout = new Foldout() { text = "Breadcrumbs", value = false }; foldout.Add(breadcrumbsFolderout);
-                breadcrumbsFolderout?.Clear();
+                var breadcrumbsFoldout = new Foldout() { text = "Breadcrumbs", value = false }; foldout.Add(breadcrumbsFoldout);
+                breadcrumbsFoldout?.Clear();
                 foreach (var breadcrumb in Target.Node.Breadcrumbs)
                 {
                     var breadcrumbInspector = new Breadcrumb.Inspector(breadcrumb, breadcrumb.DisplayName);
-                    breadcrumbsFolderout.Add(breadcrumbInspector);
+                    breadcrumbsFoldout.Add(breadcrumbInspector);
                 }
                 
                 // Steps
@@ -560,13 +560,23 @@ namespace Galleon.Checkout
         {
             IEntity Entity; public LIVE(IEntity entity) => this.Entity = entity;
             
-            public async Task Plus()
+            public async Task Plus(string text)
             {
-                var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
-                                                       ,parent     : this.Entity
-                                                       ,definition : new LiveNode() { TargetText = "Assets.Folder f1", ActionText = "plus" });
+                //////////////////////////////// Attempt 1 - APF
                 
-                await plusOperation.ExecuteAPF();
+                // var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
+                //                                        ,parent     : this.Entity
+                //                                        ,definition : new LiveNode() { TargetText = "Assets.Folder f1", ActionText = "plus" });
+                // 
+                // await plusOperation.ExecuteAPF();
+                
+                
+                //////////////////////////////// Attempt 2 - APF_E
+                
+                var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_Fe"
+                                                       ,parent     : this.Entity
+                                                       ,text       : "> Folder f1");
+                await plusOperation.ExecuteAPF_E();
             }
             
             public LiveHandler LiveHandler
