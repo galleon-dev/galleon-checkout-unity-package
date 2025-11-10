@@ -12,15 +12,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-#if UNITY_ANDROID
+//#if UNITY_ANDROID
 using AdvancedInputFieldPlugin;
-#endif
+//#endif
 
 namespace Galleon.Checkout.UI
 {
     public class CreditCardInfoPanelView : View
     {
-        #if UNITY_ANDROID
+       // #if UNITY_ANDROID
         
         //////////////////////////////////////////////////////////////////////////// Members
 
@@ -598,7 +598,7 @@ namespace Galleon.Checkout.UI
         
         public Step test_confirm() => new Step(action : async (s) => On_OkClick() );
     
-        #endif // ANDROID
+    //    #endif // ANDROID
     
     }
 

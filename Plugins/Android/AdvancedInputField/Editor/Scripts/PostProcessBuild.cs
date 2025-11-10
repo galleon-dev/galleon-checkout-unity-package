@@ -29,7 +29,7 @@ namespace AdvancedInputFieldPlugin.Editor
 #else
 				string target = project.TargetGuidByName(PBXProject.GetUnityTargetName()); //Use this line for older versions of Unity
 #endif
-				project.AddBuildProperty(target, "OTHER_LDFLAGS", "-force_load $(PROJECT_DIR)/Libraries/AdvancedInputField/Plugins/iOS/NativeKeyboard.a");
+				project.AddBuildProperty(target, "OTHER_LDFLAGS", "-force_load $(PROJECT_DIR)/Libraries/com.galleon.checkout/Plugins/Android/AdvancedInputField/Plugins/iOS/NativeKeyboard.a");
 				project.WriteToFile(projectPath);
 			}
 		}
