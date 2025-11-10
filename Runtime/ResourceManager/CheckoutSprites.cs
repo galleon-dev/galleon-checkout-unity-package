@@ -70,7 +70,7 @@ namespace Galleon.Checkout
                         #elif UNITY_IOS
                             return AppleIconSprite;
                         #else
-                            return AddCreditCardIconSprite
+                            return AddCreditCardIconSprite;
                         #endif
                     default:            return AddCreditCardIconSprite;
                 }
