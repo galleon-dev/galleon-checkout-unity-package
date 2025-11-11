@@ -144,15 +144,15 @@ namespace Galleon.Checkout.UI
 
         public static Step EndCheckoutScreenMobile()
         =>
-            new Step(name: $"end_checkout_screen_mobile"
-                    , action: async (s) =>
-                              {
-                                  if (CheckoutClient.Instance.CheckoutScreenMobile == null)
-                                      return;
-
-                                  //CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(false);
-                                  await CheckoutClient.Instance.CheckoutScreenMobile.Close();
-                              });
+            new Step(name   : $"end_checkout_screen_mobile"
+                    ,action : async (s) =>
+                            {
+                                if (CheckoutClient.Instance.CheckoutScreenMobile == null)
+                                    return;
+                            
+                                //CheckoutClient.Instance.CheckoutScreenMobile.gameObject.SetActive(false);
+                                await CheckoutClient.Instance.CheckoutScreenMobile.Close();
+                            });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -364,8 +364,8 @@ namespace Galleon.Checkout.UI
 
                         ///////////////////////// Page
 
-                        IsPageActive = true;
-                        CurrentPage = page;
+                        IsPageActive     = true;
+                        CurrentPage      = page;
                         NavigationHistory.Add(page);
                         
                         ///////////////////////// Refresh
@@ -413,7 +413,8 @@ namespace Galleon.Checkout.UI
             new Step(name: $"UI_CLOSE"
                     , action: async (s) =>
                               {
-                                  await Close();
+                                  // await Close();
+                                  s.ParentStep.RemoveStepsAfterThisInParentFlow();
                               });
 
         public Step UI_Back()
@@ -443,7 +444,10 @@ namespace Galleon.Checkout.UI
 
         public void On_BackClicked()
         {
-            OnPageFinishedWithResult(NavigationStates.Back.ToString());
+            if (CurrentPage == CheckoutPage)
+                OnPageFinishedWithResult(NavigationStates.Close.ToString());
+            else
+                OnPageFinishedWithResult(NavigationStates.Back.ToString());
         }
 
         public void On_CloseClicked()
@@ -509,9 +513,13 @@ namespace Galleon.Checkout.UI
             {
                 var transform      = NativeKeyboardManager.Keyboard.transform as RectTransform;
                 int keyboardHeight = Mathf.RoundToInt(transform.rect.height); //Convert to screen pixels
-                return keyboardHeight;
+                var footerHeight   = (this.FooterPanelView.transform as RectTransform).rect.height;
+                
+                return keyboardHeight - footerHeight;
             }
 
+            
+            
             #elif UNITY_ANDROID && !UNITY_EDITOR
             
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -520,9 +528,10 @@ namespace Galleon.Checkout.UI
                 AndroidJavaObject view = activity.Get<AndroidJavaObject>("mUnityPlayer").Call<AndroidJavaObject>("getView");
                 AndroidJavaObject rect = new AndroidJavaObject("android.graphics.Rect");
                 view.Call("getWindowVisibleDisplayFrame", rect);
-                int visibleHeight = rect.Call<int>("height");
+                int visibleHeight  = rect.Call<int>("height");
+                var footerHeight   = (this.FooterPanelView.transform as RectTransform).rect.height;
             
-                return UnityEngine.Screen.height - visibleHeight;
+                return (UnityEngine.Screen.height - visibleHeight) - footerHeight;
             }
             
             #elif UNITY_IOS && !UNITY_EDITOR
@@ -730,7 +739,7 @@ namespace Galleon.Checkout.UI
 
         public void OnShadeClick()
         {
-            Close();
+            OnPageFinishedWithResult(NavigationStates.Close.ToString());
         }
 
         public static event Action<bool> On_ApplicationFocus;

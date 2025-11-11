@@ -19,7 +19,9 @@ namespace Galleon.Checkout
             return new InitializationResult() { IsSuccess = true };
         }
         
-        public static async Task<PurchaseResult> Purchase(CheckoutProduct product, Dictionary<string, string> metadata = null, List<BonusItem> bonusData = null)
+        public static async Task<PurchaseResult> Purchase(CheckoutProduct            product
+                                                         ,Dictionary<string, string> metadata  = null
+                                                         ,List<BonusItem>            bonusData = null)
         {
             // Safty
             if (metadata  == null) metadata  = new Dictionary<string, string>();

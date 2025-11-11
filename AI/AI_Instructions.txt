@@ -1,113 +1,156 @@
 
 This is an instruction file for AI.
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// code standards for small class
-
-public class SmallClass
-{
-    //// Consts
-    
-    public const int MY_CONST = 4;
-    
-    //// Members
-    
-    public  int     myInt            = 4;
-    public  string  myString         = "bla"";
-    private float   myFloat          = 1.2f;
-    
-    public  double  MyProperty       => 4.0;
-    public  bool    MyOtherProperty  => true;
-    
-    //// Lifecycle
-    
-    public SmallClass()
-    {
-        // ctor logic here
-    }
-    
-    //// API Methods
-    
-    public void DoTheThing()
-    {
-        ActuallyToDoTheThing();
-    }
-    
-    //// helper Methods
-    
-    private void ActuallyToDoTheThing()
-    {
-        // Logic here
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// code standards for medium class
-
-public class MediumClass
-{
-    //////////////////////////////////////////////////////////////// Members
-    
-    public  int          myInt     = 4;
-    public  string       myString  = "bla"";
-    private float        myFloat   = 1.2f;
-    
-    public  event Action MyEvent;
-    
-    //////////////////////////////////////////////////////////////// Lifecycle
-    
-    public MediumClass()
-    {
-        // ctor logic here
-    }
-    
-    //////////////////////////////////////////////////////////////// API Methods
-    
-    public void DoTheThing()
-    {
-        ActuallyToDoTheThing();
-    }
-    
-    //////////////////////////////////////////////////////////////// helper Methods
-    
-    private void ActuallyToDoTheThing()
-    {
-        // Logic here
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// code standards for big class
-
-public class BigClass
-{
-    
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Project
 
 > Entities and Nodes
-    > Everything sits in a tree of entities.
-    > IEntity interface, Entity class, and Entity Node.
-    > Aspects of Entity
+    > Entities
+        > "Entity" is a general base class for everything. (similar to "Object").
+        > Everything in the project is an entity.
+        > There is an interface "IEntity" that all classes in the project implement, and that makes them an entity.
+        > as a helpfull shortcut, there is a class "Entity" that implements IEntity, and many classes inherit from it directly.
+        > the IEntity interface has only one property : "EntityNode Node { get; }" which returns an instance of an "EntityNode" for this entity.
+        > This means we favor composition over inheritance when possible. this is our way to do it.
+        > classes that already inherit something (e.g. Mono Behaviour) can just implement IEntity and they will also have access to their node and be considered an Entity.
+        > EntityNode has Tree-Node Functionality, i.e. parent and children properties. (and helpful methods to access Ancestors, Descendants etc), (and of-course methods to add/remove children), etc.
+        > There is a special entity Called "Root". defined in the "Root" class in Root.cs
+        > The entire project (runtime code, editor code, build system, etc.) is a tree of entities with root at top level.
+        > Note! : of-course we have 3rd party code and libraries that are not Entities. but everything we write ourselves should be an entity.   
+    > Aspects of an Entity
+        > General usage :
+            > An Entity has many helpful functionalities. 
+            > The functionalities are written in the EntityNode class. and each entity has Access to its node. (and each EntityNode has access to its relevant Entity)
+            > e.g. if i want to add a child to the entity "myEntity", that i will write : "myEntity.Node.AddChild(childEntityToAdd);"
+            > some functions are written in an inner struct/class (for readability and organization purposes). e.g. to store persistant data, i will write "myEntity.Node.Storage.Store(key, value)"
+        > Tree Node aspect :
+            > an Entity is a node in a tree.
+            > it has Parent and Children Properties.
+            > it has Ancestors() and Descendants() functions to help traverse the tree
+            > it has methods to add and remove children.
+        > Quick overview Additional aspects :
+            > ID - an entity has an EntityID object. used to identify itself uniquely within the application.
+            > Tags - an entity may have tags attached to it. used for various purposes such as filtering or grouping.
+            > DisplayName - an entity may have a display name. used for debug or UI purposes.
+            > Breadcrumbs - an entity may have breadcrumbs associated with it. used for debug. (breadcrumbs capture and store information such as who created the entity, where and when.)
+            > testing - an entity may have test data stored in it.
+            > debug - an entity may have debugging info stored, such as logs, errors etc.
+            > storage - an entity has functionality to quickly save/load persistant data using ID/Tags/key.
+            > reflection - an entity has helper functionality to access selected members via Reflection
+            > inspector - an entity has Inspector functionality (for edit-time and runtime), used for debug by the Explorer window. (the Explorer is a custom debug window that shows the app as a tree of entities, each entity can be inspected)
+            > editor extras - an entity has Editor specific helper functionality and properties
+        > Live aspect :
+            > an entity is Live. this is explained below.
+            > an entity has functionality related to live operations, such as Plus, Minus, Print, etc. 
+            
 
-> Root and Structure
-    > Tree
-    > Root, context, Project, Runtime, Package
-    > Client/App (runtime) > Stuff
-    > Project, Packages, Elements, Assets, H, Etc. 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Structure
+
+> Structure summary : 
+    > Root
+        > Context
+            > (Misc)
+            > Project
+                > Package
+                    > Definitions
+                    > Elements
+                    > Assets
+                    > Hierarchy
+                    > Segments
+                    > "Core"        
+        > Runtime
+            > App / Client
+    
+    > Main structure nodes
+        > Root          - the root of the whole structure
+        > Context       - everything loaded in the project. (a developer may have additional packages/services/data/whatever outside of the project). 
+        > Project       - Contains the main project structure and configuration
+        > Package       - A modular unit containing related functionality, assets, and code
+        > Runtime       - during application runtime (or playtime in editor) this is the root of all runtime entity trees
+        > Client/App    - The main application entry point and client-side implementation in runtime. this object is not instantiated until needed at runtime start.
+
+    > Virtual Trees
+        > Definitions   - text definitions of elements that dont have assets yet.
+        > Elements      - Reusable building blocks used throughout project
+        > Assets        - Resource folders and files, such as textures, audio, and other media files
+        > Hierarchy     - Defines the structure and organization of game objects and components
+        > Segments      - Modular sections of functionality that can be combined or reused
+        > Core          - Essential systems and base functionality required by the package
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Steps and Flows and Operations
 
 > Steps and Flows
-    > Example Step Code
-    > Step capabilities
-    > Step is Flow
-        > Child Steps, Pre+Post Steps
-
-> Elements & Live
-    > Elements
-        > Definitions, Assets, H, App, Etc.
-        > Manager, Pool, Settings, Data, Etc.
-    > Live
-        > Scan, Plus, Minus, Equals, Print
-        > Operations, VTree
+    > Steps are used to define asynchronous operations with optional data such as names and tags
+    > Example Step Code :
     
+            new Step(name   : "example_step"
+                    ,tags   : new[] { "init", "example" }
+                    ,action : async s =>
+                            {   
+                                // Add child steps
+                                s.AddChildStep(SubStep1());
+                                s.AddChildStep(SubStep2());
+                            
+                                // Log within step
+                                s.Log("Step completed");
+                            
+                                // Async operations
+                                await SomeAsyncOperation();
+                            
+                                // Set result
+                                s.SetResult("Completed successfully");
+                            });
+        
+    > Step is a Flow
+        > Steps nested and chained insinde a parent step to create complex flows
+        > Child Steps, Pre+Post Steps
+            > node : the first thing to run when executing a step is the step's Action. after that the child steps execute.
+            > Child steps are executed in sequence after the parent step's action
+            > Pre-steps is a seperate list of child steps that run before the "childSteps"
+            > Post-steps is a seperate list of child steps that run after "childSteps" 
+            > this way we can add additional steps to the main flow (ChildSteps) during executing, and know that post steps are garantied to run after all regular child steps finish even if we added more.
+            > child steps can be added using AddChildStep 
+            > pre and post steps can be added using AddPreStep() and AddPostStep() methods
+        > whenever i use the term flow - i mean a Step class with child steps that logiclly acts as a flow - not a class named "Flow".
+        
+    > Step capabilities examples :
+        > Name and Tags     - Steps can have descriptive names and tags for organization
+        > Action            - Contains the async operation to execute
+        > Child Steps       - Can contain nested sub-steps
+        > Pre/Post Steps    - Can define steps to run before/after child steps
+        > Logging           - Built-in logging functionality via s.Log()
+        > Status            - Tracks execution state (pending, running, completed, etc.)
+        > Error Handling    - Catches and logs errors during execution
+        > Result            - Can return results from the step execution
+        
+    
+    > Operation
+        > an operation is a persistant flow that knows to resume itself if interrupted
+        > a regular flow can be interupted for example by a domain reload, and it wont continue automatically on next load or something like that.
+        > the operation has a Flow property (i.e. a step that will contain child steps)
+        > the operation has an ID (string). and knows how to find itself again based on it.
+        > the operation saves its state to disk between each step in its flow.
+        > in the event of interruption, such as domain reload, the operation resumes itself automatically after load, using the saved state.
+        > exmaple of when we might need to use an operation :
+            > during edit-time, if we create a prefab asset and a script asset by code, and then try to create an attach a the component defined in the script to the prefab, 
+              it wont be straight-forward because we can only instantiate once the script compiled - and that requires a domain reload.
+              so we need an operation to create the prefab+script. compile and resume after domain-reload, and finally attach the compoent to the prefab.     
+    
+    
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Elements, Virtual Trees, Live
+
+> Virtual Trees
+
+> Elements
+    > Definitions, Assets, H, App, Etc.
+    > Manager, Pool, Settings, Data, Etc.
+    
+> Live
+    > Scan, Plus, Minus, Equals, Print
+    > Operations, VTree
+    
+> Foundation Elements
+    > Assets
+        > Folder
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Foundation
 

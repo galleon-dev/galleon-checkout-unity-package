@@ -6,8 +6,9 @@ namespace Galleon.Checkout
 {
     public class BonusItem : Entity
     {
-        public string                PaymentMethodType;
-        public string                BonusMainText;
-        public string                BonusRewardText;
+        public string PaymentMethodType;
+        public string RewardType;
+        public string BonusMainText;
+        public string BonusRewardText;
     }
 }

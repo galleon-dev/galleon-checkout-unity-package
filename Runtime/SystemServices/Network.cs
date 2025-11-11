@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
-using Galleon.Checkout.NETWORK;
-using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -76,8 +71,8 @@ namespace Galleon.Checkout
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
                                                              {
-                                                               { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
-                                                               //  { "Authorization", $"Bearer {GalleonUserAccessToken}" }
+                                                                 { "Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44" }
+                                                                 //  { "Authorization", $"Bearer {GalleonUserAccessToken}" }
                                                              }
                                                     ,body    : new
                                                              {
@@ -321,4 +316,3 @@ namespace Galleon.Checkout
         }
     }
 } 
-

@@ -26,6 +26,9 @@ namespace Galleon.Checkout
         public SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
         public UserPaymentMethod                  userPaymentMethodToDelete = null;
         
+        // Preselection 
+        public UserPaymentMethod                  PreselectedPaymentMethod = null;
+        
         // Bonus Data
         public List<BonusItem>                    BonusData                 = new();
         
@@ -73,11 +76,27 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////////// Post Steps
                         
-                        // Report
-                        s.AddPostStep("report", async x =>
-                                                {
-                                                    Report?.Invoke();
-                                                });
+                        s.AddChildStep(name   : "check_preselection"
+                                      ,action : async x =>
+                                      {
+                                          if (CHECKOUT.Session.PreselectedPaymentMethod.Type == "native")
+                                          {
+                                              this.PurchaseResult = new PurchaseResult()
+                                                                  {
+                                                                      IsSuccess              = true,
+                                                                      DidUserSelectNativeIAP = true,
+                                                                  };
+                                              
+                                              return;
+                                          }   
+                                      });
+                        
+
+                        
+                        /////////////////////////////////////// Post Steps
+                        
+                        // Test Report
+                        s.AddPostStep("report", async x => { Report?.Invoke(); });
                         
                         // Close
                         s.AddPostStep(CheckoutScreenMobile.EndCheckoutScreenMobile());

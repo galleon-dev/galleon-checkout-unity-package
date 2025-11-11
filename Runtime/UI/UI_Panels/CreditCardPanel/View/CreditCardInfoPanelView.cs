@@ -171,18 +171,18 @@ namespace Galleon.Checkout.UI
             if (IsCorrectInputFields())
             {
                 // Create payment method object
-                var card                   = new CreditCardUserUserPaymentMethod();
-                card.Data.type             = "credit_card";
-                card.Data.credit_card_type = card.Type;
+                var card                     = new CreditCardUserUserPaymentMethod();
+                card.Data.type               = "credit_card";
+                card.Data.credit_card_type   = card.Type;
                 
                 // Set card Data
-                card.Type                  = CurrentCardFormat.Name;
-                card.DisplayName           = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
-                card.CardHolderName        = NameInputField.Text;
-                card.CardNumber            = CreditCardNumberField.Text;
-                card.CardCCV               = CVVInputField.Text;
-                card.CardMonth             = DateInputField.Text.Substring(0, 2);
-                card.CardYear              = DateInputField.Text.Substring(2, 2);
+                card.Type                    = CurrentCardFormat.Name;
+                card.DisplayName             = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
+                card.CardHolderName          = NameInputField.Text;
+                card.CardNumber              = CreditCardNumberField.Text;
+                card.CardCCV                 = CVVInputField.Text;
+                card.CardMonth               = DateInputField.Text.Substring(0, 2);
+                card.CardYear                = DateInputField.Text.Substring(2, 2);
 
                 // Set additional data
                 card.IsNewPaymentMethod      = true;

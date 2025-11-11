@@ -18,6 +18,13 @@ namespace Galleon.Checkout.Foundation
         /// The full raw text block for this node, including all lines.
         /// </summary>
         public string RawText;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+        
+        public TextNode Clone()
+        {
+            return new TextNode { RawText = this.RawText };
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Text Properties
 

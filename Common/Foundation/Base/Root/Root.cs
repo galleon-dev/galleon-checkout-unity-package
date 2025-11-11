@@ -24,7 +24,6 @@ namespace Galleon.Checkout
         
         public Context  Context  = new Context();
         public Runtime  Runtime  = new Runtime();
-        public Project  Project  = new Project();
         
         ////////////////////////////////////////////////////// Lifecycle
         

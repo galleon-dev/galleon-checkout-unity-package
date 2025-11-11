@@ -24,13 +24,14 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public  List<UserPaymentMethod>             SpecialUserPaymentMethods    => UserPaymentMethods.Where(x=>x.Type == "native").ToList();
+        public  List<UserPaymentMethod>             SpecialUserPaymentMethods    => UserPaymentMethods.Where(x => x.Type == "native" || x.Type == "app").ToList();
         public  List<UserPaymentMethod>             LastUsedUserPaymentMethods   => GetLastUsedUserPaymentMethods();
         
         public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods 
                                                                                     .Union(SpecialUserPaymentMethods)
                                                                                     .OrderBy(x => x.SortOrder)
                                                                                     .Take(MAX_LAST_USED_PAYMENT_METHODS)
+                                                                                    .Where(x => x.Type != "app")
                                                                                     .ToList();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -68,7 +69,7 @@ namespace Galleon.Checkout
                         s.AddPostStep(name : "finish_adding_user_payment_method"
                                      ,action: async step =>
                                               {
-                                                  CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod(upm);
+                                                  CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod   (upm);
                                                   CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
                                               });
                     });
@@ -158,9 +159,7 @@ namespace Galleon.Checkout
                                                            {
                                                                Type                = pmd.Type,
                                                                InitializationSteps = {},
-                                                               TransactionSteps    =
-                                                                                   {
-                                                                                   },
+                                                               TransactionSteps    = {},
                                                                Data                = data,
                                                            });
                         }
@@ -182,6 +181,8 @@ namespace Galleon.Checkout
             new Step(name   : $"get_user_payment_methods"
                     ,action : async (s) =>
                     {
+                        /////////////////////////////////// from server
+                        
                         var _result = await CHECKOUT.Network.Get<Shared.UserPaymentMethodsResponse>(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/user-payment-methods"
                                                                                                    ,headers : new ()
                                                                                                    {
@@ -204,6 +205,8 @@ namespace Galleon.Checkout
                                                         });
                         }
                         
+                        /////////////////////////////////// Native
+                        
                         string nativeDisplayName = "";
                         #if UNITY_ANDROID
                         nativeDisplayName = "Google Play";
@@ -217,6 +220,17 @@ namespace Galleon.Checkout
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
                                                         Type               = "native"
+                                                    });
+                        
+                        /////////////////////////////////// App
+                        
+                        this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                    {
+                                                        Data               = null,
+                                                        DisplayName        = "Continue to Checkout",
+                                                        IsNewPaymentMethod = false,
+                                                        IsSelected         = false,
+                                                        Type               = "app"
                                                     });
                         
                     });
