@@ -79,7 +79,7 @@ namespace Galleon.Checkout
                         s.AddChildStep(name   : "check_preselection"
                                       ,action : async x =>
                                       {
-                                          if (CHECKOUT.Session.PreselectedPaymentMethod.Type == "native")
+                                          if (CHECKOUT.Session?.PreselectedPaymentMethod?.Type == "native")
                                           {
                                               this.PurchaseResult = new PurchaseResult()
                                                                   {

@@ -31,7 +31,7 @@ namespace Galleon.Checkout
                                                                                     .Union(SpecialUserPaymentMethods)
                                                                                     .OrderBy(x => x.SortOrder)
                                                                                     .Take(MAX_LAST_USED_PAYMENT_METHODS)
-                                                                                    .Where(x => x.Type != "app")
+                                                                                    .Where(x => x?.Type != "app")
                                                                                     .ToList();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -97,14 +97,14 @@ namespace Galleon.Checkout
         public async Task Save()
         {
             CHECKOUT.Storage.Write(key   : "saved_payment_methods"
-                                  ,value : LastUsedUserPaymentMethodIDs);
+                                  ,value : LastUsedUserPaymentMethodIDs.Where(x => !x.StartsWith("local_pm_id")));
         }
         
         public async Task Load()
         {
             this.LastUsedUserPaymentMethodIDs.Clear();
             var saved = CHECKOUT.Storage.Read<List<string>>(key : "saved_payment_methods");
-            this.LastUsedUserPaymentMethodIDs.AddRange(saved);
+            this.LastUsedUserPaymentMethodIDs.AddRange(saved.Where(x => !x.StartsWith("local_pm_id")));
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last used
@@ -215,7 +215,10 @@ namespace Galleon.Checkout
                         #endif
                         this.UserPaymentMethods.Add(new UserPaymentMethod()
                                                     {
-                                                        Data               = null,
+                                                        Data               = new()
+                                                                           {
+                                                                              type = "native"
+                                                                           },
                                                         DisplayName        = nativeDisplayName,
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
@@ -226,7 +229,10 @@ namespace Galleon.Checkout
                         
                         this.UserPaymentMethods.Add(new UserPaymentMethod()
                                                     {
-                                                        Data               = null,
+                                                        Data               = new ()
+                                                                           {
+                                                                              type = "app"
+                                                                           },
                                                         DisplayName        = "Continue to Checkout",
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
