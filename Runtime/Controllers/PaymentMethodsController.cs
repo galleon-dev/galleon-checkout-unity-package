@@ -63,15 +63,14 @@ namespace Galleon.Checkout
             new Step(name   : $"add_new_user_payment_method"
                     ,action : async (s) =>
                     {
-                        foreach (var vaultingStep in upm.GetVaultingSteps())
-                            s.AddChildStep(vaultingStep);
-                        
-                        s.AddPostStep(name : "finish_adding_user_payment_method"
+                        s.AddPreStep(name : "setup_adding_user_payment_method"
                                      ,action: async step =>
                                               {
                                                   CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod   (upm);
                                                   CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
                                               });
+                        foreach (var vaultingStep in upm.GetVaultingSteps())
+                            s.AddChildStep(vaultingStep);
                     });
         
         public void SelectPaymentMethodDefinition(PaymentMethodDefinition definition)

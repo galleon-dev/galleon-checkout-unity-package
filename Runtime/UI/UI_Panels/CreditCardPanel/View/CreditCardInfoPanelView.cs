@@ -476,7 +476,7 @@ namespace Galleon.Checkout.UI
 
             IsValidCreditCardNumber = IsValidLuhn(digits); // digits.Length == format.MaxLength && 
 
-            Debug.Log("LUHN isValid: " + IsValidCreditCardNumber);
+            // Debug.Log("LUHN isValid: " + IsValidCreditCardNumber);
 
             if (!IsValidCreditCardNumber)
             {
