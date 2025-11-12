@@ -233,7 +233,7 @@ namespace Galleon.Checkout
                                                                            {
                                                                               type = "app"
                                                                            },
-                                                        DisplayName        = "Continue to Checkout",
+                                                        DisplayName        = "Continue Checkout",
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
                                                         Type               = "app"
