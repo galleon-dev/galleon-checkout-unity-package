@@ -97,6 +97,7 @@ namespace Galleon.Checkout.UI
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
             }
 
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)PaymentMethodsPanel.transform);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Radio Buttons
@@ -148,7 +149,7 @@ namespace Galleon.Checkout.UI
 
         public void SetPurchaseButtonSprite(Sprite sprite)
         {
-            var image = this.PurchaseButton.GetComponentInChildren<Image>();
+            var image    = this.PurchaseButton.GetComponentInChildren<Image>();
             image.sprite = sprite;
         }        
     }

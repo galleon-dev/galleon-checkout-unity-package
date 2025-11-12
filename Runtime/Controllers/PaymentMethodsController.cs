@@ -27,8 +27,9 @@ namespace Galleon.Checkout
         public  List<UserPaymentMethod>             SpecialUserPaymentMethods    => UserPaymentMethods.Where(x => x.Type == "native" || x.Type == "app").ToList();
         public  List<UserPaymentMethod>             LastUsedUserPaymentMethods   => GetLastUsedUserPaymentMethods();
         
-        public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods 
+        public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods
                                                                                     .Union(SpecialUserPaymentMethods)
+                                                                                    .Distinct()
                                                                                     .OrderBy(x => x.SortOrder)
                                                                                     .Take(MAX_LAST_USED_PAYMENT_METHODS)
                                                                                     .Where(x => x?.Type != "app")

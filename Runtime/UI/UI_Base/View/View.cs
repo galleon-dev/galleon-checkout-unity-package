@@ -56,6 +56,8 @@ namespace Galleon.Checkout.UI
         {
             RefreshState();
            // RefreshUI();
+           
+           LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)this.transform);
         }
         
         

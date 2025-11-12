@@ -252,7 +252,7 @@ namespace Galleon.Checkout.UI
         
         private void GenerateTaxes()
         {
-            Debug.Log("GenerateTaxes()");
+            // Debug.Log("GenerateTaxes()");
 
             foreach (Transform child in TaxesContainer.transform)
             {
@@ -279,14 +279,14 @@ namespace Galleon.Checkout.UI
                     SubTotal = result;
                 }
 
-                Debug.Log("SubTotal Parsed: " + SubTotal);
+                // Debug.Log("SubTotal Parsed: " + SubTotal);
 
                 // CultureInfo.InvariantCulture is important from parsing perspective from string to float as on mobile devices it can appear ",", instead "." in float values
                 SubtotalPriceText.text = $"${SubTotal.ToString(CultureInfo.InvariantCulture)}";
 
                 decimal TaxesAmount = 0;
 
-                Debug.Log("Taxes Amount: " + taxes.Count);
+                // Debug.Log("Taxes Amount: " + taxes.Count);
 
                 // If Location is USA or Canada generate taxes
                 if (IsUSAorCanadaUser)

@@ -41,12 +41,13 @@ namespace Galleon.Checkout.UI
             this.gameObject.name += $"_{paymentMethod.Type}";
             
             // Definitions
-            this.PaymentMethod     = paymentMethod;
+            this.PaymentMethod         = paymentMethod;
             this.PreselectionPanelView = PreselectionPanelView;
             
             // Bonus
             if (this.bonusItemView != null)
                 Destroy(this.bonusItemView.gameObject); // destroy placeholder
+            
             if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
             {
                 this.IBonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<IBonusItemView>();
@@ -114,13 +115,16 @@ namespace Galleon.Checkout.UI
             
             CHECKOUT.Session.PreselectedPaymentMethod = this.PaymentMethod;
             
-            Refresh();
+            //Refresh();
+            this.PreselectionPanelView.Refresh();
         }
 
         public void Unselect()
         {
             this.PaymentMethod?.Unselect();
-            Refresh();
+            //Refresh();
+            
+            this.PreselectionPanelView.Refresh();
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
