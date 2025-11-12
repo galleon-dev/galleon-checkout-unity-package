@@ -120,7 +120,7 @@ namespace Galleon.Checkout
 
         public Step CreateCheckoutSession(CheckoutProduct product)
         =>
-            new Step(name   : $"run_checkout_session"
+            new Step(name   : $"create_checkout_session"
                     ,action : async (s) =>
                               {
                                   // Create new session

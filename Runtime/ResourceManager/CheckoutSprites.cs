@@ -15,6 +15,7 @@ namespace Galleon.Checkout
         
         [Header("Built in")]
         // Icons
+        public Sprite GalleonIconSprite;
         public Sprite AddCreditCardIconSprite;
         public Sprite VisaIconSprite;
         public Sprite MasterCardIconSprite;
@@ -70,8 +71,9 @@ namespace Galleon.Checkout
                         #elif UNITY_IOS
                             return AppleIconSprite;
                         #else
-                            return AddCreditCardIconSprite
+                            return AddCreditCardIconSprite;
                         #endif
+                    case "app":         return GalleonIconSprite;
                     default:            return AddCreditCardIconSprite;
                 }
             }

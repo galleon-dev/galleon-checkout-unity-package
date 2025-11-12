@@ -553,31 +553,41 @@ namespace Galleon.Checkout
         
         #endif // UNITY_EDITOR
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element 
      
+        public Element GetElement() => Elements.GetElement(this.Entity.GetType());
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
+        
         public        LIVE Live => new(Entity);
         public struct LIVE
         {
             IEntity Entity; public LIVE(IEntity entity) => this.Entity = entity;
             
-            public async Task Plus(string text)
-            {
-                //////////////////////////////// Attempt 1 - APF
+            public async Task Plus_APF(string text)
+            {                
+                var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
+                                                       ,parent     : this.Entity
+                                                       ,definition : new LiveNode() { TargetText = "Assets.Folder f1", ActionText = "plus" });
                 
-                // var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
-                //                                        ,parent     : this.Entity
-                //                                        ,definition : new LiveNode() { TargetText = "Assets.Folder f1", ActionText = "plus" });
-                // 
-                // await plusOperation.ExecuteAPF();
-                
-                
-                //////////////////////////////// Attempt 2 - APF_E
-                
-                var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_Fe"
+                await plusOperation.ExecuteAPF();
+            }
+            public async Task Plus_APFE1(string text)
+            {   
+                var   plusOperation = new LiveOperation(id         : $"APFE1"
                                                        ,parent     : this.Entity
                                                        ,text       : "> Folder f1");
-                await plusOperation.ExecuteAPF_E();
+                await plusOperation.ExecuteAPFE1();
             }
+            public async Task Plus_PPFE1(string text)
+            {   
+                var   plusOperation = new LiveOperation(id         : $"PPFE1"
+                                                       ,parent     : this.Entity
+                                                       ,text       : "> Folder f1");
+                await plusOperation.ExecutePPFE1();
+            }
+            
+            //////////////////////////////////////////////////
             
             public LiveHandler LiveHandler
             {

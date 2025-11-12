@@ -1,0 +1,273 @@
+
+This is an instruction file for AI for code style and standards.
+
+
+------------------------------------------------------------------------------------------------------------------------ General Overview
+
+> code style rules
+    > naming conventions:
+        > constants should be in UPPER_CASE with underscores
+        > private members should start with lowercase
+        > public properties should start with uppercase
+        > method names should be PascalCase
+        > event handlers should start with "On_"
+    > code sections in a class (or whatever) are seperated by "///////////////////" and the title of the section
+    > the sections are generally sorted in the following order :
+        > Consts         - consts and read only stuff
+        > Members        - members
+        > Lifecycle      - Ctor, Dtor (if used), Dispose, Initialization, etc. everything that has to do with the lifecycle of the object
+        > Main methods   - if multiple categories of main methods exist - its best to separated them to different sections
+        > methods        - misc methods - if relevant the section's title will describe in a little more detail - e.g. "Network Methods" of "Storage Methods" or whatever...
+        > Events         - event handles for app events
+        > UI Events      - event handlers for user UI events such as button presses
+        > Helper methods - private helper methods
+    > sort explanation
+        > the idea behind sorting the sections as mentioned above is readability
+        > consts members and lifecycle come first because of common world wide standards
+        > then we strive to write the code and split it in such a way that its easy to understand in a glance. and is seperated correctly for functionality.
+            > main methods are clearly defined at the top (after lifecycle). the methods are short and readable, and the logic is split into smaller methods that appear in clear readable sections later
+            > another example is that ui events are grouped together, and each handler calles other helpers which are also grouped. so we could activate the helpers directly for testing even if not running on ui at the moment.
+            > by grouping related functionality together and maintaining a consistent order, we make the code more maintainable and easier to navigate
+            > each section should have clear responsibilities and minimal dependencies on other sections as much as possible
+            > helper methods should be private (if not needed as public) and grouped by their related main method or feature
+            
+         
+        
+
+------------------------------------------------------------------------------------------------------------------------ code standards for small class
+
+public class SmallClass
+{
+    //// Consts
+    
+    public const int MY_CONST = 4;
+    
+    //// Members
+    
+    public  int     myInt            = 4;
+    public  string  myString         = "bla"";
+    private float   myFloat          = 1.2f;
+    
+    public  double  MyProperty       => 4.0;
+    public  bool    MyOtherProperty  => true;
+    
+    //// Lifecycle
+    
+    public SmallClass()
+    {
+        // ctor logic here
+    }
+    
+    //// API Methods
+    
+    public void DoTheThing()
+    {
+        ActuallyToDoTheThing();
+    }
+    
+    //// helper Methods
+    
+    private void ActuallyToDoTheThing()
+    {
+        // Logic here
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------ code standards for medium class
+
+public class MediumClass
+{
+    //////////////////////////////////////////////////////////////// Consts
+
+    public const int MY_CONST_1 = 4;
+    public const int MY_CONST_2 = 5;
+
+    //////////////////////////////////////////////////////////////// Members
+
+    public  int     myInt1           = 4;
+    public  int     myInt2           = 5;
+    public  string  myString1        = "bla1";
+    public  string  myString2        = "bla2";
+    private float   myFloat1         = 1.2f;
+    private float   myFloat2         = 2.3f;
+
+    public  double  MyProperty1      => 4.0;
+    public  double  MyProperty2      => 5.0;
+    public  bool    MyOtherProperty1 => true;
+    public  bool    MyOtherProperty2 => false;
+
+    //////////////////////////////////////////////////////////////// Lifecycle
+
+    public MediumClass()
+    {
+        // ctor logic here
+    }
+
+    //////////////////////////////////////////////////////////////// API Methods
+
+    public void DoTheThing1()
+    {
+        ActuallyToDoTheThing1();
+    }
+
+    public void DoTheThing2()
+    {
+        ActuallyToDoTheThing2();
+    }
+
+    //////////////////////////////////////////////////////////////// Events
+    
+    public void On_ThingHappened()
+    {
+        // Do something
+    }
+    
+    //////////////////////////////////////////////////////////////// UI Events
+    
+    public void On_ButtonClicked()
+    {
+        // Call method that handles button clicks.
+        // do not handle logic here, just call the handler.
+    }
+    
+    //////////////////////////////////////////////////////////////// Helper Methods
+
+    private void ActuallyToDoTheThing1()
+    {
+        // Logic here
+    }
+
+    private void ActuallyToDoTheThing2()
+    {
+        // Logic here
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------ code standards for big class
+
+public class BigClass
+{
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
+
+    public const int MY_CONST_1 = 4;
+    public const int MY_CONST_2 = 5;
+    public const int MY_CONST_3 = 6;
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+
+    public  int     myInt1           = 4;
+    public  int     myInt2           = 5;
+    public  int     myInt3           = 6;
+    public  string  myString1        = "bla1";
+    public  string  myString2        = "bla2";
+    public  string  myString3        = "bla3";
+    private float   myFloat1         = 1.2f;
+    private float   myFloat2         = 2.3f;
+    private float   myFloat3         = 3.4f;
+
+    public  double  MyProperty1      => 4.0;
+    public  double  MyProperty2      => 5.0;
+    public  double  MyProperty3      => 6.0;
+    public  bool    MyOtherProperty1 => true;
+    public  bool    MyOtherProperty2 => false;
+    public  bool    MyOtherProperty3 => true;
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+    public BigClass()
+    {
+        // ctor logic here
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API Methods
+
+    public void DoTheThing1()
+    {
+        ActuallyToDoTheThing1();
+    }
+
+    public void DoTheThing2()
+    {
+        ActuallyToDoTheThing2();
+    }
+
+    public void DoTheThing3()
+    {
+        ActuallyToDoTheThing3();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
+
+    public void On_ThingHappened1()
+    {
+        ActuallyToDoTheThing1();
+    }
+
+    public void On_ThingHappened2()
+    {
+        ActuallyToDoTheThing2();
+    }
+
+    public void On_ThingHappened3()
+    {
+        ActuallyToDoTheThing3();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
+
+    public void On_ButtonClicked1()
+    {
+        // Call method that handles button clicks.
+        // do not handle logic here, just call the handler.
+    }
+
+    public void On_ButtonClicked2()
+    {
+        // Call method that handles button clicks.
+        // do not handle logic here, just call the handler.
+    }
+
+    public void On_ButtonClicked3()
+    {
+        // Call method that handles button clicks.
+        // do not handle logic here, just call the handler.
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
+
+    public void ActuallyToDoTheThing1()
+    {
+        // Logic here
+        
+        HelperMethod1();
+        HelperMethod2();
+    }
+
+    public void ActuallyToDoTheThing2()
+    {
+        // Logic here
+        
+        HelperMethod1();
+        HelperMethod2();
+    }
+
+    public void ActuallyToDoTheThing3()
+    {
+        // Logic here
+        
+        HelperMethod1();
+        HelperMethod2();
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
+    
+    private void HelperMethod1()
+    {
+        // Logic here
+    }
+    
+    private void HelperMethod2()
+    {
+        // Logic here
+    }
+}

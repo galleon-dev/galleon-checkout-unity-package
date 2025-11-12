@@ -6,7 +6,7 @@ namespace Galleon.Checkout.Foundation
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-      //public Package             Package1       = new();
+        public Project             Project  = new Project();
         
         public OperationController Operations     = new();
         public StepController      StepController = new StepController();
@@ -21,3 +21,4 @@ namespace Galleon.Checkout.Foundation
         
     }
 }
+

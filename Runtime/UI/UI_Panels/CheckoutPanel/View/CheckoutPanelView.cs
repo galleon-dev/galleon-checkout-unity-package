@@ -78,7 +78,6 @@ namespace Galleon.Checkout.UI
 
         public override void Initialize()
         {
-            Debug.Log("CheckoutPanelView --> Initialize()");
           //RefreshState();
         }
 

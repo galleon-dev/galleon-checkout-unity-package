@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -25,7 +24,7 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
-        public PositionLayoutGroup PositionLayoutGroup;
+        public PositionLayoutGroup  PositionLayoutGroup;
 
         [Header("Shop Item")]
         public TextMeshProUGUI      ProductTitleText;
@@ -54,13 +53,13 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Links
 
-        public IEnumerable<checkoutPanelPaymentMethodItemView> PaymentMethodItemViews => GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
+        public IEnumerable<PreselectionPanelItemView> PaymentMethodItemViews => GetComponentsInChildren<PreselectionPanelItemView>();
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public override void Initialize()
         {
-          //RefreshState();
+            CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").Select();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
@@ -69,54 +68,40 @@ namespace Galleon.Checkout.UI
         {
             if (CheckoutClient.Instance.CurrentSession == null) return;
             
-            // // Panel config
-            // var configText = CheckoutClient.Instance.CheckoutScreenMobile.CurrentPage.panelConfiguration;
-            // if (configText != null)
-            //     this.Configutation = JsonConvert.DeserializeObject<Config>(configText);
-            // if (this.Configutation == null)
-            //     this.Configutation = new Config() { ShowMinimalOptions = false };
-            // 
-            // if (this.Configutation.ShowMinimalOptions)
-            // {
-            //     this.TaxesContainer.SetActive(false);
-            // }
-            
-            // Debug.Log("<color=green>RefreshState</color>");
-            
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
             this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
 
             ///////////////
 
-            // // Remove children (if any)
-            // // Debug.Log("<color=orange>- Removing Payment Methods</color>");
-            // foreach (Transform child in PaymentMethodsPanel.transform)
-            // {
-            //     // Debug.Log($"-Removing Item {child.gameObject.name}");
-            //     Destroy(child.gameObject);
-            // }
+            // Remove children (if any)
+            // Debug.Log("<color=orange>- Removing Payment Methods</color>");
+            foreach (Transform child in PaymentMethodsPanel.transform)
+            {
+                // Debug.Log($"-Removing Item {child.gameObject.name}");
+                Destroy(child.gameObject);
+            }
 
-            // // Add children
-            // var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
-            // foreach (var paymentMethod in paymentMethods)
-            // {
-            //     // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
-            //     //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
-            //     
-            //     var go   = Instantiate(original: PreselectionItemPrefab, parent: PaymentMethodsPanel.transform);
-            //     var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
-            //   //item.Initialize(paymentMethod, this);
-            // 
-            //     // Add ui separator
-            //     Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
-            // }
+            // Add children
+            var paymentMethods = CHECKOUT.PaymentMethods.SpecialUserPaymentMethods;
+            paymentMethods.Reverse();
+            foreach (var paymentMethod in paymentMethods)
+            {
+                // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
+                //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
+                
+                var go   = Instantiate(original: PreselectionItemPrefab, parent: PaymentMethodsPanel.transform);
+                var item = go.GetComponent<PreselectionPanelItemView>();
+                item.Initialize(paymentMethod, this);
+            
+                // Add ui separator
+                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
+            }
 
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Radio Buttons
 
-
-        public void OnRadiobuttonSelected(checkoutPanelPaymentMethodItemView SelectedItem)
+        public void OnRadiobuttonSelected(PreselectionPanelItemView SelectedItem)
         {
             foreach (var item in PaymentMethodItemViews)
             {
@@ -127,7 +112,7 @@ namespace Galleon.Checkout.UI
             }
             
             //ShowPurchaseButton();
-            var image = PurchaseButton.gameObject.GetComponent<Image>();
+            var image    = PurchaseButton.gameObject.GetComponent<Image>();
             image.sprite = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.First().LogoSprite;
         }
 
@@ -135,6 +120,8 @@ namespace Galleon.Checkout.UI
 
         public void OnConfirmPurchaseClick()
         {
+            CHECKOUT.User.SelectedUserPaymentMethod.Unselect();
+            
             this.Result = ViewResult.Confirm;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
@@ -163,8 +150,7 @@ namespace Galleon.Checkout.UI
         {
             var image = this.PurchaseButton.GetComponentInChildren<Image>();
             image.sprite = sprite;
-        }
-        
+        }        
     }
 }
 

@@ -30,19 +30,19 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
-        public UserPaymentMethod PaymentMethod     { get; set; }
-        public CheckoutPanelView CheckoutPanelView { get; set; }
+        public UserPaymentMethod     PaymentMethod         { get; set; }
+        public PreselectionPanelView PreselectionPanelView { get; set; }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-        public void Initialize(UserPaymentMethod paymentMethod, CheckoutPanelView CheckoutPanelView)
+        public void Initialize(UserPaymentMethod paymentMethod, PreselectionPanelView PreselectionPanelView)
         {
             // "log"
             this.gameObject.name += $"_{paymentMethod.Type}";
             
             // Definitions
             this.PaymentMethod     = paymentMethod;
-            this.CheckoutPanelView = CheckoutPanelView;
+            this.PreselectionPanelView = PreselectionPanelView;
             
             // Bonus
             if (this.bonusItemView != null)
@@ -61,7 +61,7 @@ namespace Galleon.Checkout.UI
 
         public override void RefreshState()
         {
-            if (CheckoutPanelView == null)
+            if (PreselectionPanelView == null)
             {
                 this.Icon.sprite = CHECKOUT.Sprites.AddCreditCardIconSprite;
                 this.Label.text  = "Add Credit Card";
@@ -79,7 +79,7 @@ namespace Galleon.Checkout.UI
             
             // Set button Sprite
             if (this.PaymentMethod.IsSelected)
-                CheckoutPanelView.SetPurchaseButtonSprite(this.PaymentMethod.GetButtonSprite());
+                PreselectionPanelView.SetPurchaseButtonSprite(this.PaymentMethod.GetButtonSprite());
             
             // Set Seperator Color 
             if (this.PaymentMethod.IsSelected)
@@ -109,9 +109,12 @@ namespace Galleon.Checkout.UI
 
         public void Select()
         {
-            // this.PaymentMethod?.Select();
-            // this.CheckoutPanelView.OnRadiobuttonSelected(this);
-            // Refresh();
+            this.PaymentMethod?.Select();
+            this.PreselectionPanelView.OnRadiobuttonSelected(this);
+            
+            CHECKOUT.Session.PreselectedPaymentMethod = this.PaymentMethod;
+            
+            Refresh();
         }
 
         public void Unselect()
@@ -131,45 +134,5 @@ namespace Galleon.Checkout.UI
             }
         }
 
-        // For Dropdown Menu
-        public void SelectDropdownPaymentMethod(UserPaymentMethod paymentMethod, CheckoutPanelView CheckoutPanelView)
-        {
-            Debug.Log("SetPaymentMethod: " + paymentMethod.Type + "  CheckoutPanelView: " + CheckoutPanelView);
-         
-            this.PaymentMethod = paymentMethod;
-            
-            this.CheckoutPanelView = CheckoutPanelView;
-
-            this.PaymentMethod?.Select();
-
-            // Refresh();
-
-            // if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowPurchaseButton();
-            // }
-            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowPurchaseButton();
-            // }
-            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowGooglePayButton();
-            // }
-            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowPaypalPayButton();
-            // }
-            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowApplePayButton();
-            // }
-           
-        }
     }
 }

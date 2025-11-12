@@ -22,6 +22,13 @@ namespace Galleon.Checkout
         }
     }
     
+    public class DefinitionNode : Entity
+    {
+        public string Value = "";
+        
+        public bool IsNamespace => Value.StartsWith("(") && Value.EndsWith(")");
+    }
+    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     [AttributeUsage(AttributeTargets.All)]
