@@ -76,25 +76,6 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////////// Post Steps
                         
-                        s.AddChildStep(name   : "check_preselection"
-                                      ,action : async x =>
-                                      {
-                                          if (CHECKOUT.Session?.PreselectedPaymentMethod?.Type == "native")
-                                          {
-                                              this.PurchaseResult = new PurchaseResult()
-                                                                  {
-                                                                      IsSuccess              = true,
-                                                                      DidUserSelectNativeIAP = true,
-                                                                  };
-                                              
-                                              return;
-                                          }   
-                                      });
-                        
-
-                        
-                        /////////////////////////////////////// Post Steps
-                        
                         // Test Report
                         s.AddPostStep("report", async x => { Report?.Invoke(); });
                         
@@ -120,6 +101,30 @@ namespace Galleon.Checkout
                                                       IsError    = false,
                                                       Errors     = new(),
                                                   };
+                        }
+                    });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc
+        
+        public Step CheckPreselection() 
+        =>
+            new Step(name   : $"check_preselection"
+                    ,action : async (s) =>
+                    {
+                        if (CHECKOUT.Session?.PreselectedPaymentMethod?.Type == "native")
+                        {
+                            this.PurchaseResult = new PurchaseResult()
+                                                {
+                                                    IsSuccess              = true,
+                                                    DidUserSelectNativeIAP = true,
+                                                };
+                            
+                            s.RemoveStepsAfterThisInParentFlow();
+                        }
+                        else
+                        {
+                            s.ParentStep.AddChildStep(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage));
+                            
                         }
                     });
         
