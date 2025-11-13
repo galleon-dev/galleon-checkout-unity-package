@@ -25,15 +25,12 @@ namespace Galleon.Checkout.UI
         public GameObject         EmailInputFieldText;
         public GameObject         Gap;
         public GameObject         EmailInputFieldContainer;
+        public GameObject         EmailButtonGO;
 
         public AdvancedInputField EmailInputField;
         public TMP_Text           ErrorText;
         public TMP_Text           MainText;
 
-
-        public GameObject SuccessEmailContainer;
-        public GameObject SuccessTextOnlyContainer;
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public override void Initialize()
@@ -51,55 +48,34 @@ namespace Galleon.Checkout.UI
             string Email = PlayerPrefs.GetString("Email");
 
             if (!string.IsNullOrEmpty(Email))
-            {
                 EmailInputField.Text = Email;
-            }
 
             if (string.IsNullOrEmpty(EmailInputField.Text))
             {
                 if (EmailInputFieldContainer)
-                {
-                    ShowEmail(true);
-                }
+                    ShowEmail();
             }
             else
             {
                 if (EmailInputFieldContainer)
-                {
-                    ShowEmail(false);
-                }
+                    HideEmail();
             }
         }
 
-        public void ShowEmail(bool Status)
+        public void ShowEmail()
         {
-            Status = true;
-            EmailInputFieldText.SetActive(Status);
-            Gap.SetActive(Status);
-            EmailInputFieldContainer.SetActive(Status);
-
-            if(Status)
-            {
-                if (SuccessEmailContainer)
-                {
-                    SuccessEmailContainer.SetActive(true);
-                }
-                if (SuccessTextOnlyContainer)
-                {
-                    SuccessTextOnlyContainer.SetActive(false);
-                }
-
-            } else
-            {
-                if (SuccessEmailContainer)
-                {
-                    SuccessEmailContainer.SetActive(false);
-                }
-                if (SuccessTextOnlyContainer)
-                {
-                    SuccessTextOnlyContainer.SetActive(true);
-                }
-            }
+            EmailInputFieldText     .SetActive(true);
+            Gap                     .SetActive(true);
+            EmailInputFieldContainer.SetActive(true);
+            EmailButtonGO           .SetActive(true);
+        }
+        
+        public void HideEmail()
+        {
+            EmailInputFieldText     .SetActive(false);
+            Gap                     .SetActive(false);
+            EmailInputFieldContainer.SetActive(false);
+            EmailButtonGO           .SetActive(false);
         }
 
         //////////////////////////////////////////////////////////////////////////// UI Events
@@ -153,7 +129,7 @@ namespace Galleon.Checkout.UI
                 await SendEmail(to: email, subject: message.Subject, body: message.Body);
 
                 this.ErrorText.gameObject.SetActive(false);
-                MainText.text = "Done! Your receipt has been sent to your email. Check your inbox for the details.";
+                MainText.text = "Done! Your receipt has been sent to your email. \nCheck your inbox for the details.";
             }
             catch (System.Exception ex)
             {

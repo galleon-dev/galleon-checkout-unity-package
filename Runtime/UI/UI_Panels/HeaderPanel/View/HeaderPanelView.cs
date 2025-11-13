@@ -59,6 +59,8 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
+        public GameObject HeaderSeperator;
+        
         public GameObject CheckoutAndSettingsPanel;
         public GameObject BackAndTitlePanel;
         public GameObject XButtonPanel;
@@ -73,6 +75,7 @@ namespace Galleon.Checkout.UI
         // To avoid inconsistencies with header apperance, I've added a container that I can hide/unhide during loading panel appearance, otherwise RefreshStates are triggered multiple times during the galleon button click and screen states switches in between 
         public GameObject HeaderContainerLeft;
         public GameObject HeaderContainerRight;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
@@ -83,6 +86,7 @@ namespace Galleon.Checkout.UI
             if (this.State == STATE.checkout_and_settings.ToString())
             {
                 CheckoutAndSettingsPanel.SetActive(true);
+                HeaderSeperator.SetActive(true);
 
                 if (CheckoutAndSettingsPanelRight)
                 {
@@ -92,6 +96,7 @@ namespace Galleon.Checkout.UI
             if (this.State == STATE.back_and_text.ToString())
             {
                 BackAndTitlePanel.SetActive(true);
+                HeaderSeperator.SetActive(true);
 
                 if (BackAndTitlePanelRight)
                 {
@@ -101,6 +106,7 @@ namespace Galleon.Checkout.UI
             if (this.State == STATE.x_button.ToString())
             {
                 XButtonPanel.SetActive(true);
+                HeaderSeperator.SetActive(true);
 
                 if (XButtonPanelRight)
                 {
@@ -110,6 +116,7 @@ namespace Galleon.Checkout.UI
             if (this.State == STATE.credit_card_info.ToString())
             {
                 PaymentMethodPanel.SetActive(true);
+                HeaderSeperator.SetActive(true);
 
                 if (PaymentMethodPanelRight)
                 {
@@ -122,6 +129,8 @@ namespace Galleon.Checkout.UI
 
         private void DisableAllPanels()
         {
+            HeaderSeperator.SetActive(false);
+            
             this.CheckoutAndSettingsPanel.SetActive(false);
             this.BackAndTitlePanel.SetActive(false);
             this.XButtonPanel.SetActive(false);
@@ -156,7 +165,7 @@ namespace Galleon.Checkout.UI
             if (HeaderContainerRight)
                 HeaderContainerRight.SetActive(enabled);
 
-            if(enabled == true)
+            if (enabled == true)
             {
                 this.CheckoutAndSettingsPanel.SetActive(true);
 

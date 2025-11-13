@@ -217,15 +217,15 @@ namespace Galleon.Checkout
                        
                         ////////////////////////////////////////////////////////////// Post Steps
                         
-                        ///////// TEMP
-                        this.lastChargeResult = new ChargeResultData()
-                                              {
-                                                 is_success  = true,
-                                                 errors      = null,
-                                                 is_canceled = false,
-                                                 charge_id   = "test_transaction",
-                                              };
-                        /////////
+                        // ///////// TEMP
+                        // this.lastChargeResult = new ChargeResultData()
+                        //                       {
+                        //                          is_success  = true,
+                        //                          errors      = null,
+                        //                          is_canceled = false,
+                        //                          charge_id   = "test_transaction",
+                        //                       };
+                        // /////////
                         
                         s.AddPostStep(name   : "save_used_payment_method_if_success"
                                      ,action : async x =>

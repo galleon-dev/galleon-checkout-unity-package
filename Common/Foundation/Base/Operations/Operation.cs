@@ -425,22 +425,28 @@ namespace Galleon.Checkout.Foundation
         public void DO_PPFE_CreateVTree()
         {
             // Definitions
-            string                  targetElementName       = this.TextNode.LineWords.First();
+            string                  targetElementName             = this.TextNode.LineWords.First();
             
             // Get Parent Element
-            Element                 parentElement           = this.Operation.Parent.Node.GetElement();
+            Element                 parentElement                 = this.Operation.Parent.Node.GetElement();
             
             // Get Target Element
-            Element                 targetElement           = Elements.GetElementByName(targetElementName);
+            Element                 targetElement                 = Elements.GetElementByName(targetElementName);
             
             // Get relevant namespaces
-            var                     elementNamespaceNodes   = parentElement.Node.Descendants().OfType<DefinitionNode>().Where(x => x.IsNamespace); // get all namespace nodes under parent
-            var                     targetNamespaceNodes    = targetElement.Node.Descendants().OfType<DefinitionNode>().Where(x => x.IsNamespace); // get all namespace nodes under target element
-            var                     intersectionNodes       = elementNamespaceNodes.Intersect(targetNamespaceNodes);                               // get the intersection of the two
+            var                     parentElementNamespaceNodes   = parentElement.Node.Descendants().OfType<DefinitionNode>().Where(x => x.IsNamespace); // get all namespace nodes under parent
+            var                     targetElementNamespaceNodes   = targetElement.Node.Descendants().OfType<DefinitionNode>().Where(x => x.IsNamespace); // get all namespace nodes under target element
+            var                     intersectionNodes             = parentElementNamespaceNodes.Intersect(targetElementNamespaceNodes);                  // get the intersection of the two
+            
+            // copy relevent nodes to vtree
+            foreach (var node in intersectionNodes)
+            {
+                
+            }
             
             // Add Folder Asset Live Node To VTree
-            LiveNode                folderAssetLiveNode     = targetElement.PPFE1_Get_AssetFolderNode();
-            folderAssetLiveNode.Operation                   = this.Operation;
+            LiveNode                folderAssetLiveNode           = targetElement.PPFE1_Get_AssetFolderNode();
+            folderAssetLiveNode.Operation                         = this.Operation;
             
             // Add Assets.Folder node to this
             this.Node.AddChild(folderAssetLiveNode);
