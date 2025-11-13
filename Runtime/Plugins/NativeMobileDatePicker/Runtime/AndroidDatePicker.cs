@@ -14,23 +14,23 @@ namespace GalleonDatePicker
             _initDate             = initDate;
             _dateSelectedCallback = callback;
 
-            var unityActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            var activity      = unityActivity.GetStatic<AndroidJavaObject>("currentActivity");
+            var unityActivity     = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            var activity          = unityActivity.GetStatic<AndroidJavaObject>("currentActivity");
 
             activity.Call("runOnUiThread",
-                new AndroidJavaRunnable(() =>
-                {
-                    var dialog = new AndroidJavaClass("com.yourcompany.customdatepicker.MonthYearPicker")
-                        .CallStatic<AndroidJavaObject>("create",
-                            activity,
-                            _initDate.Year,
-                            _initDate.Month - 1,
-                            new DateCallback(this),
-                            "Select Year and Month"
-                        );
+                          new AndroidJavaRunnable(() =>
+                                                  {
+                                                      var dialog = new AndroidJavaClass("com.yourcompany.customdatepicker.MonthYearPicker")
+                                                     .CallStatic<AndroidJavaObject>("create",
+                                                                                    activity,
+                                                                                    _initDate.Year,
+                                                                                    _initDate.Month - 1,
+                                                                                    new DateCallback(this),
+                                                                                    "Select Month and Year"
+                                                                                   );
 
-                    dialog.Call("show");
-                }));
+                                                      dialog.Call("show");
+                                                  }));
         }
 
         private void DateSelectedHandler(DateTime date)
@@ -57,11 +57,11 @@ namespace GalleonDatePicker
         }
         */
 
-     /*   private void DateSelectedHandler(DateTime date)
-        {
-            _dateSelectedCallback?.Invoke(date);
-        }
-     */
+        /*   private void DateSelectedHandler(DateTime date)
+           {
+               _dateSelectedCallback?.Invoke(date);
+           }
+        */
 
         class DateCallback : AndroidJavaProxy
         {
@@ -82,3 +82,4 @@ namespace GalleonDatePicker
     }
     #endif
 }
+
