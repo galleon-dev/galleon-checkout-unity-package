@@ -274,8 +274,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3475622572209059376}
   m_HandleRect: {fileID: 3367263749950714740}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.8208635
+  m_Value: 1.0000002
+  m_Size: 0.7227886
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1364,8 +1364,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7588735980924835642}
   m_HandleRect: {fileID: 4976091989052601655}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.5380207
+  m_Value: 0
+  m_Size: 0.538021
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12212,7 +12212,36 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -30.16
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 9215382696324340413, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9215382696324340413, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9215382696324340413, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9215382696324340413, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9215382696324340413, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9215382696324340413, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9215382696324340413, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 789761483153506072, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c0cb993a091a94abd875eeec5b225d97, type: 3}
 --- !u!114 &879268243020369841 stripped
 MonoBehaviour:

@@ -38,19 +38,14 @@ namespace Galleon.Checkout.UI
             this.ErrorText.gameObject.SetActive(false);     
         }
 
-        private void Update()
-        {
-            EmailInputField.Text = EmailInputField.Text;
-        }
-
-        private void OnEnable()
+        public override async void RefreshState()
         {
             string Email = PlayerPrefs.GetString("Email");
 
             if (!string.IsNullOrEmpty(Email))
                 EmailInputField.Text = Email;
 
-            if (string.IsNullOrEmpty(EmailInputField.Text))
+            if (CHECKOUT.User.Email.IsNullOrEmpty())
             {
                 if (EmailInputFieldContainer)
                     ShowEmail();
@@ -59,6 +54,10 @@ namespace Galleon.Checkout.UI
             {
                 if (EmailInputFieldContainer)
                     HideEmail();
+                
+                await Task.Delay(1200);
+                Result = ViewResult.Confirm;
+                CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
             }
         }
 
@@ -88,8 +87,18 @@ namespace Galleon.Checkout.UI
 
         public async void OnConfirmEmailButtonClick()
         {
+            await SaveEmail();
             await SendReceipt();
             OnConfirmSuccessButtonClick();
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Email storage
+        
+        public async Task SaveEmail()
+        {
+            CHECKOUT.User.UserInfo.email = this.EmailInputField.Text;
+            await CHECKOUT.Actions.SetEmail().Execute();
+            
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Private API Methods

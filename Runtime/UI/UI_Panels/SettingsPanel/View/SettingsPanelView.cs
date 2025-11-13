@@ -98,10 +98,16 @@ public class SettingsPanelView : View
             // Add ui separator
             Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsHolder.transform);
         }
+        
+        // Email
+        if (!CHECKOUT.User.Email.IsNullOrEmpty())
+            this.EmailInputField.Text = CHECKOUT.User.Email;
 
         UpdateScrollRectMaxSize();
     }
-
+    
+    //////////////////////////////////////////////////////////////////////////// UI Helper methods
+    
     public void UpdateScrollRectMaxSize()
     {
         int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
@@ -170,10 +176,10 @@ public class SettingsPanelView : View
 
         EmailInputfieldBorder.SetActive(false);
         EmailInputField.interactable = false;
-        IsEditingEmail = false;
+        IsEditingEmail               = false;
         
-        this.EmailInputField.Text   = str;
-      //CHECKOUT.Session.User.Email = str;
+        this.EmailInputField.Text            = str;
+        CHECKOUT.Session.User.UserInfo.email = str;
         await CHECKOUT.Actions.SetEmail().Execute();
         
         // if(SuccessPanelEmailInputField)

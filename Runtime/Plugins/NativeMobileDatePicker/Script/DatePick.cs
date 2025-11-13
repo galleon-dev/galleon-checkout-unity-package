@@ -1,17 +1,20 @@
 using AdvancedInputFieldPlugin;
+using Protorius42.NativeDateTimePicker;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 namespace GalleonDatePicker.Samples
 {
     public class DatePick : MonoBehaviour
     {
-        // Recommended to use TextMeshPro instead
-        // [SerializeField] private Text _buttonText;
-        [SerializeField] private Button             _button;
+        [SerializeField] private Button _button;
         [SerializeField] private AdvancedInputField DateAdvancedInputField;
-        private                  IDatePicker        _datePicker;
+        private IDatePicker _datePicker;
+        public DatePickiOS DatePickiOS;
+
+        private DateTime lastDate = DateTime.Now;
 
         private void Start()
         {
@@ -26,16 +29,16 @@ namespace GalleonDatePicker.Samples
 
         private void OnDateButtonClicked()
         {
-            _datePicker?.Show(DateTime.Now, OnDateSelected);
+#if UNITY_ANDROID
+            _datePicker?.Show(lastDate, OnAndroidDateSelected);           
+#elif UNITY_IOS
+            DatePickiOS.OniOSDateSelected();
+#endif
         }
 
-        private void OnDateSelected(DateTime value)
+        private void OnAndroidDateSelected(DateTime value)
         {
-            // if (_buttonText)
-            // {
-            //     _buttonText.text = value.ToString();
-            // }
-
+            lastDate = value;
             Debug.Log($"Date selected: {value.ToShortDateString()}");
             Debug.Log($"Date selected: {value.ToString("MM/yy")}");
             
@@ -43,8 +46,8 @@ namespace GalleonDatePicker.Samples
             {
                 DateAdvancedInputField.Text = value.ToString("MMyy");
             }
-
         }
+
     }
 
     #if UNITY_EDITOR

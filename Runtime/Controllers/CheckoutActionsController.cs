@@ -239,6 +239,7 @@ namespace Galleon.Checkout
             new Step(name   : $"check_status_attempt_{attemptNumber}"
                     ,action : async (s) =>
                               {
+                                  
                                   int maxAttempts = 3;
                                   
                                   var response = await CHECKOUT.Network.Get<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/{CHECKOUT.Session.SessionID}"
