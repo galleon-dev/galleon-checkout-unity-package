@@ -27,8 +27,9 @@ namespace Galleon.Checkout
         public  List<UserPaymentMethod>             SpecialUserPaymentMethods    => UserPaymentMethods.Where(x => x.Type == "native" || x.Type == "app").ToList();
         public  List<UserPaymentMethod>             LastUsedUserPaymentMethods   => GetLastUsedUserPaymentMethods();
         
-        public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods 
+        public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods
                                                                                     .Union(SpecialUserPaymentMethods)
+                                                                                    .Distinct()
                                                                                     .OrderBy(x => x.SortOrder)
                                                                                     .Take(MAX_LAST_USED_PAYMENT_METHODS)
                                                                                     .Where(x => x?.Type != "app")
@@ -63,15 +64,14 @@ namespace Galleon.Checkout
             new Step(name   : $"add_new_user_payment_method"
                     ,action : async (s) =>
                     {
-                        foreach (var vaultingStep in upm.GetVaultingSteps())
-                            s.AddChildStep(vaultingStep);
-                        
-                        s.AddPostStep(name : "finish_adding_user_payment_method"
+                        s.AddPreStep(name : "setup_adding_user_payment_method"
                                      ,action: async step =>
                                               {
                                                   CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod   (upm);
                                                   CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
                                               });
+                        foreach (var vaultingStep in upm.GetVaultingSteps())
+                            s.AddChildStep(vaultingStep);
                     });
         
         public void SelectPaymentMethodDefinition(PaymentMethodDefinition definition)
@@ -233,7 +233,7 @@ namespace Galleon.Checkout
                                                                            {
                                                                               type = "app"
                                                                            },
-                                                        DisplayName        = "Continue to Checkout",
+                                                        DisplayName        = "Continue Checkout",
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
                                                         Type               = "app"

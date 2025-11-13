@@ -100,6 +100,12 @@ namespace Galleon.Checkout
             foreach (var provider in providers)
                 data.Add("provider", provider);
             
+            if (this is CreditCardUserUserPaymentMethod cc)
+            {
+                data.Add("type", "credit_card");
+                data.Add("token", cc.TokenID);
+            }
+            
             return data;
         }
         

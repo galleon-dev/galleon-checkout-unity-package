@@ -76,25 +76,6 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////////// Post Steps
                         
-                        s.AddChildStep(name   : "check_preselection"
-                                      ,action : async x =>
-                                      {
-                                          if (CHECKOUT.Session?.PreselectedPaymentMethod?.Type == "native")
-                                          {
-                                              this.PurchaseResult = new PurchaseResult()
-                                                                  {
-                                                                      IsSuccess              = true,
-                                                                      DidUserSelectNativeIAP = true,
-                                                                  };
-                                              
-                                              return;
-                                          }   
-                                      });
-                        
-
-                        
-                        /////////////////////////////////////// Post Steps
-                        
                         // Test Report
                         s.AddPostStep("report", async x => { Report?.Invoke(); });
                         
@@ -120,6 +101,30 @@ namespace Galleon.Checkout
                                                       IsError    = false,
                                                       Errors     = new(),
                                                   };
+                        }
+                    });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc
+        
+        public Step CheckPreselection() 
+        =>
+            new Step(name   : $"check_preselection"
+                    ,action : async (s) =>
+                    {
+                        if (CHECKOUT.Session?.PreselectedPaymentMethod?.Type == "native")
+                        {
+                            this.PurchaseResult = new PurchaseResult()
+                                                {
+                                                    IsSuccess              = true,
+                                                    DidUserSelectNativeIAP = true,
+                                                };
+                            
+                            s.RemoveStepsAfterThisInParentFlow();
+                        }
+                        else
+                        {
+                            s.ParentStep.AddChildStep(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage));
+                            
                         }
                     });
         
@@ -212,15 +217,15 @@ namespace Galleon.Checkout
                        
                         ////////////////////////////////////////////////////////////// Post Steps
                         
-                        ///////// TEMP
-                        this.lastChargeResult = new ChargeResultData()
-                                              {
-                                                 is_success  = true,
-                                                 errors      = null,
-                                                 is_canceled = false,
-                                                 charge_id   = "test_transaction",
-                                              };
-                        /////////
+                        // ///////// TEMP
+                        // this.lastChargeResult = new ChargeResultData()
+                        //                       {
+                        //                          is_success  = true,
+                        //                          errors      = null,
+                        //                          is_canceled = false,
+                        //                          charge_id   = "test_transaction",
+                        //                       };
+                        // /////////
                         
                         s.AddPostStep(name   : "save_used_payment_method_if_success"
                                      ,action : async x =>

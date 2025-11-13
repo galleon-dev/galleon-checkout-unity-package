@@ -112,13 +112,17 @@ namespace Galleon.Checkout.UI
         {
             this.PaymentMethod?.Select();
             this.CheckoutPanelView.OnRadiobuttonSelected(this);
-            Refresh();
+            
+            this.CheckoutPanelView.Refresh();
+            //Refresh();
         }
 
         public void Unselect()
         {
             this.PaymentMethod?.Unselect();
-            Refresh();
+            
+            this.CheckoutPanelView.Refresh();
+            //Refresh();
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods

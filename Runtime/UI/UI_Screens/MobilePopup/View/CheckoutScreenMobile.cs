@@ -642,12 +642,12 @@ namespace Galleon.Checkout.UI
                     
         
         public Page PreselectionPage         = new Page(name  : "preselection"
-                                                       ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                       ,header: HeaderPanelView     .STATE.x_button             .ToString()
                                                        ,panel : CheckoutScreenMobile.STATE.preselection_panel   .ToString()
-                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
+                                                       ,footer: FooterPanelView     .STATE.none                 .ToString()
                                                        ,setup : page =>
                                                               {
-                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.Confirm.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.Confirm.ToString()] = CHECKOUT.Session.CheckPreselection();
                                                               }
                                                         );
                     
@@ -666,7 +666,7 @@ namespace Galleon.Checkout.UI
         public Page SuccessPage              = new Page(name   : "success"
                                                        ,header : HeaderPanelView     .STATE.x_button            .ToString()
                                                        ,panel  : CheckoutScreenMobile.STATE.success_panel       .ToString()
-                                                       ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString());
+                                                       ,footer : FooterPanelView     .STATE.none                .ToString());
 
         public Page ErrorPage                = new Page(name   : "error"
                                                        ,header : HeaderPanelView     .STATE.back_and_text       .ToString()

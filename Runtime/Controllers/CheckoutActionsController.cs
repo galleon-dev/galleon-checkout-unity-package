@@ -26,35 +26,20 @@ namespace Galleon.Checkout
         
         public Step TokenizeCreditCard()
         =>
-            new Step(name   : $"tokenize_credit_card"
+            new Step(name   : $"tokenize"
                     ,action : async (s) =>
                     {
-                        var creditCard = CHECKOUT.User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
-                        
-                        var card = new 
-                        {
-                            Number = creditCard.CardNumber,
-                            Month  = creditCard.CardMonth,
-                            Year   = creditCard.CardYear,
-                            Cvc    = creditCard.CardCCV,
-                        };
-                      //var card = new 
-                      //           {
-                      //               Number = "4242424242424242",
-                      //               Month  = 12,
-                      //               Year   = 2026,
-                      //               Cvc    = "123"
-                      //           };
+                        var creditCard          = CHECKOUT.User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
                         
                         var Tokenizer           = CheckoutClient.Instance.TokenizerController.Tokenizer;
 
                         var cardTokenResponse   = await CHECKOUT.Network.Post(url      : Tokenizer.Payload.ServiceUrl
                                                                              ,headers  : Tokenizer.Payload.Headers
                                                                              ,jsonBody : Tokenizer.Payload.RequestFormat
-                                                                                                          .Replace("<CC_NUMBER>", card.Number)
-                                                                                                          .Replace("<CC_MONTH>",  $@"""{card.Month}""")
-                                                                                                          .Replace("<CC_YEAR>",   $@"""20{card.Year}""")
-                                                                                                          .Replace("<CC_CVC>",    card.Cvc)
+                                                                                                          .Replace("<CC_NUMBER>", creditCard.CardNumber)
+                                                                                                          .Replace("<CC_MONTH>",  $@"""{creditCard.CardMonth}""")
+                                                                                                          .Replace("<CC_YEAR>",   $@"""20{creditCard.CardYear}""")
+                                                                                                          .Replace("<CC_CVC>",    creditCard.CardCCV)
                                                                              );
 
                         s.Log(cardTokenResponse);
