@@ -34,9 +34,12 @@ namespace Galleon.SampleApp
         
         async void Start()
         {
-            // await Task.Yield();
-            // await Task.Yield();
-            // Root.Instance.Runtime.TestController.Test().Execute();
+            if (CHECKOUT.IsTest)
+            {
+                await Task.Yield();
+                await Task.Yield();
+                Root.Instance.Runtime.TestController.Test().Execute();    
+            }
             
             await CheckoutAPI.Initialize(new CheckoutConfiguration());
             
