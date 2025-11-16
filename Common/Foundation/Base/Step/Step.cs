@@ -295,7 +295,7 @@ namespace Galleon.Checkout
         public void AddPreStep(string name = "temp", StepAction action = default)
         {
             Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
-            AddChildStep(tempStep);
+            AddPreStep(tempStep);
         }
         
         
@@ -310,7 +310,7 @@ namespace Galleon.Checkout
         public void AddPostStep(string name = "temp", StepAction action = default)
         {
             Step tempStep = new Step(name, tags: new []{"temp"}, action: action);
-            AddChildStep(tempStep);
+            AddPostStep(tempStep);
         }
         
         

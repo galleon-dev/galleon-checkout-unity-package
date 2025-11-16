@@ -121,7 +121,7 @@ namespace Galleon.Checkout.UI
 
         public void OnConfirmPurchaseClick()
         {
-            CHECKOUT.User.SelectedUserPaymentMethod.Unselect();
+            // CHECKOUT.User.SelectedUserPaymentMethod.Unselect();
             
             this.Result = ViewResult.Confirm;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
@@ -151,7 +151,16 @@ namespace Galleon.Checkout.UI
         {
             var image    = this.PurchaseButton.GetComponentInChildren<Image>();
             image.sprite = sprite;
-        }        
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Methods
+        
+        public Step test_preselect_checkout() => new Step(name : "preselection_panel_test_checkout", action : async (s) =>
+                                                                                                            {
+                                                                                                                Debug.Log($"Aaaaa {DateTime.Now}");
+                                                                                                                CHECKOUT.User.SelectPaymentMethod(CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app"));
+                                                                                                                OnConfirmPurchaseClick();
+                                                                                                            });
     }
 }
 

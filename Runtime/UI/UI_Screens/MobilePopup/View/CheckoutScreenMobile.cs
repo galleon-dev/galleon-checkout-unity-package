@@ -317,13 +317,13 @@ namespace Galleon.Checkout.UI
                         while (IsPageActive)
                         {
                             await Task.Yield();
-
-                            if (CHECKOUT.IsTest)
-                            {
-                                await Task.Delay(1000);
-                                OnPageFinishedWithResult(CHECKOUT.CurrentTest);
-                                break;
-                            }
+                        
+                            // if (CHECKOUT.IsTest)
+                            // {
+                            //     await Task.Delay(1000);
+                            //     OnPageFinishedWithResult(CHECKOUT.CurrentTest);
+                            //     break;
+                            // }
                         }
 
                         ///////////////////////// Result Helper
@@ -338,7 +338,7 @@ namespace Galleon.Checkout.UI
                         string pageResult   = CurrentPage.PageResult;
                         this.NavigationNext = pageResult;
 
-                        if (page.NavigationMap.ContainsKey(NavigationNext))
+                        if (NavigationNext != null && page.NavigationMap.ContainsKey(NavigationNext))
                         {
                             Step nextStep = page.NavigationMap?[NavigationNext];
 

@@ -169,6 +169,13 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test
         
+        public Step TEST_SuccesPanelWaitAndDoNothing() 
+        =>
+            new Step(name   : $"success_panel_wait_and_do_nothing"
+                    ,action : async (s) =>
+                    {
+                    });
+        
         public Step TEST_FillTestEmail() 
         =>
             new Step(name   : $"fill_test_email"

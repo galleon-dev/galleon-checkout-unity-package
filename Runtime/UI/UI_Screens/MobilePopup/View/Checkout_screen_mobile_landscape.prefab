@@ -2158,13 +2158,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   State: 
   Style: 
-  IsLandscape: 1
   ParentPanel: {fileID: 3033288643074005397}
   contentTransform: {fileID: 9116521633435231480}
   HeaderPanelView: {fileID: 775535315392378007}
   FooterPanelView: {fileID: 8653390242203293431}
   CheckoutPanel: {fileID: 3662277009037181276}
   CreditCardPanel: {fileID: 887887783342974566}
+  PreselectionPanelView: {fileID: 0}
   SettingsPanelView: {fileID: 2500923192101945444}
   SuccessPanelView: {fileID: 543367759694498910}
   ErrorPanelView: {fileID: 3488530905455180892}
@@ -11697,6 +11697,10 @@ PrefabInstance:
       value: 42
       objectReference: {fileID: 0}
     - target: {fileID: 1908800322511376144, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
+      propertyPath: Result
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1908800322511376144, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: SuccessEmailContainer
       value: 
       objectReference: {fileID: 3966826470186818403}
@@ -11926,23 +11930,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2145490327696078974, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2145490327696078974, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2145490327696078974, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2145490327696078974, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 301.66
       objectReference: {fileID: 0}
     - target: {fileID: 2145490327696078974, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 79
       objectReference: {fileID: 0}
     - target: {fileID: 2145490327696078974, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -11966,6 +11970,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2254205292420205484, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2254300098521029386, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
+      propertyPath: text
+      value: levan@galleon.so
+      objectReference: {fileID: 0}
+    - target: {fileID: 2254718448661547468, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2254939789947938156, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2468643517126750441, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
@@ -12624,6 +12640,10 @@ PrefabInstance:
       propertyPath: HeaderPanelView
       value: 
       objectReference: {fileID: 775535315392378007}
+    - target: {fileID: 8457623423903138243, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
+      propertyPath: m_text
+      value: Failed to send email
+      objectReference: {fileID: 0}
     - target: {fileID: 9060701455630864082, guid: 14589cbc54fe64547bab005e34a6096c, type: 3}
       propertyPath: m_PreferredHeight
       value: 70
@@ -18530,6 +18550,10 @@ PrefabInstance:
     - target: {fileID: 488072554084145977, guid: cefa0b81fba0c4490a549111847072a4, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 606836997332876015, guid: cefa0b81fba0c4490a549111847072a4, type: 3}
+      propertyPath: Result
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 708529025885045224, guid: cefa0b81fba0c4490a549111847072a4, type: 3}
       propertyPath: m_AnchoredPosition.x

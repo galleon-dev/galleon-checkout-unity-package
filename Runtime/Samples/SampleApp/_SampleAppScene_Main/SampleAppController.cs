@@ -40,20 +40,7 @@ namespace Galleon.SampleApp
             
             await CheckoutAPI.Initialize(new CheckoutConfiguration());
             
-            if (CHECKOUT.IsTest)
-                await TestCheckout();
-        
             SampleAppStart().Execute(); 
-        }
-        
-        public async Task TestCheckout()
-        {
-            var result = await CheckoutAPI.Purchase(new CheckoutProduct
-                                           { 
-                                               DisplayName = "test product",
-                                               PriceText   = "$5.99",
-                                           });
-            
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle Steps
@@ -63,6 +50,7 @@ namespace Galleon.SampleApp
             new Step(name   : $"sample_app_start"
                     ,action : async (s) =>
                     {   
+                        Debug.Log("Sample App Start");
                     });
         
         
