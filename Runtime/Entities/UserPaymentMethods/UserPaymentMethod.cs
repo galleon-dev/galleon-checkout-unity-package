@@ -41,6 +41,11 @@ namespace Galleon.Checkout
         {
             this.IsSelected = true;
         }
+        public void SelectExclusive()
+        {
+            CHECKOUT.PaymentMethods.UserPaymentMethods.ForEach(x => x.Unselect());
+            this.IsSelected = true;
+        }
         
         public void Unselect()
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -59,7 +60,13 @@ namespace Galleon.Checkout.UI
 
         public override void Initialize()
         {
-            CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").Select();
+            // CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();
+        }
+
+        public override async Task OnTransition()
+        {
+            // CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();
+            // LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)PaymentMethodsPanel.transform);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh

@@ -11,6 +11,7 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
        
+        public string                AppUserID;
         public Shared.UserInfo       UserInfo;
         public string                Email => UserInfo.email;
  

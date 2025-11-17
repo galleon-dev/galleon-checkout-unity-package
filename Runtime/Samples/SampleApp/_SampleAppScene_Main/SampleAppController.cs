@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ namespace Galleon.SampleApp
                 Root.Instance.Runtime.TestController.Test().Execute();    
             }
             
-            await CheckoutAPI.Initialize(new CheckoutConfiguration());
+            await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"test_user_{DateTime.Now.ToString()}"} );
             
             SampleAppStart().Execute(); 
         }

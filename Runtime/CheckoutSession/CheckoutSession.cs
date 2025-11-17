@@ -124,7 +124,7 @@ namespace Galleon.Checkout
                         else
                         {
                             
-                            s.ParentStep.AddChildStep("select_pm", async step => {CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.First().Select();} );
+                            s.ParentStep.AddChildStep("select_first_upm", async step => {CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.First().SelectExclusive();} );
                             s.ParentStep.AddChildStep(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage));
                             
                         }
@@ -137,7 +137,6 @@ namespace Galleon.Checkout
             new Step(name   : $"start_session"
                     ,action : async (s) =>
                     {   
-
                         var response = await CHECKOUT.Network.Post<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/create"
                                                                                            ,headers  : new ()
                                                                                                      {

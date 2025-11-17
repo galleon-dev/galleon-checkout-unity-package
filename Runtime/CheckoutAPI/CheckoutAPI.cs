@@ -13,6 +13,7 @@ namespace Galleon.Checkout
         public static async Task<InitializationResult> Initialize(CheckoutConfiguration configuration)
         {
             CheckoutClient.Instance.Network.GalleonUserAccessToken = configuration.JWT;
+            CHECKOUT.User.AppUserID                                = configuration.AppUserID;
             
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             
@@ -47,6 +48,7 @@ namespace Galleon.Checkout
     {
         public string JWT;
         public string Country;
+        public string AppUserID;
     }
     
     [Serializable]

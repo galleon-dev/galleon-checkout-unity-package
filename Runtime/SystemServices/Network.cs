@@ -76,7 +76,7 @@ namespace Galleon.Checkout
                                                              }
                                                     ,body    : new
                                                              {
-                                                                 app_user_id = "test_vadimski"
+                                                                 app_user_id = CHECKOUT.User.AppUserID ?? "test_vadimski"
                                                              });
                         
                         /// Response Example :
