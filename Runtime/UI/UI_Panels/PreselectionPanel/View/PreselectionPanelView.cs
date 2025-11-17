@@ -63,10 +63,10 @@ namespace Galleon.Checkout.UI
             // CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();
         }
 
-        public override async Task OnTransition()
+        public void OnEnable()
         {
-            // CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();
-            // LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)PaymentMethodsPanel.transform);
+            CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)PaymentMethodsPanel.transform);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh

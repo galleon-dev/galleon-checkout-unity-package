@@ -301,8 +301,7 @@ namespace Galleon.Checkout.UI
 
                         ///////////////////////// Transition
                         
-                        // foreach (var view in views)
-                        //     view.Transition();
+                        // this.Transition();
 
                         ///////////////////////// Refresh
                         
@@ -315,8 +314,8 @@ namespace Galleon.Checkout.UI
                         
                         ///////////////////////// Focus
                         
-                        foreach (var view in views)
-                            view.Focus();
+                        // foreach (var view in views)
+                        //     view.Focus();
 
                         ///////////////////////// Await Page
 
@@ -378,8 +377,7 @@ namespace Galleon.Checkout.UI
 
                         ///////////////////////// Transition
                         
-                        // foreach (var view in views)
-                        //     view.Transition();
+                        // view.Transition();
 
                         ///////////////////////// Refresh
 
