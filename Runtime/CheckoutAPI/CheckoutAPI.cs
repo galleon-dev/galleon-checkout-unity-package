@@ -14,6 +14,7 @@ namespace Galleon.Checkout
         {
             CheckoutClient.Instance.Network.GalleonUserAccessToken = configuration.JWT;
             CHECKOUT.User.AppUserID                                = configuration.AppUserID;
+            CheckoutClient.Instance.ApplicationDisplayName         = configuration.ApplicationDisplayName;
             
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             
@@ -49,6 +50,7 @@ namespace Galleon.Checkout
         public string JWT;
         public string Country;
         public string AppUserID;
+        public string ApplicationDisplayName;
     }
     
     [Serializable]
