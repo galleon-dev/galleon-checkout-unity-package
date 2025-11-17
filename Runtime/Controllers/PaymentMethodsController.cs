@@ -43,8 +43,6 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
-                        await ClearSavedData();
-                        
                         PaymentMethodsDefinitions.Node.DisplayName = "Payment Method Definitions";
                         UserPaymentMethods       .Node.DisplayName = "User Payment Methods";
                         
