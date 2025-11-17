@@ -58,7 +58,7 @@ namespace Galleon.Checkout.UI
         public TextMeshProUGUI      SubtotalPriceText;
         public TextMeshProUGUI      TotalPriceText;
         
-        private bool                IsUSAorCanadaUser = true;
+        private bool                IsUSAorCanadaUser = false;
         
         public  Config              Configutation;
         
@@ -81,7 +81,7 @@ namespace Galleon.Checkout.UI
           //RefreshState();
         }
         
-        public void Onenable()
+        public void OnEnable()
         {
             CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
         }

@@ -60,13 +60,12 @@ namespace Galleon.Checkout.UI
 
         public override void Initialize()
         {
-            // CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();
+            
         }
 
         public void OnEnable()
         {
             CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)PaymentMethodsPanel.transform);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
@@ -105,6 +104,7 @@ namespace Galleon.Checkout.UI
             }
 
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)PaymentMethodsPanel.transform);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(this.gameObject.transform as RectTransform);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Radio Buttons
