@@ -280,6 +280,8 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"View_{page.Name}_page"
                     ,action : async (s) =>
                     {
+                        View[] views = this.GetComponentsInChildren<View>();
+                        
                         ///////////////////////// Setup
 
                         page.Setup?.Invoke(page);
@@ -290,27 +292,30 @@ namespace Galleon.Checkout.UI
                         this.State                 = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
 
-
+                        
                         ///////////////////////// Page
 
                         IsPageActive = true;
                         CurrentPage  = page;
                         NavigationHistory.Add(page);
+
+                        ///////////////////////// Transition
                         
+                        // this.Transition();
+
                         ///////////////////////// Refresh
                         
                         RefreshState();
                         HeaderPanelView.RefreshState();
                         FooterPanelView.RefreshState();
 
-                        View[] views = this.GetComponentsInChildren<View>();
                         foreach (var view in views)
                             view.Refresh();
                         
                         ///////////////////////// Focus
                         
-                        foreach (var view in views)
-                            view.Focus();
+                        // foreach (var view in views)
+                        //     view.Focus();
 
                         ///////////////////////// Await Page
 
@@ -352,6 +357,8 @@ namespace Galleon.Checkout.UI
             new Step(name: $"set_{page.Name}_page"
                     , action: async (s) =>
                     {
+                        View[] views = this.GetComponentsInChildren<View>();
+                        
                         ///////////////////////// Setup
 
                         page.Setup?.Invoke(page);
@@ -367,14 +374,17 @@ namespace Galleon.Checkout.UI
                         IsPageActive     = true;
                         CurrentPage      = page;
                         NavigationHistory.Add(page);
+
+                        ///////////////////////// Transition
                         
+                        // view.Transition();
+
                         ///////////////////////// Refresh
 
                         RefreshState();
                         HeaderPanelView.RefreshState();
                         FooterPanelView.RefreshState();
 
-                        View[] views = this.GetComponentsInChildren<View>();
                         foreach (var view in views)
                             view.Refresh();
 

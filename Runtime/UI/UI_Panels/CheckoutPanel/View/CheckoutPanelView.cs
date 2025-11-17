@@ -80,6 +80,12 @@ namespace Galleon.Checkout.UI
         {
           //RefreshState();
         }
+        
+        public void Onenable()
+        {
+            CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
+        }
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 

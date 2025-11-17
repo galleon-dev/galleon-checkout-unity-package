@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -34,11 +35,14 @@ namespace Galleon.SampleApp
         
         async void Start()
         {
-            // await Task.Yield();
-            // await Task.Yield();
-            // Root.Instance.Runtime.TestController.Test().Execute();
+            if (CHECKOUT.IsTest)
+            {
+                await Task.Yield();
+                await Task.Yield();
+                Root.Instance.Runtime.TestController.Test().Execute();    
+            }
             
-            await CheckoutAPI.Initialize(new CheckoutConfiguration());
+            await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"test_user_{DateTime.Now.ToString()}"} );
             
             SampleAppStart().Execute(); 
         }

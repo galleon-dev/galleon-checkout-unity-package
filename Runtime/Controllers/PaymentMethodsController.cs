@@ -43,6 +43,8 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
+                        await ClearSavedData();
+                        
                         PaymentMethodsDefinitions.Node.DisplayName = "Payment Method Definitions";
                         UserPaymentMethods       .Node.DisplayName = "User Payment Methods";
                         
@@ -106,6 +108,12 @@ namespace Galleon.Checkout
             var saved = CHECKOUT.Storage.Read<List<string>>(key : "saved_payment_methods");
             this.LastUsedUserPaymentMethodIDs.AddRange(saved.Where(x => !x.StartsWith("local_pm_id")));
         }
+        
+        public async Task ClearSavedData()
+        {
+            CHECKOUT.Storage.ClearAll();
+        }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last used
         
