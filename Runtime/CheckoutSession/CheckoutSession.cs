@@ -76,13 +76,13 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////////// Post Steps
                         
-                        // Test Report
-                        s.AddPostStep("report", async x => { Report?.Invoke(); });
-                        
                         // Close
                         s.AddPostStep(CheckoutScreenMobile.EndCheckoutScreenMobile());
                         s.AddPostStep(EndCheckoutSession());
-
+                        
+                        // Test Report
+                        s.AddPostStep("report", async x => { Report?.Invoke(); });
+                        
                     });
         
         
@@ -123,6 +123,8 @@ namespace Galleon.Checkout
                         }
                         else
                         {
+                            
+                            s.ParentStep.AddChildStep("select_first_upm", async step => {CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.First().SelectExclusive();} );
                             s.ParentStep.AddChildStep(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage));
                             
                         }
@@ -135,7 +137,6 @@ namespace Galleon.Checkout
             new Step(name   : $"start_session"
                     ,action : async (s) =>
                     {   
-
                         var response = await CHECKOUT.Network.Post<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/create"
                                                                                            ,headers  : new ()
                                                                                                      {
@@ -145,9 +146,10 @@ namespace Galleon.Checkout
                                                                                                      {
                                                                                                         order      = new OrderDetails()
                                                                                                                    {
-                                                                                                                       sku      = "sku-1-3DS", // SelectedProduct.DisplayName,
-                                                                                                                       amount   = 100,
-                                                                                                                       currency = "USD",
+                                                                                                                       sku      = CHECKOUT.Session.SelectedProduct.Sku,
+                                                                                                                     //sku      = "sku-1-3DS",
+                                                                                                                       amount   = CHECKOUT.Session.SelectedProduct.Amount,
+                                                                                                                       currency = CHECKOUT.Session.SelectedProduct.Currency,
                                                                                                                    },
                                                                                                         expires_at = DateTime.UtcNow.AddDays(1),
                                                                                                         metadata   = new Dictionary<string, string>() { }

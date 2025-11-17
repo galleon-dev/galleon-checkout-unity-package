@@ -92,6 +92,21 @@ namespace Galleon.Checkout.UI
         {   
         }
 
+        
+        // Transition
+        
+        public void Transition()
+        {
+            OnTransition();    
+        }
+        
+        public void OnTransition()
+        {
+            
+        }
+        
+        // Focus
+        
         public async Task Focus()
         {
             await OnFocus();
@@ -99,21 +114,14 @@ namespace Galleon.Checkout.UI
         
         public virtual async Task OnFocus()
         {
-            await OnViewFocus().Execute();
-            
-            #if DEBUG
-            
-            await Task.Delay(1000);
-            await this.Node.RunCurrentTestScenario();
-            
-            #endif
+            // await OnViewFocus().Execute();
         }
         
-        public Step OnViewFocus() 
-        =>
-            new Step(name   : $"on_view_focus_{this.name}"
-                    ,action : async (s) =>
-                    { 
-                    });
+        // public Step OnViewFocus() 
+        // =>
+        //     new Step(name   : $"on_view_focus_{this.name}"
+        //             ,action : async (s) =>
+        //             { 
+        //             });
     }
 }

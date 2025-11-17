@@ -51,13 +51,16 @@ namespace Galleon.Checkout.Samples
                                            { 
                                                DisplayName = "fake_product_2",
                                                PriceText   = "$24.99",
+                                             //Sku         = "sku-1-3DS", 
+                                               Sku         = "sku-1",
+                                               Amount      = 100,
+                                               Currency    = "USD",
                                            });
             
             Debug.Log("==========================================");
             Debug.Log("Purchase Result: " + result);
             Debug.Log("==========================================");
         }   
-        
         
         
         //////////////////////////////////////////////////////////////////////// Helper Methods

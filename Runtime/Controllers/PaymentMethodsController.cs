@@ -107,6 +107,12 @@ namespace Galleon.Checkout
             this.LastUsedUserPaymentMethodIDs.AddRange(saved.Where(x => !x.StartsWith("local_pm_id")));
         }
         
+        public async Task ClearSavedData()
+        {
+            CHECKOUT.Storage.ClearAll();
+        }
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last used
         
         public Step SaveUsedUserPaymentMethod() 
@@ -233,7 +239,7 @@ namespace Galleon.Checkout
                                                                            {
                                                                               type = "app"
                                                                            },
-                                                        DisplayName        = "Continue Checkout",
+                                                        DisplayName        = CheckoutClient.Instance.ApplicationDisplayName ?? "Continue Checkout",
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
                                                         Type               = "app"

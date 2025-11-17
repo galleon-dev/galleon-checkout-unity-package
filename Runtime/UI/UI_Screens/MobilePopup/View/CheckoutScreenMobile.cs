@@ -280,6 +280,7 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"View_{page.Name}_page"
                     ,action : async (s) =>
                     {
+                        
                         ///////////////////////// Setup
 
                         page.Setup?.Invoke(page);
@@ -290,13 +291,17 @@ namespace Galleon.Checkout.UI
                         this.State                 = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
 
-
+                        
                         ///////////////////////// Page
 
                         IsPageActive = true;
                         CurrentPage  = page;
                         NavigationHistory.Add(page);
+
+                        ///////////////////////// Transition
                         
+                        // this.Transition();
+
                         ///////////////////////// Refresh
                         
                         RefreshState();
@@ -309,21 +314,21 @@ namespace Galleon.Checkout.UI
                         
                         ///////////////////////// Focus
                         
-                        foreach (var view in views)
-                            view.Focus();
+                        // foreach (var view in views)
+                        //     view.Focus();
 
                         ///////////////////////// Await Page
 
                         while (IsPageActive)
                         {
                             await Task.Yield();
-
-                            if (CHECKOUT.IsTest)
-                            {
-                                await Task.Delay(1000);
-                                OnPageFinishedWithResult(CHECKOUT.CurrentTest);
-                                break;
-                            }
+                        
+                            // if (CHECKOUT.IsTest)
+                            // {
+                            //     await Task.Delay(1000);
+                            //     OnPageFinishedWithResult(CHECKOUT.CurrentTest);
+                            //     break;
+                            // }
                         }
 
                         ///////////////////////// Result Helper
@@ -338,7 +343,7 @@ namespace Galleon.Checkout.UI
                         string pageResult   = CurrentPage.PageResult;
                         this.NavigationNext = pageResult;
 
-                        if (page.NavigationMap.ContainsKey(NavigationNext))
+                        if (NavigationNext != null && page.NavigationMap.ContainsKey(NavigationNext))
                         {
                             Step nextStep = page.NavigationMap?[NavigationNext];
 
@@ -367,7 +372,11 @@ namespace Galleon.Checkout.UI
                         IsPageActive     = true;
                         CurrentPage      = page;
                         NavigationHistory.Add(page);
+
+                        ///////////////////////// Transition
                         
+                        // view.Transition();
+
                         ///////////////////////// Refresh
 
                         RefreshState();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -34,26 +35,16 @@ namespace Galleon.SampleApp
         
         async void Start()
         {
-            // await Task.Yield();
-            // await Task.Yield();
-            // Root.Instance.Runtime.TestController.Test().Execute();
-            
-            await CheckoutAPI.Initialize(new CheckoutConfiguration());
-            
             if (CHECKOUT.IsTest)
-                await TestCheckout();
-        
-            SampleAppStart().Execute(); 
-        }
-        
-        public async Task TestCheckout()
-        {
-            var result = await CheckoutAPI.Purchase(new CheckoutProduct
-                                           { 
-                                               DisplayName = "test product",
-                                               PriceText   = "$5.99",
-                                           });
+            {
+                await Task.Yield();
+                await Task.Yield();
+                Root.Instance.Runtime.TestController.Test().Execute();    
+            }
             
+            await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"test_user_{DateTime.Now.ToString()}"} );
+            
+            SampleAppStart().Execute(); 
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle Steps
@@ -63,6 +54,7 @@ namespace Galleon.SampleApp
             new Step(name   : $"sample_app_start"
                     ,action : async (s) =>
                     {   
+                        Debug.Log("Sample App Start");
                     });
         
         
