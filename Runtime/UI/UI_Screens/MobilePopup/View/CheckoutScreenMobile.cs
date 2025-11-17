@@ -280,7 +280,6 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"View_{page.Name}_page"
                     ,action : async (s) =>
                     {
-                        View[] views = this.GetComponentsInChildren<View>();
                         
                         ///////////////////////// Setup
 
@@ -309,6 +308,7 @@ namespace Galleon.Checkout.UI
                         HeaderPanelView.RefreshState();
                         FooterPanelView.RefreshState();
 
+                        View[] views = this.GetComponentsInChildren<View>();
                         foreach (var view in views)
                             view.Refresh();
                         
@@ -357,8 +357,6 @@ namespace Galleon.Checkout.UI
             new Step(name: $"set_{page.Name}_page"
                     , action: async (s) =>
                     {
-                        View[] views = this.GetComponentsInChildren<View>();
-                        
                         ///////////////////////// Setup
 
                         page.Setup?.Invoke(page);
@@ -385,6 +383,7 @@ namespace Galleon.Checkout.UI
                         HeaderPanelView.RefreshState();
                         FooterPanelView.RefreshState();
 
+                        View[] views = this.GetComponentsInChildren<View>();
                         foreach (var view in views)
                             view.Refresh();
 
