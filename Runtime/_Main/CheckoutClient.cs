@@ -66,6 +66,7 @@ namespace Galleon.Checkout
         public CheckoutTEMP                 Temp                        = new();
         
         public string                       CurrentTest                 = "test_1";
+        public string                       ApplicationDisplayName      = null;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Entry Point
         

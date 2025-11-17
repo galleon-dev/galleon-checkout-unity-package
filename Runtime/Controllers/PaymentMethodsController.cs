@@ -239,7 +239,7 @@ namespace Galleon.Checkout
                                                                            {
                                                                               type = "app"
                                                                            },
-                                                        DisplayName        = "Continue Checkout",
+                                                        DisplayName        = CheckoutClient.Instance.ApplicationDisplayName ?? "Continue Checkout",
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
                                                         Type               = "app"
