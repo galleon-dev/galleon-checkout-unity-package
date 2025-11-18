@@ -234,6 +234,7 @@ namespace Galleon.Checkout
                                                         DisplayName        = nativeDisplayName,
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
+                                                        SortOrder          = float.PositiveInfinity,
                                                         Type               = "native"
                                                     });
                         
@@ -248,6 +249,7 @@ namespace Galleon.Checkout
                                                         DisplayName        = CheckoutClient.Instance.ApplicationDisplayName ?? "Continue Checkout",
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
+                                                        SortOrder          = float.PositiveInfinity, 
                                                         Type               = "app"
                                                     });
                         
