@@ -35,14 +35,14 @@ namespace Galleon.SampleApp
         
         async void Start()
         {
+            await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"test_user_{DateTime.Now.ToString()}"} );
+            
             if (CHECKOUT.IsTest)
             {
-                await Task.Yield();
-                await Task.Yield();
+                await Task.Delay(1000);
+                CheckoutClient.Instance.Storage.ClearAll();
                 Root.Instance.Runtime.TestController.Test().Execute();    
             }
-            
-            await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"test_user_{DateTime.Now.ToString()}"} );
             
             SampleAppStart().Execute(); 
         }
@@ -72,16 +72,33 @@ namespace Galleon.SampleApp
             new Step(name   : $"test_purchase_product_1"
                     ,action : async (s) =>
                     {   
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                        
+                        // Definitions
+                        bool emptyPaymentMethods = true;
+                        bool isUSAorCanada       = false;
+                        bool isShortHeader       = true;
+                        
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                        
                         var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                                                { 
-                                                                   DisplayName = "test_product_1",
-                                                                   PriceText   = "$5.99",
+                                                                   DisplayName     = "test_product_1",
+                                                                   PriceText       = "$5.99",
+                                                                   //Sku           = "sku-1-3DS", 
+                                                                   Sku             = "sku-1",
+                                                                   Amount          = 100,
+                                                                   Currency        = "USD",
                                                                });
                         
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                         
                         Debug.Log($"==================");
                         Debug.Log($"result : ");
                         Debug.Log($"{result.IsSuccess}");
                         Debug.Log($"==================");
+                        
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
                         
                         OnBackToStoreScreen().Execute();
                     });
@@ -92,11 +109,35 @@ namespace Galleon.SampleApp
             new Step(name   : $"test_purchase_product_2"
                     ,action : async (s) =>
                     {   
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                        
+                        // Definitions
+                        bool emptyPaymentMethods = true;
+                        bool isUSAorCanada       = false;
+                        bool isShortHeader       = true;
+                        
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                        
                         var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                                                { 
-                                                                   DisplayName = "test_product_2",
-                                                                   PriceText   = "$19.99",
+                                                                   DisplayName     = "test_product_2",
+                                                                   PriceText       = "$19.99",
+                                                                   //Sku           = "sku-1-3DS", 
+                                                                   Sku             = "sku-1",
+                                                                   Amount          = 100,
+                                                                   Currency        = "USD",
                                                                });
+                        
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                         
+                        Debug.Log($"==================");
+                        Debug.Log($"result : ");
+                        Debug.Log($"{result.IsSuccess}");
+                        Debug.Log($"==================");
+                        
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                        
+                        OnBackToStoreScreen().Execute();
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc

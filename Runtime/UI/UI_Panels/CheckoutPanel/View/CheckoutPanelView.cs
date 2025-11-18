@@ -58,7 +58,7 @@ namespace Galleon.Checkout.UI
         public TextMeshProUGUI      SubtotalPriceText;
         public TextMeshProUGUI      TotalPriceText;
         
-        private bool                IsUSAorCanadaUser = true;
+        private bool                IsUSAorCanadaUser = false;
         
         public  Config              Configutation;
         
@@ -81,7 +81,7 @@ namespace Galleon.Checkout.UI
           //RefreshState();
         }
         
-        public void Onenable()
+        public void OnEnable()
         {
             CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
         }
@@ -349,13 +349,8 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
-        public TestScenario scenario_1        => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase     )}()" });
-        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_select_other_methods)}()" });
-        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_settings_page       )}()" });
-        public TestScenario scenario_2_part_3 => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase     )}()" });
-        
-        public Step test_confirmPurchase()       => new Step(name : "checkout_panel_test_confirm_purchase", action : async (s) => { OnConfirmPurchaseClick();     });
-        public Step test_select_other_methods() => new Step(action : async (s) => { OnOtherPaymentMethodsClick(); });
+        public Step test_confirmPurchase()      => new Step(name : "checkout_panel_test_confirm_purchase", action : async (s) => { OnConfirmPurchaseClick();     });
+        public Step test_select_other_methods() => new Step(name : "checkout_panel_test_select_other_pm",  action : async (s) => { OnOtherPaymentMethodsClick(); });
         public Step test_settings_page()        => new Step(action : async (s) => { OnSettingsClick();            });
         
         /// Test Rule : On_Next("checkoutPanel").Do("confirm_purchase")

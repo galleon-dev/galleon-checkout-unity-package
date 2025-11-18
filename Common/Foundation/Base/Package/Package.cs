@@ -105,9 +105,9 @@ namespace Galleon.Checkout.Foundation
                 btn_APFE1.clicked            += () => target.Do_APFE1().Execute(); 
                 btn_APFE1.text                = "A+FE1";
                 
-                Button btn_PPFE1              = new Button(); this.Add(btn_APFE1);
-                btn_APFE1.clicked            += () => target.Do_PPFE1().Execute(); 
-                btn_APFE1.text                = "P+FE1";
+                Button btn_PPFE1              = new Button(); this.Add(btn_PPFE1);
+                btn_PPFE1.clicked            += () => target.Do_PPFE1().Execute(); 
+                btn_PPFE1.text                = "Package.element + Folder.element 1";
                 
             }
         }   

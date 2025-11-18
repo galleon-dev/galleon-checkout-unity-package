@@ -424,6 +424,35 @@ namespace Galleon.Checkout.Foundation
         
         public void DO_PPFE_CreateVTree()
         {
+            ////////////////////////////////////////////////////////////////////////
+            /// Folder Element Definition:
+            /// > Folder
+            ///     > (Assets)
+            ///         > Assets.Folder
+            ////////////////////////////////////////////////////////////////////////
+            /// Package Element Definition:
+            /// > Package
+            ///     > (Assets)
+            ///         > Assets.Folder "package_root_folder"
+            ///     > (Hierarchy)
+            ///         > H.Scene "package_main_scene"
+            ///     > (whatever)
+            ///         > Whatever "..."
+            ////////////////////////////////////////////////////////////////////////
+            /// Expected v tree result :
+            /// > (this node) Elements.Folder "f1"
+            ///     > (Assets)
+            ///         > Assets.Folder "f1"
+            ////////////////////////////////////////////////////////////////////////
+            /// And then :
+            /// > (this node) Elements.Folder "f1"
+            ///     > (Assets)
+            ///         > Assets.Folder "f1" <---- this needs to get printed under package root asset
+            ////////////////////////////////////////////////////////////////////////
+            /// need :
+            ///     -> print parent per category
+            ///////////////////////////////////////////////////////////////////////
+            
             // Definitions
             string                  targetElementName             = this.TextNode.LineWords.First();
             

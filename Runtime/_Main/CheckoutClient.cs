@@ -31,10 +31,6 @@ namespace Galleon.Checkout
         public CheckoutIAPStore             IAPStore                    = new();
       //public CheckoutIapStoreListener     IapStoreListener            = new(); // for testing
       
-        // Resources
-        public CheckoutResources            Resources                   => CheckoutResources.Instance;
-        public ResourceManager              ResourceManager             = new ResourceManager();
-        
         // System
         public NavigationController         Navigation                  = new ();
         
@@ -61,11 +57,17 @@ namespace Galleon.Checkout
         [Header("UI")]
         public CheckoutScreenMobile         CheckoutScreenMobile; 
         
+        // Resources
+        public CheckoutResources            Resources                   => CheckoutResources.Instance;
+        public ResourceManager              ResourceManager             = new ResourceManager();
+        
         // TEMP - testing/debug/wip/etc...
         [Header("Temp")]
         public CheckoutTEMP                 Temp                        = new();
         
+        
         public string                       CurrentTest                 = "test_1";
+        public string                       ApplicationDisplayName      = null;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Entry Point
         
