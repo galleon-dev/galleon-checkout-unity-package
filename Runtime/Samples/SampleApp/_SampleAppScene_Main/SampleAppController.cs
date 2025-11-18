@@ -37,6 +37,7 @@ namespace Galleon.SampleApp
         {
             await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"test_user_{DateTime.Now.ToString()}"} );
             
+            Debug.Log($"Is Test Mode : {CHECKOUT.IsTest}");
             if (CHECKOUT.IsTest)
             {
                 await Task.Delay(1000);
