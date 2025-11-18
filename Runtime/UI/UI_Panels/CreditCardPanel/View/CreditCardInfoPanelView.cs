@@ -579,24 +579,30 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
-        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[]
-                                                                              {
-                                                                                  $"{nameof(test_fill_card_data)}()",
-                                                                                  $"{nameof(test_confirm)}()"
-                                                                              });
-        
-        public Step test_fill_card_data() => new Step(action : async (s) =>
+        public Step test_fill_card_data() => new Step(name   : "credit_card_info_panel_fill_test_card"
+                                                     ,action : async (s) =>
                                                              {
                                                                  NameInputField.Text        = "jhon doe";
-                                                                 CreditCardNumberField.Text = "4242 4242 4242 4242";
-                                                                 DateInputField.Text        = "09/26";
+                                                                 CreditCardNumberField.Text = "4242424242424242";
+                                                                 DateInputField.Text        = "0926";
                                                                  CVVInputField.Text         = "111";
                                                                  
+                                                                 OnValueChanged(CreditCardNumberField.Text);
+                                                                 OnDateValueChanged(DateInputField.Text);
+                                                                 OnCVVValueChanged(CVVInputField.Text);
+                                                                 
+                                                                 // IsValidCreditCardNumber = true;
+                                                                 // IsValidCVV              = true;
+                                                                 // IsValidDate             = true;
+                                                                 
+                                                                 cbx_SaveCardDetails.IsChecked = true;
+                                                                 
                                                                  await Task.Delay(500);
-                                                                 EntityNode.CurrentTestScenario = "scenario_2_part_2";
+                                                                 
                                                              });
         
-        public Step test_confirm() => new Step(action : async (s) => On_OkClick() );
+        public Step test_confirm() => new Step(name   : "credit_card_info_panel_confirm"
+                                              ,action : async (s) => On_OkClick() );
     
     //    #endif // ANDROID
     

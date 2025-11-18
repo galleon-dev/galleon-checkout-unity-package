@@ -221,9 +221,6 @@ public class SettingsPanelView : View
     
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
-        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_delete_last_payment_method)}()" });
-        public TestScenario scenario_2_part_3 => new TestScenario(expressions : new[] { $"{nameof(test_go_back)}()" });
-        
         public Step test_delete_last_payment_method() => new Step(action : async (s) => GetComponentsInChildren<SettingsPanelPaymentMethodItem>().Last().On_Delete_Clicked() );
         public Step test_go_back()                    => new Step(action : async (s) => On_Done() );
 }

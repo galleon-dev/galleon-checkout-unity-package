@@ -28,7 +28,7 @@ namespace Galleon.Checkout
         public  List<UserPaymentMethod>             LastUsedUserPaymentMethods   => GetLastUsedUserPaymentMethods();
         
         public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods
-                                                                                    .Union(SpecialUserPaymentMethods)
+                                                                                    .Concat(SpecialUserPaymentMethods)
                                                                                     .Distinct()
                                                                                     .OrderBy(x => x.SortOrder)
                                                                                     .Take(MAX_LAST_USED_PAYMENT_METHODS)
@@ -197,6 +197,12 @@ namespace Galleon.Checkout
                         
                         var dataList = _result.payment_methods;
         
+                        if (dataList is not null
+                        &&  dataList.Length > 0)
+                        {
+                            UserPaymentMethods.Clear();
+                        }
+                        
                         foreach (var data in dataList)
                         {
                             UserPaymentMethod pm = new UserPaymentMethod();

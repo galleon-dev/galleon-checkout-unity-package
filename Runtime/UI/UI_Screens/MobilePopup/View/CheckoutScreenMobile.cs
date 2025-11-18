@@ -110,6 +110,8 @@ namespace Galleon.Checkout.UI
                                   DontDestroyOnLoad(CheckoutScreenMobileGO);
                                   
                                   CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>();
+                                  CheckoutClient.Instance.Node.AddChild(CheckoutClient.Instance.CheckoutScreenMobile);
+                                  
 								  
 								  /*
                                   // Instantiate screen
@@ -155,11 +157,6 @@ namespace Galleon.Checkout.UI
                             });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
-
-        public CheckoutScreenMobile()
-        {
-            this.Node.SetParent(CheckoutClient.Instance);
-        }
 
         public void OnEnable()
         {
@@ -314,8 +311,8 @@ namespace Galleon.Checkout.UI
                         
                         ///////////////////////// Focus
                         
-                        // foreach (var view in views)
-                        //     view.Focus();
+                        foreach (var view in views)
+                            view.Focus();
 
                         ///////////////////////// Await Page
 
@@ -386,6 +383,11 @@ namespace Galleon.Checkout.UI
                         View[] views = this.GetComponentsInChildren<View>();
                         foreach (var view in views)
                             view.Refresh();
+                        
+                        ///////////////////////// Focus
+                        
+                        foreach (var view in views)
+                            view.Focus();
 
                     });
 

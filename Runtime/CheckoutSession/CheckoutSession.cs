@@ -236,6 +236,11 @@ namespace Galleon.Checkout
                                                        x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
                                                });
                         
+                        
+                        // Refresh user payment methods
+                        // s.AddPostStep(CHECKOUT.PaymentMethods.GetUserPaymentMethods());
+                        
+                        
                         // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());
                         
