@@ -88,7 +88,10 @@ namespace Galleon.Checkout.UI
         public async void OnConfirmEmailButtonClick()
         {
             await SaveEmail();
-            await SendReceipt();
+            
+            if (!CHECKOUT.IsTest)
+                await SendReceipt();
+            
             OnConfirmSuccessButtonClick();
         }
         
