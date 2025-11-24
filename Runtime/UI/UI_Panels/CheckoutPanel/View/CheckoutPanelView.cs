@@ -26,6 +26,7 @@ namespace Galleon.Checkout.UI
             Confirm,
             Settings,
             AddCard,
+            AddPaypal,
             OtherPaymentMethods,
         }
 
@@ -173,16 +174,25 @@ namespace Galleon.Checkout.UI
                 item.Unselect();
             }
             
-            //ShowPurchaseButton();
-            var image = PurchaseButton.gameObject.GetComponent<Image>();
-            image.sprite = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.First().LogoSprite;
+            var image    = PurchaseButton.gameObject.GetComponent<Image>();
+            image.sprite = SelectedItem.PaymentMethod.GetButtonSprite();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
 
         public void OnConfirmPurchaseClick()
         {
-            this.Result = ViewResult.Confirm;
+            var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault(x => x.IsSelected);
+            
+            if (selectedPaymentMethod == null) 
+                return; // (Should never happen)
+            else if (selectedPaymentMethod.Type == "empty_card") 
+                Result = ViewResult.AddCard;
+            else if (selectedPaymentMethod.Type == "empty_paypal")
+                Result = ViewResult.AddPaypal;
+            else
+                this.Result = ViewResult.Confirm;
+            
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
 

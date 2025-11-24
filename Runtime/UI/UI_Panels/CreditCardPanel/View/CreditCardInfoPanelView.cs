@@ -100,7 +100,22 @@ namespace Galleon.Checkout.UI
             }
         }
 
+        private void OnEnable()
+        {
+            // Clear input fields
+            if (NameInputField) NameInputField.Text               = string.Empty;
+            if (CreditCardNumberField) CreditCardNumberField.Text = string.Empty;
+            if (DateInputField) DateInputField.Text               = string.Empty;
+            if (CVVInputField) CVVInputField.Text                 = string.Empty;
 
+            // Reset validation flags
+            IsValidCVV              = false;
+            IsValidCreditCardNumber = false;
+            IsValidDate             = false;
+
+            // Remove card icon
+            RemoveCardIcon();
+        }
 
         public enum ViewResult
         {

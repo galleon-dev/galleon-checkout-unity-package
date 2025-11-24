@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.Samples;
+using TMPro;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -17,6 +18,7 @@ namespace Galleon.SampleApp
         ////////////////////////////////////////////////////////////////////// Members
         
         public StoreView StoreView;
+        public TMP_Text ReportText;
         
         ////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -35,8 +37,17 @@ namespace Galleon.SampleApp
         
         async void Start()
         {
-            await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"test_user_{DateTime.Now.ToString()}"} );
+            ReportText.text = "> Initializing ... ";
             
+          //await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"levan", ApplicationDisplayName = "Dice Dreams"} );
+            await CheckoutAPI.Initialize(new CheckoutConfiguration()
+                                         {
+                                            AppUserID              = $"test_user_{DateTime.Now.ToString()}",
+                                            ApplicationDisplayName = "Dice Dreams"
+                                         
+                                         } );
+            
+            Debug.Log($"Is Test Mode : {CHECKOUT.IsTest}");
             if (CHECKOUT.IsTest)
             {
                 await Task.Delay(1000);
@@ -44,7 +55,9 @@ namespace Galleon.SampleApp
                 Root.Instance.Runtime.TestController.Test().Execute();    
             }
             
-            SampleAppStart().Execute(); 
+            SampleAppStart().Execute();
+            
+            ReportText.text = "> Galleon Checkout Test App";
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle Steps
@@ -78,6 +91,23 @@ namespace Galleon.SampleApp
                         bool emptyPaymentMethods = true;
                         bool isUSAorCanada       = false;
                         bool isShortHeader       = true;
+                        
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                        
+                        ReportText.text = @"
+> Galleon checkout Test App
+----------------------------------------------------
+> Product : 1
+----------------------------------------------------
+> IsCalifornia : False
+----------------------------------------------------
+> Tax 
+	> Vat 5%
+	> IRS 10 %
+                                          ";
+                        
+                        await Task.Delay(1000);
+                        
                         
                         //////////////////////////////////////////////////////////////////////////////////////////////// 
                         
@@ -116,6 +146,21 @@ namespace Galleon.SampleApp
                         bool isUSAorCanada       = false;
                         bool isShortHeader       = true;
                         
+                        ReportText.text = @"
+> Galleon checkout Test App
+----------------------------------------------------
+> Product : 2
+----------------------------------------------------
+> IsCalifornia : true
+----------------------------------------------------
+> Tax 
+	> Vat 30%
+	> IRS 200 %
+                                          ";
+                        
+                        await Task.Delay(1000);
+                        
+                        
                         //////////////////////////////////////////////////////////////////////////////////////////////// 
                         
                         var result = await CheckoutAPI.Purchase(new CheckoutProduct
@@ -141,6 +186,15 @@ namespace Galleon.SampleApp
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc
+        
+        
+        #if UNITY_EDITOR
+        [ContextMenu("Dump Steps")]
+        #endif
+        public void DumpSteps()
+        {
+            Debug.Log(Root.Instance.Context.StepController.DumpSteps());
+        }
         
         #if UNITY_EDITOR
         [MenuItem("Tools/Galleon/Open Test Scene")]

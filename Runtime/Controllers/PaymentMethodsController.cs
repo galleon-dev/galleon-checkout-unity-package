@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AdvancedInputFieldSamples;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Shared;
 using Newtonsoft.Json;
@@ -25,14 +24,30 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public  List<UserPaymentMethod>             SpecialUserPaymentMethods    => UserPaymentMethods.Where(x => x.Type == "native" || x.Type == "app").ToList();
+        public  List<UserPaymentMethod>             EmptyUserPaymentMethods      => UserPaymentMethods.Where(x => x.Type.Contains("empty")).ToList();
         public  List<UserPaymentMethod>             LastUsedUserPaymentMethods   => GetLastUsedUserPaymentMethods();
         
         public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods
-                                                                                    .Concat(SpecialUserPaymentMethods)
+                                                                                  //.Concat(SpecialUserPaymentMethods)
+                                                                                    .Concat(EmptyUserPaymentMethods)
                                                                                     .Distinct()
                                                                                     .OrderBy(x => x.SortOrder)
                                                                                     .Take(MAX_LAST_USED_PAYMENT_METHODS)
-                                                                                    .Where(x => x?.Type != "app")
+                                                                                    .Except(SpecialUserPaymentMethods)
+                                                                                    .ToList();
+        
+        public  List<UserPaymentMethod>             UserPaymentMethodsToSelect  =>  UserPaymentMethods
+                                                                                    .Distinct()
+                                                                                    .Except(SpecialUserPaymentMethods)
+                                                                                    .Except(EmptyUserPaymentMethods)
+                                                                                    .OrderBy(x => x.SortOrder)
+                                                                                    .ToList();
+        
+        public  List<UserPaymentMethod>             UserPaymentMethodsToRemove  => UserPaymentMethods
+                                                                                    .Distinct()
+                                                                                    .Except(SpecialUserPaymentMethods)
+                                                                                    .Except(EmptyUserPaymentMethods)
+                                                                                    .OrderBy(x => x.SortOrder)
                                                                                     .ToList();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -46,14 +61,22 @@ namespace Galleon.Checkout
                         PaymentMethodsDefinitions.Node.DisplayName = "Payment Method Definitions";
                         UserPaymentMethods       .Node.DisplayName = "User Payment Methods";
                         
-                        s.AddChildStep(GetPaymentMethodDefinitions());
-                        s.AddChildStep(GetUserPaymentMethods());
+                        s.AddChildStep(RefreshPaymentMethods());
                         
-                        // s.AddChildStep(TestPopulatePaymentMethodDefinitions());
-                        // s.AddChildStep(TestPopulateUserPaymentMethods());
-
                         s.AddChildStep(InitializeDefinitions());
                         s.AddChildStep(LoadLastUsedUserPaymentMethods());
+                    });
+        
+        public Step RefreshPaymentMethods()
+        =>
+            new Step(name   : "refresh_payment_methods"
+                    ,action : async s =>
+                    {
+                        Load();
+                        s.AddChildStep(GetPaymentMethodDefinitions());
+                        s.AddChildStep(GetUserPaymentMethods());
+                        // s.AddChildStep(TestPopulatePaymentMethodDefinitions());
+                        // s.AddChildStep(TestPopulateUserPaymentMethods());
                     });
 
         
@@ -146,6 +169,8 @@ namespace Galleon.Checkout
             new Step(name   : $"get_payment_method_definitions"
                     ,action : async (s) =>
                     {
+                        PaymentMethodsDefinitions.Clear();
+                        
                         var _result = await CHECKOUT.Network.Get<Shared.PaymentMethodDefinitionsResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions?currency=USD&country=US"
                                                                                                          ,headers  : new ()
                                                                                                                    {
@@ -189,6 +214,8 @@ namespace Galleon.Checkout
                     {
                         /////////////////////////////////// from server
                         
+                        UserPaymentMethods.Clear();
+                        
                         var _result = await CHECKOUT.Network.Get<Shared.UserPaymentMethodsResponse>(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/user-payment-methods"
                                                                                                    ,headers : new ()
                                                                                                    {
@@ -197,11 +224,11 @@ namespace Galleon.Checkout
                         
                         var dataList = _result.payment_methods;
         
-                        if (dataList is not null
-                        &&  dataList.Length > 0)
-                        {
-                            UserPaymentMethods.Clear();
-                        }
+                        // if (dataList is not null
+                        // &&  dataList.Length > 0)
+                        // {
+                        //     UserPaymentMethods.Clear();
+                        // }
                         
                         foreach (var data in dataList)
                         {
@@ -216,6 +243,7 @@ namespace Galleon.Checkout
                                                             Data        = data,
                                                         });
                         }
+                        
                         
                         /////////////////////////////////// Native
                         
@@ -234,6 +262,7 @@ namespace Galleon.Checkout
                                                         DisplayName        = nativeDisplayName,
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
+                                                        SortOrder          = float.PositiveInfinity,
                                                         Type               = "native"
                                                     });
                         
@@ -248,7 +277,36 @@ namespace Galleon.Checkout
                                                         DisplayName        = CheckoutClient.Instance.ApplicationDisplayName ?? "Continue Checkout",
                                                         IsNewPaymentMethod = false,
                                                         IsSelected         = false,
+                                                        SortOrder          = float.PositiveInfinity, 
                                                         Type               = "app"
+                                                    });
+                        
+                        /////////////////////////////////// Empty
+                        
+                        this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                    {
+                                                        Data               = new ()
+                                                                           {
+                                                                              type = "empty_card"
+                                                                           },
+                                                        DisplayName        = "Add Credit Card",
+                                                        IsNewPaymentMethod = false,
+                                                        IsSelected         = false,
+                                                        SortOrder          = float.PositiveInfinity, 
+                                                        Type               = "empty_card"
+                                                    });
+                        
+                        this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                    {
+                                                        Data               = new ()
+                                                                           {
+                                                                              type = "empty_paypal"
+                                                                           },
+                                                        DisplayName        = "Add Paypal Account",
+                                                        IsNewPaymentMethod = false,
+                                                        IsSelected         = false,
+                                                        SortOrder          = float.PositiveInfinity, 
+                                                        Type               = "empty_paypal"
                                                     });
                         
                     });
@@ -257,35 +315,38 @@ namespace Galleon.Checkout
         
         public List<UserPaymentMethod> GetLastUsedUserPaymentMethods()
         {
-            Load();
-            
+            // Return empty list if no payment methods were used
             if (this.LastUsedUserPaymentMethodIDs.Count == 0)
                 return new List<UserPaymentMethod>();
-            
-            var lastUsedUpmID = this.LastUsedUserPaymentMethodIDs.Last();
-            List<UserPaymentMethod> result = new List<UserPaymentMethod>();
-            
+
+            var                     lastUsedUpmID = this.LastUsedUserPaymentMethodIDs.Last();
+            List<UserPaymentMethod> result        = new List<UserPaymentMethod>();
+
+            // Process each saved payment method ID
             foreach (var id in  this.LastUsedUserPaymentMethodIDs)
             {
-                var upm = this.UserPaymentMethods.Except(SpecialUserPaymentMethods).FirstOrDefault(x => x.Data.id == id);
+                // Try to find existing payment method
+                var upm = this.UserPaymentMethods.Except(SpecialUserPaymentMethods).Except(EmptyUserPaymentMethods).FirstOrDefault(x => x.Data.id == id);
                 if (upm != null)
                 {
                     result.Add(UserPaymentMethods.FirstOrDefault(upm => upm.ID == lastUsedUpmID));
                 }
+                // Handle locally stored payment methods
                 else if (id.StartsWith("local_pm_id"))
                 {
                     var definition = this.PaymentMethodsDefinitions.FirstOrDefault(x => x.LocalID == id);
                     if (definition is null) continue;
                     upm = definition.CreateLocalUserPaymentMethod();
-                    
+
                     this.UserPaymentMethods.Add(upm);
                     if (upm.ID == lastUsedUpmID)
                         upm.Select();
-                    
+
                     result.Add(upm);
                 }
             }
-            
+
+            // Fill remaining slots if we have fewer than maximum allowed
             if (result.Count < MAX_LAST_USED_PAYMENT_METHODS)
             {
                 int diff = MAX_LAST_USED_PAYMENT_METHODS - result.Count;
