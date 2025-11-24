@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,6 +11,38 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public List<Step> Steps = new List<Step>();
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug
+        
+        public string DumpSteps()
+        {
+            StringBuilder str = new StringBuilder();
+            
+            void DumpStep(Step step, StringBuilder str, int depth = 0)
+            {
+                str.AppendLine($"{new string(' ', depth * 2)}> [{step.Name}]");
+
+                foreach (var preStep in step.PreSteps)
+                {
+                    DumpStep(preStep, str, depth + 1);
+                }
+                foreach (var childStep in step.ChildSteps)
+                {
+                    DumpStep(childStep, str, depth + 1);
+                }
+                foreach (var postStep in step.PostSteps)
+                {
+                    DumpStep(postStep, str, depth + 1);
+                }
+            }
+
+            foreach (var step in Steps)
+            {
+                DumpStep(step, str);
+            }
+            
+            return str.ToString();
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inspector
         

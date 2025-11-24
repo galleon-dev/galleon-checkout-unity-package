@@ -625,6 +625,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d5b52db799d4d2cb9a17626ce2901d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  State: 
+  Style: 
+  Result: 0
 --- !u!114 &5559008990780725771
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -940,9 +943,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DTCScreenController, Assembly-CSharp
-        m_MethodName: OnPurchaseClick
+      - m_Target: {fileID: 2515309582764764660}
+        m_TargetAssemblyTypeName: Galleon.Checkout.UI.ErrorPanelView, CheckoutRuntime
+        m_MethodName: On_TryAnotherMethodButtonClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1008,7 +1011,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 523.4, y: -383}
+  m_AnchoredPosition: {x: 523.4, y: -420.805}
   m_SizeDelta: {x: 485.2, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3914816852108403747
@@ -1407,7 +1410,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3781483781979593713, guid: f9e24acdf8a7e42af927c643905a1572, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -884.31
+      value: -914.47
       objectReference: {fileID: 0}
     - target: {fileID: 3781483781979593713, guid: f9e24acdf8a7e42af927c643905a1572, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

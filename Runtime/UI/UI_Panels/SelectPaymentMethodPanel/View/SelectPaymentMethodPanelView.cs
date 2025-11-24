@@ -85,7 +85,7 @@ namespace Galleon.Checkout.UI
             /////////////////////
             
             // Add user payment methods children
-            var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
+            var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToSelect;
             foreach (var userPaymentMethod in userPaymentMethods)
             {
                 var go = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);

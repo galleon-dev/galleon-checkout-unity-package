@@ -25,7 +25,7 @@ public class SettingsPanelView : View
     
     public ViewResult         Result = ViewResult.None;
     
-    public  LayoutElement     ScrollRectLayoutElement;
+    public LayoutElement      ScrollRectLayoutElement;
     public ScrollRect         ScrollRect;
     private int               ScrollRectMaxSize   = 6;
     private float             PaymentPrefabHeight = 175f;
@@ -88,7 +88,7 @@ public class SettingsPanelView : View
         }
         
         // Add children
-        var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods.Except(CHECKOUT.PaymentMethods.SpecialUserPaymentMethods);
+        var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToRemove;
         foreach (var paymentMethod in paymentMethods)
         {
             var go   = Instantiate(original : SettingsPanelPaymentMethodItemPrefab, parent : PaymentMethodsHolder.transform);
@@ -120,7 +120,8 @@ public class SettingsPanelView : View
             {
                 ScrollRect.vertical = false;
             }
-        } else
+        } 
+        else
         {
             if (ScrollRect)
             {

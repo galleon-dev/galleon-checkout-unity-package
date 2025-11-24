@@ -236,6 +236,18 @@ namespace Galleon.Checkout.Foundation
             }
         }
         
+        ////
+        
+        /// foreach node in full_v_tree
+        ///     if (node needs action)
+        ///         node.DoAction()
+        ///         (plus) =>
+        ///             var parent = node.getParent();
+        ///             var child  = node.getElement().CreateActualChild();
+        /// 
+        ///             parent.AddChild(child);
+        ///             child.Create();
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
         
