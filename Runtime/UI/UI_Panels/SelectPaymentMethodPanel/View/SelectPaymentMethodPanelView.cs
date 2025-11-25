@@ -85,7 +85,7 @@ namespace Galleon.Checkout.UI
             /////////////////////
             
             // Add user payment methods children
-            var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
+            var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToSelect;
             foreach (var userPaymentMethod in userPaymentMethods)
             {
                 var go = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
@@ -194,10 +194,7 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
-        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_add_new_card)}()" });
-        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_back_to_checkout)}()" });
-        
-        public Step test_add_new_card()     => new Step(action : async (s) => { On_NewCardClicked(); });
+        public Step test_add_new_card()     => new Step(name : "selection_panel_test_new_card", action : async (s) => { On_NewCardClicked(); });
         public Step test_back_to_checkout() => new Step(action : async (s) => { On_Select();         });
         
     }

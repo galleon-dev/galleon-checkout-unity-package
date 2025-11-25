@@ -38,7 +38,6 @@ namespace Galleon.Checkout
                         foreach (var pair in dictionary)
                             this.ConfigData.Add(pair.Key, pair.Value);
                         
-                        
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flow
@@ -49,4 +48,3 @@ namespace Galleon.Checkout
         public float  GetFloat (string key) => ConfigData.ContainsKey(key) ? float.Parse(ConfigData[key].ToString()) : 0;
     }
 }
-

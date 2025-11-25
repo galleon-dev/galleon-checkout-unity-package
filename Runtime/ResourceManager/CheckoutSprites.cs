@@ -16,6 +16,7 @@ namespace Galleon.Checkout
         [Header("Built in")]
         // Icons
         public Sprite GalleonIconSprite;
+        public Sprite AppIconSprite;
         public Sprite AddCreditCardIconSprite;
         public Sprite VisaIconSprite;
         public Sprite MasterCardIconSprite;
@@ -51,20 +52,22 @@ namespace Galleon.Checkout
             {
                 switch (paymentMethodActualType)
                 {
-                    case "card" :        return AddCreditCardIconSprite;   
-                    case "visa":         return VisaIconSprite;
-                    case "mastercard":   return MasterCardIconSprite;
-                    case "amex":         return AmexIconSprite;
-                    case "diners":       return DinersIconSprite;
-                    case "discover":     return DiscoverIconSprite;
-                    case "google_pay":   return GPayIconSprite;
-                    case "google_play":  return GPlayIconSprite;
-                    case "paypal":       return PaypalIconSprite;
-                    case "apple":        return AppleIconSprite;
-                    case "klarna":       return KlarnaIconSprite;
-                    case "web_checkout": return WebCheckoutIconSprite;
-                    case "cashapp":      return CashAppIconSprite;
-                    case "amazon_pay":   return AmazonPayIconSprite;
+                    case "empty_card" :        return AddCreditCardIconSprite;   
+                    case "card" :              return AddCreditCardIconSprite;   
+                    case "visa":               return VisaIconSprite;
+                    case "mastercard":         return MasterCardIconSprite;
+                    case "amex":               return AmexIconSprite;
+                    case "diners":             return DinersIconSprite;
+                    case "discover":           return DiscoverIconSprite;
+                    case "google_pay":         return GPayIconSprite;
+                    case "google_play":        return GPlayIconSprite;
+                    case "empty_paypal":       return PaypalIconSprite;
+                    case "paypal":             return PaypalIconSprite;
+                    case "apple":              return AppleIconSprite;
+                    case "klarna":             return KlarnaIconSprite;
+                    case "web_checkout":       return WebCheckoutIconSprite;
+                    case "cashapp":            return CashAppIconSprite;
+                    case "amazon_pay":         return AmazonPayIconSprite;
                     case "native":
                         #if UNITY_ANDROID
                             return GPlayIconSprite;
@@ -73,8 +76,14 @@ namespace Galleon.Checkout
                         #else
                             return AddCreditCardIconSprite;
                         #endif
-                    case "app":         return GalleonIconSprite;
-                    default:            return AddCreditCardIconSprite;
+                    case "app":         return AppIconSprite;
+                    default:
+                    {
+                        if (paymentMethodActualType.ToLower().Contains("paypal")) 
+                            return PaypalIconSprite;
+                        
+                        return AddCreditCardIconSprite;
+                    }
                 }
             }
         }
@@ -89,10 +98,11 @@ namespace Galleon.Checkout
             {
                 switch (paymentMethodActualType)
                 {
-                    case "google_pay": return GpaybuttonSprite;
-                    case "paypal":     return PaypalbuttonSprite;
-                    case "apple":      return AppleButtonSprite;
-                    default:           return CheckoutButtonSprite;
+                    case "google_pay":      return GpaybuttonSprite;
+                    case "paypal":          return PaypalbuttonSprite;
+                    case "empty_paypal":    return PaypalbuttonSprite;
+                    case "apple":           return AppleButtonSprite;
+                    default:                return CheckoutButtonSprite;
                 }
             }
         }

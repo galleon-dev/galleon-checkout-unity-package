@@ -64,13 +64,6 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
-        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[]
-                                                                                {
-                                                                                    $"{nameof(test_confirm)}()", 
-                                                                                    $"{nameof(test_part3)}()"     
-                                                                                });
-        
         public Step test_confirm() => new Step(action : async (s) => { On_ConfirmClicked(); });
-        public Step test_part3()   => new Step(action : async (s) => { EntityNode.CurrentTestScenario = "scenario_2_part_3"; });
     }
 }

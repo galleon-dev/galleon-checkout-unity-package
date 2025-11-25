@@ -31,10 +31,6 @@ namespace Galleon.Checkout
         public CheckoutIAPStore             IAPStore                    = new();
       //public CheckoutIapStoreListener     IapStoreListener            = new(); // for testing
       
-        // Resources
-        public CheckoutResources            Resources                   => CheckoutResources.Instance;
-        public ResourceManager              ResourceManager             = new ResourceManager();
-        
         // System
         public NavigationController         Navigation                  = new ();
         
@@ -61,9 +57,14 @@ namespace Galleon.Checkout
         [Header("UI")]
         public CheckoutScreenMobile         CheckoutScreenMobile; 
         
+        // Resources
+        public CheckoutResources            Resources                   => CheckoutResources.Instance;
+        public ResourceManager              ResourceManager             = new ResourceManager();
+        
         // TEMP - testing/debug/wip/etc...
         [Header("Temp")]
         public CheckoutTEMP                 Temp                        = new();
+        
         
         public string                       CurrentTest                 = "test_1";
         public string                       ApplicationDisplayName      = null;
@@ -154,6 +155,8 @@ namespace Galleon.Checkout
         public static Analytics                 Analytics       => CheckoutClient.Instance.Analytics;
         public static Storage                   Storage         => CheckoutClient.Instance.Storage;
          
+        public static CheckoutScreenMobile      Screen         => CheckoutClient.Instance.CheckoutScreenMobile;
+        
         public static CheckoutResources         Resources       => CheckoutClient.Instance.Resources;
         public static CheckoutSprites           Sprites         => Resources.Sprites;
         
@@ -168,7 +171,7 @@ namespace Galleon.Checkout
         public static User                      User            => CheckoutClient.Instance.CurrentUser;
         public static Transaction               Transaction     => User.CurrentTransaction;
          
-        public static bool                      IsTest          => Resources.IsTest;
+        public static bool                      IsTest          => false; //  true; // Resources.IsTest;
         public static string                    CurrentTest     { get => CheckoutClient.Instance.CurrentTest; set => CheckoutClient.Instance.CurrentTest = value; } 
     }   
 }
