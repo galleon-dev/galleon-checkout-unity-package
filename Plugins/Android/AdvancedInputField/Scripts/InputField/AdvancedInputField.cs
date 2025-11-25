@@ -159,8 +159,13 @@ namespace AdvancedInputFieldPlugin
 		[Serializable]
 		public class SpecialKeyPressedEvent: UnityEvent<SpecialKeyCode> { }
 
-		/// <summary>Event used when the text has been tapped</summary>
-		[Serializable]
+        public void ActivateInputField(bool v)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>Event used when the text has been tapped</summary>
+        [Serializable]
 		public class TextTapEvent: UnityEvent<int, Vector2> { }
 
 		/// <summary>Event used when an ActionBar action has been triggered</summary>

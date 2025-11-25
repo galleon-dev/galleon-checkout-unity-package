@@ -12,7 +12,7 @@ namespace Galleon.Checkout.UI
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 
-        public      ViewResult Result = ViewResult.None;
+        public ViewResult Result = ViewResult.None;
         public enum ViewResult
         {
             None,
@@ -21,21 +21,23 @@ namespace Galleon.Checkout.UI
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
-      
-        public GameObject         EmailInputFieldText;
-        public GameObject         Gap;
-        public GameObject         EmailInputFieldContainer;
-        public GameObject         EmailButtonGO;
+
+        public GameObject EmailInputFieldText;
+        public GameObject Gap;
+        public GameObject EmailInputFieldContainer;
+        public GameObject EmailButtonGO;
+        public GameObject SuccessLabel;
+        public GameObject SuccessLabelForExistingEmail;
 
         public AdvancedInputField EmailInputField;
-        public TMP_Text           ErrorText;
-        public TMP_Text           MainText;
+        public TMP_Text ErrorText;
+        public TMP_Text MainText;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public override void Initialize()
         {
-            this.ErrorText.gameObject.SetActive(false);     
+            this.ErrorText.gameObject.SetActive(false);
         }
 
         public override async void RefreshState()
@@ -54,7 +56,7 @@ namespace Galleon.Checkout.UI
             {
                 if (EmailInputFieldContainer)
                     HideEmail();
-                
+
                 await Task.Delay(1200);
                 Result = ViewResult.Confirm;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
@@ -63,18 +65,46 @@ namespace Galleon.Checkout.UI
 
         public void ShowEmail()
         {
-            EmailInputFieldText     .SetActive(true);
-            Gap                     .SetActive(true);
+            EmailInputFieldText.SetActive(true);
+            Gap.SetActive(true);
             EmailInputFieldContainer.SetActive(true);
-            EmailButtonGO           .SetActive(true);
+
+            if (EmailButtonGO)
+            {
+                EmailButtonGO.SetActive(true);
+            }
+
+            if (SuccessLabel)
+            {
+                SuccessLabel.SetActive(true);
+            }
+
+            if (SuccessLabelForExistingEmail)
+            {
+                SuccessLabelForExistingEmail.SetActive(false);
+            }
         }
-        
+
         public void HideEmail()
         {
-            EmailInputFieldText     .SetActive(false);
-            Gap                     .SetActive(false);
+            EmailInputFieldText.SetActive(false);
+            Gap.SetActive(false);
             EmailInputFieldContainer.SetActive(false);
-            EmailButtonGO           .SetActive(false);
+
+            if (EmailButtonGO)
+            {
+                EmailButtonGO.SetActive(false);
+            }
+
+            if (SuccessLabel)
+            {
+                SuccessLabel.SetActive(false);
+            }
+
+            if (SuccessLabelForExistingEmail)
+            {
+                SuccessLabelForExistingEmail.SetActive(true);
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////// UI Events
@@ -96,18 +126,18 @@ namespace Galleon.Checkout.UI
             
             OnConfirmSuccessButtonClick();
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Email storage
-        
+
         public async Task SaveEmail()
         {
             CHECKOUT.User.UserInfo.email = this.EmailInputField.Text;
             await CHECKOUT.Actions.SetEmail().Execute();
-            
+
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Private API Methods
-        
+
         private async Task SendReceipt()
         {
             var email = this.EmailInputField.Text;
@@ -121,10 +151,10 @@ namespace Galleon.Checkout.UI
 
             var message = new MailMessage
             {
-                From       = new MailAddress("test@localhost"),
-                Subject    = "Your Purchase Receipt",
+                From = new MailAddress("test@localhost"),
+                Subject = "Your Purchase Receipt",
                 IsBodyHtml = true,
-                Body       = $@"
+                Body = $@"
                              <html>
                              <body>
                                  <h1>Thank you for your purchase!</h1>
@@ -152,47 +182,47 @@ namespace Galleon.Checkout.UI
                 Debug.LogError($"Failed to send email: {ex.Message}");
             }
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Private Helper Methods
-        
-        
+
+
         private async Task SendEmail(string to, string subject, string body)
         {
             Debug.Log("Sending Email");
 
-            var message        = new MailMessage("levan@galleon.so", to);
-            message.Subject    = subject;
-            message.Body       = body;
+            var message = new MailMessage("levan@galleon.so", to);
+            message.Subject = subject;
+            message.Body = body;
             message.IsBodyHtml = true;
 
-            using var smtp     = new SmtpClient("smtp.gmail.com", 587);
-            smtp.EnableSsl     = true;
-            smtp.Credentials   = new NetworkCredential("levan@galleon.so", "viil dbxh fvgo jcys");
+            using var smtp = new SmtpClient("smtp.gmail.com", 587);
+            smtp.EnableSsl = true;
+            smtp.Credentials = new NetworkCredential("levan@galleon.so", "viil dbxh fvgo jcys");
 
             smtp.Send(message);
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test
-        
-        public Step TEST_SuccesPanelWaitAndDoNothing() 
+
+        public Step TEST_SuccesPanelWaitAndDoNothing()
         =>
-            new Step(name   : $"success_panel_wait_and_do_nothing"
-                    ,action : async (s) =>
+            new Step(name: $"success_panel_wait_and_do_nothing"
+                    , action: async (s) =>
                     {
                     });
-        
-        public Step TEST_FillTestEmail() 
+
+        public Step TEST_FillTestEmail()
         =>
-            new Step(name   : $"fill_test_email"
-                    ,action : async (s) =>
+            new Step(name: $"fill_test_email"
+                    , action: async (s) =>
                     {
                         this.EmailInputField.Text = "levan@galleon.so";
                     });
-        
-        public Step TEST_SendReceiptClicked() 
+
+        public Step TEST_SendReceiptClicked()
         =>
-            new Step(name   : $"test_click_send_receipt"
-                    ,action : async (s) =>
+            new Step(name: $"test_click_send_receipt"
+                    , action: async (s) =>
                     {
                         OnConfirmEmailButtonClick();
                     });

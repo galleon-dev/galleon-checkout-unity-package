@@ -11,25 +11,27 @@ using UnityEngine.UI;
 public class SettingsPanelView : View
 {
     //////////////////////////////////////////////////////////////////////////// Members
-    
+
     [Header("Email")]
-    public GameObject         EmailInputfieldBorder;
+    public GameObject EmailInputfieldBorder;
     public AdvancedInputField EmailInputField;
+    public GameObject EmailEditButton;
 
     [Header("Payment Methods")]
-    public GameObject         SettingsPanelPaymentMethodItemPrefab;
-    public GameObject         PaymentMethodsHolder;
-    public bool               IsEditingEmail = false;
-    
+    public GameObject SettingsPanelPaymentMethodItemPrefab;
+    public GameObject PaymentMethodsHolder;
+    public bool IsEditingEmail = false;
+    public GameObject InformationalLabel;
+
     //////////////////////////////////////////////////////////////////////////// View Result
-    
-    public ViewResult         Result = ViewResult.None;
-    
-    public LayoutElement      ScrollRectLayoutElement;
-    public ScrollRect         ScrollRect;
-    private int               ScrollRectMaxSize   = 6;
-    private float             PaymentPrefabHeight = 175f;
-    private float             SeparatorHeight     = 2f;
+
+    public ViewResult Result = ViewResult.None;
+
+    public LayoutElement ScrollRectLayoutElement;
+    public ScrollRect ScrollRect;
+    private int ScrollRectMaxSize = 6;
+    private float PaymentPrefabHeight = 175f;
+    private float SeparatorHeight = 2f;
 
     public enum ViewResult
     {
@@ -43,6 +45,10 @@ public class SettingsPanelView : View
 
     public override void Initialize()
     {
+        if (InformationalLabel)
+        {
+            InformationalLabel.SetActive(false);
+        }
 
         string Email = PlayerPrefs.GetString("Email");
 
@@ -56,28 +62,28 @@ public class SettingsPanelView : View
 
         RefreshState();
     }
-        
+
     //////////////////////////////////////////////////////////////////////////// View Flow
 
     public bool IsCompleted = false;
 
     public Step View()
     =>
-        new Step(name   : $"view_settings_panel"
-                ,action : async (s) =>
+        new Step(name: $"view_settings_panel"
+                , action: async (s) =>
                 {
                     IsCompleted = false;
-                    
+
                     this.gameObject.SetActive(true);
-                    
+
                     while (!IsCompleted)
                         await Task.Yield();
-                    
+
                     this.gameObject.SetActive(false);
                 });
-    
+
     //////////////////////////////////////////////////////////////////////////// Refresh
-    
+
     public override void RefreshState()
     {
         // Remove children (if any)
@@ -86,28 +92,54 @@ public class SettingsPanelView : View
             //Debug.Log($"-Removing Item {child.gameObject.name}");
             Destroy(child.gameObject);
         }
-        
+
         // Add children
         var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToRemove;
         foreach (var paymentMethod in paymentMethods)
         {
-            var go   = Instantiate(original : SettingsPanelPaymentMethodItemPrefab, parent : PaymentMethodsHolder.transform);
+            var go = Instantiate(original: SettingsPanelPaymentMethodItemPrefab, parent: PaymentMethodsHolder.transform);
             var item = go.GetComponent<SettingsPanelPaymentMethodItem>();
             item.Initialize(paymentMethod, this);
-            
+
             // Add ui separator
-            Instantiate(original : CHECKOUT.Resources.UI_Seporator, parent : PaymentMethodsHolder.transform);
+            Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsHolder.transform);
         }
-        
+
+        if (paymentMethods.Count() == 0)
+        {
+            if (InformationalLabel)
+            {
+                InformationalLabel.SetActive(true);
+            }
+            if (ScrollRectLayoutElement)
+            {
+                ScrollRectLayoutElement.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            if (InformationalLabel)
+            {
+                InformationalLabel.SetActive(false);
+            }
+            if (ScrollRectLayoutElement)
+            {
+                ScrollRectLayoutElement.gameObject.SetActive(true);
+            }
+        }
+
         // Email
-        if (!CHECKOUT.User.Email.IsNullOrEmpty())
+        //if (!CHECKOUT.User.Email.IsNullOrEmpty())
+        if (!string.IsNullOrEmpty(CHECKOUT.User.Email))
+        {
             this.EmailInputField.Text = CHECKOUT.User.Email;
+        }
 
         UpdateScrollRectMaxSize();
     }
-    
+
     //////////////////////////////////////////////////////////////////////////// UI Helper methods
-    
+
     public void UpdateScrollRectMaxSize()
     {
         int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
@@ -156,33 +188,34 @@ public class SettingsPanelView : View
 
     public void On_EditEmailClicked()
     {
-        if (!IsEditingEmail)
-        {
+    //    if (!IsEditingEmail)
+    //    {
             EmailInputfieldBorder.SetActive(true);
-            EmailInputField.interactable = true;
+            EmailEditButton.SetActive(false);
             IsEditingEmail = true;
-        }
-        else
-        {
-            EmailInputfieldBorder.SetActive(false);       
-            EmailInputField.interactable = false;
-            IsEditingEmail = false;
-        }
+            EmailInputField.Select(); //.ActivateInputField(true);
+     //   }
+     //   else
+     //   {
+     //       EmailInputfieldBorder.SetActive(false);
+     //       EmailEditButton.SetActive(true);
+     //       IsEditingEmail = false;
+     //   }
     }
-    
+
     public async void On_FinishedEditingEmail(string str, EndEditReason reason)
     {
         Debug.Log($"str = {str}");
         Debug.Log($"reason = {reason}");
 
         EmailInputfieldBorder.SetActive(false);
-        EmailInputField.interactable = false;
-        IsEditingEmail               = false;
-        
-        this.EmailInputField.Text            = str;
+        EmailEditButton.SetActive(true);
+        IsEditingEmail = false;
+
+        this.EmailInputField.Text = str;
         CHECKOUT.Session.User.UserInfo.email = str;
         await CHECKOUT.Actions.SetEmail().Execute();
-        
+
         // if(SuccessPanelEmailInputField)
         // {
         //     SuccessPanelEmailInputField.Text = EmailInputField.Text;
@@ -198,23 +231,23 @@ public class SettingsPanelView : View
         //     PlayerPrefs.Save();
         // } 
     }
-    
+
     public void On_Done()
     {
         this.Result = ViewResult.Back;
         CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
     }
-    
+
     //////////////////////////////////////////////////////////////////////////// Events
-    
+
     public void DeletePaymentMethod(UserPaymentMethod userPaymentMethod)
     {
         if (IsEditingEmail)
             return;
-        
-        CheckoutClient.Instance.CurrentSession.LastDialogRequest         = "delete_payment_method";
+
+        CheckoutClient.Instance.CurrentSession.LastDialogRequest = "delete_payment_method";
         CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete = userPaymentMethod;
-        
+
         this.Result = ViewResult.DeletePaymentMethod;
         CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
     }

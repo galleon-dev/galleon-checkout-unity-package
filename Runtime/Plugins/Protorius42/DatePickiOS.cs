@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using AdvancedInputFieldPlugin;
 using Protorius42.NativeDateTimePicker;
@@ -22,20 +22,34 @@ public class DatePickiOS : MonoBehaviour
         dialog.ShowNativeDateTimeDialogAsync(dateTimeParam)
             .ContinueWith(t =>
             {
-                if (t.Result.Item2 == DateTimeErrorCode.UserCancelled)
+                var (timestamp, errorCode) = t.Result;
+
+                // 1️ Handle cancel explicitly
+                if (errorCode == DateTimeErrorCode.UserCancelled)
                 {
-                    Debug.Log($"DateTimeDialog.OnYearAndMonthButtonClick cancelled");
+                    Debug.Log("DateTimeDialog: user cancelled");
+                    return;
                 }
-                else if (t.Result.Item2 != DateTimeErrorCode.NoError)
+
+                // 2️ Defensive guard: handle bogus zero timestamp
+                if (timestamp <= 0)
                 {
-                    Debug.LogError($"DateTimeDialog.OnYearAndMonthButtonClick done with error status code={t.Result.Item2}");
+                    Debug.LogWarning("DateTimeDialog: received invalid or zero timestamp - ignoring.");
+                    return;
                 }
-                else
+
+                // 3️ Handle plugin-reported errors
+                if (errorCode != DateTimeErrorCode.NoError)
                 {
-                    string formatted = FormatTimestamp(t.Result.Item1, dateTimeParam.PickerMode);
-                    Debug.Log($"DateTimeDialog.OnYearAndMonthButtonClick, MonthAndYear={formatted}!");
-                    DateAdvancedInputField.Text = formatted;
+                    Debug.LogError($"DateTimeDialog: error status code = {errorCode}");
+                    return;
                 }
+
+                // 4️ Success case — apply formatted result
+                string formatted = FormatTimestamp(timestamp, dateTimeParam.PickerMode);
+                Debug.Log($"DateTimeDialog: user selected date {formatted}");
+                DateAdvancedInputField.Text = formatted;
+
             }, TaskScheduler.FromCurrentSynchronizationContext());
     }
 
@@ -44,6 +58,12 @@ public class DatePickiOS : MonoBehaviour
     {
         try
         {
+            if (unixSeconds <= 0)
+            {
+                Debug.LogWarning("FormatTimestamp: received zero timestamp, ignoring.");
+                return string.Empty;
+            }
+
             var local = DateTimeOffset.FromUnixTimeSeconds(unixSeconds).LocalDateTime;
             if (mode == DateTimePickerMode.UIDatePickerModeCountDownTimer)
             {
