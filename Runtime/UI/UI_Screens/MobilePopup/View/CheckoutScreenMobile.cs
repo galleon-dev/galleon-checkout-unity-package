@@ -110,6 +110,8 @@ namespace Galleon.Checkout.UI
                                   DontDestroyOnLoad(CheckoutScreenMobileGO);
                                   
                                   CheckoutClient.Instance.CheckoutScreenMobile = CheckoutScreenMobileGO.GetComponent<CheckoutScreenMobile>();
+                                  CheckoutClient.Instance.Node.AddChild(CheckoutClient.Instance.CheckoutScreenMobile);
+                                  
 								  
 								  /*
                                   // Instantiate screen
@@ -155,11 +157,6 @@ namespace Galleon.Checkout.UI
                             });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
-
-        public CheckoutScreenMobile()
-        {
-            this.Node.SetParent(CheckoutClient.Instance);
-        }
 
         public void OnEnable()
         {
@@ -314,8 +311,8 @@ namespace Galleon.Checkout.UI
                         
                         ///////////////////////// Focus
                         
-                        // foreach (var view in views)
-                        //     view.Focus();
+                        foreach (var view in views)
+                            view.Focus();
 
                         ///////////////////////// Await Page
 
@@ -386,6 +383,11 @@ namespace Galleon.Checkout.UI
                         View[] views = this.GetComponentsInChildren<View>();
                         foreach (var view in views)
                             view.Refresh();
+                        
+                        ///////////////////////// Focus
+                        
+                        foreach (var view in views)
+                            view.Focus();
 
                     });
 
@@ -431,9 +433,14 @@ namespace Galleon.Checkout.UI
             new Step(name: $"UI_Back"
                     , action: async (s) =>
                               {
-                                  //var previousPage = NavigationHistory[^2];
-                                  //s.ParentStep.AddChildStep(ViewPage(previousPage));
-                                  s.ParentStep.AddChildStep(ViewPage(CheckoutPage));
+                                  // var previousPage = NavigationHistory[^2];
+                                  // s.ParentStep.AddChildStep(ViewPage(previousPage));
+                                  
+                                  if (CurrentPage == CheckoutPage)
+                                      s.ParentStep.AddChildStep(ViewPage(PreselectionPage));
+                                  else
+                                      s.ParentStep.AddChildStep(ViewPage(CheckoutPage));
+                                  
                               });
 
         public Step UI_PaymentMethods()
@@ -453,7 +460,7 @@ namespace Galleon.Checkout.UI
 
         public void On_BackClicked()
         {
-            if (CurrentPage == CheckoutPage)
+            if (CurrentPage == PreselectionPage)
                 OnPageFinishedWithResult(NavigationStates.Close.ToString());
             else
                 OnPageFinishedWithResult(NavigationStates.Back.ToString());
@@ -651,9 +658,9 @@ namespace Galleon.Checkout.UI
                     
         
         public Page PreselectionPage         = new Page(name  : "preselection"
-                                                       ,header: HeaderPanelView     .STATE.x_button             .ToString()
+                                                       ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
                                                        ,panel : CheckoutScreenMobile.STATE.preselection_panel   .ToString()
-                                                       ,footer: FooterPanelView     .STATE.none                 .ToString()
+                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
                                                        ,setup : page =>
                                                               {
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.Confirm.ToString()] = CHECKOUT.Session.CheckPreselection();
@@ -668,7 +675,8 @@ namespace Galleon.Checkout.UI
                                                               {
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.Confirm            .ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                                   page.NavigationMap[CheckoutPanelView.ViewResult.OtherPaymentMethods.ToString()] = page.screen.ViewPage(page.screen.SelectPaymentMethodsPage);
-                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = page.screen.ViewPage(page.screen.CreditCardPage);
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.AddCard            .ToString()] = CHECKOUT.Session.On_EmptyCardSelected();
+                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.AddPaypal          .ToString()] = CHECKOUT.Session.On_EmptyPaypalSelected();
                                                               }
                                                         );
 

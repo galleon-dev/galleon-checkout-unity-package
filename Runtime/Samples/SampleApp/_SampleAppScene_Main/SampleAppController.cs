@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.Samples;
+using TMPro;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -17,6 +18,7 @@ namespace Galleon.SampleApp
         ////////////////////////////////////////////////////////////////////// Members
         
         public StoreView StoreView;
+        public TMP_Text ReportText;
         
         ////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -35,16 +37,29 @@ namespace Galleon.SampleApp
         
         async void Start()
         {
+            ReportText.text = "> Initializing ... ";
+            
+          //await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"levan", ApplicationDisplayName = "Dice Dreams"} );
+            await CheckoutAPI.Initialize(new CheckoutConfiguration()
+                                         {
+                                            AppUserID              = $"test_user_{DateTime.Now.ToString()}",
+                                            ApplicationDisplayName = "Dice Dreams"
+                                         
+                                         } );
+            
+            Debug.Log($"Is Test Mode : {CHECKOUT.IsTest}");
             if (CHECKOUT.IsTest)
             {
-                await Task.Yield();
-                await Task.Yield();
+                await Task.Delay(1000);
+                CheckoutClient.Instance.Storage.ClearAll();
                 Root.Instance.Runtime.TestController.Test().Execute();    
             }
             
-            await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"test_user_{DateTime.Now.ToString()}"} );
+            CHECKOUT.PaymentMethods.ClearSavedData();
             
-            SampleAppStart().Execute(); 
+            SampleAppStart().Execute();
+            
+            ReportText.text = "> ready";
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle Steps
@@ -72,16 +87,50 @@ namespace Galleon.SampleApp
             new Step(name   : $"test_purchase_product_1"
                     ,action : async (s) =>
                     {   
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                        
+                        // Definitions
+                        bool emptyPaymentMethods = true;
+                        bool isUSAorCanada       = false;
+                        bool isShortHeader       = true;
+                        
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                        
+                        ReportText.text = @"
+> Galleon checkout Test App
+----------------------------------------------------
+> Product : 1
+----------------------------------------------------
+> IsCalifornia : False
+----------------------------------------------------
+> Tax 
+	> Vat 5%
+	> IRS 10 %
+                                          ";
+                        
+                        await Task.Delay(1000);
+                        
+                        
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                        
                         var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                                                { 
-                                                                   DisplayName = "test_product_1",
-                                                                   PriceText   = "$5.99",
+                                                                   DisplayName     = "test_product_1",
+                                                                   PriceText       = "$5.99",
+                                                                   //Sku           = "sku-1-3DS", 
+                                                                   Sku             = "sku-1",
+                                                                   Amount          = 100,
+                                                                   Currency        = "USD",
                                                                });
                         
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                         
                         Debug.Log($"==================");
                         Debug.Log($"result : ");
                         Debug.Log($"{result.IsSuccess}");
                         Debug.Log($"==================");
+                        
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
                         
                         OnBackToStoreScreen().Execute();
                     });
@@ -92,14 +141,62 @@ namespace Galleon.SampleApp
             new Step(name   : $"test_purchase_product_2"
                     ,action : async (s) =>
                     {   
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                        
+                        // Definitions
+                        bool emptyPaymentMethods = true;
+                        bool isUSAorCanada       = false;
+                        bool isShortHeader       = true;
+                        
+                        ReportText.text = @"
+> Galleon checkout Test App
+----------------------------------------------------
+> Product : 2
+----------------------------------------------------
+> IsCalifornia : true
+----------------------------------------------------
+> Tax 
+	> Vat 30%
+	> IRS 200 %
+                                          ";
+                        
+                        await Task.Delay(1000);
+                        
+                        
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                        
                         var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                                                { 
-                                                                   DisplayName = "test_product_2",
-                                                                   PriceText   = "$19.99",
+                                                                   DisplayName     = "test_product_2",
+                                                                   PriceText       = "$19.99",
+                                                                   //Sku           = "sku-1-3DS", 
+                                                                   Sku             = "sku-1",
+                                                                   Amount          = 100,
+                                                                   Currency        = "USD",
                                                                });
+                        
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                         
+                        Debug.Log($"==================");
+                        Debug.Log($"result : ");
+                        Debug.Log($"{result.IsSuccess}");
+                        Debug.Log($"==================");
+                        
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                        
+                        OnBackToStoreScreen().Execute();
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc
+        
+        
+        #if UNITY_EDITOR
+        [ContextMenu("Dump Steps")]
+        #endif
+        public void DumpSteps()
+        {
+            Debug.Log(Root.Instance.Context.StepController.DumpSteps());
+        }
         
         #if UNITY_EDITOR
         [MenuItem("Tools/Galleon/Open Test Scene")]

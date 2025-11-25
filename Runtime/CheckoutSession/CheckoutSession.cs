@@ -236,6 +236,11 @@ namespace Galleon.Checkout
                                                        x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
                                                });
                         
+                        
+                        // Refresh user payment methods
+                        s.AddPostStep(CHECKOUT.PaymentMethods.RefreshPaymentMethods());
+                        
+                        
                         // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());
                         
@@ -269,5 +274,40 @@ namespace Galleon.Checkout
                                                   IsError     = result.errors?.Length > 0,
                                               };
                     });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc Steps
+        
+        public Step On_EmptyCardSelected() 
+        =>
+            new Step(name   : $"on_empty_card_selected"
+                    ,action : async (s) =>
+                              {
+                                  s.AddNextStepInParentFlow(CHECKOUT.Screen.ViewPage(CHECKOUT.Screen.CreditCardPage));
+                              });
+        
+        public Step On_EmptyPaypalSelected() 
+        =>
+            new Step(name   : $"on_empty_paypal_selected"
+                    ,action : async (s) =>
+                              {
+                                  var paypalPM = new UserPaymentMethod()
+                                                 {
+                                                    Data = new ()
+                                                         {
+                                                             type           = "paypal",
+                                                             display_name   = "paypal",
+                                                             id             = "local_pm_id_paypal"
+                                                         },
+                                                    DisplayName             = "PayPal",
+                                                    IsNewPaymentMethod      = true,
+                                                    ShouldSavePaymentMethod = true,
+                                                    Type                    = "paypal",
+                                                 };
+                                  CHECKOUT.PaymentMethods.UserPaymentMethods.Add(paypalPM);
+                                  CHECKOUT.User.SelectPaymentMethod(paypalPM);
+                                  
+                                  s.AddNextStepInParentFlow(RunTransaction());
+                              });
+        
     }
 }

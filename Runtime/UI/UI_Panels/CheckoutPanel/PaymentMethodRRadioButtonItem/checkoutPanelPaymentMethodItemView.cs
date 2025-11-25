@@ -46,13 +46,15 @@ namespace Galleon.Checkout.UI
             
             // Bonus
             if (this.bonusItemView != null)
-                Destroy(this.bonusItemView.gameObject); // destroy placeholder
-            if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
-            {
-                this.IBonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<IBonusItemView>();
-                var bonusItem = CHECKOUT.Session.BonusData.FirstOrDefault() ?? new BonusItem() { BonusMainText = "Extra", BonusRewardText = "1000k" };
-                this.IBonusItemView.Initialize(bonusItem.BonusMainText, bonusItem.BonusRewardText);
-            }
+                this.bonusItemView.gameObject.SetActive(false);
+            // if (this.bonusItemView != null)
+            //     Destroy(this.bonusItemView.gameObject); // destroy placeholder
+            // if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
+            // {
+            //     this.IBonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<IBonusItemView>();
+            //     var bonusItem = CHECKOUT.Session.BonusData.FirstOrDefault() ?? new BonusItem() { BonusMainText = "Extra", BonusRewardText = "1000k" };
+            //     this.IBonusItemView.Initialize(bonusItem.BonusMainText, bonusItem.BonusRewardText);
+            // }
             
             // Refresh
             Refresh();
@@ -89,14 +91,14 @@ namespace Galleon.Checkout.UI
                 SetSeperatorColor(UnselectedOptionColor, false);
             
             // Bonus
-            if (this.bonusItemView != null)
-            {    
-                if (this.PaymentMethod.IsSelected) IBonusItemView.Open();
-                else                               IBonusItemView.Close();
-                
-                if (this.PaymentMethod.Type == "native")
-                    (IBonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
-            }
+            // if (this.bonusItemView != null)
+            // {    
+            //     if (this.PaymentMethod.IsSelected) IBonusItemView.Open();
+            //     else                               IBonusItemView.Close();
+            //     
+            //     if (this.PaymentMethod.Type == "native")
+            //         (IBonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
+            // }
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events

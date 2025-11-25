@@ -49,7 +49,7 @@ namespace Galleon.Checkout.Samples
         {   
             var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                            { 
-                                               DisplayName = "fake_product_2",
+                                               DisplayName = "Bunch Of Coins",
                                                PriceText   = "$24.99",
                                              //Sku         = "sku-1-3DS", 
                                                Sku         = "sku-1",

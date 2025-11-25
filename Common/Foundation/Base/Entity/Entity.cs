@@ -56,16 +56,13 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setup
         
+        bool didSetup = false;
+        
         public void Setup()
         {
             PopulatePredefinedChildren();
             
-            #if UNITY_EDITOR
-          //if (Application.isPlaying) 
-            #endif
-            {
-                PopulateTestScenarios();
-            }
+            didSetup = true;
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - General
@@ -101,38 +98,6 @@ namespace Galleon.Checkout
 
         public List<Breadcrumb> Breadcrumbs = new();
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Testing
-        
-        public List<TestScenario> TestScenarios = new();
-        
-        public static string CurrentTestScenario = ""; // "scenario_1";
-        
-        protected void PopulateTestScenarios()
-        {
-            IEnumerable<TestScenario> scenarios = this.Reflection.TestScenarios();
-
-            foreach (var scenario in scenarios)
-            {
-                scenario.Target = this.Entity;
-                this.TestScenarios.Add(scenario);
-            }
-        }
-        
-        public async Task RunCurrentTestScenario()
-        {
-            await RunTestScenario(CurrentTestScenario);
-        }
-        
-        public async Task RunTestScenario(string scenarioName)
-        {
-            var scenario = this.TestScenarios.First(x => x.Name == scenarioName);
-            
-            if (scenario == null)
-                return;
-            
-            await scenario.RunScenario().Execute();
-        }
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Node
 
         [SerializeReference] public IEntity             Parent          = null;
@@ -165,6 +130,9 @@ namespace Galleon.Checkout
             
             this.Children.Add(child);
             child.Node.SetParent(this.Entity);
+            
+            if (child.Node.didSetup == false)
+                child.Node.Setup();
         }
         
         public void RemoveChild(IEntity child)
@@ -240,7 +208,6 @@ namespace Galleon.Checkout
                     
                     if (value != null && value is IEntity e)
                     {
-                        //this.AddChild(e);
                         this.AddChild(e);
                         
                         #if UNITY_EDITOR
@@ -387,32 +354,7 @@ namespace Galleon.Checkout
 
                 yield break;
             }
-            
-            public IEnumerable<TestScenario> TestScenarios()
-            {
-                var type = this.Entity.GetType();
-                
-                // Retrieve all properties and fields in the type that are of type TestScenario
-                var members = type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                  .Where     (m => (m is FieldInfo    fi && fi.FieldType    == typeof(TestScenario)) 
-                                                || (m is PropertyInfo pi && pi.PropertyType == typeof(TestScenario)));
-
-                foreach (var member in members)
-                {
-                    var value = member switch
-                    {
-                        FieldInfo    field => field.GetValue(this.Entity),
-                        PropertyInfo prop  => prop .GetValue(this.Entity),
-                        _ => null
-                    };
-
-                    if (value is TestScenario scenario)
-                    {
-                        yield return scenario;
-                    }
-                }
-            }   
-            
+          
             public IEnumerable<Operation> Operations()
             {
                 var type = this.Entity.GetType();

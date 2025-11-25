@@ -22,6 +22,7 @@ namespace Galleon.Checkout.UI
 
         public GameObject ViewPaymentMethodsPanel;
         public GameObject TermsOfServicePanel;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()

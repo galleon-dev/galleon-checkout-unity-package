@@ -3,34 +3,34 @@ using UnityEngine;
 
 namespace GalleonDatePicker
 {
-    #if UNITY_ANDROID
+#if UNITY_ANDROID
     public class AndroidDatePicker : IDatePicker
     {
         private Action<DateTime> _dateSelectedCallback;
-        private DateTime         _initDate;
+        private DateTime _initDate;
 
         public void Show(DateTime initDate, Action<DateTime> callback)
         {
-            _initDate             = initDate;
+            _initDate = initDate;
             _dateSelectedCallback = callback;
 
-            var unityActivity     = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            var activity          = unityActivity.GetStatic<AndroidJavaObject>("currentActivity");
+            var unityActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            var activity = unityActivity.GetStatic<AndroidJavaObject>("currentActivity");
 
             activity.Call("runOnUiThread",
-                          new AndroidJavaRunnable(() =>
-                                                  {
-                                                      var dialog = new AndroidJavaClass("com.yourcompany.customdatepicker.MonthYearPicker")
-                                                     .CallStatic<AndroidJavaObject>("create",
-                                                                                    activity,
-                                                                                    _initDate.Year,
-                                                                                    _initDate.Month - 1,
-                                                                                    new DateCallback(this),
-                                                                                    "Select Month and Year"
-                                                                                   );
+                new AndroidJavaRunnable(() =>
+                {
+                    var dialog = new AndroidJavaClass("com.yourcompany.customdatepicker.MonthYearPicker")
+                        .CallStatic<AndroidJavaObject>("create",
+                            activity,
+                            _initDate.Year,
+                            _initDate.Month - 1,
+                            new DateCallback(this),
+                            "Select Year and Month"
+                        );
 
-                                                      dialog.Call("show");
-                                                  }));
+                    dialog.Call("show");
+                }));
         }
 
         private void DateSelectedHandler(DateTime date)
@@ -80,6 +80,5 @@ namespace GalleonDatePicker
             }
         }
     }
-    #endif
+#endif
 }
-
