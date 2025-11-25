@@ -59,7 +59,7 @@ namespace Galleon.SampleApp
             
             SampleAppStart().Execute();
             
-            ReportText.text = "> Galleon Checkout Test App";
+            ReportText.text = "> ready";
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle Steps
