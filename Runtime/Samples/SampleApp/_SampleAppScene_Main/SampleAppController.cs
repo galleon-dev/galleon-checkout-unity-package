@@ -55,6 +55,8 @@ namespace Galleon.SampleApp
                 Root.Instance.Runtime.TestController.Test().Execute();    
             }
             
+            CHECKOUT.PaymentMethods.ClearSavedData();
+            
             SampleAppStart().Execute();
             
             ReportText.text = "> Galleon Checkout Test App";

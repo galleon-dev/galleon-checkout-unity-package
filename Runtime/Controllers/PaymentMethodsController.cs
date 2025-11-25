@@ -27,13 +27,13 @@ namespace Galleon.Checkout
         public  List<UserPaymentMethod>             EmptyUserPaymentMethods      => UserPaymentMethods.Where(x => x.Type.Contains("empty")).ToList();
         public  List<UserPaymentMethod>             LastUsedUserPaymentMethods   => GetLastUsedUserPaymentMethods();
         
-        public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => LastUsedUserPaymentMethods
+        public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => UserPaymentMethods
                                                                                   //.Concat(SpecialUserPaymentMethods)
                                                                                     .Concat(EmptyUserPaymentMethods)
                                                                                     .Distinct()
                                                                                     .OrderBy(x => x.SortOrder)
-                                                                                    .Take(MAX_LAST_USED_PAYMENT_METHODS)
                                                                                     .Except(SpecialUserPaymentMethods)
+                                                                                    .Take(MAX_LAST_USED_PAYMENT_METHODS)
                                                                                     .ToList();
         
         public  List<UserPaymentMethod>             UserPaymentMethodsToSelect  =>  UserPaymentMethods
@@ -43,7 +43,7 @@ namespace Galleon.Checkout
                                                                                     .OrderBy(x => x.SortOrder)
                                                                                     .ToList();
         
-        public  List<UserPaymentMethod>             UserPaymentMethodsToRemove  => UserPaymentMethods
+        public  List<UserPaymentMethod>             UserPaymentMethodsToRemove  =>  UserPaymentMethods
                                                                                     .Distinct()
                                                                                     .Except(SpecialUserPaymentMethods)
                                                                                     .Except(EmptyUserPaymentMethods)

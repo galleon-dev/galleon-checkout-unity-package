@@ -658,7 +658,7 @@ namespace Galleon.Checkout.UI
                     
         
         public Page PreselectionPage         = new Page(name  : "preselection"
-                                                       ,header: HeaderPanelView     .STATE.x_button             .ToString()
+                                                       ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
                                                        ,panel : CheckoutScreenMobile.STATE.preselection_panel   .ToString()
                                                        ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
                                                        ,setup : page =>
