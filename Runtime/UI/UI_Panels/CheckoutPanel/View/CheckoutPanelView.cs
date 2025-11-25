@@ -18,7 +18,7 @@ namespace Galleon.Checkout.UI
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 
-        public      ViewResult Result = ViewResult.None;
+        public ViewResult Result = ViewResult.None;
         public enum ViewResult
         {
             None,
@@ -34,42 +34,42 @@ namespace Galleon.Checkout.UI
         public PositionLayoutGroup PositionLayoutGroup;
 
         [Header("Shop Item")]
-        public TextMeshProUGUI      ProductTitleText;
-        public TextMeshProUGUI      PriceText;
-        public TextMeshProUGUI      TaxText;
+        public TextMeshProUGUI ProductTitleText;
+        public TextMeshProUGUI PriceText;
+        public TextMeshProUGUI TaxText;
 
         [Header("Payment Methods")]
-        public GameObject           PaymentMethodsPanel;
-        public GameObject           PaymentMethodItemPrefab;        
-        public GameObject           AddCreditCardButtonElement;
+        public GameObject PaymentMethodsPanel;
+        public GameObject PaymentMethodItemPrefab;
+        public GameObject AddCreditCardButtonElement;
 
         public TMP_Dropdown DropdownMenu;
 
         [Header("Payment Buttons")]
-        public GameObject           PurchaseButton;
-        public GameObject           GooglePayButton;
-        public GameObject           PaypalPayButton;
-        public GameObject           ApplePayButton;
+        public GameObject PurchaseButton;
+        public GameObject GooglePayButton;
+        public GameObject PaypalPayButton;
+        public GameObject ApplePayButton;
 
         [Header("Taxes")]
-        public List<GameObject>     TaxesPanels;
-        public GameObject           TaxesContainer;
-        public GameObject           TaxPrefab;
-        public TextMeshProUGUI      SubtotalPriceText;
-        public TextMeshProUGUI      TotalPriceText;
-        
-        private bool                IsUSAorCanadaUser = false;
-        
-        public  Config              Configutation;
-        
+        public List<GameObject> TaxesPanels;
+        public GameObject TaxesContainer;
+        public GameObject TaxPrefab;
+        public TextMeshProUGUI SubtotalPriceText;
+        public TextMeshProUGUI TotalPriceText;
+
+        private bool IsUSAorCanadaUser = false;
+
+        public Config Configutation;
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types
-        
+
         [Serializable]
         public class Config
         {
             public bool ShowMinimalOptions = false;
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Links
 
         public IEnumerable<checkoutPanelPaymentMethodItemView> PaymentMethodItemViews => GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
@@ -78,9 +78,9 @@ namespace Galleon.Checkout.UI
 
         public override void Initialize()
         {
-          //RefreshState();
+            //RefreshState();
         }
-        
+
         public void OnEnable()
         {
             CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
@@ -91,8 +91,10 @@ namespace Galleon.Checkout.UI
 
         public override void RefreshState()
         {
+            Debug.Log("RefreshState(): " + CheckoutClient.Instance.CurrentSession);
+
             if (CheckoutClient.Instance.CurrentSession == null) return;
-            
+
             // // Panel config
             // var configText = CheckoutClient.Instance.CheckoutScreenMobile.CurrentPage.panelConfiguration;
             // if (configText != null)
@@ -104,11 +106,11 @@ namespace Galleon.Checkout.UI
             // {
             //     this.TaxesContainer.SetActive(false);
             // }
-            
+
             // Debug.Log("<color=green>RefreshState</color>");
-            
+
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
-            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+            this.PriceText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
 
             ///////////////
 
@@ -126,8 +128,8 @@ namespace Galleon.Checkout.UI
             {
                 // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
                 //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
-                
-                var go   = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
+
+                var go = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
                 item.Initialize(paymentMethod, this);
 
@@ -172,7 +174,7 @@ namespace Galleon.Checkout.UI
 
                 item.Unselect();
             }
-            
+
             //ShowPurchaseButton();
             var image = PurchaseButton.gameObject.GetComponent<Image>();
             image.sprite = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.First().LogoSprite;
@@ -211,54 +213,54 @@ namespace Galleon.Checkout.UI
             var image = this.PurchaseButton.GetComponentInChildren<Image>();
             image.sprite = sprite;
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
-        
+
         public void SetDropdown()
         {
             DropdownMenu.ClearOptions();
 
-                ManagePaymentSprites ManagePaymentSprites = DropdownMenu.gameObject.GetComponent<ManagePaymentSprites>();
+            ManagePaymentSprites ManagePaymentSprites = DropdownMenu.gameObject.GetComponent<ManagePaymentSprites>();
 
-                var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
+            var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods;
 
-                // Add Dropdown Options
-                int i = 0;
-                foreach (var paymentMethod in paymentMethods)
+            // Add Dropdown Options
+            int i = 0;
+            foreach (var paymentMethod in paymentMethods)
+            {
+
+                Sprite Icon = null;
+
+                if (ManagePaymentSprites)
                 {
-                   
-                    Sprite Icon = null;
-
-                    if (ManagePaymentSprites)
-                    {
-                        Icon = ManagePaymentSprites.GetPaymentIcon(paymentMethod);
-                    }
-
-                    var newOption = new TMP_Dropdown.OptionData(paymentMethod.DisplayName, Icon);
-
-                    DropdownMenu.options.Add(newOption);
-
-                    if (paymentMethod.IsSelected)
-                    {
-                        DropdownMenu.value = i;
-                    }
-
-                    i++;
+                    Icon = ManagePaymentSprites.GetPaymentIcon(paymentMethod);
                 }
-               
-                Debug.Log("Set Dropdown 1st Option");
-               
-                // ForceReselect
-                DropdownMenu.onValueChanged.Invoke(DropdownMenu.value); // Forces the event
-                DropdownMenu.RefreshShownValue();
 
-                // Hide Dropdown if no Payments are available
-                DropdownMenu.gameObject.SetActive(paymentMethods.Count() > 0);
+                var newOption = new TMP_Dropdown.OptionData(paymentMethod.DisplayName, Icon);
+
+                DropdownMenu.options.Add(newOption);
+
+                if (paymentMethod.IsSelected)
+                {
+                    DropdownMenu.value = i;
+                }
+
+                i++;
+            }
+
+            Debug.Log("Set Dropdown 1st Option");
+
+            // ForceReselect
+            DropdownMenu.onValueChanged.Invoke(DropdownMenu.value); // Forces the event
+            DropdownMenu.RefreshShownValue();
+
+            // Hide Dropdown if no Payments are available
+            DropdownMenu.gameObject.SetActive(paymentMethods.Count() > 0);
         }
-        
-        private void GenerateTaxes()
+
+        public void GenerateTaxes()
         {
-            // Debug.Log("GenerateTaxes()");
+            Debug.Log("GenerateTaxes()");
 
             foreach (Transform child in TaxesContainer.transform)
             {
@@ -267,15 +269,15 @@ namespace Galleon.Checkout.UI
 
             var taxes = CheckoutClient.Instance.TaxController.taxes;
 
-            //   #if UNITY_EDITOR
+#if UNITY_EDITOR
 
             // These are Taxes added only for testing. Should be commented out later on
             taxes.Clear();
-            taxes.Add("VAT",          new Shared.TaxItem { tax_amount = 9.90m,  inclusive = false });
-            taxes.Add("IRS",          new Shared.TaxItem { tax_amount = 5.50m,  inclusive = false });
-          //taxes.Add("CUSTOMS",      new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
-          //taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m,  inclusive = false });
-            //#endif
+            taxes.Add("VAT", new Shared.TaxItem { tax_amount = 9.90m, inclusive = false });
+            taxes.Add("IRS", new Shared.TaxItem { tax_amount = 5.50m, inclusive = false });
+            // taxes.Add("CUSTOMS",      new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
+            // taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m,  inclusive = false });
+#endif
 
             if (Checkout.CheckoutClient.Instance != null)
             {
@@ -304,7 +306,9 @@ namespace Galleon.Checkout.UI
                     }
                     ShowTaxesPanels(true);
 
-                    TaxText.gameObject.SetActive(false);
+                    TaxText.gameObject.SetActive(true);
+
+                    TaxText.text = "Inclusive";
 
                     TotalPriceText.text = $"${(SubTotal + (float)TaxesAmount).ToString(CultureInfo.InvariantCulture)}";
                 }
@@ -346,31 +350,31 @@ namespace Galleon.Checkout.UI
             IsUSAorCanadaUser = _IsUSAorCanadaUser;
         }
 
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
-        
-        public TestScenario scenario_1        => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase     )}()" });
-        public TestScenario scenario_2_part_1 => new TestScenario(expressions : new[] { $"{nameof(test_select_other_methods)}()" });
-        public TestScenario scenario_2_part_2 => new TestScenario(expressions : new[] { $"{nameof(test_settings_page       )}()" });
-        public TestScenario scenario_2_part_3 => new TestScenario(expressions : new[] { $"{nameof(test_confirmPurchase     )}()" });
-        
-        public Step test_confirmPurchase()       => new Step(name : "checkout_panel_test_confirm_purchase", action : async (s) => { OnConfirmPurchaseClick();     });
-        public Step test_select_other_methods() => new Step(action : async (s) => { OnOtherPaymentMethodsClick(); });
-        public Step test_settings_page()        => new Step(action : async (s) => { OnSettingsClick();            });
-        
+
+        public TestScenario scenario_1 => new TestScenario(expressions: new[] { $"{nameof(test_confirmPurchase)}()" });
+        public TestScenario scenario_2_part_1 => new TestScenario(expressions: new[] { $"{nameof(test_select_other_methods)}()" });
+        public TestScenario scenario_2_part_2 => new TestScenario(expressions: new[] { $"{nameof(test_settings_page)}()" });
+        public TestScenario scenario_2_part_3 => new TestScenario(expressions: new[] { $"{nameof(test_confirmPurchase)}()" });
+
+        public Step test_confirmPurchase() => new Step(name: "checkout_panel_test_confirm_purchase", action: async (s) => { OnConfirmPurchaseClick(); });
+        public Step test_select_other_methods() => new Step(action: async (s) => { OnOtherPaymentMethodsClick(); });
+        public Step test_settings_page() => new Step(action: async (s) => { OnSettingsClick(); });
+
         /// Test Rule : On_Next("checkoutPanel").Do("confirm_purchase")
         /// Test Rule : On_ALL ("whatever")     .Do("confirm_purchase")
-        
-        
+
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test
-        
-        public Step TEST_CHANGE_TAX_VIEW() 
+
+        public Step TEST_CHANGE_TAX_VIEW()
         =>
-            new Step(name   : $"TEST_CHANGE_TAX_VIEW"
-                    ,action : async (s) =>
+            new Step(name: $"TEST_CHANGE_TAX_VIEW"
+                    , action: async (s) =>
                               {
-                                 IsUSAorCanadaUser = !IsUSAorCanadaUser;
-                                 this.Refresh();
+                                  IsUSAorCanadaUser = !IsUSAorCanadaUser;
+                                  this.Refresh();
                               });
     }
 }
