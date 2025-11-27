@@ -613,6 +613,7 @@ namespace Galleon.Checkout.UI
 
         public void SetInputFieldRect(RectTransform _RectTransform)
         {
+            Debug.Log("SetInputFieldRect()");
             StartCoroutine(SetInputFieldRectDelay(_RectTransform));
         }
 

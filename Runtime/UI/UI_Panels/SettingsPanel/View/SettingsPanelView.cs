@@ -152,7 +152,7 @@ public class SettingsPanelView : View
             {
                 ScrollRect.vertical = false;
             }
-        } 
+        }
         else
         {
             if (ScrollRect)
@@ -186,22 +186,29 @@ public class SettingsPanelView : View
 
     //////////////////////////////////////////////////////////////////////////// UI Events
 
-    public void On_EditEmailClicked()
+    public void On_EditEmailInputFieldClicked()
     {
-    //    if (!IsEditingEmail)
-    //    {
-            EmailInputfieldBorder.SetActive(true);
-            EmailEditButton.SetActive(false);
-            IsEditingEmail = true;
-            EmailInputField.Select(); //.ActivateInputField(true);
-     //   }
-     //   else
-     //   {
-     //       EmailInputfieldBorder.SetActive(false);
-     //       EmailEditButton.SetActive(true);
-     //       IsEditingEmail = false;
-     //   }
+        Debug.Log("On_EditEmailClicked");
+        //    if (!IsEditingEmail)
+        //    {
+        EmailInputfieldBorder.SetActive(true);
+        EmailEditButton.SetActive(false);
+        IsEditingEmail = true;
+        //.ActivateInputField(true);
+        //   }
+        //   else
+        //   {
+        //       EmailInputfieldBorder.SetActive(false);
+        //       EmailEditButton.SetActive(true);
+        //       IsEditingEmail = false;
+        //   }
     }
+
+    public void On_EditEmailButtonClicked()
+    {
+        EmailInputField.Select();
+    }
+
 
     public async void On_FinishedEditingEmail(string str, EndEditReason reason)
     {
@@ -251,11 +258,11 @@ public class SettingsPanelView : View
         this.Result = ViewResult.DeletePaymentMethod;
         CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
     }
-    
-    
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
-        
-        public Step test_delete_last_payment_method() => new Step(action : async (s) => GetComponentsInChildren<SettingsPanelPaymentMethodItem>().Last().On_Delete_Clicked() );
-        public Step test_go_back()                    => new Step(action : async (s) => On_Done() );
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
+
+    public Step test_delete_last_payment_method() => new Step(action: async (s) => GetComponentsInChildren<SettingsPanelPaymentMethodItem>().Last().On_Delete_Clicked());
+    public Step test_go_back() => new Step(action: async (s) => On_Done());
 }
 
