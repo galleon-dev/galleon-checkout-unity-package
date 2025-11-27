@@ -612,7 +612,10 @@ namespace Galleon.Checkout.UI
                                                                  
                                                                  cbx_SaveCardDetails.IsChecked = true;
                                                                  
+                                                                 CreditCardNumberField.Select();
+                                                                 
                                                                  await Task.Delay(500);
+                                                                 await new Step(name: $"set_test_credit_card", tags: new [] {"report"} ).Execute();
                                                                  
                                                              });
         

@@ -12,7 +12,7 @@ namespace Galleon.Checkout.UI
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 
-        public ViewResult Result = ViewResult.None;
+        public      ViewResult Result = ViewResult.None;
         public enum ViewResult
         {
             None,
@@ -51,6 +51,8 @@ namespace Galleon.Checkout.UI
             {
                 if (EmailInputFieldContainer)
                     ShowEmail();
+                
+                await new Step(name: $"capture_email", tags: new [] {"report"}).Execute();
             }
             else
             {
@@ -58,55 +60,15 @@ namespace Galleon.Checkout.UI
                     HideEmail();
 
                 await Task.Delay(1200);
+                
+                await new Step(name: $"capture_email", tags: new [] {"report"}).Execute();
+                
                 Result = ViewResult.Confirm;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
             }
         }
-
-        public void ShowEmail()
-        {
-            EmailInputFieldText.SetActive(true);
-            Gap.SetActive(true);
-            EmailInputFieldContainer.SetActive(true);
-
-            if (EmailButtonGO)
-            {
-                EmailButtonGO.SetActive(true);
-            }
-
-            if (SuccessLabel)
-            {
-                SuccessLabel.SetActive(true);
-            }
-
-            if (SuccessLabelForExistingEmail)
-            {
-                SuccessLabelForExistingEmail.SetActive(false);
-            }
-        }
-
-        public void HideEmail()
-        {
-            EmailInputFieldText.SetActive(false);
-            Gap.SetActive(false);
-            EmailInputFieldContainer.SetActive(false);
-
-            if (EmailButtonGO)
-            {
-                EmailButtonGO.SetActive(false);
-            }
-
-            if (SuccessLabel)
-            {
-                SuccessLabel.SetActive(false);
-            }
-
-            if (SuccessLabelForExistingEmail)
-            {
-                SuccessLabelForExistingEmail.SetActive(true);
-            }
-        }
-
+        
+        
         //////////////////////////////////////////////////////////////////////////// UI Events
 
         public void OnConfirmSuccessButtonClick()
@@ -119,88 +81,130 @@ namespace Galleon.Checkout.UI
         {
             Debug.Log("OnConfirmEmailButtonClick");
             
-            await SaveEmail();
-            
+            CHECKOUT.Session.Flow().AddChildStep(SaveEmail());
             if (!CHECKOUT.IsTest)
-                await SendReceipt();
+                CHECKOUT.Session.Flow().AddChildStep(SendReceipt());
             
             OnConfirmSuccessButtonClick();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Email storage
 
-        public async Task SaveEmail()
-        {
-            CHECKOUT.User.UserInfo.email = this.EmailInputField.Text;
-            await CHECKOUT.Actions.SetEmail().Execute();
-
-        }
+        public Step SaveEmail() 
+        =>
+            new Step(name   : $"save_email"
+                    ,action : async (s) =>
+                    {
+                        CHECKOUT.User.UserInfo.email = this.EmailInputField.Text;
+                        await CHECKOUT.Actions.SetEmail().Execute();
+                        
+                    });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Private API Methods
 
-        private async Task SendReceipt()
+        public Step SendReceipt() 
+            =>
+            new Step(name   : $"send_receipt"
+                    ,action : async (s) =>
+                    {
+                        var email = this.EmailInputField.Text;
+
+                        if (string.IsNullOrEmpty(email))
+                        {
+                            this.ErrorText.gameObject.SetActive(true);
+                            ErrorText.text = "Email address is required";
+                            return;
+                        }
+
+                        var message = new MailMessage
+                        {
+                            From = new MailAddress("test@localhost"),
+                            Subject = "Your Purchase Receipt",
+                            IsBodyHtml = true,
+                            Body = $@"
+                                         <html>
+                                         <body>
+                                             <h1>Thank you for your purchase!</h1>
+                                             <p>Here is your receipt:</p>
+                                             <p>product : {CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName}</p>
+                                             <p>price   : {CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText  }</p>
+                                             <p>Time    : {DateTime.UtcNow.ToLongDateString()} - {DateTime.UtcNow.ToShortTimeString()} (UTC)</p>
+                                         </body>
+                                         </html>",
+                        };
+
+                        Debug.Log(email + " " + message.Subject + " " + message.Body);
+
+                        try
+                        {
+                            await SendEmail(to: email, subject: message.Subject, body: message.Body).Execute();
+
+                            this.ErrorText.gameObject.SetActive(false);
+                            MainText.text = "Done! Your receipt has been sent to your email. \nCheck your inbox for the details.";
+                        }
+                        catch (System.Exception ex)
+                        {
+                            this.ErrorText.gameObject.SetActive(true);
+                            ErrorText.text = $"Failed to send email";
+                            Debug.LogError($"Failed to send email: {ex.Message}");
+                        }
+                    });
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI helper methods
+
+        private void ShowEmail()
         {
-            var email = this.EmailInputField.Text;
+            EmailInputFieldText.SetActive(true);
+            Gap.SetActive(true);
+            EmailInputFieldContainer.SetActive(true);
 
-            if (string.IsNullOrEmpty(email))
-            {
-                this.ErrorText.gameObject.SetActive(true);
-                ErrorText.text = "Email address is required";
-                return;
-            }
+            if (EmailButtonGO)
+                EmailButtonGO.SetActive(true);
 
-            var message = new MailMessage
-            {
-                From = new MailAddress("test@localhost"),
-                Subject = "Your Purchase Receipt",
-                IsBodyHtml = true,
-                Body = $@"
-                             <html>
-                             <body>
-                                 <h1>Thank you for your purchase!</h1>
-                                 <p>Here is your receipt:</p>
-                                 <p>product : {CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName}</p>
-                                 <p>price   : {CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText  }</p>
-                                 <p>Time    : {DateTime.UtcNow.ToLongDateString()} - {DateTime.UtcNow.ToShortTimeString()} (UTC)</p>
-                             </body>
-                             </html>",
-            };
+            if (SuccessLabel)
+                SuccessLabel.SetActive(true);
 
-            Debug.Log(email + " " + message.Subject + " " + message.Body);
+            if (SuccessLabelForExistingEmail)
+                SuccessLabelForExistingEmail.SetActive(false);
+        }
 
-            try
-            {
-                await SendEmail(to: email, subject: message.Subject, body: message.Body);
+        private void HideEmail()
+        {
+            EmailInputFieldText.SetActive(false);
+            Gap.SetActive(false);
+            EmailInputFieldContainer.SetActive(false);
 
-                this.ErrorText.gameObject.SetActive(false);
-                MainText.text = "Done! Your receipt has been sent to your email. \nCheck your inbox for the details.";
-            }
-            catch (System.Exception ex)
-            {
-                this.ErrorText.gameObject.SetActive(true);
-                ErrorText.text = $"Failed to send email";
-                Debug.LogError($"Failed to send email: {ex.Message}");
-            }
+            if (EmailButtonGO)
+                EmailButtonGO.SetActive(false);
+
+            if (SuccessLabel)
+                SuccessLabel.SetActive(false);
+
+            if (SuccessLabelForExistingEmail)
+                SuccessLabelForExistingEmail.SetActive(true);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Private Helper Methods
 
+        public Step SendEmail(string to, string subject, string body) 
+        =>
+            new Step(name   : $"send_email"
+                    ,action : async (s) =>
+                    {
+                        
+                        var message = new MailMessage("levan@galleon.so", to);
+                        message.Subject = subject;
+                        message.Body = body;
+                        message.IsBodyHtml = true;
 
-        private async Task SendEmail(string to, string subject, string body)
-        {
-            Debug.Log("Sending Email");
+                        using var smtp = new SmtpClient("smtp.gmail.com", 587);
+                        smtp.EnableSsl = true;
+                        smtp.Credentials = new NetworkCredential("levan@galleon.so", "viil dbxh fvgo jcys");
 
-            var message = new MailMessage("levan@galleon.so", to);
-            message.Subject = subject;
-            message.Body = body;
-            message.IsBodyHtml = true;
-
-            using var smtp = new SmtpClient("smtp.gmail.com", 587);
-            smtp.EnableSsl = true;
-            smtp.Credentials = new NetworkCredential("levan@galleon.so", "viil dbxh fvgo jcys");
-
-            smtp.Send(message);
-        }
+                        smtp.Send(message);
+                    });
+        
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test
 
@@ -216,7 +220,10 @@ namespace Galleon.Checkout.UI
             new Step(name: $"fill_test_email"
                     , action: async (s) =>
                     {
+                        this.EmailInputField.Select();
                         this.EmailInputField.Text = "levan@galleon.so";
+                        await Task.Delay(500);
+                        await new Step(name: $"set_test_credit_card", tags: new [] {"report"} ).Execute();
                     });
 
         public Step TEST_SendReceiptClicked()

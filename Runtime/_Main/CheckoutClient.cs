@@ -61,7 +61,10 @@ namespace Galleon.Checkout
         public CheckoutResources            Resources                   => CheckoutResources.Instance;
         public ResourceManager              ResourceManager             = new ResourceManager();
         
-        // TEMP - testing/debug/wip/etc...
+        // Globals
+        public CheckoutGlobals              CheckoutGlobals             = new();
+        
+        // TEMP 
         [Header("Temp")]
         public CheckoutTEMP                 Temp                        = new();
         
@@ -105,7 +108,7 @@ namespace Galleon.Checkout
                                   s.AddChildStep(TokenizerController            .Initialize());
                                   s.AddChildStep(PaymentMethodsController       .Initialize());
                                 
-                                //s.AddChildStep(TaxController                  .Initialize());
+                                  s.AddChildStep(TaxController                  .Initialize());
                                   
                                   // Resources
                                   s.AddChildStep(Resources                      .Initialize());
@@ -155,6 +158,8 @@ namespace Galleon.Checkout
         public static Analytics                 Analytics       => CheckoutClient.Instance.Analytics;
         public static Storage                   Storage         => CheckoutClient.Instance.Storage;
          
+        public static CheckoutGlobals           Globals         => CheckoutClient.Instance.CheckoutGlobals;
+        
         public static CheckoutScreenMobile      Screen         => CheckoutClient.Instance.CheckoutScreenMobile;
         
         public static CheckoutResources         Resources       => CheckoutClient.Instance.Resources;
@@ -171,7 +176,7 @@ namespace Galleon.Checkout
         public static User                      User            => CheckoutClient.Instance.CurrentUser;
         public static Transaction               Transaction     => User.CurrentTransaction;
          
-        public static bool                      IsTest          => false; //  true; // Resources.IsTest;
+        public static bool                      IsTest          => true; //  true; // Resources.IsTest;
         public static string                    CurrentTest     { get => CheckoutClient.Instance.CurrentTest; set => CheckoutClient.Instance.CurrentTest = value; } 
     }   
 }
