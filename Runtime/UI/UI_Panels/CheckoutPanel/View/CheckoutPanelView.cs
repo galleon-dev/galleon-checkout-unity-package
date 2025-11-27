@@ -173,8 +173,8 @@ namespace Galleon.Checkout.UI
 
                 item.Unselect();
             }
-            
-            var image    = PurchaseButton.gameObject.GetComponent<Image>();
+
+            var image = PurchaseButton.gameObject.GetComponent<Image>();
             image.sprite = SelectedItem.PaymentMethod.GetButtonSprite();
         }
 
@@ -183,16 +183,16 @@ namespace Galleon.Checkout.UI
         public void OnConfirmPurchaseClick()
         {
             var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault(x => x.IsSelected);
-            
-            if (selectedPaymentMethod == null) 
+
+            if (selectedPaymentMethod == null)
                 return; // (Should never happen)
-            else if (selectedPaymentMethod.Type == "empty_card") 
+            else if (selectedPaymentMethod.Type == "empty_card")
                 Result = ViewResult.AddCard;
             else if (selectedPaymentMethod.Type == "empty_paypal")
                 Result = ViewResult.AddPaypal;
             else
                 this.Result = ViewResult.Confirm;
-            
+
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
 
@@ -267,8 +267,6 @@ namespace Galleon.Checkout.UI
 
         public void GenerateTaxes()
         {
-            Debug.Log("GenerateTaxes()");
-
             foreach (Transform child in TaxesContainer.transform)
             {
                 Destroy(child.gameObject);
@@ -277,11 +275,10 @@ namespace Galleon.Checkout.UI
             var taxes = CheckoutClient.Instance.TaxController.taxes;
 
             #if UNITY_EDITOR
-
             // These are Taxes added only for testing. Should be commented out later on
-            taxes.Clear();
-            taxes.Add("VAT", new Shared.TaxItem { tax_amount = 9.90m, inclusive = false });
-            taxes.Add("IRS", new Shared.TaxItem { tax_amount = 5.50m, inclusive = false });
+            // taxes.Clear();
+            // taxes.Add("VAT", new Shared.TaxItem { tax_amount = 9.90m, inclusive = false });
+            // taxes.Add("IRS", new Shared.TaxItem { tax_amount = 5.50m, inclusive = false });            
             // taxes.Add("CUSTOMS",      new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
             // taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m,  inclusive = false });
             #endif
@@ -294,7 +291,7 @@ namespace Galleon.Checkout.UI
                     SubTotal = result;
                 }
 
-                // Debug.Log("SubTotal Parsed: " + SubTotal);
+                //Debug.Log("SubTotal Parsed: " + SubTotal);
 
                 // CultureInfo.InvariantCulture is important from parsing perspective from string to float as on mobile devices it can appear ",", instead "." in float values
                 SubtotalPriceText.text = $"${SubTotal.ToString(CultureInfo.InvariantCulture)}";
@@ -306,33 +303,30 @@ namespace Galleon.Checkout.UI
                 // If Location is USA or Canada generate taxes
                 if (IsUSAorCanadaUser)
                 {
+                   // Debug.Log("USA/CANADA USER");
                     foreach (var tax in taxes)
                     {
                         CreateTaxPrefab(tax.Key, tax.Value.tax_amount.ToString(CultureInfo.InvariantCulture));
                         TaxesAmount += tax.Value.tax_amount;
                     }
                     ShowTaxesPanels(true);
-
-                    TaxText.gameObject.SetActive(true);
-
-                    TaxText.text = "Inclusive";
-
-                    TotalPriceText.text = $"${(SubTotal + (float)TaxesAmount).ToString(CultureInfo.InvariantCulture)}";
+                    TaxText.gameObject.SetActive(false);
+                    TaxText.text = $"${TaxesAmount.ToString(CultureInfo.InvariantCulture)}";
                 }
                 else
                 {
+                   // Debug.Log("NOT USA/CANADA USER");
                     foreach (var tax in taxes)
                     {
+                        //CreateTaxPrefab(tax.Key, tax.Value.tax_amount.ToString(CultureInfo.InvariantCulture));
                         TaxesAmount += tax.Value.tax_amount;
                     }
+
                     ShowTaxesPanels(false);
-
                     TaxText.gameObject.SetActive(true);
-
-                    TaxText.text = $"${TaxesAmount.ToString(CultureInfo.InvariantCulture)}";
-
-                    this.PriceText.text = $"${SubTotal.ToString(CultureInfo.InvariantCulture)}";
+                    TaxText.text = "Inclusive"; // $"${TaxesAmount.ToString(CultureInfo.InvariantCulture)}";
                 }
+                TotalPriceText.text = $"${(SubTotal + (float)TaxesAmount).ToString(CultureInfo.InvariantCulture)}";
             }
         }
 
@@ -359,11 +353,11 @@ namespace Galleon.Checkout.UI
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
-        
-        public Step test_confirmPurchase()      => new Step(name : "checkout_panel_test_confirm_purchase", action : async (s) => { OnConfirmPurchaseClick();     });
-        public Step test_select_other_methods() => new Step(name : "checkout_panel_test_select_other_pm",  action : async (s) => { OnOtherPaymentMethodsClick(); });
-        public Step test_settings_page()        => new Step(action : async (s) => { OnSettingsClick();            });
-        
+
+        public Step test_confirmPurchase() => new Step(name: "checkout_panel_test_confirm_purchase", action: async (s) => { OnConfirmPurchaseClick(); });
+        public Step test_select_other_methods() => new Step(name: "checkout_panel_test_select_other_pm", action: async (s) => { OnOtherPaymentMethodsClick(); });
+        public Step test_settings_page() => new Step(action: async (s) => { OnSettingsClick(); });
+
         /// Test Rule : On_Next("checkoutPanel").Do("confirm_purchase")
         /// Test Rule : On_ALL ("whatever")     .Do("confirm_purchase")
 

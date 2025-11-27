@@ -5,6 +5,7 @@ using TMPro;
 using System.Net.Mail;
 using System.Net;
 using AdvancedInputFieldPlugin;
+using System.Collections.Generic;
 
 namespace Galleon.Checkout.UI
 {
@@ -23,7 +24,7 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
         public GameObject EmailInputFieldText;
-        public GameObject Gap;
+        public List<GameObject> Gaps;
         public GameObject EmailInputFieldContainer;
         public GameObject EmailButtonGO;
         public GameObject SuccessLabel;
@@ -42,11 +43,7 @@ namespace Galleon.Checkout.UI
 
         public override async void RefreshState()
         {
-            string Email = PlayerPrefs.GetString("Email");
-
-            if (!string.IsNullOrEmpty(Email))
-                EmailInputField.Text = Email;
-
+            Debug.Log("RefreshState() - CHECKOUT.User.Email: " + CHECKOUT.User.Email);
             if (CHECKOUT.User.Email.IsNullOrEmpty())
             {
                 if (EmailInputFieldContainer)
@@ -56,6 +53,8 @@ namespace Galleon.Checkout.UI
             }
             else
             {
+                EmailInputField.Text = CHECKOUT.User.Email;
+
                 if (EmailInputFieldContainer)
                     HideEmail();
 
@@ -156,7 +155,7 @@ namespace Galleon.Checkout.UI
         private void ShowEmail()
         {
             EmailInputFieldText.SetActive(true);
-            Gap.SetActive(true);
+            EnableGaps(true);
             EmailInputFieldContainer.SetActive(true);
 
             if (EmailButtonGO)
@@ -172,7 +171,7 @@ namespace Galleon.Checkout.UI
         private void HideEmail()
         {
             EmailInputFieldText.SetActive(false);
-            Gap.SetActive(false);
+            EnableGaps(false);
             EmailInputFieldContainer.SetActive(false);
 
             if (EmailButtonGO)
@@ -183,6 +182,16 @@ namespace Galleon.Checkout.UI
 
             if (SuccessLabelForExistingEmail)
                 SuccessLabelForExistingEmail.SetActive(true);
+        }
+
+        void EnableGaps(bool Status)
+        {
+            int GapsAmount = Gaps.Count;
+
+            for(int i = 0; i < GapsAmount; i++)
+            {
+                Gaps[i].SetActive(Status);
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Private Helper Methods

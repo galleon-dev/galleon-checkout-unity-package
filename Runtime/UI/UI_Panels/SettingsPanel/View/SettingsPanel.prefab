@@ -401,7 +401,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: -4038295843133265510}
         m_TargetAssemblyTypeName: SettingsPanelView, CheckoutRuntime
-        m_MethodName: On_EditEmailClicked
+        m_MethodName: On_EditEmailInputFieldClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -927,7 +927,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1274918255386814680}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4348,7 +4348,6 @@ MonoBehaviour:
   EmailInputfieldBorder: {fileID: 1345701573732870026}
   EmailInputField: {fileID: 1385458519224035634}
   EmailEditButton: {fileID: 7260826695301070429}
-  EmailInputFieldBorder: {fileID: 1345701573732870026}
   SettingsPanelPaymentMethodItemPrefab: {fileID: 7680502671548463619, guid: da7a41d3f25e8457a8a9ab74c32a6da1, type: 3}
   PaymentMethodsHolder: {fileID: 7670470005602889410}
   IsEditingEmail: 0
@@ -4798,7 +4797,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: -4038295843133265510}
         m_TargetAssemblyTypeName: SettingsPanelView, CheckoutRuntime
-        m_MethodName: On_EditEmailClicked
+        m_MethodName: On_EditEmailButtonClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
