@@ -176,7 +176,7 @@ namespace Galleon.Checkout
         public static User                      User            => CheckoutClient.Instance.CurrentUser;
         public static Transaction               Transaction     => User.CurrentTransaction;
          
-        public static bool                      IsTest          => true; //  true; // Resources.IsTest;
+        public static bool                      IsTest          => false; //  true; // Resources.IsTest;
         public static string                    CurrentTest     { get => CheckoutClient.Instance.CurrentTest; set => CheckoutClient.Instance.CurrentTest = value; } 
     }   
 }
