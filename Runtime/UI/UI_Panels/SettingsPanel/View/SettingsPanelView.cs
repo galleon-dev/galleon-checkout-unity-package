@@ -22,7 +22,7 @@ public class SettingsPanelView : View
     public GameObject PaymentMethodsHolder;
     public bool IsEditingEmail = false;
     public GameObject InformationalLabel;
-
+    public GameObject Gap;
     //////////////////////////////////////////////////////////////////////////// View Result
 
     public ViewResult Result = ViewResult.None;
@@ -30,7 +30,7 @@ public class SettingsPanelView : View
     public LayoutElement ScrollRectLayoutElement;
     public ScrollRect ScrollRect;
     private int ScrollRectMaxSize = 6;
-    private float PaymentPrefabHeight = 175f;
+    private float PaymentPrefabHeight = 200f;
     private float SeparatorHeight = 2f;
 
     public enum ViewResult
@@ -111,6 +111,12 @@ public class SettingsPanelView : View
             {
                 InformationalLabel.SetActive(true);
             }
+
+            if (Gap)
+            {
+                Gap.SetActive(true);
+            }
+
             if (ScrollRectLayoutElement)
             {
                 ScrollRectLayoutElement.gameObject.SetActive(false);
@@ -122,6 +128,12 @@ public class SettingsPanelView : View
             {
                 InformationalLabel.SetActive(false);
             }
+
+            if (Gap)
+            {
+                Gap.SetActive(false);
+            }
+
             if (ScrollRectLayoutElement)
             {
                 ScrollRectLayoutElement.gameObject.SetActive(true);
@@ -142,7 +154,7 @@ public class SettingsPanelView : View
 
     public void UpdateScrollRectMaxSize()
     {
-        int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
+        int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethodsToRemove.Count; // CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
 
         // Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
@@ -188,20 +200,9 @@ public class SettingsPanelView : View
 
     public void On_EditEmailInputFieldClicked()
     {
-        Debug.Log("On_EditEmailClicked");
-        //    if (!IsEditingEmail)
-        //    {
         EmailInputfieldBorder.SetActive(true);
         EmailEditButton.SetActive(false);
         IsEditingEmail = true;
-        //.ActivateInputField(true);
-        //   }
-        //   else
-        //   {
-        //       EmailInputfieldBorder.SetActive(false);
-        //       EmailEditButton.SetActive(true);
-        //       IsEditingEmail = false;
-        //   }
     }
 
     public void On_EditEmailButtonClicked()

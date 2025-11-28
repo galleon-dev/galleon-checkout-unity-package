@@ -927,7 +927,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1274918255386814680}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 0.99992436
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4352,6 +4352,7 @@ MonoBehaviour:
   PaymentMethodsHolder: {fileID: 7670470005602889410}
   IsEditingEmail: 0
   InformationalLabel: {fileID: 6627314616300504020}
+  Gap: {fileID: 296603178546117800}
   Result: 0
   ScrollRectLayoutElement: {fileID: 8507080111783232673}
   ScrollRect: {fileID: 0}
@@ -5875,6 +5876,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
+--- !u!1 &296603178546117800 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1415656391310666612, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
+  m_PrefabInstance: {fileID: 1709350221016422364}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &2229785650931875837 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 669099848437721121, guid: 8d6947f3040d343fab890ddaaf41d040, type: 3}
