@@ -553,6 +553,24 @@ namespace Galleon.Checkout
                     return null;
                 }
             }
+            
+            public LiveHandler LiveHandlerByType(string entityTypeName)
+            {
+                Type entityType      = Type.GetType("Galleon.Checkout." + entityTypeName);
+                var  liveHandlerType = entityType
+                                      .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
+                                      .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveHandler)));
+
+                if (liveHandlerType != null)
+                {
+                    var liveHandler = (LiveHandler)Activator.CreateInstance(liveHandlerType);
+                    liveHandler.SetTarget(this.Entity);
+                    return liveHandler;
+                }
+
+                return null;
+         
+            }
         }
     }    
 }

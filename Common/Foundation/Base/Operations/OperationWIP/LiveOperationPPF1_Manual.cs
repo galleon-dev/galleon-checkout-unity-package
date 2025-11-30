@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationPPF1M;
+using PlasticGui.WorkspaceWindow.Items;
 
 namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
 {
@@ -38,28 +39,65 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
         public Step Flow() 
         =>
             new Step(name   : $"execute_PPF1M"
-                    ,action : async (s) =>
+                    ,action : async (flow) =>
                     {
-                        await ManuallyCreateFullVirtualTree().Execute();
+                        await DumpParentElement()               .Execute();
+                        await DumpChildElement()                .Execute();
+                        await ManuallyCreateChildVirtualTree()  .Execute();
+                        await ManuallyCreateFullVirtualTree()   .Execute();
+                        await DumpVirtualTree()                 .Execute();
         
                         foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
                         {
                             if (vNode.DoesNeedToDoAction)
-                                vNode.DoAction();
+                                await vNode.DoAction();
                         }
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
         
+        public Step DumpParentElement() 
+        =>
+            new Step(action : async (s) =>
+            {
+                 Element parentElement = this.Parent.Node.GetElement();
+            });
+        
+        public Step DumpChildElement() 
+        =>
+            new Step(action : async (s) =>
+            {
+                 Element childElement = Elements.GetElementByName("Folder");
+            });
+        
+        public Step ManuallyCreateChildVirtualTree() 
+        =>
+            new Step(action : async (s) =>
+            {
+                 
+            });
+        
         public Step ManuallyCreateFullVirtualTree() 
         =>
             new Step(action : async (s) =>
             {
-                this.FullVirtualTree = new PPF1M_LiveNode()        { TextNode = new TextNode("root")};                                                              // Root
-                    var pf              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1") }; FullVirtualTree.Node.AddChild(pf);      // package_1
-                        var f1              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1") }; pf.Node.AddChild(f1);                   // f1 
-                
-                
+                this.FullVirtualTree = new PPF1M_LiveNode()        { TextNode = new TextNode("root"), Operation = this};                                                                              // Root
+                    var pf              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1"), Operation = this }; FullVirtualTree.Node.AddChild(pf);                      // package_1
+                        var f1              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1"), Operation = this,  DoesNeedToDoAction = true}; pf.Node.AddChild(f1);         // f1 
+            });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper debug steps
+       
+        public Step DumpVirtualTree()
+        =>
+            new Step(action : async (s) =>
+            {
+                foreach (var item in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
+                {
+                    var indent = item.Node.Ancestors().Count();
+                    var prefix = new string(' ', indent * 4);
+                    s.Log($"{prefix}{item.TextNode.FullText}");
+                }
             });
     }
     
@@ -90,24 +128,39 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
         
         ////////////////// Main Actions
         
-        public void DoAction()
+        public async Task DoAction()
         {
             switch (action_type)
             {
-                case "plus" : DoPlus(); return;
-                default     :           return;
+                case "plus" : await DoPlus().Execute(); return;
+                default     :                           return;
             }
         }
         
-        public void DoPlus()
-        {
-            var parent = this.Node.Parent;
-            var child  = this;
-            
-            parent.Node.AddChild(child);
-            child.Node.Live.LiveHandler.OnAddedToParent(parent);
-            child.Node.Live.LiveHandler.Create();
-        }
+        
+        public Step DoPlus()
+        =>
+            new Step(action: async s =>
+            {
+                // Definitions
+                var parentLiveNode = this.Node.Parent;
+                var childLiveNode  = this;
+                
+                // Parent Entity
+                var parentEntity = (Operation.Parent as Package).Assets.rootFolder;
+                
+                // Child Entity
+                var  childEntityTypeName = "Galleon.Checkout." + childLiveNode.TextNode.LineWords.First();
+                Type entityType          = Type.GetType(childEntityTypeName);
+                var  childEntity         = (IEntity)Activator.CreateInstance(entityType);
+                
+                // Add child entity
+                parentEntity.Node.AddChild(childEntity);
+                childEntity.Node.Live.LiveHandler.OnAddedToParent(parentEntity);
+                
+                // Create child entity
+                childEntity.Node.Live.LiveHandler.Create();
+            });
     }
 }
 
