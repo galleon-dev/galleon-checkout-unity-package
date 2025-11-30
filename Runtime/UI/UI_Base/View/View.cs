@@ -122,6 +122,18 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"on_view_focus_{this.name}"
                     ,action : async (s) =>
                     { 
+                        if (CHECKOUT.IsTest)
+                        {
+                            if (s.Name.ToLower().Contains("panel")
+                            && !s.Name.ToLower().Contains("item"))
+                            {
+                                await Task.Yield();       
+                                await Task.Yield();       
+                                await Task.Yield();       
+                                await Task.Yield();       
+                                new Step(name: $"capture_{s.Name}", tags: new []{"report"}).Execute();
+                            }
+                        }   
                     });
     }
 }

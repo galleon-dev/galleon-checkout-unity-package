@@ -719,7 +719,7 @@ namespace Galleon.Checkout.UI
         public Page SettingsPage             = new Page(name  : "settings"
                                                        ,header: HeaderPanelView     .STATE.back_and_text       .ToString()
                                                        ,panel : CheckoutScreenMobile.STATE.settings_panel      .ToString()
-                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return.ToString()
+                                                       ,footer: FooterPanelView     .STATE.none                .ToString()
                                                        ,setup : page =>
                                                               {
                                                                   page.NavigationMap[SettingsPanelView.ViewResult.DeletePaymentMethod.ToString()] = page.screen.ViewPage(page.screen.SimpleDialogPage);

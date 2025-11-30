@@ -59,9 +59,7 @@ namespace Galleon.Checkout.UI
         public TextMeshProUGUI SubtotalPriceText;
         public TextMeshProUGUI TotalPriceText;
 
-        private bool IsUSAorCanadaUser = false;
-
-        public Config Configutation;
+        private bool IsUSAorCanadaUser = true;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types
 
@@ -111,7 +109,7 @@ namespace Galleon.Checkout.UI
             // Debug.Log("<color=green>RefreshState</color>");
 
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
-            this.PriceText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
 
             ///////////////
 
@@ -130,7 +128,7 @@ namespace Galleon.Checkout.UI
                 // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
                 //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
 
-                var go = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
+                var go   = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
                 item.Initialize(paymentMethod, this);
 
@@ -238,7 +236,6 @@ namespace Galleon.Checkout.UI
             int i = 0;
             foreach (var paymentMethod in paymentMethods)
             {
-
                 Sprite Icon = null;
 
                 if (ManagePaymentSprites)
@@ -277,14 +274,14 @@ namespace Galleon.Checkout.UI
 
             var taxes = CheckoutClient.Instance.TaxController.taxes;
 
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             // These are Taxes added only for testing. Should be commented out later on
             // taxes.Clear();
             // taxes.Add("VAT", new Shared.TaxItem { tax_amount = 9.90m, inclusive = false });
             // taxes.Add("IRS", new Shared.TaxItem { tax_amount = 5.50m, inclusive = false });            
             // taxes.Add("CUSTOMS",      new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
             // taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m,  inclusive = false });
-#endif
+            #endif
 
             if (Checkout.CheckoutClient.Instance != null)
             {

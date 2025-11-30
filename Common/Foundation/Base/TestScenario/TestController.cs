@@ -42,7 +42,7 @@ namespace Galleon.Checkout.Foundation.Tests
                             //
                             // Test Product 2
                             @$"on 'on_back_to_store_screen'         do 'test_purchase_product_2'",
-                            @$"on 'on_view_focus_PreselectionPanel' do 'preselection_panel_test_checkout'",
+                          //@$"on 'on_view_focus_PreselectionPanel' do 'preselection_panel_test_checkout'",
                             @$"on 'on_view_focus_CheckoutPanel '    do 'checkout_panel_test_confirm_purchase'",
                           //@$"on 'on_view_focus_SuccessPanel'      do 'test_close_checkout_screen_clicked'",
                             @$"on 'on_view_focus_SuccessPanel'      do 'success_panel_wait_and_do_nothing'",

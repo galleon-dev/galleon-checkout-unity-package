@@ -69,9 +69,12 @@ namespace Galleon.Checkout
                       //s.AddChildStep(CheckoutClient.Instance.TaxController.GetTaxInfo());
                       //s.AddChildStep("wait",        async x => await Task.Delay(1000));
                         
-                        // View CheckoutPage
-                        s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "preselection");
-                      //s.AddChildStep("tax_success", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
+                        bool isPreselectionScreenEnabled = CHECKOUT.Globals.IsPreselectionEnabled;
+                        if (isPreselectionScreenEnabled)
+                            s.AddChildStep("view_preselection", async x => Client.CheckoutScreenMobile.NavigationNext = "preselection");
+                        else
+                            s.AddChildStep("view_checkout", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
+                            
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                         
                         /////////////////////////////////////// Post Steps

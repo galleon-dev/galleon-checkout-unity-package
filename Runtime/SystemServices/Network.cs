@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
@@ -29,7 +30,6 @@ namespace Galleon.Checkout
         //public string SERVER_BASE_URL = "https://bridge-staging-api.galleon.so";
         public string SERVER_BASE_URL   = "https://galleon-bridge-server-paypal-integration.up.railway.app";
         
-        
         public const int TIMEOUT_MILLISECONDS = 10000;
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members
@@ -37,6 +37,8 @@ namespace Galleon.Checkout
         public string GalleonUserAccessToken = "";
       //public string GalleonUserAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdHJpcGVDdXN0b21lcklkIjoiY3VzX1NxQm9ocHZ0M2IzZ0JWIiwiYXBwSWQiOiJ0ZXN0LmFwcCIsImlhdCI6MTc1NjEyOTQzNSwiZXhwIjoxNzU2MTMzMDM1fQ.VHXbOh8fetbUHumIunpWzB-pMQBmEzLsrXrde2r06oY";
         
+        public string deviceIP; 
+      
         /////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle 
 
         public Step Initialize() 
@@ -45,6 +47,7 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
+                        s.AddChildStep(GetDeviceIP());
                         s.AddChildStep(GetUserAccessToken());
                     });
         
@@ -60,6 +63,17 @@ namespace Galleon.Checkout
                                         .setHeaders(("Authorization", () => $"Bearer {CHECKOUT.Network?.GalleonUserAccessToken ?? "NULL"}"));
                     
         }
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////// Methods
+        
+        public Step GetDeviceIP() 
+            =>
+            new Step(name   : $"get_device_ip"
+                    ,action : async (s) =>
+                              {
+                                  this.deviceIP = new WebClient().DownloadString("https://api.ipify.org");
+                              });
+        
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Steps
         

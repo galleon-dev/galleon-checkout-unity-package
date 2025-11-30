@@ -61,7 +61,10 @@ namespace Galleon.Checkout
         public CheckoutResources            Resources                   => CheckoutResources.Instance;
         public ResourceManager              ResourceManager             = new ResourceManager();
         
-        // TEMP - testing/debug/wip/etc...
+        // Globals
+        public CheckoutGlobals              CheckoutGlobals             = new();
+        
+        // TEMP 
         [Header("Temp")]
         public CheckoutTEMP                 Temp                        = new();
         
@@ -155,6 +158,8 @@ namespace Galleon.Checkout
         public static Analytics                 Analytics       => CheckoutClient.Instance.Analytics;
         public static Storage                   Storage         => CheckoutClient.Instance.Storage;
          
+        public static CheckoutGlobals           Globals         => CheckoutClient.Instance.CheckoutGlobals;
+        
         public static CheckoutScreenMobile      Screen         => CheckoutClient.Instance.CheckoutScreenMobile;
         
         public static CheckoutResources         Resources       => CheckoutClient.Instance.Resources;

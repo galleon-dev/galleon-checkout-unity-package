@@ -49,6 +49,21 @@ namespace Galleon.Checkout
         public Step               CurrentChildStep            = default;
         public Step               CurrentPostStep             = default;
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
+       
+        public IEnumerable<Step> StepAncestors(Step origin = null)
+        {
+            Step current = origin ?? this;
+            yield return current;
+
+            while (current.ParentStep != null)
+            {
+                current = current.ParentStep;
+                yield return current;
+            }    
+        }
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
         
         public static event Action<Step>     OnPreStepExecute;
@@ -188,11 +203,12 @@ namespace Galleon.Checkout
                 //////////////////////////////////////////////// Temp
 
                 // Capture report
-                if (this.Tags.Contains("report")
-                ||  this.ParentStep != null && this.ParentStep.Tags.Contains("report"))
-                {
+                // if (this.StepAncestors().Any(s => s.Tags.Contains("report")))
+                //     await this.CaptureReport();
+                
+                // Capture report 
+                if (this.Tags.Contains("report"))
                     await this.CaptureReport();
-                }
                 
                 ////////////////////////////////////////////////
                 
