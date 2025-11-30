@@ -9,6 +9,7 @@ using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationAPF;
 using Galleon.Checkout.Foundation.LiveOperationAPFE1;
 using Galleon.Checkout.Foundation.LiveOperationPPF1;
+using Galleon.Checkout.Foundation.LiveOperationPPF1M;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -524,11 +525,11 @@ namespace Galleon.Checkout
                                                              ,definition : "> Folder f1");
                 await plusOperation.Flow().Execute();
             }
-            public async Task Plus_PPFE1(string text)
+            public async Task Plus_PPFE1M(string text)
             {   
-                var   plusOperation = new PPF1_LiveOperation(id         : $"PPFE1"
-                                                            ,parent     : this.Entity
-                                                            ,definition : "> Folder f1");
+                var   plusOperation = new PPF1M_LiveOperation(id         : $"PPFE1M"
+                                                             ,parent     : this.Entity
+                                                             ,definition : "> Folder f1");
                 await plusOperation.Flow().Execute();
             }
             

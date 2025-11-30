@@ -63,6 +63,8 @@ namespace Galleon.Checkout.UI
         bool IsValidDate = false;
         int expectedCVVLength = 3;
         
+        public GameObject TestCardButton;
+        
         //////////////////////////////////////////////////////////////////////////// View Result
 
         public ViewResult Result = ViewResult.None;
@@ -109,10 +111,10 @@ namespace Galleon.Checkout.UI
         private void OnEnable()
         {
             // Clear input fields
-            if (NameInputField) NameInputField.Text               = string.Empty;
+            if (NameInputField)        NameInputField.Text        = string.Empty;
             if (CreditCardNumberField) CreditCardNumberField.Text = string.Empty;
-            if (DateInputField) DateInputField.Text               = string.Empty;
-            if (CVVInputField) CVVInputField.Text                 = string.Empty;
+            if (DateInputField)        DateInputField.Text        = string.Empty;
+            if (CVVInputField)         CVVInputField.Text         = string.Empty;
 
             // Reset validation flags
             IsValidCVV              = false;
@@ -120,13 +122,19 @@ namespace Galleon.Checkout.UI
             IsValidDate             = false;
 
             // Hide Error Messages
-            NameErrorTextBackground.SetActive(false);
+            NameErrorTextBackground      .SetActive(false);
             CardNumberErrorTextBackground.SetActive(false);
-            CVVNumberErrorTextBackground.SetActive(false);
-            DateErrorTextBackground.SetActive(false);
+            CVVNumberErrorTextBackground .SetActive(false);
+            DateErrorTextBackground      .SetActive(false);
 
             // Remove card icon
             RemoveCardIcon();
+
+            #if DEBUG
+            TestCardButton.SetActive(true);
+            #else
+            TestCardButton.SetActive(false);
+            #endif
         }
 
         public enum ViewResult
@@ -134,26 +142,6 @@ namespace Galleon.Checkout.UI
             None,
             Confirm,
         }
-
-        //////////////////////////////////////////////////////////////////////////// View Flow
-
-        public bool IsCompleted = false;
-
-        public Step View()
-        =>
-            new Step(name: $"view_credit_card_panel"
-                    , action: async (s) =>
-                    {
-                        IsCompleted = false;
-
-                        this.gameObject.SetActive(true);
-
-                        while (!IsCompleted)
-                            await Task.Yield();
-
-                        this.gameObject.SetActive(false);
-                    });
-
 
         //////////////////////////////////////////////////////////////////////////// UI Events
 
@@ -599,6 +587,21 @@ namespace Galleon.Checkout.UI
             return digits.Length >= 12 && sum % 10 == 0; // avoid false positive on short input
         }
         
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test UI Events
+        
+        public void On_TestFakeCardButtonClicked()
+        {
+            NameInputField.Text        = "jhon doe";
+            CreditCardNumberField.Text = "4242424242424242";
+            DateInputField.Text        = "0929";
+            CVVInputField.Text         = "111";
+            
+            OnValueChanged(CreditCardNumberField.Text);
+            OnDateValueChanged(DateInputField.Text);
+            OnCVVValueChanged(CVVInputField.Text);
+            
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         

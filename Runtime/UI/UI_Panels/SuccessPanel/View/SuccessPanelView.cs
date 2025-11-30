@@ -23,16 +23,16 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
-        public GameObject EmailInputFieldText;
-        public List<GameObject> Gaps;
-        public GameObject EmailInputFieldContainer;
-        public GameObject EmailButtonGO;
-        public GameObject SuccessLabel;
-        public GameObject SuccessLabelForExistingEmail;
+        public GameObject           EmailInputFieldText;
+        public List<GameObject>     Gaps;
+        public GameObject           EmailInputFieldContainer;
+        public GameObject           EmailButtonGO;
+        public GameObject           SuccessLabel;
+        public GameObject           SuccessLabelForExistingEmail;
 
-        public AdvancedInputField EmailInputField;
-        public TMP_Text ErrorText;
-        public TMP_Text MainText;
+        public AdvancedInputField   EmailInputField;
+        public TMP_Text             ErrorText;
+        public TMP_Text             MainText;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -43,7 +43,6 @@ namespace Galleon.Checkout.UI
 
         public override async void RefreshState()
         {
-            Debug.Log("RefreshState() - CHECKOUT.User.Email: " + CHECKOUT.User.Email);
             if (CHECKOUT.User.Email.IsNullOrEmpty())
             {
                 if (EmailInputFieldContainer)
@@ -78,8 +77,6 @@ namespace Galleon.Checkout.UI
 
         public async void OnConfirmEmailButtonClick()
         {
-            Debug.Log("OnConfirmEmailButtonClick");
-            
             CHECKOUT.Session.Flow().AddChildStep(SaveEmail());
             if (!CHECKOUT.IsTest)
                 CHECKOUT.Session.Flow().AddChildStep(SendReceipt());
@@ -117,10 +114,10 @@ namespace Galleon.Checkout.UI
 
                         var message = new MailMessage
                         {
-                            From = new MailAddress("test@localhost"),
-                            Subject = "Your Purchase Receipt",
+                            From       = new MailAddress("test@localhost"),
+                            Subject    = "Your Purchase Receipt",
                             IsBodyHtml = true,
-                            Body = $@"
+                            Body       = $@"
                                          <html>
                                          <body>
                                              <h1>Thank you for your purchase!</h1>
@@ -158,14 +155,9 @@ namespace Galleon.Checkout.UI
             EnableGaps(true);
             EmailInputFieldContainer.SetActive(true);
 
-            if (EmailButtonGO)
-                EmailButtonGO.SetActive(true);
-
-            if (SuccessLabel)
-                SuccessLabel.SetActive(true);
-
-            if (SuccessLabelForExistingEmail)
-                SuccessLabelForExistingEmail.SetActive(false);
+            EmailButtonGO.SetActive(true);
+            SuccessLabel.SetActive(true);
+            SuccessLabelForExistingEmail.SetActive(false);
         }
 
         private void HideEmail()
@@ -174,14 +166,9 @@ namespace Galleon.Checkout.UI
             EnableGaps(false);
             EmailInputFieldContainer.SetActive(false);
 
-            if (EmailButtonGO)
-                EmailButtonGO.SetActive(false);
-
-            if (SuccessLabel)
-                SuccessLabel.SetActive(false);
-
-            if (SuccessLabelForExistingEmail)
-                SuccessLabelForExistingEmail.SetActive(true);
+            EmailButtonGO.SetActive(false);
+            SuccessLabel.SetActive(false);
+            SuccessLabelForExistingEmail.SetActive(true);
         }
 
         void EnableGaps(bool Status)
@@ -202,14 +189,14 @@ namespace Galleon.Checkout.UI
                     ,action : async (s) =>
                     {
                         
-                        var message = new MailMessage("levan@galleon.so", to);
-                        message.Subject = subject;
-                        message.Body = body;
-                        message.IsBodyHtml = true;
+                        var message         = new MailMessage("levan@galleon.so", to);
+                        message.Subject     = subject;
+                        message.Body        = body;
+                        message.IsBodyHtml  = true;
 
-                        using var smtp = new SmtpClient("smtp.gmail.com", 587);
-                        smtp.EnableSsl = true;
-                        smtp.Credentials = new NetworkCredential("levan@galleon.so", "viil dbxh fvgo jcys");
+                        using var smtp      = new SmtpClient("smtp.gmail.com", 587);
+                        smtp.EnableSsl      = true;
+                        smtp.Credentials    = new NetworkCredential("levan@galleon.so", "viil dbxh fvgo jcys");
 
                         smtp.Send(message);
                     });
