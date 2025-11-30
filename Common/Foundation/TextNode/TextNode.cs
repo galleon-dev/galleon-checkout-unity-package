@@ -20,6 +20,13 @@ namespace Galleon.Checkout.Foundation
         public string RawText;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public TextNode() { }
+
+        public TextNode(string text)
+        {
+            this.RawText = text;
+        }
         
         public TextNode Clone()
         {

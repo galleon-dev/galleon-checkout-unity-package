@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Galleon.Checkout.UI
 {
-    public class FooterPanelView : View
+    public class FooterPanelView : View, IPointerClickHandler
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// State
         
@@ -29,19 +32,41 @@ namespace Galleon.Checkout.UI
         {
             DisableAllPanels();
             
-            if (this.State == STATE.long_terms_of_service.ToString())
+            if (this.State == STATE.terms_privacy_return.ToString())
             {
-                LongTermsOfServiceelement.SetActive(true);
-            }
-            else if (this.State == STATE.terms_privacy_return.ToString())
-            {
-                TermsPrivacyReturnElement.SetActive(true);
+                if (CHECKOUT.Globals.ShowLongFooter)
+                    TermsPrivacyReturnElement.SetActive(true);
+                else
+                    LongTermsOfServiceelement.SetActive(true);
             }
             else if (this.State == STATE.none.ToString())
             {
                 DisableAllPanels();
             }
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
+        
+        
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            try
+            {
+                var text      = GetComponentInChildren<TextMeshProUGUI>();
+                var linkIndex = TMP_TextUtilities.FindIntersectingLink(text, eventData.position, null);
+                var linkId    = text.textInfo.linkInfo[linkIndex].GetLinkID();
+                
+                if (CHECKOUT.Config.ConfigData.ContainsKey($"url_{linkId}"))
+                {
+                    var url = CHECKOUT.Config.GetString($"$url_{linkId}");
+                    Application.OpenURL(url);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
         
@@ -65,5 +90,6 @@ namespace Galleon.Checkout.UI
             // Debug.Log("Show Terms Of Service Panel: " + _Status);
             TermsOfServicePanel.SetActive(_Status);
         }
+
     }
 }

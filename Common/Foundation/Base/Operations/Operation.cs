@@ -154,18 +154,24 @@ namespace Galleon.Checkout.Foundation
         }
     }
     
-    //
-    //
-    //
-    //
-    //
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
     
     public class LiveOperation
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         public LiveNode OriginalTree;
-        public LiveNode VirtualTree;
+        public LiveNode ChildVirtualTree;
+        public LiveNode ParentFullVirtualTree;
         
         public TextNode OriginalTextNode;
         
@@ -180,7 +186,6 @@ namespace Galleon.Checkout.Foundation
             this.Parent                 = parent;
             this.OriginalTree           = definition;
             this.OriginalTree.Operation = this;
-            
         }
         public LiveOperation(string id, IEntity parent, string text)
         {
@@ -193,7 +198,7 @@ namespace Galleon.Checkout.Foundation
                                         }
             this.OriginalTree.Operation = this;
                                         
-            this.VirtualTree            = OriginalTree.CloneTree();
+            this.ChildVirtualTree            = OriginalTree.CloneTree();
             
         }
         
@@ -210,31 +215,6 @@ namespace Galleon.Checkout.Foundation
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
-        
-        public async Task ExecuteAPF()
-        {
-            OriginalTree.DO_APF();
-        }
-        public async Task ExecuteAPFE1()
-        {
-            VirtualTree.DO_APFE_CreateVTree();
-
-            foreach (var vNode in VirtualTree.Node.Descendants().OfType<LiveNode>())
-            {
-                if (vNode.APFE_DoesNeedToDoAction)
-                    vNode.DO_APFE_PLusAction_PerNode();
-            }
-        }
-        public async Task ExecutePPFE1()
-        {
-            VirtualTree.DO_PPFE_CreateVTree();
-
-            foreach (var vNode in VirtualTree.Node.Descendants().OfType<LiveNode>())
-            {
-                if (vNode.PPFE_DoesNeedToDoAction)
-                    vNode.DO_PPFE_PLusAction_PerNode();
-            }
-        }
         
         ////
         
@@ -254,11 +234,11 @@ namespace Galleon.Checkout.Foundation
         public async Task CreateVirtualTree()
         {
             // Create virtual tree
-            VirtualTree = new LiveNode();
+            ChildVirtualTree = new LiveNode();
             
             // With Parent
             LiveNode Parent = new LiveNode();
-            VirtualTree.Node.AddChild(Parent);
+            ChildVirtualTree.Node.AddChild(Parent);
             
             // Find categories
             List<string> categories = new();
@@ -277,7 +257,7 @@ namespace Galleon.Checkout.Foundation
             }
             
             // Remove irrelevant nodes per category
-            foreach (var lineNode in VirtualTree.Node.Descendants().OfType<LiveNode>())
+            foreach (var lineNode in ChildVirtualTree.Node.Descendants().OfType<LiveNode>())
             {
                 // Get Category
                 var category = lineNode.GetCategoryName();
@@ -305,7 +285,7 @@ namespace Galleon.Checkout.Foundation
         
         public async Task CreateActualContent()
         {
-            var virtualTreeRoot = VirtualTree;
+            var virtualTreeRoot = ChildVirtualTree;
 
             foreach (var liveNode in virtualTreeRoot.Node.Descendants().OfType<LiveNode>())
             {
@@ -322,11 +302,18 @@ namespace Galleon.Checkout.Foundation
         }
     }
     
-    ///
-    ///
-    ///
-    ///
-    /// 
+    
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+     
     
     public partial class LiveNode : Entity
     {   
@@ -370,147 +357,6 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// WIP
-
-        //////////////////////////////////// A_p_F
-        
-        
-        public void DO_APF()
-        {
-            IEntity Parent     = this.Operation.Parent;
-            
-            string  type       = this.TargetText.Split(' ').First(); // "Folder"
-            Type    targetType = Type.GetType("Galleon.Checkout." + type);
-            
-            IEntity target     = (IEntity)Activator.CreateInstance(targetType);
-            
-            Parent.Node.AddChild(target);
-            target.Node.Live.LiveHandler.OnAddedToParent(Parent);
-            target.Node.Live.LiveHandler.Create();            
-        }
-        
-        //////////////////////////////////// A_p_FE1
-        
-        /// <summary>
-        /// This is APFE1
-        /// this (root) node is : ["> Folder f1"]
-        /// Operation.Parent is : Root.Instance.Context.Package1.Assets.rootFolder
-        ///
-        /// This method creates the following vtree under this (root) node :
-        ///     > (this node) Elements.Folder "f1"
-        ///         > Assets.Folder "f1"
-        /// </summary>
-        public void DO_APFE_CreateVTree()
-        {
-            // Definitions
-            string              targetElementName   = this.TextNode.LineWords.First();
-            
-            // Get Target Element
-            IEnumerable<Element> AllElements        = Elements.GetAllElements();
-            Element              targetElement      = AllElements.Single(x => x.Name == targetElementName);
-            
-            // Add Folder Asset Live Node To VTree
-            LiveNode            folderAssetLiveNode = targetElement.APFE1_Get_AssetFolderNode();
-            folderAssetLiveNode.Operation           = this.Operation;
-            
-            // Add Assets.Folder node to this
-            this.Node.AddChild(folderAssetLiveNode);
-        }
-        public void DO_APFE_PLusAction_PerNode()
-        {
-            if (!this.APFE_DoesNeedToDoAction) 
-                return;
-            
-            IEntity Parent     = this.Operation.Parent; var p = this.Node.Ancestors().OfType<LiveNode>().FirstOrDefault(n => n.LinkedCreatedEntity != null);
-            string  type       = this.TextNode.LineContent.Split(' ').First(); // "Folder"
-            Type    targetType = Type.GetType("Galleon.Checkout." + type);
-            IEntity target     = (IEntity)Activator.CreateInstance(targetType);
-            
-            Parent.Node.AddChild(target);
-            target.Node.Live.LiveHandler.OnAddedToParent(Parent);
-            target.Node.Live.LiveHandler.Create();
-            
-            LinkedCreatedEntity = target;
-        }
-        
-        //////////////////////////////////// P_p_FE1
-        
-        public void DO_PPFE_CreateVTree()
-        {
-            ////////////////////////////////////////////////////////////////////////
-            /// Folder Element Definition:
-            /// > Folder
-            ///     > (Assets)
-            ///         > Assets.Folder
-            ////////////////////////////////////////////////////////////////////////
-            /// Package Element Definition:
-            /// > Package
-            ///     > (Assets)
-            ///         > Assets.Folder "package_root_folder"
-            ///     > (Hierarchy)
-            ///         > H.Scene "package_main_scene"
-            ///     > (whatever)
-            ///         > Whatever "..."
-            ////////////////////////////////////////////////////////////////////////
-            /// Expected v tree result :
-            /// > (this node) Elements.Folder "f1"
-            ///     > (Assets)
-            ///         > Assets.Folder "f1"
-            ////////////////////////////////////////////////////////////////////////
-            /// And then :
-            /// > (this node) Elements.Folder "f1"
-            ///     > (Assets)
-            ///         > Assets.Folder "f1" <---- this needs to get printed under package root asset
-            ////////////////////////////////////////////////////////////////////////
-            /// need :
-            ///     -> print parent per category
-            ///////////////////////////////////////////////////////////////////////
-            
-            // Definitions
-            string                  targetElementName             = this.TextNode.LineWords.First();
-            
-            // Get Parent Element
-            Element                 parentElement                 = this.Operation.Parent.Node.GetElement();
-            
-            // Get Target Element
-            Element                 targetElement                 = Elements.GetElementByName(targetElementName);
-            
-            // Get relevant namespaces
-            var                     parentElementNamespaceNodes   = parentElement.Node.Descendants().OfType<DefinitionNode>().Where(x => x.IsNamespace); // get all namespace nodes under parent
-            var                     targetElementNamespaceNodes   = targetElement.Node.Descendants().OfType<DefinitionNode>().Where(x => x.IsNamespace); // get all namespace nodes under target element
-            var                     intersectionNodes             = parentElementNamespaceNodes.Intersect(targetElementNamespaceNodes);                  // get the intersection of the two
-            
-            // copy relevent nodes to vtree
-            foreach (var node in intersectionNodes)
-            {
-                
-            }
-            
-            // Add Folder Asset Live Node To VTree
-            LiveNode                folderAssetLiveNode           = targetElement.PPFE1_Get_AssetFolderNode();
-            folderAssetLiveNode.Operation                         = this.Operation;
-            
-            // Add Assets.Folder node to this
-            this.Node.AddChild(folderAssetLiveNode);
-        }
-        public void DO_PPFE_PLusAction_PerNode()
-        {
-            if (!this.APFE_DoesNeedToDoAction) 
-                return;
-            
-            IEntity Parent     = this.Operation.Parent; var p = this.Node.Ancestors().OfType<LiveNode>().FirstOrDefault(n => n.LinkedCreatedEntity != null);
-            string  type       = this.TextNode.LineContent.Split(' ').First(); // "Folder"
-            Type    targetType = Type.GetType("Galleon.Checkout." + type);
-            IEntity target     = (IEntity)Activator.CreateInstance(targetType);
-            
-            Parent.Node.AddChild(target);
-            target.Node.Live.LiveHandler.OnAddedToParent(Parent);
-            target.Node.Live.LiveHandler.Create();
-            
-            LinkedCreatedEntity = target;
-        }
-        
-        
-        ////////////////////////////////////
         
         /// [plus1]   -> simple-op + 1 node + direct-action.
         /// [plus1e]  -> plus1 + element + live + node + code + fake vtree.
@@ -634,11 +480,18 @@ namespace Galleon.Checkout.Foundation
         }
     }
     
-    ///
-    ///
-    ///
-    ///
-    ///
+    
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    /// /// ///
+    
     
     public class LiveElement
     {
@@ -662,23 +515,16 @@ namespace Galleon.Checkout
         partial class LiveNode
         {
             public bool APFE_DoesNeedToDoAction = false;
-            public bool PPFE_DoesNeedToDoAction = false;
+            public bool PPFE_DoesNeedToDoAction => !ActuallyExists;
+            public bool ActuallyExists = false;
         }
-        
     }
     
     public partial class Element
     {
-        public LiveNode APFE1_Get_AssetFolderNode() =>  new LiveNode()
-        {
-            Text                    = "> Assets.Folder f1", 
-            APFE_DoesNeedToDoAction = true
-        };
-        public LiveNode PPFE1_Get_AssetFolderNode() =>  new LiveNode()
-        {
-            Text                    = "> Assets.Folder f1", 
-            PPFE_DoesNeedToDoAction = true
-        };
+        
+        
+        
     }
 }
 

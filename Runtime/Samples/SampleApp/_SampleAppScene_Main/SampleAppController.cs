@@ -88,34 +88,42 @@ namespace Galleon.SampleApp
                     ,action : async (s) =>
                     {   
                         //////////////////////////////////////////////////////////////////////////////////////////////// 
-                        
-                        // Definitions
-                        bool emptyPaymentMethods = true;
-                        bool isUSAorCanada       = false;
-                        bool isShortHeader       = true;
+
+                        CHECKOUT.Config.SetOverrideValue("is_preselection_screen_enabled", true);
+                        CHECKOUT.Config.SetOverrideValue("show_tax_breakdown",             true);
+                        CHECKOUT.Config.SetOverrideValue("show_log_footer",                true);
                         
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         
-                        ReportText.text = @"
-> Galleon checkout Test App
+                        ReportText.text = $@"
+> Test Scenario 1
 ----------------------------------------------------
-> Product : 1
+> Product : 
+    > name  : ''bunch of spins''
+    > price : $5.99
+    > sku   : 'sku-1'
 ----------------------------------------------------
-> IsCalifornia : False
+> Payment Method : new credit card
 ----------------------------------------------------
-> Tax 
-	> Vat 5%
-	> IRS 10 %
+> Preselection : true
+----------------------------------------------------
+> show tax : true
+----------------------------------------------------
+> Is California : true
+----------------------------------------------------
                                           ";
                         
-                        await Task.Delay(1000);
+                        new Step(name: $"test_scenario_1", tags: new [] {"report"} ).Execute();
                         
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                        
+                        await Task.Delay(1000);
                         
                         //////////////////////////////////////////////////////////////////////////////////////////////// 
                         
                         var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                                                { 
-                                                                   DisplayName     = "test_product_1",
+                                                                   DisplayName     = "bunch of coins",
                                                                    PriceText       = "$5.99",
                                                                    //Sku           = "sku-1-3DS", 
                                                                    Sku             = "sku-1",
@@ -143,34 +151,45 @@ namespace Galleon.SampleApp
                     {   
                         //////////////////////////////////////////////////////////////////////////////////////////////// 
                         
-                        // Definitions
-                        bool emptyPaymentMethods = true;
-                        bool isUSAorCanada       = false;
-                        bool isShortHeader       = true;
                         
+                        CHECKOUT.Config.SetOverrideValue("is_preselection_screen_enabled", false);
+                        CHECKOUT.Config.SetOverrideValue("show_tax_breakdown",             false);
+                        CHECKOUT.Config.SetOverrideValue("show_log_footer",                false);
+                        
+                        //////////////////////////////////////////////////////////////////////////////////////////////// 
+                         
                         ReportText.text = @"
-> Galleon checkout Test App
+> Test Scenario 2
 ----------------------------------------------------
-> Product : 2
+> Product : 
+    > name  : ''bunch of spins''
+    > price : $19.99
+    > sku   : 'sku-2'
 ----------------------------------------------------
-> IsCalifornia : true
+> Payment Method : first existing credit card
 ----------------------------------------------------
-> Tax 
-	> Vat 30%
-	> IRS 200 %
+> Preselection : false
+----------------------------------------------------
+> show tax : false
+----------------------------------------------------
+> Is California : false
+----------------------------------------------------
                                           ";
                         
-                        await Task.Delay(1000);
+                        new Step(name: $"test_scenario_1", tags: new [] {"report"} ).Execute();
                         
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                        
+                        await Task.Delay(1000);
                         
                         //////////////////////////////////////////////////////////////////////////////////////////////// 
                         
                         var result = await CheckoutAPI.Purchase(new CheckoutProduct
                                                                { 
-                                                                   DisplayName     = "test_product_2",
+                                                                   DisplayName     = "bunch of spins",
                                                                    PriceText       = "$19.99",
                                                                    //Sku           = "sku-1-3DS", 
-                                                                   Sku             = "sku-1",
+                                                                   Sku             = "sku-2",
                                                                    Amount          = 100,
                                                                    Currency        = "USD",
                                                                });

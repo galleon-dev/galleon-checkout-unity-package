@@ -31,6 +31,11 @@ namespace Galleon.Checkout.UI
         public AdvancedInputField DateInputField;
         public AdvancedInputField CVVInputField;
 
+        public GameObject CardNumberErrorTextBackground;
+        public GameObject NameErrorTextBackground;
+        public GameObject CVVNumberErrorTextBackground;
+        public GameObject DateErrorTextBackground;
+
         public TMP_Text CardNumberErrorText;
         public TMP_Text NameErrorText;
         public TMP_Text CVVNumberErrorText;
@@ -58,6 +63,8 @@ namespace Galleon.Checkout.UI
         bool IsValidDate = false;
         int expectedCVVLength = 3;
         
+        public GameObject TestCardButton;
+        
         //////////////////////////////////////////////////////////////////////////// View Result
 
         public ViewResult Result = ViewResult.None;
@@ -66,25 +73,25 @@ namespace Galleon.Checkout.UI
         {
             if (NameErrorText)
             {
-                NameErrorText.gameObject.SetActive(false);
+                NameErrorTextBackground.SetActive(false);
             }
 
             if (CVVNumberErrorText)
             {
-                CVVNumberErrorText.gameObject.SetActive(false);
+                CVVNumberErrorTextBackground.SetActive(false);
             }
 
             if (DateErrorText)
             {
-                DateErrorText.gameObject.SetActive(false);
+                DateErrorTextBackground.SetActive(false);
             }
 
             if (CardNumberErrorText)
             {
-                CardNumberErrorText.gameObject.SetActive(false);
+                CardNumberErrorTextBackground.SetActive(false);
             }
 
-            if (CVVInputField)
+          /*  if (CVVInputField)
             {
                 CVVInputField.OnValueChanged.AddListener(OnCVVValueChanged);
             }
@@ -98,23 +105,36 @@ namespace Galleon.Checkout.UI
             {
                 NameInputField.OnValueChanged.AddListener(OnNameValueChanged);
             }
+          */
         }
 
         private void OnEnable()
         {
             // Clear input fields
-            if (NameInputField) NameInputField.Text               = string.Empty;
+            if (NameInputField)        NameInputField.Text        = string.Empty;
             if (CreditCardNumberField) CreditCardNumberField.Text = string.Empty;
-            if (DateInputField) DateInputField.Text               = string.Empty;
-            if (CVVInputField) CVVInputField.Text                 = string.Empty;
+            if (DateInputField)        DateInputField.Text        = string.Empty;
+            if (CVVInputField)         CVVInputField.Text         = string.Empty;
 
             // Reset validation flags
             IsValidCVV              = false;
             IsValidCreditCardNumber = false;
             IsValidDate             = false;
 
+            // Hide Error Messages
+            NameErrorTextBackground      .SetActive(false);
+            CardNumberErrorTextBackground.SetActive(false);
+            CVVNumberErrorTextBackground .SetActive(false);
+            DateErrorTextBackground      .SetActive(false);
+
             // Remove card icon
             RemoveCardIcon();
+
+            #if DEBUG
+            TestCardButton.SetActive(true);
+            #else
+            TestCardButton.SetActive(false);
+            #endif
         }
 
         public enum ViewResult
@@ -123,62 +143,6 @@ namespace Galleon.Checkout.UI
             Confirm,
         }
 
-        //////////////////////////////////////////////////////////////////////////// View Flow
-
-        public bool IsCompleted = false;
-
-        public Step View()
-        =>
-            new Step(name: $"view_credit_card_panel"
-                    , action: async (s) =>
-                    {
-                        IsCompleted = false;
-
-                        this.gameObject.SetActive(true);
-
-                        while (!IsCompleted)
-                            await Task.Yield();
-
-                        this.gameObject.SetActive(false);
-                    });
-
-
-        // Related to Autofill Fix while refocusing inputfields
-        /* 
-         
-          private void OnEnable()
-           {
-                   RefocusInputFields();
-           }
-
-           private void Start()
-           {
-               NativeKeyboardManager.ResetAutofill();
-           }
-
-           public void RefocusInputFields()
-           {
-             StartCoroutine(RefocusAdvancedInputFields());
-           }
-
-           IEnumerator RefocusAdvancedInputFields()
-           {
-               Debug.Log("<color=green>RefocusInputFields() for Autofill</color>");
-               int AdvancedInputFieldsAmount = AdvancedInputFields.Count;
-
-               for (int i = 0; i < AdvancedInputFieldsAmount; i++)
-               {
-                   // yield return new WaitForEndOfFrame();
-                   AdvancedInputFields[i].SelectionRefresh(); // instead of ManualSelect();
-                   // AdvancedInputFields[i].SetCaretToTextEnd();
-                   //   yield return new WaitForEndOfFrame();
-                   AdvancedInputFields[i].ManualDeselect(EndEditReason.KEYBOARD_DONE); //EventSystem.current.SetSelectedGameObject(null); // Deselection
-               }
-               //  yield return new WaitForSeconds(0.5f);
-               yield return null;
-           }
-
-        */
         //////////////////////////////////////////////////////////////////////////// UI Events
 
         public async void On_OkClick()
@@ -221,31 +185,31 @@ namespace Galleon.Checkout.UI
             if (string.IsNullOrEmpty(NameInputField.Text))
             {
                 NameErrorText.text = NameMissingInfoText;
-                NameErrorText.gameObject.SetActive(true);
+                NameErrorTextBackground.SetActive(true);
                 InputFieldsCorrect = false;
             }
             else if (string.IsNullOrEmpty(CreditCardNumberField.Text))
             {
                 CardNumberErrorText.text = CardNumberInfoText;
-                CardNumberErrorText.gameObject.SetActive(true);
+                CardNumberErrorTextBackground.SetActive(true);
                 InputFieldsCorrect = false;
             }
             else if (string.IsNullOrEmpty(CVVInputField.Text))
             {
                 CVVNumberErrorText.text = CVVNumberInfoText;
-                CVVNumberErrorText.gameObject.SetActive(true);
+                CVVNumberErrorTextBackground.SetActive(true);
                 InputFieldsCorrect = false;
             }
             else if (CVVInputField.Text.Length != expectedCVVLength)
             {
                 CVVNumberErrorText.text = $"* Enter a {expectedCVVLength}-Digit CVV";
-                CVVNumberErrorText.gameObject.SetActive(true);
+                CVVNumberErrorTextBackground.SetActive(true);
                 InputFieldsCorrect = false;
             }
             else if (string.IsNullOrEmpty(DateInputField.Text))
             {
                 DateErrorText.text = DateInfoText;
-                DateErrorText.gameObject.SetActive(true);
+                DateErrorTextBackground.SetActive(true);
                 InputFieldsCorrect = false;
             }
 
@@ -291,6 +255,13 @@ namespace Galleon.Checkout.UI
             }
         }
 
+
+        public void OnCreditCardValueEndEdit(AdvancedInputField _AdvancedInputFieldText)
+        {
+            FormatCreditCardInput(_AdvancedInputFieldText.Text);
+        }
+
+
         public void OnValueChanged(string text)
         {
             FormatCreditCardInput(text);
@@ -333,9 +304,14 @@ namespace Galleon.Checkout.UI
             }
         }
 
+        public void OnDateValueEndEdit(AdvancedInputField _AdvancedInputFieldText)
+        {
+            OnDateValueChanged(_AdvancedInputFieldText.Text);
+        }
+
         void OnDateValueChanged(string rawInput)
         {
-            Debug.Log("<color=green>OnDateValueChanged. rawInput: " + rawInput + "</color>");
+            //Debug.Log("<color=green>OnDateValueChanged. rawInput: " + rawInput + "</color>");
 
             if (rawInput.Length > 4)
             {
@@ -347,13 +323,13 @@ namespace Galleon.Checkout.UI
                 if (!ValidateDateExpiry(rawInput, out string err))
                 {
                     DateErrorText.text = err;
-                    DateErrorText.gameObject.SetActive(true);
+                    DateErrorTextBackground.SetActive(true);
 
                     IsValidDate = false;
                 }
                 else
                 {
-                    DateErrorText.gameObject.SetActive(false);
+                    DateErrorTextBackground.SetActive(false);
                     IsValidDate = true;
 
                     StartCoroutine(CheckIfFocusOnCVV());
@@ -361,7 +337,7 @@ namespace Galleon.Checkout.UI
             }
             else
             {
-                DateErrorText.gameObject.SetActive(false);
+                DateErrorTextBackground.SetActive(false);
                 IsValidDate = true;
             }
         }
@@ -409,6 +385,11 @@ namespace Galleon.Checkout.UI
             return true;
         }
 
+        public void OnCVVValueEndEdit(AdvancedInputField _AdvancedInputFieldText)
+        {
+            OnCVVValueChanged(_AdvancedInputFieldText.Text);
+        }
+
         public void OnCVVValueChanged(string digits)
         {
             // Debug.Log("<color=green>OnCVVValueChanged. rawInput: " + digits + "</color>");
@@ -435,38 +416,46 @@ namespace Galleon.Checkout.UI
                 digits = digits.Remove(digits.Length - 1);
             }
 
+            Debug.Log("CVV Digits Length: " + digits.Length);
+
             if (digits.Length != 0)
             {
                 if (digits.Length == expectedCVVLength)
                 {
-                    CVVNumberErrorText.gameObject.SetActive(false);
+                    CVVNumberErrorTextBackground.SetActive(false);
                     IsValidCVV = true;
                 }
                 else
                 {
                     CVVNumberErrorText.text = $"Enter a {expectedCVVLength}-digit CVV";
-                    CVVNumberErrorText.gameObject.SetActive(true);
+                    CVVNumberErrorTextBackground.SetActive(true);
                     IsValidCVV = false;
                 }
             }
             else
             {
-                CVVNumberErrorText.gameObject.SetActive(false);
+                CVVNumberErrorTextBackground.SetActive(false);
                 IsValidCVV = true;
             }
+        }
+
+        public void OnNameValueEndEdit(AdvancedInputField _AdvancedInputFieldText)
+        {
+            OnNameValueChanged(_AdvancedInputFieldText.Text);
         }
 
         public void OnNameValueChanged(string inputName)
         {
             if (!string.IsNullOrEmpty(inputName))
             {
-                NameErrorText.gameObject.SetActive(false);
+                NameErrorTextBackground.SetActive(false);
             }
 
             StartCoroutine(CheckIfFocusOnCVV());
         }
 
         int MaxLength;
+
         void FormatCreditCardInput(string rawInput)
         {
             // Debug.Log("FormatCreditCardInput: " + rawInput);
@@ -477,7 +466,14 @@ namespace Galleon.Checkout.UI
                 // Debug.Log("Updated RawInput: " + rawInput);
             }
 
-            CheckLuhnOnEndEdit(rawInput);
+            if (string.IsNullOrEmpty(CreditCardNumberField.Text))
+            {
+                CardNumberErrorTextBackground.SetActive(false);
+            }
+            else
+            {
+                CheckLuhnOnEndEdit(rawInput);
+            }
 
             OnCVVValueChanged(CVVInputField.Text);
 
@@ -495,12 +491,12 @@ namespace Galleon.Checkout.UI
 
             if (!IsValidCreditCardNumber)
             {
-                CardNumberErrorText.gameObject.SetActive(true);
+                CardNumberErrorTextBackground.SetActive(true);
                 CardNumberErrorText.text = "* Invalid Number";
             }
             else
             {
-                CardNumberErrorText.gameObject.SetActive(false);
+                CardNumberErrorTextBackground.SetActive(false);
             }
         }
 
@@ -592,6 +588,21 @@ namespace Galleon.Checkout.UI
         }
         
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test UI Events
+        
+        public void On_TestFakeCardButtonClicked()
+        {
+            NameInputField.Text        = "jhon doe";
+            CreditCardNumberField.Text = "4242424242424242";
+            DateInputField.Text        = "0929";
+            CVVInputField.Text         = "111";
+            
+            OnValueChanged(CreditCardNumberField.Text);
+            OnDateValueChanged(DateInputField.Text);
+            OnCVVValueChanged(CVVInputField.Text);
+            
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
         public Step test_fill_card_data() => new Step(name   : "credit_card_info_panel_fill_test_card"
@@ -612,7 +623,10 @@ namespace Galleon.Checkout.UI
                                                                  
                                                                  cbx_SaveCardDetails.IsChecked = true;
                                                                  
+                                                                 CreditCardNumberField.Select();
+                                                                 
                                                                  await Task.Delay(500);
+                                                                 await new Step(name: $"set_test_credit_card", tags: new [] {"report"} ).Execute();
                                                                  
                                                              });
         
