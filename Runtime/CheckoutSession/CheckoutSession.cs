@@ -13,13 +13,13 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         // SessionData
-        public string                             SessionID             = "1";
+        public string                             SessionID                 = "1";
         
         // Purchase data
         public CheckoutProduct                    SelectedProduct;
-        public PurchaseResult                     PurchaseResult        = default;
+        public PurchaseResult                     PurchaseResult            = default;
         
-        public Dictionary<string, string>         Metadata              = new();
+        public Dictionary<string, string>         Metadata                  = new();
         
         // Simple Dialog Panel data
         public string                             LastDialogRequest         = null;
@@ -40,7 +40,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
         
-        public ChargeResultData                   lastChargeResult;
+        public ChargeResultData                   lastChargeResult          = null;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
         
@@ -56,7 +56,7 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         /////////////////////////////////////// Pre Steps
-                        
+                         
                         // Open Screen
                         s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
                         s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
@@ -125,8 +125,7 @@ namespace Galleon.Checkout
                             s.RemoveStepsAfterThisInParentFlow();
                         }
                         else
-                        {
-                            
+                        {   
                             s.ParentStep.AddChildStep("select_first_upm", async step => {CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.First().SelectExclusive();} );
                             s.ParentStep.AddChildStep(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage));
                             
@@ -177,6 +176,7 @@ namespace Galleon.Checkout
                                                                                                                { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                            }
                                                                                                  ,body     : body);
+                        
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// transaction Steps
@@ -221,16 +221,6 @@ namespace Galleon.Checkout
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                        
                         ////////////////////////////////////////////////////////////// Post Steps
-                        
-                        // ///////// TEMP
-                        // this.lastChargeResult = new ChargeResultData()
-                        //                       {
-                        //                          is_success  = true,
-                        //                          errors      = null,
-                        //                          is_canceled = false,
-                        //                          charge_id   = "test_transaction",
-                        //                       };
-                        // /////////
                         
                         s.AddPostStep(name   : "save_used_payment_method_if_success"
                                      ,action : async x =>
@@ -279,6 +269,16 @@ namespace Galleon.Checkout
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc Steps
+        
+        public Step On_CheckoutScreenClosed()
+        => 
+            new Step(name    : $"on_checkout_screen_closed"
+                     ,action : async (s) =>
+                               {
+                                   if (lastChargeResult is null
+                                   ||  lastChargeResult.is_success == false)
+                                       s.ParentStep.AddPostStep(CancelSession());
+                               });
         
         public Step On_EmptyCardSelected() 
         =>

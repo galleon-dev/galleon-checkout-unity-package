@@ -22,8 +22,6 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                               {
-
-                                  Debug.Log("TAX CONTROLLER");
                                   // var response = await CHECKOUT.Network.Get($"{CHECKOUT.Network.SERVER_BASE_URL}/tax");
                                   // var tax      = JsonConvert.DeserializeObject<Shared.TaxData>(response.ToString());
                                   // 
