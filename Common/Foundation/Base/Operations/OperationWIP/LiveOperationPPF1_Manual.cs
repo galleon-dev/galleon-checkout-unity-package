@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationPPF1M;
-using PlasticGui.WorkspaceWindow.Items;
 
 namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
 {

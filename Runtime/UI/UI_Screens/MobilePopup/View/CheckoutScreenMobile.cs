@@ -426,6 +426,7 @@ namespace Galleon.Checkout.UI
                               {
                                   // await Close();
                                   s.ParentStep.RemoveStepsAfterThisInParentFlow();
+                                  s.ParentStep.AddPostStep(CHECKOUT.Session.On_CheckoutScreenClosed());
                               });
 
         public Step UI_Back()

@@ -24,7 +24,7 @@ namespace Galleon.Checkout
                     {
                         #if UNITY_ANDROID 
         
-                        using (AndroidJavaClass  unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                        using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                             using (AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
                                 using (AndroidJavaClass plugin = new AndroidJavaClass("com.example.checkoutgpaybridge.GooglePayBridge"))
                                 {                            
@@ -215,11 +215,11 @@ namespace Galleon.Checkout
                                                                                                     is_new_payment_method   = selectedUserPaymentMethod.IsNewPaymentMethod,
                                                                                                     payment_method          = new PaymentMethodDetails()
                                                                                                                             {
-                                                                                                                                 id   = selectedUserPaymentMethod.Data.id,
+                                                                                                                                 id   = selectedUserPaymentMethod.IsNewPaymentMethod ? null : selectedUserPaymentMethod.Data.id,
                                                                                                                                  data = selectedUserPaymentMethod.GetDataForCharge(),
                                                                                                                             },
                                                                                                     save_payment_method     = isNewPaymentMethod,
-                                                                                                    return_url              = CheckoutClient.Instance.URLs.AppDeepLinkReturnURL
+                                                                                                    success_redirect_url              = CheckoutClient.Instance.URLs.AppDeepLinkReturnURL
                                                                                                 });
                             
                             CheckoutClient.Instance.CurrentSession.lastChargeResult = response.result;

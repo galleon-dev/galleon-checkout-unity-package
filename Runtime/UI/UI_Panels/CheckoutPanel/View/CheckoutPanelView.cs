@@ -59,7 +59,7 @@ namespace Galleon.Checkout.UI
         public TextMeshProUGUI SubtotalPriceText;
         public TextMeshProUGUI TotalPriceText;
 
-        private bool IsUSAorCanadaUser = true;
+        private bool IsUSAorCanadaUser = false;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types
 
@@ -90,8 +90,6 @@ namespace Galleon.Checkout.UI
 
         public override void RefreshState()
         {
-            Debug.Log("RefreshState(): " + CheckoutClient.Instance.CurrentSession);
-
             if (CheckoutClient.Instance.CurrentSession == null) return;
 
             // // Panel config
