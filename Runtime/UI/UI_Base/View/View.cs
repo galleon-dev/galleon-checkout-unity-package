@@ -114,7 +114,8 @@ namespace Galleon.Checkout.UI
         
         public virtual async Task OnFocus()
         {
-            await OnViewFocus().Execute();
+            //if (CHECKOUT.IsTest)
+                await OnViewFocus().Execute();
         }
         
         public Step OnViewFocus() 
@@ -122,6 +123,26 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"on_view_focus_{this.name}"
                     ,action : async (s) =>
                     { 
+                        if (CHECKOUT.IsTest)
+                        {
+                            if (s.Name.ToLower().Contains("panel")
+                            && !s.Name.ToLower().Contains("item"))
+                            {
+                                s.AddChildStep(OnPanelFocus());
+                            }
+                        }   
+                    });
+        
+        public Step OnPanelFocus()
+        =>
+            new Step(name   : $"on_panel_focus_{this.name}"
+                    ,action : async (s) =>
+                    { 
+                        await Task.Yield();       
+                        await Task.Yield();       
+                        await Task.Yield();       
+                        await Task.Yield();       
+                        new Step(name: $"capture_{s.Name}", tags: new []{"report"}).Execute();
                     });
     }
 }

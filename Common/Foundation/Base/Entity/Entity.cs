@@ -6,6 +6,10 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
+using Galleon.Checkout.Foundation.LiveOperationAPF;
+using Galleon.Checkout.Foundation.LiveOperationAPFE1;
+using Galleon.Checkout.Foundation.LiveOperationPPF1;
+using Galleon.Checkout.Foundation.LiveOperationPPF1M;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -508,25 +512,25 @@ namespace Galleon.Checkout
             
             public async Task Plus_APF(string text)
             {                
-                var   plusOperation = new LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
-                                                       ,parent     : this.Entity
-                                                       ,definition : new LiveNode() { TargetText = "Assets.Folder f1", ActionText = "plus" });
+                var   plusOperation = new APF_LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
+                                                           ,parent     : this.Entity
+                                                           ,definition : new APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
                 
-                await plusOperation.ExecuteAPF();
+                await plusOperation.Flow().Execute();
             }
             public async Task Plus_APFE1(string text)
             {   
-                var   plusOperation = new LiveOperation(id         : $"APFE1"
-                                                       ,parent     : this.Entity
-                                                       ,text       : "> Folder f1");
-                await plusOperation.ExecuteAPFE1();
+                var   plusOperation = new APFE1_LiveOperation(id         : $"APFE1"
+                                                             ,parent     : this.Entity
+                                                             ,definition : "> Folder f1");
+                await plusOperation.Flow().Execute();
             }
-            public async Task Plus_PPFE1(string text)
+            public async Task Plus_PPFE1M(string text)
             {   
-                var   plusOperation = new LiveOperation(id         : $"PPFE1"
-                                                       ,parent     : this.Entity
-                                                       ,text       : "> Folder f1");
-                await plusOperation.ExecutePPFE1();
+                var   plusOperation = new PPF1M_LiveOperation(id         : $"PPFE1M"
+                                                             ,parent     : this.Entity
+                                                             ,definition : "> Folder f1");
+                await plusOperation.Flow().Execute();
             }
             
             //////////////////////////////////////////////////
@@ -548,6 +552,24 @@ namespace Galleon.Checkout
 
                     return null;
                 }
+            }
+            
+            public LiveHandler LiveHandlerByType(string entityTypeName)
+            {
+                Type entityType      = Type.GetType("Galleon.Checkout." + entityTypeName);
+                var  liveHandlerType = entityType
+                                      .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
+                                      .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveHandler)));
+
+                if (liveHandlerType != null)
+                {
+                    var liveHandler = (LiveHandler)Activator.CreateInstance(liveHandlerType);
+                    liveHandler.SetTarget(this.Entity);
+                    return liveHandler;
+                }
+
+                return null;
+         
             }
         }
     }    

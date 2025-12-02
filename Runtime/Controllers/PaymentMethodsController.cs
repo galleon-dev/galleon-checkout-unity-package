@@ -33,7 +33,7 @@ namespace Galleon.Checkout
                                                                                     .Distinct()
                                                                                     .OrderBy(x => x.SortOrder)
                                                                                     .Except(SpecialUserPaymentMethods)
-                                                                                    .Take(MAX_LAST_USED_PAYMENT_METHODS)
+                                                                                    .Take(MAX_LAST_USED_PAYMENT_METHODS -1)
                                                                                     .ToList();
         
         public  List<UserPaymentMethod>             UserPaymentMethodsToSelect  =>  UserPaymentMethods
@@ -87,12 +87,13 @@ namespace Galleon.Checkout
             new Step(name   : $"add_new_user_payment_method"
                     ,action : async (s) =>
                     {
-                        s.AddPreStep(name : "setup_adding_user_payment_method"
-                                     ,action: async step =>
+                        s.AddPreStep(name     : "setup_adding_user_payment_method"
+                                     ,action  : async step =>
                                               {
                                                   CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod   (upm);
                                                   CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
                                               });
+                        
                         foreach (var vaultingStep in upm.GetVaultingSteps())
                             s.AddChildStep(vaultingStep);
                     });
@@ -283,31 +284,37 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////// Empty
                         
-                        this.UserPaymentMethods.Add(new UserPaymentMethod()
-                                                    {
-                                                        Data               = new ()
-                                                                           {
-                                                                              type = "empty_card"
-                                                                           },
-                                                        DisplayName        = "Add Credit Card",
-                                                        IsNewPaymentMethod = false,
-                                                        IsSelected         = false,
-                                                        SortOrder          = float.PositiveInfinity, 
-                                                        Type               = "empty_card"
-                                                    });
+                        if (UserPaymentMethods.All(pm => pm.Data.type != "credit_card"))
+                        {
+                            this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                        {
+                                                            Data               = new ()
+                                                                               {
+                                                                                  type = "empty_card"
+                                                                               },
+                                                            DisplayName        = "Add Credit Card",
+                                                            IsNewPaymentMethod = false,
+                                                            IsSelected         = false,
+                                                            SortOrder          = float.PositiveInfinity, 
+                                                            Type               = "empty_card"
+                                                        });
+                        }
                         
-                        this.UserPaymentMethods.Add(new UserPaymentMethod()
-                                                    {
-                                                        Data               = new ()
-                                                                           {
-                                                                              type = "empty_paypal"
-                                                                           },
-                                                        DisplayName        = "Add Paypal Account",
-                                                        IsNewPaymentMethod = false,
-                                                        IsSelected         = false,
-                                                        SortOrder          = float.PositiveInfinity, 
-                                                        Type               = "empty_paypal"
-                                                    });
+                        if (UserPaymentMethods.All(pm => pm.Type != "paypal"))
+                        {
+                            this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                        {
+                                                            Data               = new ()
+                                                                               {
+                                                                                  type = "empty_paypal"
+                                                                               },
+                                                            DisplayName        = "Add Paypal Account",
+                                                            IsNewPaymentMethod = false,
+                                                            IsSelected         = false,
+                                                            SortOrder          = float.PositiveInfinity, 
+                                                            Type               = "empty_paypal"
+                                                        });
+                        }
                         
                     });
         
@@ -318,7 +325,6 @@ namespace Galleon.Checkout
             // Return empty list if no payment methods were used
             if (this.LastUsedUserPaymentMethodIDs.Count == 0)
                 return new List<UserPaymentMethod>();
-
             var                     lastUsedUpmID = this.LastUsedUserPaymentMethodIDs.Last();
             List<UserPaymentMethod> result        = new List<UserPaymentMethod>();
 

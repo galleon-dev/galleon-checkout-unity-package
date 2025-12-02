@@ -31,21 +31,21 @@ namespace Galleon.Checkout.Foundation.Tests
                             // @$"on 'sample_app_start' do 'print_hello'",
                             //
                             // Test product 1
-                            @$"on 'sample_app_start'                        do 'test_purchase_product_1'",
-                            @$"on 'on_view_focus_PreselectionPanel'         do 'preselection_panel_test_checkout'",
-                            @$"on 'on_view_focus_CheckoutPanel '            do 'checkout_panel_test_select_other_pm'",
-                            @$"on 'on_view_focus_SelectPaymentMethodPanel'  do 'selection_panel_test_new_card'",
-                            @$"on 'on_view_focus_CreditCardInfoPanel'       do 'credit_card_info_panel_fill_test_card' and 'credit_card_info_panel_confirm'",
-                            @$"on 'on_view_focus_SuccessPanel'              do 'fill_test_email' and 'test_click_send_receipt'", // and 'test_close_checkout_screen_clicked'",
-                          //@$"on 'on_view_focus_SuccessPanel'              do 'success_panel_wait_and_do_nothing'",
-                        
+                            @$"on 'sample_app_start'                         do 'test_purchase_product_1'",
+                            @$"on 'on_panel_focus_PreselectionPanel'         do 'preselection_panel_test_checkout'",
+                            @$"on 'on_panel_focus_CheckoutPanel '            do 'checkout_panel_test_select_other_pm'",
+                            @$"on 'on_panel_focus_SelectPaymentMethodPanel'  do 'selection_panel_test_new_card'",
+                            @$"on 'on_panel_focus_CreditCardInfoPanel'       do 'credit_card_info_panel_fill_test_card' and 'credit_card_info_panel_confirm'",
+                            @$"on 'on_panel_focus_SuccessPanel'              do 'fill_test_email' and 'test_click_send_receipt'", // and 'test_close_checkout_screen_clicked'",
+                          //@$"on 'on_panel_focus_SuccessPanel'              do 'success_panel_wait_and_do_nothing'",
+                            
                             //
                             // Test Product 2
-                            @$"on 'on_back_to_store_screen'         do 'test_purchase_product_2'",
-                            @$"on 'on_view_focus_PreselectionPanel' do 'preselection_panel_test_checkout'",
-                            @$"on 'on_view_focus_CheckoutPanel '    do 'checkout_panel_test_confirm_purchase'",
-                          //@$"on 'on_view_focus_SuccessPanel'      do 'test_close_checkout_screen_clicked'",
-                            @$"on 'on_view_focus_SuccessPanel'      do 'success_panel_wait_and_do_nothing'",
+                            @$"on 'on_back_to_store_screen'          do 'test_purchase_product_2'",
+                          //@$"on 'on_panel_focus_PreselectionPanel' do 'preselection_panel_test_checkout'",
+                            @$"on 'on_panel_focus_CheckoutPanel '    do 'checkout_panel_test_confirm_purchase'",
+                          //@$"on 'on_panel_focus_SuccessPanel'      do 'test_close_checkout_screen_clicked'",
+                            @$"on 'on_panel_focus_SuccessPanel'      do 'success_panel_wait_and_do_nothing'",
                         };
 
                         foreach (var rule in rules)

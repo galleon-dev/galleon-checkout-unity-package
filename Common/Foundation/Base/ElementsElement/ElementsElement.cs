@@ -16,13 +16,13 @@ namespace Galleon.Checkout.Foundation
         {
             Element Folder              = new Element(name : "Folder");                     this.Collection.Add(Folder);
                 var folderAssetsNS      = new DefinitionNode() { Value = "(assets)" };      Folder.Node.AddChild(folderAssetsNS);
-                    var Assets          = new DefinitionNode() { Value = "Folder" };        folderAssetsNS.Node.AddChild(Assets);
+                    var Assets          = new DefinitionNode()     { Value = "Folder" };    folderAssetsNS.Node.AddChild(Assets);
             
             Element Package             = new Element(name : "Package");                    this.Collection.Add(Package);
                 var packageAssetsNS     = new DefinitionNode() { Value = "(assets)" };      Package.Node.AddChild(packageAssetsNS);
-                    var AssetsFolder    = new DefinitionNode() { Value = "Folder" };        packageAssetsNS.Node.AddChild(AssetsFolder);
+                    var AssetsFolder    = new DefinitionNode()     { Value = "Folder" };    packageAssetsNS.Node.AddChild(AssetsFolder);
                 var packageHierarchyNS  = new DefinitionNode() { Value = "(hierarchy)" };   Package.Node.AddChild(packageHierarchyNS);
-                    var Scene           = new DefinitionNode() { Value = "Scene" };         packageHierarchyNS.Node.AddChild(Scene);
+                    var Scene           = new DefinitionNode()     { Value = "Scene" };     packageHierarchyNS.Node.AddChild(Scene);
         }
         
         public static Element GetElement(Type type)

@@ -351,8 +351,8 @@ namespace Galleon.Checkout.UI
 
         public Step SetPage(Page page)
         =>
-            new Step(name: $"set_{page.Name}_page"
-                    , action: async (s) =>
+            new Step(name  : $"set_{page.Name}_page"
+                    ,action: async (s) =>
                     {
                         ///////////////////////// Setup
 
@@ -394,8 +394,8 @@ namespace Galleon.Checkout.UI
 
         public Step Navigate()
         =>
-            new Step(name: $"navigate"
-                    , action: async (s) =>
+            new Step(name   : $"navigate"
+                    ,action : async (s) =>
                     {
                         Page page = NavigationHistory.Last();
 
@@ -426,6 +426,7 @@ namespace Galleon.Checkout.UI
                               {
                                   // await Close();
                                   s.ParentStep.RemoveStepsAfterThisInParentFlow();
+                                  s.ParentStep.AddPostStep(CHECKOUT.Session.On_CheckoutScreenClosed());
                               });
 
         public Step UI_Back()
@@ -659,7 +660,7 @@ namespace Galleon.Checkout.UI
                     
         
         public Page PreselectionPage         = new Page(name  : "preselection"
-                                                       ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                       ,header: HeaderPanelView     .STATE.x_button             .ToString()
                                                        ,panel : CheckoutScreenMobile.STATE.preselection_panel   .ToString()
                                                        ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
                                                        ,setup : page =>
@@ -719,7 +720,7 @@ namespace Galleon.Checkout.UI
         public Page SettingsPage             = new Page(name  : "settings"
                                                        ,header: HeaderPanelView     .STATE.back_and_text       .ToString()
                                                        ,panel : CheckoutScreenMobile.STATE.settings_panel      .ToString()
-                                                       ,footer: FooterPanelView     .STATE.terms_privacy_return.ToString()
+                                                       ,footer: FooterPanelView     .STATE.none                .ToString()
                                                        ,setup : page =>
                                                               {
                                                                   page.NavigationMap[SettingsPanelView.ViewResult.DeletePaymentMethod.ToString()] = page.screen.ViewPage(page.screen.SimpleDialogPage);
@@ -790,7 +791,7 @@ namespace Galleon.Checkout.UI
         {
             // Current page result is close
             CurrentPage.PageResult = NavigationStates.Close.ToString();
-            IsPageActive = false;
+            IsPageActive           = false;
             
             // Close animation
             overrideContentSize = 0f;
