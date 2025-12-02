@@ -215,11 +215,11 @@ namespace Galleon.Checkout
                                                                                                     is_new_payment_method   = selectedUserPaymentMethod.IsNewPaymentMethod,
                                                                                                     payment_method          = new PaymentMethodDetails()
                                                                                                                             {
-                                                                                                                                 id   = selectedUserPaymentMethod.IsNewPaymentMethod ? null : selectedUserPaymentMethod.Data.id,
+                                                                                                                                 id   = selectedUserPaymentMethod.Data.id,
                                                                                                                                  data = selectedUserPaymentMethod.GetDataForCharge(),
                                                                                                                             },
                                                                                                     save_payment_method     = isNewPaymentMethod,
-                                                                                                    success_redirect_url              = CheckoutClient.Instance.URLs.AppDeepLinkReturnURL
+                                                                                                    return_url              = CheckoutClient.Instance.URLs.AppDeepLinkReturnURL
                                                                                                 });
                             
                             CheckoutClient.Instance.CurrentSession.lastChargeResult = response.result;
