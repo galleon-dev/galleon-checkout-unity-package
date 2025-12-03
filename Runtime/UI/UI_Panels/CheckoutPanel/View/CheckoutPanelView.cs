@@ -46,11 +46,8 @@ namespace Galleon.Checkout.UI
 
         public TMP_Dropdown DropdownMenu;
 
-        [Header("Payment Buttons")]
+        [Header("Payment Button")]
         public GameObject PurchaseButton;
-        public GameObject GooglePayButton;
-        public GameObject PaypalPayButton;
-        public GameObject ApplePayButton;
 
         [Header("Taxes")]
         public List<GameObject> TaxesPanels;
