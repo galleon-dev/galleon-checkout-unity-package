@@ -40,40 +40,51 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             new Step(name   : $"execute_PPF1M"
                     ,action : async (flow) =>
                     {
-                        await DumpParentElement()               .Execute();
-                        await DumpChildElement()                .Execute();
-                        await ManuallyCreateChildVirtualTree()  .Execute();
-                        await ManuallyCreateFullVirtualTree()   .Execute();
-                        await DumpVirtualTree()                 .Execute();
+                        flow.AddChildStep(DumpChildElement()              );
+                        flow.AddChildStep(DumpParentElement()             );
+                        flow.AddChildStep(ManuallyCreateChildVirtualTree());
+                        flow.AddChildStep(ManuallyCreateFullVirtualTree() );
+                        flow.AddChildStep(DumpVirtualTree()               );
         
-                        foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
-                        {
-                            if (vNode.DoesNeedToDoAction)
-                                await vNode.DoAction();
-                        }
+                        flow.AddChildStep("setup_flow"
+                                         ,async s =>
+                                                  {
+                                                      foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
+                                                      {
+                                                          if (vNode.DoesNeedToDoAction)
+                                                              await vNode.DoAction();
+                                                      }
+                                                  
+                                                  });
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
-        
-        public Step DumpParentElement() 
-        =>
-            new Step(action : async (s) =>
-            {
-                 Element parentElement = this.Parent.Node.GetElement();
-            });
         
         public Step DumpChildElement() 
         =>
             new Step(action : async (s) =>
             {
                  Element childElement = Elements.GetElementByName("Folder");
+                 var dump = childElement.DumpDefinition();
+                 foreach (var line in dump)
+                     s.Log(line);
+            });
+        
+        public Step DumpParentElement() 
+        =>
+            new Step(action : async (s) =>
+            {
+                 Element parentElement = this.Parent.Node.GetElement();
+                 var dump = parentElement.DumpDefinition();
+                 foreach (var line in dump)
+                     s.Log(line);
             });
         
         public Step ManuallyCreateChildVirtualTree() 
         =>
             new Step(action : async (s) =>
             {
-                 
+                this.ChildVirtualTree = new PPF1M_LiveNode()        { TextNode = new TextNode("> Assets.Folder f1"), Operation = this }; ChildVirtualTree.Node.AddChild(ChildVirtualTree); // f1
             });
         
         public Step ManuallyCreateFullVirtualTree() 
@@ -82,7 +93,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             {
                 this.FullVirtualTree = new PPF1M_LiveNode()        { TextNode = new TextNode("root"), Operation = this};                                                                              // Root
                     var pf              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1"), Operation = this }; FullVirtualTree.Node.AddChild(pf);                      // package_1
-                        var f1              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1"), Operation = this,  DoesNeedToDoAction = true}; pf.Node.AddChild(f1);         // f1 
+                        var f1              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder f1"),   Operation = this,  DoesNeedToDoAction = true}; pf.Node.AddChild(f1);         // f1 
             });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper debug steps
@@ -100,16 +111,16 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             });
     }
     
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
     
     public class PPF1M_LiveNode : Entity
     {
@@ -163,16 +174,16 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
     }
 }
 
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
 
 namespace Galleon.Checkout
 {

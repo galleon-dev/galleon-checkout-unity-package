@@ -1,35 +1,52 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
 
 namespace Galleon.Checkout
 {
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Element Class
+    
     [Element("element")]   
     public partial class Element : Entity
     {
         //// Members
         
-        public string Name;
-
+        public string         Name;
+        public DefinitionNode Definition;
+        
         //// Lifecycle
         
         public Element(string name)
         {
             this.Name = name;
         }
+        
+        //// Methods
+        
+        public string[] DumpDefinition()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var child in Definition.Node.Descendants().OfType<DefinitionNode>())
+            {
+                sb.AppendLine(child.Text);
+            }
+            
+            return sb.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        }
     }
     
     public class DefinitionNode : Entity
     {
-        public string Value = "";
-        
-        public bool IsNamespace => Value.StartsWith("(") && Value.EndsWith(")");
+        public string Text        =  "";
+        public bool   IsNamespace => Text.StartsWith("(") && Text.EndsWith(")");
     }
     
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Element Attribute
     
     [AttributeUsage(AttributeTargets.All)]
     public class ElementAttribute : Attribute

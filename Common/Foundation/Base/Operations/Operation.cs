@@ -520,11 +520,5 @@ namespace Galleon.Checkout
         }
     }
     
-    public partial class Element
-    {
-        
-        
-        
-    }
 }
 
