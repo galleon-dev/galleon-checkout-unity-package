@@ -31,12 +31,26 @@ namespace Galleon.Checkout
         public Sprite WebCheckoutIconSprite;
         public Sprite CashAppIconSprite;
         public Sprite AmazonPayIconSprite;
+        public Sprite VenmoIconSprite;
+        public Sprite ZelleIconSprite;
+
         // Buttons
         public Sprite CheckoutButtonSprite;
         public Sprite GpaybuttonSprite;
         public Sprite PaypalbuttonSprite;
         public Sprite AppleButtonSprite;
-        
+        public Sprite AmazonPayButtonSprite;
+        public Sprite AmexButtonSprite;
+        public Sprite CashAppButtonSprite;
+        public Sprite DinersButtonSprite;
+        public Sprite DiscoverButtonSprite;
+        public Sprite KlarnaButtonSprite;
+        public Sprite MastercardButtonSprite;
+        public Sprite VenmoButtonSprite;
+        public Sprite VisaButtonSprite;
+        public Sprite ZelleButtonSprite;
+
+
         [Header("Cloud")]
         public List<SpriteResource> SpriteResources = new();
         
@@ -68,6 +82,8 @@ namespace Galleon.Checkout
                     case "web_checkout":       return WebCheckoutIconSprite;
                     case "cashapp":            return CashAppIconSprite;
                     case "amazon_pay":         return AmazonPayIconSprite;
+                    case "venmo":              return VenmoIconSprite;
+                    case "zelle":              return ZelleIconSprite;
                     case "native":
                         #if UNITY_ANDROID
                             return GPlayIconSprite;
@@ -102,6 +118,17 @@ namespace Galleon.Checkout
                     case "paypal":          return PaypalbuttonSprite;
                     case "empty_paypal":    return PaypalbuttonSprite;
                     case "apple":           return AppleButtonSprite;
+                    case "amazon_pay":      return AmazonPayButtonSprite;
+                    case "amex":            return AmexButtonSprite;
+                    case "cashapp":         return CashAppButtonSprite;
+                    case "diners":          return DinersButtonSprite;
+                    case "discover":        return DiscoverButtonSprite;
+                    case "klarna":          return KlarnaButtonSprite;
+                    case "mastercard":      return MastercardButtonSprite;
+                    case "venmo":           return VenmoButtonSprite;
+                    case "visa":            return VisaButtonSprite;
+                    case "zelle":           return ZelleButtonSprite;
+
                     default:                return CheckoutButtonSprite;
                 }
             }
