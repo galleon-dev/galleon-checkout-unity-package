@@ -14,21 +14,42 @@ namespace Galleon.Checkout.Foundation
 
         public Elements()
         {
-            Element Folder                  = new Element(name : "Folder");                                     this.Collection.Add(Folder);
-                Folder.Definition           = new DefinitionNode() { Text = "> Element Folder" }; 
-                var folderAssetsNS          = new DefinitionNode() { Text = "   > (assets)" };                  Folder.Definition.Node.AddChild(folderAssetsNS);
-                    var Assets              = new DefinitionNode() { Text = "       > Folder" };                folderAssetsNS.Node.AddChild(Assets);
+            Element Folder    = new Element(name : "Folder"); this.Collection.Add(Folder);
+            Folder.Definition = DefinitionNode.Parse(new []
+                                                     {
+                                                        "> Element Folder "
+                                                     ,  "   > (assets)    "
+                                                     ,  "       > Folder  "
+                                                     });
             
-            Element Package                 = new Element(name : "Package");                                    this.Collection.Add(Package);
-                Package.Definition          = new DefinitionNode() { Text = "> Element Package" }; 
-                var packageDefinitionsNS    = new DefinitionNode() { Text = "   > (definitions)" };             Package.Definition.Node.AddChild(packageDefinitionsNS);
-                    var FolderDefinition    = new DefinitionNode() { Text = "       > Definition Folder" };     packageDefinitionsNS.Node.AddChild(FolderDefinition);
-                var packageElementsNS       = new DefinitionNode() { Text = "   > (elements)" };                Package.Definition.Node.AddChild(packageElementsNS);
-                    var FolderElement       = new DefinitionNode() { Text = "       > Element Folder" };        packageElementsNS.Node.AddChild(FolderElement);
-                var packageAssetsNS         = new DefinitionNode() { Text = "   > (assets)" };                  Package.Definition.Node.AddChild(packageAssetsNS);
-                    var AssetsFolder        = new DefinitionNode() { Text = "       > Folder top" };            packageAssetsNS.Node.AddChild(AssetsFolder);
-                var packageHierarchyNS      = new DefinitionNode() { Text = "   > (hierarchy)" };               Package.Definition.Node.AddChild(packageHierarchyNS);
-                    var Scene               = new DefinitionNode() { Text = "       > Scene main" };            packageHierarchyNS.Node.AddChild(Scene);
+          //    Folder.Definition           = new DefinitionNode() { TextNode = "> Element Folder" }; 
+          //    var folderAssetsNS          = new DefinitionNode() { TextNode = "   > (assets)" };                  Folder.Definition.Node.AddChild(folderAssetsNS);
+          //        var Assets              = new DefinitionNode() { TextNode = "       > Folder" };                folderAssetsNS.Node.AddChild(Assets);
+            
+            Element Package                 = new Element(name : "Package"); this.Collection.Add(Package);
+            Package.Definition = DefinitionNode.Parse(new []
+                                                      {
+                                                         "> Element Package             "
+                                                      ,  "   > (definitions)            "
+                                                      ,  "       > Definition Folder    "
+                                                      ,  "   > (elements)               "
+                                                      ,  "       > Element Folder       "
+                                                      ,  "   > (assets)                 "
+                                                      ,  "       > Folder top           "
+                                                      ,  "   > (hierarchy)              "
+                                                      ,  "       > Scene main           "
+                                                      });
+            
+            
+          //    Package.Definition          = new DefinitionNode() { TextNode = "> Element Package" }; 
+          //    var packageDefinitionsNS    = new DefinitionNode() { TextNode = "   > (definitions)" };             Package.Definition.Node.AddChild(packageDefinitionsNS);
+          //        var FolderDefinition    = new DefinitionNode() { TextNode = "       > Definition Folder" };     packageDefinitionsNS.Node.AddChild(FolderDefinition);
+          //    var packageElementsNS       = new DefinitionNode() { TextNode = "   > (elements)" };                Package.Definition.Node.AddChild(packageElementsNS);
+          //        var FolderElement       = new DefinitionNode() { TextNode = "       > Element Folder" };        packageElementsNS.Node.AddChild(FolderElement);
+          //    var packageAssetsNS         = new DefinitionNode() { TextNode = "   > (assets)" };                  Package.Definition.Node.AddChild(packageAssetsNS);
+          //        var AssetsFolder        = new DefinitionNode() { TextNode = "       > Folder top" };            packageAssetsNS.Node.AddChild(AssetsFolder);
+          //    var packageHierarchyNS      = new DefinitionNode() { TextNode = "   > (hierarchy)" };               Package.Definition.Node.AddChild(packageHierarchyNS);
+          //        var Scene               = new DefinitionNode() { TextNode = "       > Scene main" };            packageHierarchyNS.Node.AddChild(Scene);
         }
         
         public static Element GetElement(Type type)

@@ -153,7 +153,7 @@ namespace Galleon.Checkout.Foundation
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Parse API
 
-        public static TextNode  Parse(string text)
+        public static TextNode Parse(string text)
         {
             return Parse(text.Split('\n').ToList());
         }

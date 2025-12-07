@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationPPF1M;
+using UnityEngine;
 
 namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
 {
@@ -52,7 +53,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
                                                       foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
                                                       {
                                                           if (vNode.DoesNeedToDoAction)
-                                                              await vNode.DoAction();
+                                                              flow.AddChildStep(vNode.DoAction());
                                                       }
                                                   
                                                   });
@@ -91,9 +92,20 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
         =>
             new Step(action : async (s) =>
             {
-                this.FullVirtualTree = new PPF1M_LiveNode()        { TextNode = new TextNode("root"), Operation = this};                                                                              // Root
-                    var pf              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1"), Operation = this }; FullVirtualTree.Node.AddChild(pf);                      // package_1
-                        var f1              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder f1"),   Operation = this,  DoesNeedToDoAction = true}; pf.Node.AddChild(f1);         // f1 
+                this.FullVirtualTree = PPF1M_LiveNode.ParseTree(new []
+                                       {
+                                           "> Assets.Folder package1    "
+                                       ,   "    > Assets.Folder f1      "
+                                       });
+
+                foreach (var textNode in FullVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
+                {
+                    s.Log(textNode.RawText);
+                }
+                
+                // this.FullVirtualTree = new PPF1M_LiveNode()        { TextNode = new TextNode("> root"), Operation = this};                                                                              // Root
+                //     var pf              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1"), Operation = this }; FullVirtualTree.Node.AddChild(pf);                      // package_1
+                //         var f1              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder f1"),   Operation = this,  DoesNeedToDoAction = true}; pf.Node.AddChild(f1);         // f1 
             });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper debug steps
@@ -124,7 +136,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
     
     public class PPF1M_LiveNode : Entity
     {
-        ////////////////// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public PPF1M_LiveOperation   Operation               { get; set; }
         
@@ -132,21 +144,72 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
         public bool                  DoesNeedToDoAction      = false;
         public IEntity               LinkedCreatedEntity;
 
-        ////////////////// Properties
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public string action_type => TextNode == null ? "plus" : "plus";
         
-        ////////////////// Main Actions
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Static
         
-        public async Task DoAction()
+        public static PPF1M_LiveNode ParseTree(string lines) => ParseTree(lines.Split('\n'));
+        public static PPF1M_LiveNode ParseTree(IEnumerable<string> lines)
         {
-            switch (action_type)
+            PPF1M_LiveNode rootLiveNode = null;
+            TextNode       rootTextNode = TextNode.Parse(lines);
+            
+            Debug.Log(">>>");
+            foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
-                case "plus" : await DoPlus().Execute(); return;
-                default     :                           return;
+                Debug.Log(textNode.RawText);
             }
+            Debug.Log("<<<");
+            
+            foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
+            {
+                var liveNode = ParseNode(textNode.RawText);
+                textNode.Node.Data["live_node"] = liveNode;
+                
+                if (textNode.Node.Parent != null)
+                {
+                    var parentText     = textNode  .Node.Parent;
+                    var parentLiveNode = parentText.Node.Data["live_node"] as PPF1M_LiveNode;
+                    liveNode.Node.SetParent(parentLiveNode);
+                }
+                else
+                {
+                    rootLiveNode = liveNode;
+                }
+            }
+            
+            // cleanup
+            foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
+            {
+                textNode.Node.Data.Remove("live_node");
+            }
+            
+            return rootLiveNode;
         }
         
+        public static PPF1M_LiveNode ParseNode(string nodeText)
+        {
+            var node      = new PPF1M_LiveNode();
+            node.TextNode = TextNode.Parse(nodeText);
+            return node;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Actions
+        
+        public Step DoAction() 
+        =>
+            new Step(name   : $"do_action"
+                    ,action : async (s) =>
+                    {
+                        switch (action_type)
+                        {
+                            case "plus" : s.AddChildStep(DoPlus()); return;
+                            default     :                           return;
+                        }
+                        
+                    });
         
         public Step DoPlus()
         =>
