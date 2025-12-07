@@ -18,7 +18,7 @@ namespace Galleon.SampleApp
         ////////////////////////////////////////////////////////////////////// Members
         
         public StoreView StoreView;
-        public TMP_Text ReportText;
+        public TMP_Text  ReportText;
         
         ////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -56,6 +56,7 @@ namespace Galleon.SampleApp
             }
             
             CHECKOUT.PaymentMethods.ClearSavedData();
+            RefreshConfig();
             
             SampleAppStart().Execute();
             
@@ -79,6 +80,39 @@ namespace Galleon.SampleApp
                     ,action : async (s) =>
                     {   
                     });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
+        
+        public void On_DropdownValueChanged(int value)
+        {
+            RefreshConfig();
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
+        
+        public void RefreshConfig()
+        {
+            switch (this.StoreView.drp_preselection.captionText.text.ToLower())
+            {
+                case "enabled"  : CHECKOUT.Globals.IsPreselectionEnabled = true;           break;
+                case "disabled" : CHECKOUT.Globals.IsPreselectionEnabled = false;          break;
+                default         : CHECKOUT.Globals.clear_override_IsPreselectionEnabled(); break;
+            }
+
+            switch (this.StoreView.drp_footer.captionText.text.ToLower())
+            {
+                case "regular"    : CHECKOUT.Globals.ShowLongFooter = false;          break;
+                case "california" : CHECKOUT.Globals.ShowLongFooter = true;           break;
+                default           : CHECKOUT.Globals.clear_override_ShowLongFooter(); break;
+            }
+
+            switch (this.StoreView.drp_tax.captionText.text.ToLower())
+            {
+                case "inclusive" : CHECKOUT.Globals.ShowTaxBreakdown = false;          break;
+                case "show full" : CHECKOUT.Globals.ShowTaxBreakdown = true;           break;
+                default          : CHECKOUT.Globals.clear_override_ShowTaxBreakdown(); break;
+            }
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
         

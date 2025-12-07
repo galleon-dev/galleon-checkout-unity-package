@@ -195,6 +195,7 @@ namespace Galleon.Checkout
                                                                Data                = data,
                                                            });
                         }
+                        
                     });
         
         public Step InitializeDefinitions() 

@@ -63,6 +63,11 @@ namespace Galleon.Checkout
             else
                 ConfigData[key].OverrideValue(value);
         }
+        public void ClearOverrideValue(string key)
+        {
+            if (ConfigData.ContainsKey(key))
+                ConfigData[key].ClearOverrideValue();
+        }
         
     }
     

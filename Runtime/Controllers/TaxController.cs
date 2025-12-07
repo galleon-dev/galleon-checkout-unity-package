@@ -32,8 +32,8 @@ namespace Galleon.Checkout
                                   //     s.Log($" - {t.Key} : {t.Value}");
                                   
                                   // Fake data until server is ready :
-                                  taxes.Add("Tax", new TaxItem() { inclusive = true, tax_amount = 4.99m } );
-                                  taxes.Add("irs", new TaxItem() { inclusive = true, tax_amount = 2.99m } );
+                                  taxes.Add("Levan Tax", new TaxItem() { inclusive = true, tax_amount = 4.99m } );
+                                  taxes.Add("IRS",       new TaxItem() { inclusive = true, tax_amount = 2.99m } );
                               });
         
         public Step GetTaxInfo()

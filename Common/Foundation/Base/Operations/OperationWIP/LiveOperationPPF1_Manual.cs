@@ -41,22 +41,13 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             new Step(name   : $"execute_PPF1M"
                     ,action : async (flow) =>
                     {
-                        flow.AddChildStep(DumpChildElement()              );
-                        flow.AddChildStep(DumpParentElement()             );
-                        flow.AddChildStep(ManuallyCreateChildVirtualTree());
-                        flow.AddChildStep(ManuallyCreateFullVirtualTree() );
-                        flow.AddChildStep(DumpVirtualTree()               );
-        
-                        flow.AddChildStep("setup_flow"
-                                         ,async s =>
-                                                  {
-                                                      foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
-                                                      {
-                                                          if (vNode.DoesNeedToDoAction)
-                                                              flow.AddChildStep(vNode.DoAction());
-                                                      }
-                                                  
-                                                  });
+                        flow.AddChildStep(DumpChildElement()               );
+                        flow.AddChildStep(DumpParentElement()              );
+                        flow.AddChildStep(ManuallyCreateChildVirtualTree() );
+                        flow.AddChildStep(ManuallyCreateFullVirtualTree()  );
+                        flow.AddChildStep(ManuallyCreateZipedTree()        );
+                        flow.AddChildStep(DumpVirtualTree()                );
+                        flow.AddChildStep(RunLiveFlow()                    );
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
@@ -75,6 +66,18 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
         =>
             new Step(action : async (s) =>
             {
+                /// > Package
+                ///     > (definition)
+                ///         > definition
+                ///     > (Elements)
+                ///         > Element
+                ///     > (Assets)
+                ///         > Folder "package1"
+                ///     > (Hierarchy)
+                ///         > Scene "main"
+                ///     > (whatever)
+                ///         > Whatever "..."
+                
                  Element parentElement = this.Parent.Node.GetElement();
                  var dump = parentElement.DumpDefinition();
                  foreach (var line in dump)
@@ -85,28 +88,60 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
         =>
             new Step(action : async (s) =>
             {
-                this.ChildVirtualTree = new PPF1M_LiveNode()        { TextNode = new TextNode("> Assets.Folder f1"), Operation = this }; ChildVirtualTree.Node.AddChild(ChildVirtualTree); // f1
+                this.ChildVirtualTree = ParseTree(new []
+                                        {
+                                           "> Assets.Folder f1"
+                                        });
+
+                foreach (var node in ChildVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
+                    s.Log(node.RawText);
+                
+            });        
+        
+        public Step ManuallyCreateZipedTree() 
+        =>
+            new Step(action : async (s) =>
+            {
+                var zipTree = ParseTree(new []
+                              {
+                                 "> Assets.Folder f1"
+                              });
+
+                foreach (var node in zipTree.TextNode.Node.Descendants().OfType<TextNode>())
+                    s.Log(node.RawText);
+                
             });
         
         public Step ManuallyCreateFullVirtualTree() 
         =>
             new Step(action : async (s) =>
             {
-                this.FullVirtualTree = PPF1M_LiveNode.ParseTree(new []
+                this.FullVirtualTree = ParseTree(new []
                                        {
-                                           "> Assets.Folder package1    "
-                                       ,   "    > Assets.Folder f1      "
+                                           "> Package package                    #exists "
+                                       ,   "    > (Assets)                       #exists "
+                                       ,   "        > Assets.Folder 'package 1'  #exists "
+                                       ,   "            > Assets.Folder 'f1'     #plus   "
                                        });
 
-                foreach (var textNode in FullVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
-                {
-                    s.Log(textNode.RawText);
-                }
                 
-                // this.FullVirtualTree = new PPF1M_LiveNode()        { TextNode = new TextNode("> root"), Operation = this};                                                                              // Root
-                //     var pf              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder package1"), Operation = this }; FullVirtualTree.Node.AddChild(pf);                      // package_1
-                //         var f1              = new PPF1M_LiveNode()         { TextNode = new TextNode("> Assets.Folder f1"),   Operation = this,  DoesNeedToDoAction = true}; pf.Node.AddChild(f1);         // f1 
+                
+                foreach (var node in ChildVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
+                    s.Log(node.RawText);
             });
+        
+        public Step RunLiveFlow() 
+            =>
+            new Step(name   : $"run_live_flow"
+                    ,action : async (s) =>
+                    {   
+                        foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
+                        {
+                            s.Log($"- {vNode.TextNode.RawText} { (vNode.DoesNeedToDoAction ? "<-- action" : "") } ");
+                            if (vNode.DoesNeedToDoAction)
+                                s.ParentStep.AddChildStep(vNode.DoAction());
+                        }                          
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper debug steps
        
@@ -114,13 +149,21 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
         =>
             new Step(action : async (s) =>
             {
-                foreach (var item in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
-                {
-                    var indent = item.Node.Ancestors().Count();
-                    var prefix = new string(' ', indent * 4);
-                    s.Log($"{prefix}{item.TextNode.FullText}");
-                }
+                foreach (var textNode in FullVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
+                    s.Log(textNode.RawText);
             });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Parse Methods
+        
+        public PPF1M_LiveNode ParseTree(string[] lines)
+        {
+            var root = PPF1M_LiveNode.ParseTree(lines);
+
+            foreach (var node in root.Node.Descendants().OfType<PPF1M_LiveNode>())
+                node.Operation = this;
+            
+            return root;
+        }
     }
     
     /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
@@ -156,16 +199,9 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             PPF1M_LiveNode rootLiveNode = null;
             TextNode       rootTextNode = TextNode.Parse(lines);
             
-            Debug.Log(">>>");
             foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
-                Debug.Log(textNode.RawText);
-            }
-            Debug.Log("<<<");
-            
-            foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
-            {
-                var liveNode = ParseNode(textNode.RawText);
+                var liveNode = ParseNode(textNode);
                 textNode.Node.Data["live_node"] = liveNode;
                 
                 if (textNode.Node.Parent != null)
@@ -189,10 +225,14 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             return rootLiveNode;
         }
         
-        public static PPF1M_LiveNode ParseNode(string nodeText)
+        public static PPF1M_LiveNode ParseNode(TextNode textNode)
         {
             var node      = new PPF1M_LiveNode();
-            node.TextNode = TextNode.Parse(nodeText);
+            node.TextNode = textNode;
+            
+            if (node.TextNode.Hashtags.Contains("plus"))
+                node.DoesNeedToDoAction = true;
+            
             return node;
         }
         
