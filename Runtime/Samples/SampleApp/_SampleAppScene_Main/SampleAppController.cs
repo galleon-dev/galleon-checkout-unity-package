@@ -101,16 +101,16 @@ namespace Galleon.SampleApp
 
             switch (this.StoreView.drp_footer.captionText.text.ToLower())
             {
-                case "regular"    : CHECKOUT.Globals.ShowLongFooter = false;          break;
-                case "california" : CHECKOUT.Globals.ShowLongFooter = true;           break;
-                default           : CHECKOUT.Globals.clear_override_ShowLongFooter(); break;
+                case "regular"    : CHECKOUT.Globals.ShowLongFooter = false;                break;
+                case "california" : CHECKOUT.Globals.ShowLongFooter = true;                 break;
+                default           : CHECKOUT.Globals.clear_override_ShowLongFooter();       break;
             }
 
             switch (this.StoreView.drp_tax.captionText.text.ToLower())
             {
-                case "inclusive" : CHECKOUT.Globals.ShowTaxBreakdown = false;          break;
-                case "show full" : CHECKOUT.Globals.ShowTaxBreakdown = true;           break;
-                default          : CHECKOUT.Globals.clear_override_ShowTaxBreakdown(); break;
+                case "inclusive" : CHECKOUT.Globals.ShowTaxBreakdown = false;               break;
+                case "show full" : CHECKOUT.Globals.ShowTaxBreakdown = true;                break;
+                default          : CHECKOUT.Globals.clear_override_ShowTaxBreakdown();      break;
             }
         }
         
