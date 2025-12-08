@@ -4,242 +4,378 @@ using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationPPF1;
+using UnityEngine;
 
 namespace Galleon.Checkout.Foundation.LiveOperationPPF1
 {
     public class PPF1_LiveOperation : Entity
     {   
-        ///////// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public string           ID;
-        public IEntity          Parent;
+        public IEntity          OperationParent;
         
         public PPF1_LiveNode    OriginalTree;
         public PPF1_LiveNode    ChildVirtualTree;
-        public PPF1_LiveNode    ParentFullVirtualTree;
+        public PPF1_LiveNode    FullVirtualTree;
         
         
-        ///////// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public PPF1_LiveOperation(string id, IEntity parent, string definition)
+        public PPF1_LiveOperation(string id, IEntity operationParent, string definitionText)
         {
             this.ID                     = id;
-            this.Parent                 = parent;
-            this.OriginalTree           = new ()
+            this.OperationParent                 = operationParent;
+            this.OriginalTree           = new()
                                         {
-                                            TextNode = new TextNode(definition)
+                                            DefinitionNode = new DefinitionNode(definitionText), 
+                                            Operation      = this
                                         };
-            this.OriginalTree.Operation = this;
-            this.ChildVirtualTree       = OriginalTree.CloneTree();
         }
         
         
-        ///////// Main API
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow
         
         public Step Flow() 
         =>
             new Step(name   : $"execute_PPF1"
-                    ,action : async (s) =>
+                    ,action : async (flow) =>
                     {
-                        ChildVirtualTree.DO_PPF1_CreateChildVTree();
-
-                        foreach (var vNode in ChildVirtualTree.Node.Descendants().OfType<PPF1_LiveNode>())
-                        {
-                            if (vNode.DoesNeedToDoAction)
-                                vNode.DO_PPF1_PLusAction_Per_Node();
-                        }
+                        flow.AddChildStep(DumpChildElement()       );
+                        flow.AddChildStep(DumpParentElement()      );
+                        flow.AddChildStep(CreateChildVirtualTree() );
+                        flow.AddChildStep(CreateParentVirtualTree());
+                        flow.AddChildStep(CreateZipedTree()        );
+                        flow.AddChildStep(CreateFullVirtualTree()  );
+                        flow.AddChildStep(DumpVirtualTree()        );
+                        flow.AddChildStep(RunLiveFlow()            );
                     });
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
+        
+        public Step DumpChildElement() 
+        =>
+            new Step(action : async (s) =>
+            {
+                 Element childElement = Elements.GetElementByName("Folder");
+                 var dump = childElement.DumpDefinition();
+                 foreach (var line in dump)
+                     s.Log(line);
+            });
+        
+        public Step DumpParentElement() 
+        =>
+            new Step(action : async (s) =>
+            {
+                /// > Package
+                ///     > (definition)
+                ///         > definition
+                ///     > (Elements)
+                ///         > Element
+                ///     > (Assets)
+                ///         > Folder "package1"
+                ///     > (Hierarchy)
+                ///         > Scene "main"
+                ///     > (whatever)
+                ///         > Whatever "..."
+                
+                 Element parentElement = this.OperationParent.Node.GetElement();
+                 var dump = parentElement.DumpDefinition();
+                 foreach (var line in dump)
+                     s.Log(line);
+            });
+        
+        public Step CreateChildVirtualTree() 
+        =>
+            new Step(action : async (s) =>
+            {
+                this.ChildVirtualTree = OriginalTree.CloneTree();
+                
+                foreach (var node in ChildVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
+                    s.Log(node.RawText);
+            });        
+        
+        public Step CreateParentVirtualTree() 
+        =>
+            new Step(action : async (s) =>
+            {
+                Element parentElement = this.OperationParent.Node.GetElement();
+                var     parentTree    = parentElement.Definition.CloneTree();
+                
+                foreach (var node in parentTree.TextNode.Node.Descendants().OfType<TextNode>())
+                    s.Log(node.RawText);
+            });        
+        
+        public Step CreateZipedTree() 
+        =>
+            new Step(action : async (s) =>
+            {
+                // Create zip tree
+                var zipTree = CreateZippedTree();
+                
+                // Log zip tree
+                foreach (var node in zipTree.Node.Descendants().OfType<DefinitionNode>())
+                {
+                    var expanded = node.DoesNeedToExpandToFullLine() ? node.ExpandToFullLine() : node.TextNode;
+                    s.Log($"{node.TextNode.RawText} - (ns:{node.GetNamespace() + ")", -15} ---> | {expanded.RawText}");
+                }        
+            });
+        
+        public Step CreateFullVirtualTree() 
+        =>
+            new Step(action : async (s) =>
+            {
+                // Create Zipped Tree
+                var zipTree = CreateZipedTree();
+                
+                // Insert Child
+                var childTree               = ChildVirtualTree.Node.Descendants().OfType<DefinitionNode>();
+                var childTreeNamespaceNodes = childTree.Where(n => n.IsNamespaceNode()).ToList();
+                
+                foreach (var childNamespaceNode in childTreeNamespaceNodes)
+                {
+                    var namespaceNodeInZipTree = zipTree.Node.Descendants().OfType<DefinitionNode>().FirstOrDefault();
+                }
+                
+                
+                foreach (var node in ChildVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
+                    s.Log(node.RawText);
+            });
+        
+        public Step RunLiveFlow() 
+            =>
+            new Step(name   : $"run_live_flow"
+                    ,action : async (s) =>
+                    {   
+                        foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<PPF1_LiveNode>())
+                        {
+                            s.Log($"- {vNode.TextNode.RawText} { (vNode.DoesNeedToDoAction ? "<-- action" : "") } ");
+                            
+                            if (vNode.DoesNeedToDoAction)
+                                s.ParentStep.AddChildStep(vNode.DoAction());
+                        }                          
+                    });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper debug steps
+       
+        public Step DumpVirtualTree()
+        =>
+            new Step(action : async (s) =>
+            {
+                foreach (var textNode in FullVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
+                    s.Log(textNode.RawText);
+            });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Parse Methods
+        
+        public PPF1_LiveNode ParseTree(string[] lines)
+        {
+            var root = PPF1_LiveNode.ParseTree(lines);
+
+            foreach (var node in root.Node.Descendants().OfType<PPF1_LiveNode>())
+                node.Operation = this;
+            
+            return root;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
+        
+        public DefinitionNode CreateZippedTree()
+        {
+            // Definitions
+            Element parentElement = this.OperationParent.Node.GetElement();
+            Element childElement  = Elements.GetElement(this.ChildVirtualTree.DefinitionNode.EntityType); 
+            var     parentTree    = parentElement.Definition.CloneTree();
+            var     childTree     = childElement.Definition.CloneTree();
+            
+            // Get child namespaces
+            var childNamespacesNodes = childTree.Node.Descendants().OfType<DefinitionNode>().Where(n => n.IsNamespaceNode()).ToList();
+            var childNamespaces      = childNamespacesNodes.Select(n => n.TextNode.FirstLineParenthesisContent).ToList();
+            
+            // Get parent namespaces
+            var parentNamespaceNodes = parentTree.Node.Descendants().OfType<DefinitionNode>().Where(n => n.IsNamespaceNode()).ToList();
+            var parentNamespaces     = parentNamespaceNodes.Select(n => n.TextNode.FirstLineParenthesisContent).ToList();
+            
+            // Clone zip tree from parent tree 
+            var zipTree = parentTree.CloneTree();
+
+            // Remove irrelevant namespaces from zip tree
+            var zipNamespaceNodes = zipTree.Node.Descendants().OfType<DefinitionNode>().Where(n => n.IsNamespaceNode()).ToList();
+            foreach(var namespaceNode in zipNamespaceNodes)
+            {
+                if (!childNamespaces.Contains(namespaceNode.TextNode.FirstLineParenthesisContent))
+                    namespaceNode.Node.RemoveFromParent();
+            }
+            
+            // return result
+            return zipTree;
+        }
     }
     
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
     
     public class PPF1_LiveNode : Entity
     {
-        //////////////// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public PPF1_LiveOperation   Operation { get; set; }
-        public TextNode             TextNode = new TextNode();
+        public PPF1_LiveOperation    Operation               { get; set; }
         
-        public bool                 DoesNeedToDoAction => Node.Parent is PPF1_LiveNode;
+        public DefinitionNode        DefinitionNode          = new DefinitionNode();
+        public TextNode              TextNode                => DefinitionNode.TextNode;
+        public bool                  DoesNeedToDoAction      = false;
+        public IEntity               LinkedCreatedEntity;
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public IEntity              LinkedCreatedEntity;
+        public string action_type => TextNode == null ? "plus" : "plus";
         
-        //////////////// Lifecycle
-       
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Static
+        
+        public static PPF1_LiveNode ParseTree(string lines) => ParseTree(lines.Split('\n'));
+        public static PPF1_LiveNode ParseTree(IEnumerable<string> lines)
+        {
+            PPF1_LiveNode  rootLiveNode = null;
+            TextNode       rootTextNode = TextNode.Parse(lines);
+            
+            foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
+            {
+                var liveNode = ParseNode(textNode);
+                textNode.Node.SetData(key : "live_node", value : liveNode);
+                
+                if (textNode.Node.Parent != null)
+                {
+                    var parentText     = textNode  .Node.Parent;
+                    var parentLiveNode = parentText.Node.GetData<PPF1_LiveNode>(key : "live_node");
+                    liveNode.Node.SetParent(parentLiveNode);
+                }
+                else
+                {
+                    rootLiveNode = liveNode;
+                }
+            }
+            
+            // cleanup
+            foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
+            {
+                textNode.Node.RemoveData(key : "live_node");
+            }
+            
+            return rootLiveNode;
+        }
+        
+        public static PPF1_LiveNode ParseNode(TextNode textNode)
+        {
+            var node            = new PPF1_LiveNode();
+            node.DefinitionNode = new DefinitionNode(textNode.RawText);
+            
+            if (node.TextNode.Hashtags.Contains("plus"))
+                node.DoesNeedToDoAction = true;
+            
+            return node;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
         public PPF1_LiveNode()
         {
         }
         
-        //////////////// Main Methods
-        
-        public void DO_PPFE1_MANUALLY_CREATE_TEST_VTREE()
-        {
-            
-        }
-        
-        public void DO_PPFE1_CreateFullVTree()
-        {
-            // first clone parent tree
-            this.Operation.ParentFullVirtualTree = this.PPF1_CloneActualTree(this.Operation.Parent);
-            
-            // Add Child V Tree
-            this.Operation.ChildVirtualTree.Node.Descendants().OfType<LiveNode>().ToList().ForEach(x => x.ActuallyExists = false);
-            this.Operation.ParentFullVirtualTree.PPF1_AddChildVTree(this.Operation.ChildVirtualTree.PPF1_CloneLiveTree());
-        }
-        
-        public void DO_PPF1_CreateChildVTree()
-        {
-            ////////////////////////////////////////////////////////////////////////
-            /// Folder Element Definition:
-            /// > Folder
-            ///     > (Assets)
-            ///         > Assets.Folder
-            ////////////////////////////////////////////////////////////////////////
-            /// Package Element Definition:
-            /// > Package
-            ///     > (Assets)
-            ///         > Assets.Folder "package_root_folder"
-            ///     > (Hierarchy)
-            ///         > H.Scene "package_main_scene"
-            ///     > (whatever)
-            ///         > Whatever "..."
-            ////////////////////////////////////////////////////////////////////////
-            /// Expected v tree result :
-            /// > (this node) Elements.Folder "f1"
-            ///     > (Assets)
-            ///         > Assets.Folder "f1"
-            ////////////////////////////////////////////////////////////////////////
-            /// And then :
-            /// > (this node) Elements.Folder "f1"
-            ///     > (Assets)
-            ///         > Assets.Folder "f1" <---- this needs to get printed under package root asset
-            ////////////////////////////////////////////////////////////////////////
-            /// need :
-            ///     -> print parent per category
-            ///////////////////////////////////////////////////////////////////////
-            
-            // Definitions
-            string                  targetElementName             = this.TextNode.LineWords.First();
-            
-            // Get Parent Element
-            Element                 parentElement                 = this.Operation.Parent.Node.GetElement();
-            
-            // Get Target Element
-            Element                 targetElement                 = Elements.GetElementByName(targetElementName);
-            
-            // Get relevant namespaces
-            var                     parentElementNamespaceNodes   = parentElement.Node.Descendants().OfType<DefinitionNode>().Where(x => x.IsNamespace); // get all namespace nodes under parent
-            var                     targetElementNamespaceNodes   = targetElement.Node.Descendants().OfType<DefinitionNode>().Where(x => x.IsNamespace); // get all namespace nodes under target element
-            var                     intersectionNodes             = parentElementNamespaceNodes.Intersect(targetElementNamespaceNodes);                  // get the intersection of the two
-            
-            // copy relevent nodes to vtree
-            foreach (var node in intersectionNodes)
-            {
-                
-            }
-            
-            // Add Folder Asset Live Node To VTree
-            PPF1_LiveNode           folderAssetLiveNode           = targetElement.PPFE1_Get_AssetFolderNode();
-            folderAssetLiveNode.Operation                         = this.Operation;
-            
-            // Add Assets.Folder node to this
-            this.Node.AddChild(folderAssetLiveNode);
-        }
-        
-        public void DO_PPF1_PLusAction_Per_Node()
-        {
-            //////// Validation
-            
-            if (!this.DoesNeedToDoAction) 
-                return;
-            
-            //////// Definitions
-            
-            string  type       = this.TextNode.LineContent.Split(' ').First(); // "Folder"
-            Type    childType  = Type.GetType("Galleon.Checkout." + type);
-            IEntity child      = (IEntity)Activator.CreateInstance(childType);
-            IEntity Parent     = this.Node.Parent;
-          //IEntity Parent     = this.Operation.Parent; var p = this.Node.Ancestors().OfType<PPF1_LiveNode>().FirstOrDefault(n => n.LinkedCreatedEntity != null);
-        
-            //////// Actual Action
-            
-            Parent.Node.AddChild(child);
-            child.Node.Live.LiveHandler.OnAddedToParent(Parent);
-            child.Node.Live.LiveHandler.Create();
-            LinkedCreatedEntity = child;
-        }
-        
-        //////////////// Helper Methods
-        
         public PPF1_LiveNode CloneNode()
         {
-            var clone        = new PPF1_LiveNode();
-            clone.TextNode   = TextNode.Clone();
-            clone.Operation  = Operation;
+            var clone                 = new PPF1_LiveNode();
+            clone.Operation           = this.Operation;
+            clone.DefinitionNode      = this.DefinitionNode.CloneNode();
+            clone.DoesNeedToDoAction  = this.DoesNeedToDoAction;
+            clone.LinkedCreatedEntity = this.LinkedCreatedEntity;
+            
             return clone;
         }
         
         public PPF1_LiveNode CloneTree()
         {
-            var nodeMap   = new Dictionary<PPF1_LiveNode, PPF1_LiveNode>();
-            var clone     = this.CloneNode();
-            nodeMap[this] = clone;
+            var clone = CloneNode();
 
-            foreach (var descendant in this.Node.Descendants().OfType<PPF1_LiveNode>())
+            foreach (var child in this.Node.Children.OfType<PPF1_LiveNode>())
             {
-                var descendantClone = descendant.CloneNode();
-                nodeMap[descendant] = descendantClone;
-
-                var parent = descendant.Node.Parent as PPF1_LiveNode;
-                if (parent != null && nodeMap.ContainsKey(parent))
-                {
-                    nodeMap[parent].Node.AddChild(descendantClone);
-                }
+                var childClone = child.CloneTree();
+                childClone.Node.SetParent(clone);
+                childClone.DefinitionNode.Node.SetParent(clone.DefinitionNode);
+                childClone.DefinitionNode.TextNode.Node.SetParent(clone.DefinitionNode.TextNode);
             }
 
             return clone;
         }
         
-        //////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Actions
         
-        public PPF1_LiveNode PPF1_CloneActualTree(IEntity origin)
-        {
-            return new PPF1_LiveNode();
-        }
+        public Step DoAction() 
+        =>
+            new Step(name   : $"do_action"
+                    ,action : async (s) =>
+                    {
+                        switch (action_type)
+                        {
+                            case "plus" : s.AddChildStep(DoPlus()); return;
+                            default     :                           return;
+                        }
+                        
+                    });
         
-        public PPF1_LiveNode PPF1_CloneLiveTree()
-        {
-            return new PPF1_LiveNode();
-        }
+        public Step DoPlus()
+        =>
+            new Step(action: async s =>
+            {
+                // Definitions
+                var parentLiveNode = this.Node.Parent;
+                var childLiveNode  = this;
+                
+                // Parent Entity
+                var parentEntity = (Operation.OperationParent as Package).Assets.rootFolder;
+                
+                // Child Entity
+                var  childEntityTypeName = "Galleon.Checkout." + childLiveNode.TextNode.LineSplits.First();
+                Type entityType          = Type.GetType(childEntityTypeName);
+                var  childEntity         = (IEntity)Activator.CreateInstance(entityType);
+                
+                // Add child entity
+                parentEntity.Node.AddChild(childEntity);
+                childEntity.Node.Live.LiveHandler.OnAddedToParent(parentEntity);
+                
+                // Store CRUD params
+                EntityNode.CRUD_Params crud = new ()
+                                              {
+                                                 Name = childLiveNode.TextNode.LineWords.Last().Trim('\''), 
+                                              };
+                
+                childEntity.Node.SetData("CRUD_params", crud);
+                s.Log($"name : {crud.Name}");
+                
+                // Create child entity
+                childEntity.Node.Live.LiveHandler.Create();
+            });
         
-        public void PPF1_AddChildVTree(IEntity childVTreeRoot)
-        {
-            
-        }
-
     }
 }
 
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
-    /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
+    /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
 
 namespace Galleon.Checkout
 {
@@ -247,7 +383,7 @@ namespace Galleon.Checkout
     {
         public PPF1_LiveNode PPFE1_Get_AssetFolderNode() =>  new PPF1_LiveNode()
         {
-            TextNode = new TextNode("> Assets.Folder f1") 
+            DefinitionNode = new DefinitionNode( "> Assets.Folder f1" ),
         };
     }
 }

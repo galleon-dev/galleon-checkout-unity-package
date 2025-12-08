@@ -28,9 +28,22 @@ namespace Galleon.Checkout.Foundation
             this.RawText = text;
         }
         
-        public TextNode Clone()
+        public TextNode CloneNode()
         {
             return new TextNode { RawText = this.RawText };
+        }
+        
+        public TextNode CloneTree()
+        {
+            TextNode clone = CloneNode();
+
+            foreach (var child in this.Node.Children.OfType<TextNode>())
+            {
+                TextNode childClone = child.CloneTree();
+                childClone.Node.SetParent(clone);
+            }
+
+            return clone;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Text Properties
@@ -47,6 +60,8 @@ namespace Galleon.Checkout.Foundation
         /// </summary>
         public string FullText => RawText;
 
+        /////////////////////////////////////////////////////////////////////////////
+        
         /// <summary>
         /// The first line
         /// </summary>
@@ -59,11 +74,29 @@ namespace Galleon.Checkout.Foundation
                                                                     ? l.TrimStart().Substring(1).Trim() 
                                                                     : "";
 
+        /////////////////////////////////////////////////////////////////////////////
         
         /// <summary>
-        /// List of words in the LineContent, split by whitespace.
+        /// List of Splits in the LineContent, split by whitespace.
         /// </summary>
-        public List<string> LineWords => LineContent.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).ToList();
+        public List<string> LineSplits => LineContent.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).ToList();
+        
+        /// <summary>
+        /// First Split of the first line
+        /// </summary>
+        public string FirstSplit => LineSplits.FirstOrDefault() ?? "";
+        
+        /////////////////////////////////////////////////////////////////////////////
+        
+        public List<string> LineWords => LineSplits.Where(w => !w.StartsWith("#")  
+                                                            && !w.StartsWith(".")  
+                                                            && !w.StartsWith("(") && !w.EndsWith(")")
+                                                            && w.Any(char.IsLetterOrDigit))
+                                                    .ToList();
+        
+        public string LineFirstWord => LineWords.FirstOrDefault() ?? null;
+        
+        /////////////////////////////////////////////////////////////////////////////
         
         /// <summary>
         /// All lines after the first, combined into a single string.
@@ -77,6 +110,30 @@ namespace Galleon.Checkout.Foundation
                                                          .Select(line => line.TrimStart())
                                                          .ToList();
 
+        /////////////////////////////////////////////////////////////////////////////
+        
+        /// <summary>
+        /// List of all parenthesis pairs found in the LineContent.
+        /// </summary>
+        public List<string> LineParenthesis => LineSplits.Where(w => w.StartsWith("(") && w.EndsWith(")")).ToList();
+        
+        /// <summary>
+        /// First parenthesis pair found in the LineContent, or empty string if none exist.
+        /// </summary>
+        public string FirstLineParenthesis => LineParenthesis.FirstOrDefault() ?? null;
+        
+        /// <summary>
+        /// First parenthesis pair content, without the leading/trailing parenthesis characters.
+        /// </summary>
+        public string FirstLineParenthesisContent => FirstLineParenthesis.Substring(1, FirstLineParenthesis.Length - 2);
+        
+        /// <summary>
+        /// True if the LineContent contains any parenthesis pairs.
+        /// </summary>
+        public bool HasParenthesis => LineParenthesis.Count > 0;
+        
+        /////////////////////////////////////////////////////////////////////////////
+        
         /// <summary>
         /// Position of the '>' character in the first line, used to infer tree depth.
         /// </summary>

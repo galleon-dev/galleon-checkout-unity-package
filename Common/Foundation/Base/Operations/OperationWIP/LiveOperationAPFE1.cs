@@ -93,7 +93,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
         public void DO_APFE1_CreateVTree()
         {
             // Definitions
-            string               targetElementName   = this.TextNode.LineWords.First();
+            string               targetElementName   = this.TextNode.LineSplits.First();
             
             // Get Target Element
             IEnumerable<Element> AllElements        = Elements.GetAllElements();
@@ -129,7 +129,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
         public APFE1_LiveNode CloneNode()
         {
             var clone        = new APFE1_LiveNode();
-            clone.TextNode   = TextNode.Clone();
+            clone.TextNode   = TextNode.CloneNode();
             clone.Operation  = Operation;
             return clone;
         }

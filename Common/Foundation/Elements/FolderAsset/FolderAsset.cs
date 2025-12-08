@@ -37,6 +37,16 @@ namespace   Galleon.Checkout.Assets
         
         public void CreateFolder()
         {
+            var crud = this.Node.GetData<EntityNode.CRUD_Params>("CRUD_params");
+
+            if (!string.IsNullOrEmpty(crud?.Name))
+            {
+                this.FolderName = crud.Name;
+                var oldPath     = Path;
+                var newPath     = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(oldPath) ?? string.Empty, this.FolderName);
+                this.Path       = newPath;
+            }
+            
             Directory.CreateDirectory(Path);
         }
         

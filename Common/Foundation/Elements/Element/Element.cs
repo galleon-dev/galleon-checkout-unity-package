@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Codice.Client.Common;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
 
@@ -57,7 +58,50 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public TextNode TextNode;
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
+        
+        public string   EntityType  => TextNode.LineFirstWord;
         public bool     IsNamespace => TextNode.LineContent.StartsWith("(") && TextNode.LineContent.EndsWith(")");
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+
+        public DefinitionNode()
+        {
+        }
+
+        public DefinitionNode(TextNode textNode)
+        {
+            this.TextNode = textNode;
+        }
+        
+        public DefinitionNode(string text)
+        {
+            this.TextNode = new TextNode(new string(text));
+        }
+        
+        public DefinitionNode CloneNode()
+        {
+            return new DefinitionNode
+                   {
+                       TextNode = this.TextNode.CloneNode()
+                   };
+        }
+        
+        public DefinitionNode CloneTree()
+        {
+            var clone = CloneNode();
+
+            foreach (var child in Node.Children.OfType<DefinitionNode>())
+            {
+                var childClone = child.CloneTree();
+                childClone.Node.SetParent(clone);
+                childClone.TextNode.Node.SetParent(clone.TextNode);
+            }
+
+            return clone;
+        }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Static Parse
         
@@ -70,12 +114,12 @@ namespace Galleon.Checkout
             foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
                 var def = new DefinitionNode() { TextNode = textNode };
-                textNode.Node.Data["definition_node"] = def;
+                textNode.Node.SetData("definition_node", def);
                 
                 if (textNode.Node.Parent != null)
                 {
                     var parentText = textNode.Node.Parent;
-                    var parentDef  = parentText.Node.Data["definition_node"] as DefinitionNode;
+                    var parentDef  = parentText.Node.GetData<DefinitionNode>("definition_node");
                     def.Node.SetParent(parentDef);
                 }
                 else
@@ -87,11 +131,49 @@ namespace Galleon.Checkout
             // cleanup
             foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
-                textNode.Node.Data.Remove("definition_node");
+                textNode.Node.RemoveData("definition_node");
             }
             
             return rootDefinition;
         }
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Utility Methods
+        
+        ////////// Namespace
+        
+        public DefinitionNode GetNamespaceNode()
+        {
+            var parents = this.Node.Ancestors().OfType<DefinitionNode>();
+            return parents.FirstOrDefault(p => p.TextNode.HasParenthesis);
+        }
+        
+        public string GetNamespace()
+        {
+            return GetNamespaceNode()?.TextNode.FirstLineParenthesisContent ?? null;
+        }
+        
+        public bool IsNamespaceNode() => TextNode.HasParenthesis;
+        
+        ////////// Fill To Full Line
+        
+        public TextNode ExpandToFullLine()
+        {
+            // e.g. "> Folder 'package 1'" --> becomes --> "> Assets.Folder 'package 1'"
+            
+            TextNode lineNode = this.TextNode;
+            
+            var ns            = GetNamespace();
+            var newLine       = ns == null 
+                              ? lineNode.RawText
+                              : lineNode.RawText.Replace($"> {lineNode.FirstSplit}"
+                                                        ,$"> {ns}.{lineNode.FirstSplit}");
+            
+            return new TextNode(newLine);
+        }
+        
+        public bool DoesNeedToExpandToFullLine() => !IsNamespaceNode() && GetNamespace() != null;
+        
     }
     
     /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///

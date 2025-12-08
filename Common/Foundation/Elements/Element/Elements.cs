@@ -18,7 +18,7 @@ namespace Galleon.Checkout.Foundation
             Folder.Definition = DefinitionNode.Parse(new []
                                                      {
                                                         "> Element Folder "
-                                                     ,  "   > (assets)    "
+                                                     ,  "   > (Assets)    "
                                                      ,  "       > Folder  "
                                                      });
             
@@ -30,13 +30,13 @@ namespace Galleon.Checkout.Foundation
             Package.Definition = DefinitionNode.Parse(new []
                                                       {
                                                          "> Element Package             "
-                                                      ,  "   > (definitions)            "
+                                                      ,  "   > (Definitions)            "
                                                       ,  "       > Definition Folder    "
-                                                      ,  "   > (elements)               "
+                                                      ,  "   > (Elements)               "
                                                       ,  "       > Element Folder       "
-                                                      ,  "   > (assets)                 "
-                                                      ,  "       > Folder top           "
-                                                      ,  "   > (hierarchy)              "
+                                                      ,  "   > (Assets)                 "
+                                                      ,  "       > Folder 'package1'    "
+                                                      ,  "   > (Hierarchy)              "
                                                       ,  "       > Scene main           "
                                                       });
             
@@ -52,6 +52,10 @@ namespace Galleon.Checkout.Foundation
           //        var Scene               = new DefinitionNode() { TextNode = "       > Scene main" };            packageHierarchyNS.Node.AddChild(Scene);
         }
         
+        public static Element GetElement(string typeName)
+        {
+            return GetAllElements().FirstOrDefault(e => e.Name == typeName);
+        }
         public static Element GetElement(Type type)
         {
             var elements = GetAllElements();

@@ -104,11 +104,18 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             {
                 var zipTree = ParseTree(new []
                               {
-                                 "> Assets.Folder f1"
+                                  "> Package package             #exists "
+                              ,   "    > (Assets)                #exists "
+                              ,   "        > Folder 'package 1'  #exists "
+                              ,   "            > Folder 'f1'             "
                               });
 
-                foreach (var node in zipTree.TextNode.Node.Descendants().OfType<TextNode>())
-                    s.Log(node.RawText);
+                foreach (var node in zipTree.Node.Descendants().OfType<PPF1M_LiveNode>())
+                {
+                    var expanded = node.DoesNeedToExpandToFullLine() ? node.ExpandToFullLine() : node.TextNode;
+                    s.Log($"{node.TextNode.RawText} - (ns:{node.GetNamespace()}) ---> {expanded.RawText}");
+                }
+                
                 
             });
         
@@ -138,6 +145,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
                         foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<PPF1M_LiveNode>())
                         {
                             s.Log($"- {vNode.TextNode.RawText} { (vNode.DoesNeedToDoAction ? "<-- action" : "") } ");
+                            
                             if (vNode.DoesNeedToDoAction)
                                 s.ParentStep.AddChildStep(vNode.DoAction());
                         }                          
@@ -202,12 +210,12 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
                 var liveNode = ParseNode(textNode);
-                textNode.Node.Data["live_node"] = liveNode;
+                textNode.Node.SetData(key : "live_node", value : liveNode);
                 
                 if (textNode.Node.Parent != null)
                 {
                     var parentText     = textNode  .Node.Parent;
-                    var parentLiveNode = parentText.Node.Data["live_node"] as PPF1M_LiveNode;
+                    var parentLiveNode = parentText.Node.GetData<PPF1M_LiveNode>(key : "live_node");
                     liveNode.Node.SetParent(parentLiveNode);
                 }
                 else
@@ -219,7 +227,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
             // cleanup
             foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
-                textNode.Node.Data.Remove("live_node");
+                textNode.Node.RemoveData(key : "live_node");
             }
             
             return rootLiveNode;
@@ -263,7 +271,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
                 var parentEntity = (Operation.Parent as Package).Assets.rootFolder;
                 
                 // Child Entity
-                var  childEntityTypeName = "Galleon.Checkout." + childLiveNode.TextNode.LineWords.First();
+                var  childEntityTypeName = "Galleon.Checkout." + childLiveNode.TextNode.LineSplits.First();
                 Type entityType          = Type.GetType(childEntityTypeName);
                 var  childEntity         = (IEntity)Activator.CreateInstance(entityType);
                 
@@ -271,9 +279,55 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
                 parentEntity.Node.AddChild(childEntity);
                 childEntity.Node.Live.LiveHandler.OnAddedToParent(parentEntity);
                 
+                // Store CRUD params
+                EntityNode.CRUD_Params crud = new ()
+                                              {
+                                                 Name = childLiveNode.TextNode.LineWords.Last().Trim('\''), 
+                                              };
+                
+                childEntity.Node.SetData("CRUD_params", crud);
+                s.Log($"name : {crud.Name}");
+                
                 // Create child entity
                 childEntity.Node.Live.LiveHandler.Create();
             });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Utility Methods
+        
+        ////////// Namespace
+        
+        public PPF1M_LiveNode GetNamespaceNode()
+        {
+            var parents = this.Node.Ancestors().OfType<PPF1M_LiveNode>();
+            return parents.FirstOrDefault(p => p.TextNode.HasParenthesis);
+        }
+        
+        public string GetNamespace()
+        {
+            return GetNamespaceNode()?.TextNode.FirstLineParenthesisContent ?? null;
+        }
+        
+        public bool IsNamespaceNode() => TextNode.HasParenthesis;
+        
+        ////////// Fill To Full Line
+        
+        public TextNode ExpandToFullLine()
+        {
+            // e.g. "> Folder 'package 1'" --> becomes --> "> Assets.Folder 'package 1'"
+            
+            TextNode lineNode = this.TextNode;
+            
+            var ns            = GetNamespace();
+            var newLine       = ns == null 
+                              ? lineNode.RawText
+                              : lineNode.RawText.Replace($"> {lineNode.FirstSplit}"
+                                                        ,$"> {ns}.{lineNode.FirstSplit}");
+            
+            return new TextNode(newLine);
+        }
+        
+        public bool DoesNeedToExpandToFullLine() => !IsNamespaceNode() && GetNamespace() != null;
+        
     }
 }
 

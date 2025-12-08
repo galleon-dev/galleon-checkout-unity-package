@@ -124,6 +124,11 @@ namespace Galleon.Checkout
             if (!parent.Node.Children.Contains(this.Entity))
                 parent.Node.Children.Add(this.Entity);
         }
+        
+        public void RemoveFromParent()
+        {
+            Parent.Node.RemoveChild(this.Entity);
+        }
 
         public void AddChild(IEntity child)
         {
@@ -248,8 +253,40 @@ namespace Galleon.Checkout
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Data
         
-        public Dictionary<string, object> Data = new Dictionary<string, object>();
+        private Dictionary<string, object> Data;
         
+        public void SetData(string key, object value)
+        {
+            if (Data is null)
+                Data = new Dictionary<string, object>();
+            
+            this.Data[key] = value;
+        }
+
+        public object GetData(string key)
+        {
+            if (Data is null)
+                return null;
+            
+            return this.Data[key];
+        }
+
+        public T GetData<T>(string key)
+        {
+            if (Data is null)
+                return default;
+            
+            return (T)this.Data[key];
+        }
+
+        public void RemoveData(string key)
+        {
+            if (Data is null)
+                return;
+            
+            this.Data.Remove(key);
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Storage
         
         public        EntityStorage Storage => new(Entity);
@@ -536,6 +573,13 @@ namespace Galleon.Checkout
                                                              ,definition : "> Folder f1");
                 await plusOperation.Flow().Execute();
             }
+            public async Task Plus_PPFE1(string text)
+            {   
+                var   plusOperation = new PPF1_LiveOperation(id         : $"PPFE1"
+                                                            ,operationParent     : this.Entity
+                                                            ,definitionText : "> Folder f1");
+                await plusOperation.Flow().Execute();
+            }
             
             //////////////////////////////////////////////////
             
@@ -576,5 +620,11 @@ namespace Galleon.Checkout
          
             }
         }
+        
+        public class CRUD_Params
+        {
+            public string Name;
+        }
+
     }    
 }
