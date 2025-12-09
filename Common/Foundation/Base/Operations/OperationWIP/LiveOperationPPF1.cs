@@ -41,17 +41,26 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
             new Step(name   : $"execute_Flow"
                     ,action : async (flow) =>
                     {
+                        flow.AddChildStep(LogOriginalTree()        );
                         flow.AddChildStep(DumpChildElement()       );
                         flow.AddChildStep(DumpParentElement()      );
                         flow.AddChildStep(CreateChildVirtualTree() );
                         flow.AddChildStep(CreateParentVirtualTree());
-                        flow.AddChildStep(CreateZipTree()        );
+                        flow.AddChildStep(CreateZipTree()          );
                         flow.AddChildStep(CreateFullVirtualTree()  );
                         flow.AddChildStep(DumpVirtualTree()        );
                         flow.AddChildStep(RunLiveFlow()            );
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
+        
+        
+        public Step LogOriginalTree() 
+        =>
+            new Step(action : async (s) =>
+            {
+                 s.Log(OriginalTree.TextNode.ToTreeString());
+            });
         
         public Step DumpChildElement() 
         =>
