@@ -198,7 +198,7 @@ namespace Galleon.Checkout.Foundation
                                         }
             this.OriginalTree.Operation = this;
                                         
-            this.ChildVirtualTree            = OriginalTree.CloneTree();
+            this.ChildVirtualTree       = OriginalTree.CloneTree();
             
         }
         
@@ -444,7 +444,7 @@ namespace Galleon.Checkout.Foundation
         public LiveNode CloneNode()
         {
             var clone        = new LiveNode();
-            clone.TextNode   = TextNode.Clone();
+            clone.TextNode   = TextNode.CloneNode();
             clone.TargetText = new string(TargetText);
             clone.ActionText = new string(ActionText);
             clone.Operation  = Operation;
@@ -520,11 +520,12 @@ namespace Galleon.Checkout
         }
     }
     
-    public partial class Element
-    {
-        
-        
-        
-    }
 }
 
+/// > Elements
+///     > Element
+///     > Package
+///     > (Assets)
+///         > Folder
+///     > (Hierarchy)
+///         > Scene

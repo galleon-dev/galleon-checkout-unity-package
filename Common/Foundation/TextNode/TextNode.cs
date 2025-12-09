@@ -28,9 +28,22 @@ namespace Galleon.Checkout.Foundation
             this.RawText = text;
         }
         
-        public TextNode Clone()
+        public TextNode CloneNode()
         {
             return new TextNode { RawText = this.RawText };
+        }
+        
+        public TextNode CloneTree()
+        {
+            TextNode clone = CloneNode();
+
+            foreach (var child in this.Node.Children.OfType<TextNode>())
+            {
+                TextNode childClone = child.CloneTree();
+                childClone.Node.SetParent(clone);
+            }
+
+            return clone;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Text Properties
@@ -47,6 +60,8 @@ namespace Galleon.Checkout.Foundation
         /// </summary>
         public string FullText => RawText;
 
+        /////////////////////////////////////////////////////////////////////////////
+        
         /// <summary>
         /// The first line
         /// </summary>
@@ -59,11 +74,29 @@ namespace Galleon.Checkout.Foundation
                                                                     ? l.TrimStart().Substring(1).Trim() 
                                                                     : "";
 
+        /////////////////////////////////////////////////////////////////////////////
         
         /// <summary>
-        /// List of words in the LineContent, split by whitespace.
+        /// List of Splits in the LineContent, split by whitespace.
         /// </summary>
-        public List<string> LineWords => LineContent.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).ToList();
+        public List<string> LineSplits => LineContent.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).ToList();
+        
+        /// <summary>
+        /// First Split of the first line
+        /// </summary>
+        public string FirstSplit => LineSplits.FirstOrDefault() ?? "";
+        
+        /////////////////////////////////////////////////////////////////////////////
+        
+        public List<string> LineWords => LineSplits.Where(w => !w.StartsWith("#")  
+                                                            && !w.StartsWith(".")  
+                                                            && !w.StartsWith("(") && !w.EndsWith(")")
+                                                            && w.Any(char.IsLetterOrDigit))
+                                                    .ToList();
+        
+        public string LineFirstWord => LineWords.FirstOrDefault() ?? null;
+        
+        /////////////////////////////////////////////////////////////////////////////
         
         /// <summary>
         /// All lines after the first, combined into a single string.
@@ -77,6 +110,30 @@ namespace Galleon.Checkout.Foundation
                                                          .Select(line => line.TrimStart())
                                                          .ToList();
 
+        /////////////////////////////////////////////////////////////////////////////
+        
+        /// <summary>
+        /// List of all parenthesis pairs found in the LineContent.
+        /// </summary>
+        public List<string> LineParenthesis => LineSplits.Where(w => w.StartsWith("(") && w.EndsWith(")")).ToList();
+        
+        /// <summary>
+        /// First parenthesis pair found in the LineContent, or empty string if none exist.
+        /// </summary>
+        public string FirstLineParenthesis => LineParenthesis.FirstOrDefault() ?? null;
+        
+        /// <summary>
+        /// First parenthesis pair content, without the leading/trailing parenthesis characters.
+        /// </summary>
+        public string FirstLineParenthesisContent => FirstLineParenthesis.Substring(1, FirstLineParenthesis.Length - 2);
+        
+        /// <summary>
+        /// True if the LineContent contains any parenthesis pairs.
+        /// </summary>
+        public bool HasParenthesis => LineParenthesis.Count > 0;
+        
+        /////////////////////////////////////////////////////////////////////////////
+        
         /// <summary>
         /// Position of the '>' character in the first line, used to infer tree depth.
         /// </summary>
@@ -153,26 +210,32 @@ namespace Galleon.Checkout.Foundation
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Parse API
 
-        public static TextNode  Parse(string text)
+        public static TextNode Parse(string text)
         {
             return Parse(text.Split('\n').ToList());
         }
 
+        /// <summary>
+        /// Parses a collection of text lines into a hierarchical tree structure of TextNodes.
+        /// The hierarchy is determined by the indentation level and '>' markers in the text.
+        /// </summary>
+        /// <param name="textLines">Collection of text lines to parse</param>
+        /// <returns>Root TextNode containing the complete parsed tree structure</returns>
         public static TextNode Parse(IEnumerable<string> textLines)
         {
             /////// Definitions
-            
+
             List<TextNode> nodes        = new List<TextNode>();
             List<string>   currentBlock = new List<string>();
-
-            /////// Parse
             
+            //////////////////////////// Parse
+
+            // Process each line and create nodes when encountering '>' markers
             foreach (var line in textLines)
             {
-                var trimmed = line.TrimStart();
-
-                if (trimmed.StartsWith(">"))
+                if (line.TrimStart().StartsWith(">"))
                 {
+                    // When finding a new node marker, save the previous block as a node
                     if (currentBlock.Count > 0)
                     {
                         nodes.Add(new TextNode { RawText = string.Join("\n", currentBlock) });
@@ -183,20 +246,22 @@ namespace Galleon.Checkout.Foundation
                 currentBlock.Add(line);
             }
 
+            // Add the final block if any content remains
             if (currentBlock.Count > 0)
                 nodes.Add(new TextNode { RawText = string.Join("\n", currentBlock) });
 
-            TextNode rootNode = new TextNode { RawText = "> root" };
 
-            /////// Link
-            
+            //////////////////////////// Link
+
             for (int i = nodes.Count - 1; i >= 0; i--)
             {
+                // For each node, look backwards to find its parent based on indentation
                 for (int j = i - 1; j >= 0; j--)
                 {
                     TextNode currentNode         = nodes[i];
                     TextNode potentialParentNode = nodes[j];
 
+                    // If we find a node with less indentation, it becomes the parent
                     if (potentialParentNode.Indent < currentNode.Indent)
                     {
                         currentNode.Node.Parent = potentialParentNode;
@@ -206,19 +271,39 @@ namespace Galleon.Checkout.Foundation
                 }
             }
 
-            var rootNodes = nodes.Where(n => n.Node.Parent == null).ToList();
-            foreach (var topNode in rootNodes)
-                topNode.Node.SetParent(rootNode);
+            //////////////////////////// return result
 
-            return rootNode;
+            var rootNodes = nodes.Where(n => n.Node.Parent == null).ToList();
+            
+            // Single root node - return it
+            if (rootNodes.Count == 1)
+            {
+                return rootNodes.First();
+            }
+            // Multiple root nodes - create a parent
+            else
+            {
+                // Connect any remaining top-level nodes to the root
+                TextNode rootNode = new TextNode { RawText = "> origin" };
+                foreach (var topNode in rootNodes)
+                    topNode.Node.SetParent(rootNode);
+                
+                return rootNode;
+            }
         }
 
+        public static TextNode ParseSingleNode(string text)
+        {
+            return new TextNode() { RawText = text };
+        }
+
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Write API
 
         /// <summary>
         /// Returns a string representation of the current node only.
         /// </summary>
-        public string SelfToString()
+        public string ToNodeString()
         {
             return RawText ?? "";
         }
@@ -226,7 +311,7 @@ namespace Galleon.Checkout.Foundation
         /// <summary>
         /// Returns a string representation of the whole tree from the current node downwards.
         /// </summary>
-        public string TreeToString()
+        public string ToTreeString()
         {
             var result = new List<string>();
             AddNodeToString(this, result, 0);
@@ -276,7 +361,7 @@ namespace Galleon.Checkout.Foundation
         {
             try
             {
-                string content = TreeToString();
+                string content = ToTreeString();
                 System.IO.File.WriteAllText(path, content);
             }
             catch (System.Exception ex)
@@ -290,7 +375,7 @@ namespace Galleon.Checkout.Foundation
 
         public override string ToString()
         {
-            return SelfToString();
+            return ToNodeString();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Unity Test Menu
@@ -369,13 +454,13 @@ namespace Galleon.Checkout.Foundation
             if (childNode != null)
             {
                 Debug.Log("SelfToString() for child node:");
-                Debug.Log(childNode.SelfToString());
+                Debug.Log(childNode.ToNodeString());
                 Debug.Log("---");
             }
 
             // Test TreeToString on the root
             Debug.Log("TreeToString() for entire tree:");
-            string treeString = root.TreeToString();
+            string treeString = root.ToTreeString();
             Debug.Log(treeString);
             Debug.Log("---");
 

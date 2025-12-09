@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Galleon;
 using Galleon.Checkout;
 using Galleon.SampleApp;
+using TMPro;
 using UnityEngine;
 
 namespace Galleon.Checkout.Samples
@@ -18,6 +19,13 @@ namespace Galleon.Checkout.Samples
         public GameObject StoreViewItemPrefab; 
         public GameObject StoreViewItemParent; 
         
+        [Header("test")]
+        public TMP_Dropdown drp_products;
+        public TMP_Dropdown drp_preselection;
+        public TMP_Dropdown drp_tax;
+        public TMP_Dropdown drp_footer;
+        
+        // Products
         public List<CheckoutProduct> Products = new List<CheckoutProduct>();
         
         //////////////////////////////////////////////////////////////////////// Lifecycle

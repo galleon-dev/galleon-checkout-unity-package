@@ -15,6 +15,7 @@ namespace Galleon.Checkout
             CheckoutClient.Instance.Network.GalleonUserAccessToken = configuration.JWT;
             CHECKOUT.User.AppUserID                                = configuration.AppUserID;
             CheckoutClient.Instance.ApplicationDisplayName         = configuration.ApplicationDisplayName;
+            CHECKOUT.Globals.CheckoutConfiguration                 = configuration;
             
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             
@@ -22,8 +23,8 @@ namespace Galleon.Checkout
         }
         
         public static async Task<PurchaseResult> Purchase(CheckoutProduct            product
-                                                         ,Dictionary<string, string> metadata  = null
-                                                         ,List<BonusItem>            bonusData = null)
+                                                         ,Dictionary<string, string> metadata      = null
+                                                         ,List<BonusItem>            bonusData     = null)
         {
             // Safty
             if (metadata  == null) metadata  = new Dictionary<string, string>();
@@ -31,6 +32,7 @@ namespace Galleon.Checkout
             
             // Create and setup session
             await CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
+            
             CheckoutClient.Instance.CurrentSession.Metadata  = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             CheckoutClient.Instance.CurrentSession.BonusData = bonusData;
                    
@@ -47,10 +49,18 @@ namespace Galleon.Checkout
     [Serializable]
     public class CheckoutConfiguration
     {
-        public string JWT;
-        public string Country;
-        public string AppUserID;
-        public string ApplicationDisplayName;
+        public string              JWT;
+        public string              Country;
+        public string              AppUserID;
+        public string              ApplicationDisplayName;
+        public CheckoutOrientation UIPanelOrientation = CheckoutOrientation.Auto;
+    }
+    
+    public enum CheckoutOrientation
+    {
+        Auto,
+        ForcePortrait,
+        ForceLandscape,
     }
     
     [Serializable]

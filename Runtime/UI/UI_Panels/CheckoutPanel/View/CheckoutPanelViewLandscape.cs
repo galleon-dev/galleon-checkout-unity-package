@@ -80,7 +80,7 @@ namespace Galleon.Checkout.UI
                 Debug.Log("Taxes Amount: " + taxes.Count);
 
                 // If Location is USA or Canada generate taxes
-                if (IsUSAorCanadaUser)
+                if (CHECKOUT.Globals.ShowTaxBreakdown)
                 {
                     foreach (var tax in taxes)
                     {

@@ -19,7 +19,7 @@ namespace Galleon.Checkout.UI
         
         [Header("Bonus")]
         public GameObject                   BonusContainer;
-        public BonusItemView              bonusItemView;
+        public BonusItemView                bonusItemView;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -105,6 +105,9 @@ namespace Galleon.Checkout.UI
             {    
                 bonusItemView.Close();
             }
+            
+            bonusItemView? .gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
+            BonusContainer?.gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events

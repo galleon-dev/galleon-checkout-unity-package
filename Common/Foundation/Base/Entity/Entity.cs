@@ -13,6 +13,7 @@ using Galleon.Checkout.Foundation.LiveOperationPPF1M;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UIElements;
+using LiveOperation = Galleon.Checkout.Foundation.LiveOperationPPF1.LiveOperation;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -123,6 +124,11 @@ namespace Galleon.Checkout
 
             if (!parent.Node.Children.Contains(this.Entity))
                 parent.Node.Children.Add(this.Entity);
+        }
+        
+        public void RemoveFromParent()
+        {
+            Parent.Node.RemoveChild(this.Entity);
         }
 
         public void AddChild(IEntity child)
@@ -244,6 +250,42 @@ namespace Galleon.Checkout
                 foreach (var child in entity.Node.Children)
                     DumpTreeNode(child, level + 1);
             }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Data
+        
+        private Dictionary<string, object> Data;
+        
+        public void SetData(string key, object value)
+        {
+            if (Data is null)
+                Data = new Dictionary<string, object>();
+            
+            this.Data[key] = value;
+        }
+
+        public object GetData(string key)
+        {
+            if (Data is null)
+                return null;
+            
+            return this.Data[key];
+        }
+
+        public T GetData<T>(string key)
+        {
+            if (Data is null)
+                return default;
+            
+            return (T)this.Data[key];
+        }
+
+        public void RemoveData(string key)
+        {
+            if (Data is null)
+                return;
+            
+            this.Data.Remove(key);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Storage
@@ -512,24 +554,31 @@ namespace Galleon.Checkout
             
             public async Task Plus_APF(string text)
             {                
-                var   plusOperation = new APF_LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
-                                                           ,parent     : this.Entity
-                                                           ,definition : new APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
+                var   plusOperation = new Foundation.LiveOperationAPF.LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
+                                                                                   ,parent     : this.Entity
+                                                                                   ,definition : new APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
                 
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_APFE1(string text)
             {   
-                var   plusOperation = new APFE1_LiveOperation(id         : $"APFE1"
-                                                             ,parent     : this.Entity
-                                                             ,definition : "> Folder f1");
+                var   plusOperation = new Foundation.LiveOperationAPFE1.LiveOperation(id         : $"APFE1"
+                                                                                     ,parent     : this.Entity
+                                                                                     ,definition : "> Folder f1");
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_PPFE1M(string text)
             {   
-                var   plusOperation = new PPF1M_LiveOperation(id         : $"PPFE1M"
-                                                             ,parent     : this.Entity
-                                                             ,definition : "> Folder f1");
+                var   plusOperation = new Foundation.LiveOperationPPF1M.LiveOperation(id         : $"PPFE1M"
+                                                                                     ,parent     : this.Entity
+                                                                                     ,definition : "> Folder f1");
+                await plusOperation.Flow().Execute();
+            }
+            public async Task Plus_PPFE1(string text)
+            {   
+                var   plusOperation = new Foundation.LiveOperationPPF1.LiveOperation(id                 : $"PPFE1"
+                                                                                    ,operationParent    : this.Entity
+                                                                                    ,definitionText     : "> Folder f1");
                 await plusOperation.Flow().Execute();
             }
             
@@ -553,6 +602,30 @@ namespace Galleon.Checkout
                     return null;
                 }
             }
+            
+            public LiveHandler LiveHandlerByType(string entityTypeName)
+            {
+                Type entityType      = Type.GetType("Galleon.Checkout." + entityTypeName);
+                var  liveHandlerType = entityType
+                                      .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
+                                      .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveHandler)));
+
+                if (liveHandlerType != null)
+                {
+                    var liveHandler = (LiveHandler)Activator.CreateInstance(liveHandlerType);
+                    liveHandler.SetTarget(this.Entity);
+                    return liveHandler;
+                }
+
+                return null;
+         
+            }
         }
+        
+        public class CRUD_Params
+        {
+            public string Name;
+        }
+
     }    
 }

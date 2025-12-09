@@ -7,7 +7,7 @@ using Galleon.Checkout.Foundation.LiveOperationAPFE1;
 
 namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
 {
-    public class APFE1_LiveOperation : Entity
+    public class LiveOperation : Entity
     {   
         ///////// Members
         
@@ -20,7 +20,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
         
         ///////// Lifecycle
         
-        public APFE1_LiveOperation(string id, IEntity parent, string definition)
+        public LiveOperation(string id, IEntity parent, string definition)
         {
             this.ID                     = id;
             this.Parent                 = parent;
@@ -66,7 +66,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
     {
         //////////////// Members
         
-        public APFE1_LiveOperation  Operation { get; set; }
+        public LiveOperation  Operation { get; set; }
         public TextNode             TextNode = new TextNode();
         
         public bool                 DoesNeedToDoAction => Node.Parent is APFE1_LiveNode;
@@ -93,7 +93,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
         public void DO_APFE1_CreateVTree()
         {
             // Definitions
-            string               targetElementName   = this.TextNode.LineWords.First();
+            string               targetElementName   = this.TextNode.LineSplits.First();
             
             // Get Target Element
             IEnumerable<Element> AllElements        = Elements.GetAllElements();
@@ -129,7 +129,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
         public APFE1_LiveNode CloneNode()
         {
             var clone        = new APFE1_LiveNode();
-            clone.TextNode   = TextNode.Clone();
+            clone.TextNode   = TextNode.CloneNode();
             clone.Operation  = Operation;
             return clone;
         }

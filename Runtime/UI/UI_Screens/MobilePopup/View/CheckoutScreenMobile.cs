@@ -55,8 +55,10 @@ namespace Galleon.Checkout.UI
 
         // Propertiews
         
-        public bool                         IsLandscape => UnityEngine.Screen.orientation == ScreenOrientation.LandscapeLeft
-                                                        || UnityEngine.Screen.orientation == ScreenOrientation.LandscapeRight;
+        public static bool                  IsPortrait  => !IsLandscape;
+        public static bool                  IsLandscape => CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape ? true
+                                                         : CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForcePortrait  ? false
+                                                         : (UnityEngine.Screen.orientation == ScreenOrientation.LandscapeLeft || UnityEngine.Screen.orientation == ScreenOrientation.LandscapeRight);
         
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
@@ -69,12 +71,12 @@ namespace Galleon.Checkout.UI
 								  GameObject Prefab = null; // For Portrait or Landscape Mode
                                   bool IsLandscapeMode = false;
 
-                                  if (UnityEngine.Device.Screen.orientation == ScreenOrientation.Portrait || UnityEngine.Device.Screen.orientation == ScreenOrientation.PortraitUpsideDown)
+                                  if (IsPortrait)
                                   {
                                       Debug.Log("Device is in Portrait mode");
                                       Prefab = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
                                   }
-                                  else if (UnityEngine.Device.Screen.orientation == ScreenOrientation.LandscapeLeft || UnityEngine.Device.Screen.orientation == ScreenOrientation.LandscapeRight)
+                                  else if (IsLandscape)
                                   {
                                       Debug.Log("Device is in Landscape mode");
                                       Prefab = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
@@ -84,13 +86,15 @@ namespace Galleon.Checkout.UI
 
                                   #if UNITY_EDITOR
                                   
-                                  if (UnityEngine.Device.Screen.width > UnityEngine.Device.Screen.height)
+                                  if (UnityEngine.Device.Screen.width > UnityEngine.Device.Screen.height
+                                  ||  CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape)
                                   {
                                       Debug.Log("Device is in Landscape mode");
                                       Prefab = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
                                       IsLandscapeMode = true;
                                   }
-                                  else
+                                  else if (UnityEngine.Device.Screen.width <= UnityEngine.Device.Screen.height
+                                       ||  CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForcePortrait)
                                   {
                                       Debug.Log("Device is in Portrait mode");
                                       Prefab = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
@@ -351,8 +355,8 @@ namespace Galleon.Checkout.UI
 
         public Step SetPage(Page page)
         =>
-            new Step(name: $"set_{page.Name}_page"
-                    , action: async (s) =>
+            new Step(name  : $"set_{page.Name}_page"
+                    ,action: async (s) =>
                     {
                         ///////////////////////// Setup
 
@@ -394,8 +398,8 @@ namespace Galleon.Checkout.UI
 
         public Step Navigate()
         =>
-            new Step(name: $"navigate"
-                    , action: async (s) =>
+            new Step(name   : $"navigate"
+                    ,action : async (s) =>
                     {
                         Page page = NavigationHistory.Last();
 
@@ -426,6 +430,7 @@ namespace Galleon.Checkout.UI
                               {
                                   // await Close();
                                   s.ParentStep.RemoveStepsAfterThisInParentFlow();
+                                  s.ParentStep.AddPostStep(CHECKOUT.Session.On_CheckoutScreenClosed());
                               });
 
         public Step UI_Back()
@@ -659,7 +664,7 @@ namespace Galleon.Checkout.UI
                     
         
         public Page PreselectionPage         = new Page(name  : "preselection"
-                                                       ,header: HeaderPanelView     .STATE.checkout_and_settings.ToString()
+                                                       ,header: HeaderPanelView     .STATE.x_button             .ToString()
                                                        ,panel : CheckoutScreenMobile.STATE.preselection_panel   .ToString()
                                                        ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
                                                        ,setup : page =>
@@ -790,7 +795,7 @@ namespace Galleon.Checkout.UI
         {
             // Current page result is close
             CurrentPage.PageResult = NavigationStates.Close.ToString();
-            IsPageActive = false;
+            IsPageActive           = false;
             
             // Close animation
             overrideContentSize = 0f;

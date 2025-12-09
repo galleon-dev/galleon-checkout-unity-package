@@ -80,6 +80,12 @@ namespace Galleon.Checkout.Foundation
                     {
                         await this.Node.Live.Plus_PPFE1M("> Folder f1");
                     });
+        public Step Do_PPFE1() 
+        =>
+            new Step(action : async (s) =>
+                    {
+                        await this.Node.Live.Plus_PPFE1("> Folder f1");
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
         
@@ -107,7 +113,11 @@ namespace Galleon.Checkout.Foundation
                 
                 Button btn_PPFE1M              = new Button(); this.Add(btn_PPFE1M);
                 btn_PPFE1M.clicked            += () => target.Do_PPFE1M().Execute(); 
-                btn_PPFE1M.text                = "Package.element + Folder.element 1 Manual";
+                btn_PPFE1M.text                = "PPF1_M";
+                
+                Button btn_PPFE1               = new Button(); this.Add(btn_PPFE1);
+                btn_PPFE1.clicked            += () => target.Do_PPFE1().Execute(); 
+                btn_PPFE1.text                = "PPF1";
                 
             }
         }   

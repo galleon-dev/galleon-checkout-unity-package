@@ -101,10 +101,10 @@ namespace Galleon.Checkout.Foundation
 
                         foreach (var node in RootPrintNode.Node.Descendants().Skip(1).OfType<PrintNode>())
                         {
-                            var typeName      = node.TextNode.LineWords.First();
+                            var typeName      = node.TextNode.LineSplits.First();
                             var assetTypeName = $"{typeName}Asset";
                             
-                            var commonName    = node.TextNode.LineWords.ElementAt(1);
+                            var commonName    = node.TextNode.LineSplits.ElementAt(1);
                             
                             var assetType     = Type.GetType($"Galleon.Checkout.Foundation.{assetTypeName}");
                             var asset         = Activator.CreateInstance(assetType) as IEntity;
