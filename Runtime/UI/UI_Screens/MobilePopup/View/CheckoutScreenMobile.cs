@@ -86,15 +86,25 @@ namespace Galleon.Checkout.UI
 
                                   #if UNITY_EDITOR
                                   
-                                  if (UnityEngine.Device.Screen.width > UnityEngine.Device.Screen.height
-                                  ||  CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape)
+                                  if (CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape)
+                                  {
+                                      Debug.Log("Device is in Forced Landscape mode");
+                                      Prefab          = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
+                                      IsLandscapeMode = true;
+                                  }
+                                  else if (CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForcePortrait)
+                                  {
+                                      Debug.Log("Device is in Forced portrait mode");
+                                      Prefab          = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
+                                      IsLandscapeMode = false;
+                                  }
+                                  else if (UnityEngine.Device.Screen.width > UnityEngine.Device.Screen.height)
                                   {
                                       Debug.Log("Device is in Landscape mode");
                                       Prefab = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
                                       IsLandscapeMode = true;
                                   }
-                                  else if (UnityEngine.Device.Screen.width <= UnityEngine.Device.Screen.height
-                                       ||  CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForcePortrait)
+                                  else if (UnityEngine.Device.Screen.width <= UnityEngine.Device.Screen.height)
                                   {
                                       Debug.Log("Device is in Portrait mode");
                                       Prefab = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;
@@ -810,35 +820,35 @@ namespace Galleon.Checkout.UI
 
         private void DisableAllPanels()
         {
-            CheckoutPanel               .gameObject.SetActive(false);
-            CreditCardPanel             .gameObject.SetActive(false);
-            PreselectionPanelView       .gameObject.SetActive(false);
-            SettingsPanelView           .gameObject.SetActive(false);
-            SuccessPanelView            .gameObject.SetActive(false);
-            ErrorPanelView              .gameObject.SetActive(false);
-            SelectCurrencyPanelView     .gameObject.SetActive(false);
-            SelectPaymentMethodPanelView.gameObject.SetActive(false);
-            SimpleDialogPanelView       .gameObject.SetActive(false);
-            TestPanelView               .gameObject.SetActive(false);
-            LoadingPanelView            .gameObject.SetActive(false);
-            CheckoutLoadingPanelView    .gameObject.SetActive(false);
+            CheckoutPanel               ?.gameObject.SetActive(false);
+            CreditCardPanel             ?.gameObject.SetActive(false);
+            PreselectionPanelView       ?.gameObject.SetActive(false);
+            SettingsPanelView           ?.gameObject.SetActive(false);
+            SuccessPanelView            ?.gameObject.SetActive(false);
+            ErrorPanelView              ?.gameObject.SetActive(false);
+            SelectCurrencyPanelView     ?.gameObject.SetActive(false);
+            SelectPaymentMethodPanelView?.gameObject.SetActive(false);
+            SimpleDialogPanelView       ?.gameObject.SetActive(false);
+            TestPanelView               ?.gameObject.SetActive(false);
+            LoadingPanelView            ?.gameObject.SetActive(false);
+            CheckoutLoadingPanelView    ?.gameObject.SetActive(false);
         }
 
         public override void RefreshState()
         {
             DisableAllPanels();
 
-            if      (this.State == STATE.test_panel                  .ToString()) TestPanelView               .gameObject.SetActive(true);
-            else if (this.State == STATE.checkout_panel              .ToString()) CheckoutPanel               .gameObject.SetActive(true);
-            else if (this.State == STATE.preselection_panel          .ToString()) PreselectionPanelView       .gameObject.SetActive(true);
-            else if (this.State == STATE.success_panel               .ToString()) SuccessPanelView            .gameObject.SetActive(true);
-            else if (this.State == STATE.error_panel                 .ToString()) ErrorPanelView              .gameObject.SetActive(true);
-            else if (this.State == STATE.credit_card_panel           .ToString()) CreditCardPanel             .gameObject.SetActive(true);
-            else if (this.State == STATE.settings_panel              .ToString()) SettingsPanelView           .gameObject.SetActive(true);
-            else if (this.State == STATE.select_payment_method_panel .ToString()) SelectPaymentMethodPanelView.gameObject.SetActive(true);
-            else if (this.State == STATE.simple_dialog_panel         .ToString()) SimpleDialogPanelView       .gameObject.SetActive(true);
-            else if (this.State == STATE.loading_panel               .ToString()) LoadingPanelView            .gameObject.SetActive(true);
-            else if (this.State == STATE.checkout_loading_panel      .ToString()) CheckoutLoadingPanelView    .gameObject.SetActive(true);
+            if      (this.State == STATE.test_panel                  .ToString()) TestPanelView               ?.gameObject.SetActive(true);
+            else if (this.State == STATE.checkout_panel              .ToString()) CheckoutPanel               ?.gameObject.SetActive(true);
+            else if (this.State == STATE.preselection_panel          .ToString()) PreselectionPanelView       ?.gameObject.SetActive(true);
+            else if (this.State == STATE.success_panel               .ToString()) SuccessPanelView            ?.gameObject.SetActive(true);
+            else if (this.State == STATE.error_panel                 .ToString()) ErrorPanelView              ?.gameObject.SetActive(true);
+            else if (this.State == STATE.credit_card_panel           .ToString()) CreditCardPanel             ?.gameObject.SetActive(true);
+            else if (this.State == STATE.settings_panel              .ToString()) SettingsPanelView           ?.gameObject.SetActive(true);
+            else if (this.State == STATE.select_payment_method_panel .ToString()) SelectPaymentMethodPanelView?.gameObject.SetActive(true);
+            else if (this.State == STATE.simple_dialog_panel         .ToString()) SimpleDialogPanelView       ?.gameObject.SetActive(true);
+            else if (this.State == STATE.loading_panel               .ToString()) LoadingPanelView            ?.gameObject.SetActive(true);
+            else if (this.State == STATE.checkout_loading_panel      .ToString()) CheckoutLoadingPanelView    ?.gameObject.SetActive(true);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
