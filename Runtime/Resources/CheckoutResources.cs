@@ -73,6 +73,8 @@ namespace Galleon.Checkout
         {
             get
             {
+                return null;
+                
                 // Check Cache
                 if (_checkoutAssets != null)
                     return _checkoutAssets;
