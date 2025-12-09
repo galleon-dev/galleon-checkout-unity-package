@@ -47,7 +47,7 @@ namespace Galleon.Checkout.UI
             // Bonus
             if (this.bonusItemView != null)
                 Destroy(this.bonusItemView.gameObject); // destroy placeholder
-            if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
+            if (CheckoutClient.Instance.Resources.CheckoutAssets?.BonusItemPrefab != null)
             {
                 this.IBonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<IBonusItemView>();
                 var bonusItem = CHECKOUT.Session.BonusData.FirstOrDefault() ?? new BonusItem() { BonusMainText = "Extra", BonusRewardText = "1000k" };
@@ -89,7 +89,7 @@ namespace Galleon.Checkout.UI
                 SetSeperatorColor(UnselectedOptionColor, false);
             
             // Bonus
-            if (this.bonusItemView != null)
+            if (this.bonusItemView != null && IBonusItemView != null)
             {    
                 if (this.PaymentMethod.IsSelected) IBonusItemView.Open();
                 else                               IBonusItemView.Close();

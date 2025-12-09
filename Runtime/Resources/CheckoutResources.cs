@@ -25,7 +25,7 @@ namespace Galleon.Checkout
             get
             {
                 if (instance == null)
-                    instance = Resources.LoadAll<CheckoutResources>("CheckoutResources").Single();
+                    instance = Resources.LoadAll<CheckoutResources>("").Single();
                 
                 return instance;
             }
@@ -48,6 +48,7 @@ namespace Galleon.Checkout
                     ,tags   : new []{ "init" }
                     ,action : async (s) =>
                     {
+                        s.Log($"Checkout Assets : {CheckoutAssets}");
                     });
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members
@@ -77,11 +78,14 @@ namespace Galleon.Checkout
                     return _checkoutAssets;
                 
                 // Load
-                var assets = Resources.LoadAll<CheckoutAssets>("CheckoutAssets");
+                var assets = Resources.LoadAll<CheckoutAssets>("");
                 
                 // Validations
-                if (assets.Length < 1) throw new Exception("No CheckoutAssets found");
-                if (assets.Length > 1) throw new Exception("More than one CheckoutAssets found");
+                // if (assets.Length < 1) throw new Exception("No CheckoutAssets found");
+                // if (assets.Length > 1) throw new Exception("More than one CheckoutAssets found");
+                
+                if (assets.Length < 1) 
+                    return null;
                 
                 // Result
                 this._checkoutAssets = assets.First();

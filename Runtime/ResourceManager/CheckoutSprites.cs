@@ -14,6 +14,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
         [Header("Built in")]
+        
         // Icons
         public Sprite GalleonIconSprite;
         public Sprite AppIconSprite;
@@ -50,7 +51,6 @@ namespace Galleon.Checkout
         public Sprite VisaButtonSprite;
         public Sprite ZelleButtonSprite;
 
-
         [Header("Cloud")]
         public List<SpriteResource> SpriteResources = new();
 
@@ -66,40 +66,40 @@ namespace Galleon.Checkout
             {
                 switch (paymentMethodActualType)
                 {
-                    case "empty_card": return AddCreditCardIconSprite;
-                    case "card": return AddCreditCardIconSprite;
-                    case "visa": return VisaIconSprite;
-                    case "mastercard": return MasterCardIconSprite;
-                    case "amex": return AmexIconSprite;
-                    case "diners": return DinersIconSprite;
-                    case "discover": return DiscoverIconSprite;
-                    case "google_pay": return GPayIconSprite;
-                    case "google_play": return GPlayIconSprite;
+                    case "empty_card":   return AddCreditCardIconSprite;
+                    case "card":         return AddCreditCardIconSprite;
+                    case "visa":         return VisaIconSprite;
+                    case "mastercard":   return MasterCardIconSprite;
+                    case "amex":         return AmexIconSprite;
+                    case "diners":       return DinersIconSprite;
+                    case "discover":     return DiscoverIconSprite;
+                    case "google_pay":   return GPayIconSprite;
+                    case "google_play":  return GPlayIconSprite;
                     case "empty_paypal": return PaypalIconSprite;
-                    case "paypal": return PaypalIconSprite;
-                    case "apple": return AppleIconSprite;
-                    case "klarna": return KlarnaIconSprite;
+                    case "paypal":       return PaypalIconSprite;
+                    case "apple":        return AppleIconSprite;
+                    case "klarna":       return KlarnaIconSprite;
                     case "web_checkout": return WebCheckoutIconSprite;
-                    case "cashapp": return CashAppIconSprite;
-                    case "amazon_pay": return AmazonPayIconSprite;
-                    case "venmo": return VenmoIconSprite;
-                    case "zelle": return ZelleIconSprite;
+                    case "cashapp":      return CashAppIconSprite;
+                    case "amazon_pay":   return AmazonPayIconSprite;
+                    case "venmo":        return VenmoIconSprite;
+                    case "zelle":        return ZelleIconSprite;
                     case "native":
-#if UNITY_ANDROID
+                        #if UNITY_ANDROID
                         return GPlayIconSprite;
-#elif UNITY_IOS
+                    #elif UNITY_IOS
                             return AppleIconSprite;
-#else
+                    #else
                             return AddCreditCardIconSprite;
-#endif
+                    #endif
                     case "app": return AppIconSprite;
                     default:
-                        {
-                            if (paymentMethodActualType.ToLower().Contains("paypal"))
-                                return PaypalIconSprite;
+                    {
+                        if (paymentMethodActualType.ToLower().Contains("paypal"))
+                            return PaypalIconSprite;
 
-                            return AddCreditCardIconSprite;
-                        }
+                        return AddCreditCardIconSprite;
+                    }
                 }
             }
         }
@@ -114,20 +114,20 @@ namespace Galleon.Checkout
             {
                 switch (paymentMethodActualType)
                 {
-                    case "google_pay": return GpaybuttonSprite;
-                    case "paypal": return PaypalbuttonSprite;
+                    case "google_pay":   return GpaybuttonSprite;
+                    case "paypal":       return PaypalbuttonSprite;
                     case "empty_paypal": return PaypalbuttonSprite;
-                    case "apple": return AppleButtonSprite;
-                    case "amazon_pay": return AmazonPayButtonSprite;
-                    case "amex": return AmexButtonSprite;
-                    case "cashapp": return CashAppButtonSprite;
-                    case "diners": return DinersButtonSprite;
-                    case "discover": return DiscoverButtonSprite;
-                    case "klarna": return KlarnaButtonSprite;
-                    case "mastercard": return MastercardButtonSprite;
-                    case "venmo": return VenmoButtonSprite;
-                    case "visa": return VisaButtonSprite;
-                    case "zelle": return ZelleButtonSprite;
+                    case "apple":        return AppleButtonSprite;
+                    case "amazon_pay":   return AmazonPayButtonSprite;
+                    case "amex":         return AmexButtonSprite;
+                    case "cashapp":      return CashAppButtonSprite;
+                    case "diners":       return DinersButtonSprite;
+                    case "discover":     return DiscoverButtonSprite;
+                    case "klarna":       return KlarnaButtonSprite;
+                    case "mastercard":   return MastercardButtonSprite;
+                    case "venmo":        return VenmoButtonSprite;
+                    case "visa":         return VisaButtonSprite;
+                    case "zelle":        return ZelleButtonSprite;
 
                     default: return CheckoutButtonSprite;
                 }
@@ -136,30 +136,37 @@ namespace Galleon.Checkout
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Resource Methods
 
+        //public Step LoadSprite(string name_or_url) 
+        //=>
+        //    new Step(name   : $"load_sprite_{name_or_url}"
+        //            ,action : async (s) =>
+        //            {
+        //                
+        //            });
+        
         public async Task<Sprite> LoadSprite(string name_or_url)
         {     
             try
             {
                 // Definitions
-                // Debug.Log("LoadSprite(): " + name_or_url);
                 var cached = SpriteResources.FirstOrDefault(x => x.Name == name_or_url);
 
                 // Check if cached in memory
                 if (cached != null && cached.Sprite != null)
+                {
                     return cached.Sprite;
+                }
 
+                // Definitions
                 string fileName = name_or_url.StartsWith("http") ? GetFileNameFromUrl(name_or_url) : name_or_url;
-
                 string filePath = Path.Combine(Application.persistentDataPath, fileName);
 
                 // Check if cached on disk
                 if (File.Exists(filePath))
                 {
                     Debug.Log("Load From Cache: " + filePath);
-                    byte[] bytes = File.ReadAllBytes(filePath);
-
-                    var texture = new Texture2D(2, 2);
-
+                    byte[] bytes   = File.ReadAllBytes(filePath);
+                    var    texture = new Texture2D(2, 2);
                     texture.LoadImage(bytes);
 
                     Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
@@ -167,9 +174,11 @@ namespace Galleon.Checkout
                     return sprite;
                 }
 
-                //          Download if URL
+                // Download if URL
                 if (name_or_url.StartsWith("http"))
+                {
                     return await DownloadAndCacheSprite(name_or_url, filePath);
+                }
 
                 return null;
             }
@@ -181,41 +190,37 @@ namespace Galleon.Checkout
 
         public async Task<Sprite> DownloadAndCacheSprite(string url, string filePath)
         {
-            // var filePath = Path.Combine(Application.persistentDataPath, url);
-            // Debug.Log("DownloadAndCacheSprite. url: " + url + "  filePath: " + filePath);
             try
             {
-                using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-                var operation = request.SendWebRequest();
+                // Start download
+                using UnityWebRequest request   = UnityWebRequestTexture.GetTexture(url);
+                var                   operation = request.SendWebRequest();
 
+                // Await
                 while (!operation.isDone)
                     await Task.Yield();
 
-
+                // Check result
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     Debug.LogError("Download failed: " + request.error);
                     return null;
                 }
 
-                //if (request.result == UnityWebRequest.Result.Success)
-                //{
+                // Save to disk
                 Texture2D texture = DownloadHandlerTexture.GetContent(request);
-
-                byte[] bytes = texture.EncodeToPNG();
-
+                byte[]    bytes   = texture.EncodeToPNG();
                 File.WriteAllBytes(filePath, bytes);
-
+                
+                // Get Sprite
                 var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
 
-               // Save in memory list
-               // SpriteResources.Add(new SpriteResource { Name = url, Sprite = sprite });
-
-                Debug.Log("Save To Cache: " + filePath);
+                // Save in memory list
+                SpriteResources.Add(new SpriteResource { Name = url, Sprite = sprite });
+                
+                //Debug.Log("Save To Cache: " + filePath);
 
                 return sprite;
-                //}
-
             }
             catch (Exception e)
             {
@@ -229,7 +234,6 @@ namespace Galleon.Checkout
         {
             return Path.GetFileName(new Uri(url).AbsolutePath);
         }
-
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types
@@ -241,4 +245,3 @@ namespace Galleon.Checkout
         public Sprite Sprite;
     }
 }
-

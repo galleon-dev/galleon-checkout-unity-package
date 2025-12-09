@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Galleon.Checkout.Foundation.LiveOperationAPF
 {
-    public class APF_LiveOperation : Entity
+    public class LiveOperation : Entity
     {   
         ///////// Members
         
@@ -15,7 +15,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPF
         
         ///////// Lifecycle
         
-        public APF_LiveOperation(string id, IEntity parent, APF_LiveNode definition)
+        public LiveOperation(string id, IEntity parent, APF_LiveNode definition)
         {
             this.ID                     = id;
             this.Parent                 = parent;
@@ -50,7 +50,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPF
     {
         //////////////// Members
         
-        public APF_LiveOperation Operation;
+        public LiveOperation Operation;
         public string            TargetText;
         public string            ActionText;
         

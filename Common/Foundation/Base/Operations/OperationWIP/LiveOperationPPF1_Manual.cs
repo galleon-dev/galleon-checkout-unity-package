@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
 {
-    public class PPF1M_LiveOperation : Entity
+    public class LiveOperation : Entity
     {   
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
@@ -22,7 +22,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public PPF1M_LiveOperation(string id, IEntity parent, string definition)
+        public LiveOperation(string id, IEntity parent, string definition)
         {
             this.ID                     = id;
             this.Parent                 = parent;
@@ -189,7 +189,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public PPF1M_LiveOperation   Operation               { get; set; }
+        public LiveOperation   Operation               { get; set; }
         
         public TextNode              TextNode                = new TextNode();
         public bool                  DoesNeedToDoAction      = false;

@@ -22,15 +22,20 @@ namespace Galleon.Checkout
         }
         
         public static async Task<PurchaseResult> Purchase(CheckoutProduct            product
-                                                         ,Dictionary<string, string> metadata  = null
-                                                         ,List<BonusItem>            bonusData = null)
+                                                         ,Dictionary<string, string> metadata      = null
+                                                         ,List<BonusItem>            bonusData     = null
+                                                         ,PurchaseConfiguration      configuration = null)
         {
             // Safty
             if (metadata  == null) metadata  = new Dictionary<string, string>();
             if (bonusData == null) bonusData = new List<BonusItem>();
             
+            if (configuration == null)
+                configuration = new PurchaseConfiguration();
+            
             // Create and setup session
             await CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
+            CHECKOUT.Session.PurchaseConfiguration = configuration;
             CheckoutClient.Instance.CurrentSession.Metadata  = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             CheckoutClient.Instance.CurrentSession.BonusData = bonusData;
                    
@@ -51,6 +56,19 @@ namespace Galleon.Checkout
         public string Country;
         public string AppUserID;
         public string ApplicationDisplayName;
+    }
+    
+    [Serializable]
+    public class PurchaseConfiguration
+    {
+        checkoutOrientation UIPanelOrientation = checkoutOrientation.Auto;
+    }
+    
+    enum checkoutOrientation
+    {
+        Auto,
+        ForcePortrait,
+        ForceLandscape,
     }
     
     [Serializable]

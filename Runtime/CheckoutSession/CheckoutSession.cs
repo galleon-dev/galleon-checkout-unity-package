@@ -32,6 +32,9 @@ namespace Galleon.Checkout
         // Bonus Data
         public List<BonusItem>                    BonusData                 = new();
         
+        // Configuration
+        public PurchaseConfiguration              PurchaseConfiguration     = new();
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public CheckoutClient                     Client                    => CheckoutClient.Instance;
