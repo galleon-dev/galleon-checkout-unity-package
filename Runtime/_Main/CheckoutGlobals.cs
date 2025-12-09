@@ -26,5 +26,7 @@ namespace Galleon.Checkout
         public CheckoutGlobals()
         {
         }
+        
+        public CheckoutConfiguration CheckoutConfiguration;
     }
 }

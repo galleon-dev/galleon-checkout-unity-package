@@ -15,6 +15,7 @@ namespace Galleon.Checkout
             CheckoutClient.Instance.Network.GalleonUserAccessToken = configuration.JWT;
             CHECKOUT.User.AppUserID                                = configuration.AppUserID;
             CheckoutClient.Instance.ApplicationDisplayName         = configuration.ApplicationDisplayName;
+            CHECKOUT.Globals.CheckoutConfiguration                 = configuration;
             
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             
@@ -23,19 +24,15 @@ namespace Galleon.Checkout
         
         public static async Task<PurchaseResult> Purchase(CheckoutProduct            product
                                                          ,Dictionary<string, string> metadata      = null
-                                                         ,List<BonusItem>            bonusData     = null
-                                                         ,PurchaseConfiguration      configuration = null)
+                                                         ,List<BonusItem>            bonusData     = null)
         {
             // Safty
             if (metadata  == null) metadata  = new Dictionary<string, string>();
             if (bonusData == null) bonusData = new List<BonusItem>();
             
-            if (configuration == null)
-                configuration = new PurchaseConfiguration();
-            
             // Create and setup session
             await CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
-            CHECKOUT.Session.PurchaseConfiguration = configuration;
+            
             CheckoutClient.Instance.CurrentSession.Metadata  = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             CheckoutClient.Instance.CurrentSession.BonusData = bonusData;
                    
@@ -52,19 +49,14 @@ namespace Galleon.Checkout
     [Serializable]
     public class CheckoutConfiguration
     {
-        public string JWT;
-        public string Country;
-        public string AppUserID;
-        public string ApplicationDisplayName;
+        public string              JWT;
+        public string              Country;
+        public string              AppUserID;
+        public string              ApplicationDisplayName;
+        public CheckoutOrientation UIPanelOrientation = CheckoutOrientation.Auto;
     }
     
-    [Serializable]
-    public class PurchaseConfiguration
-    {
-        checkoutOrientation UIPanelOrientation = checkoutOrientation.Auto;
-    }
-    
-    enum checkoutOrientation
+    public enum CheckoutOrientation
     {
         Auto,
         ForcePortrait,

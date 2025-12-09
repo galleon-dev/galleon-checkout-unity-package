@@ -72,7 +72,7 @@ namespace Galleon.Checkout.UI
         
         private void DisableAllPanels()
         {
-            if (CheckoutClient.Instance.CheckoutScreenMobile.IsLandscape == false)
+            if (CheckoutScreenMobile.IsLandscape == false)
             {
                 this.TermsPrivacyReturnElement.SetActive(false);
                 this.LongTermsOfServiceelement.SetActive(false);
