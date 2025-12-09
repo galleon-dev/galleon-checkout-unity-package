@@ -303,7 +303,7 @@ namespace Galleon.Checkout.Foundation
         /// <summary>
         /// Returns a string representation of the current node only.
         /// </summary>
-        public string SelfToString()
+        public string ToNodeString()
         {
             return RawText ?? "";
         }
@@ -311,7 +311,7 @@ namespace Galleon.Checkout.Foundation
         /// <summary>
         /// Returns a string representation of the whole tree from the current node downwards.
         /// </summary>
-        public string TreeToString()
+        public string ToTreeString()
         {
             var result = new List<string>();
             AddNodeToString(this, result, 0);
@@ -361,7 +361,7 @@ namespace Galleon.Checkout.Foundation
         {
             try
             {
-                string content = TreeToString();
+                string content = ToTreeString();
                 System.IO.File.WriteAllText(path, content);
             }
             catch (System.Exception ex)
@@ -375,7 +375,7 @@ namespace Galleon.Checkout.Foundation
 
         public override string ToString()
         {
-            return SelfToString();
+            return ToNodeString();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Unity Test Menu
@@ -454,13 +454,13 @@ namespace Galleon.Checkout.Foundation
             if (childNode != null)
             {
                 Debug.Log("SelfToString() for child node:");
-                Debug.Log(childNode.SelfToString());
+                Debug.Log(childNode.ToNodeString());
                 Debug.Log("---");
             }
 
             // Test TreeToString on the root
             Debug.Log("TreeToString() for entire tree:");
-            string treeString = root.TreeToString();
+            string treeString = root.ToTreeString();
             Debug.Log(treeString);
             Debug.Log("---");
 

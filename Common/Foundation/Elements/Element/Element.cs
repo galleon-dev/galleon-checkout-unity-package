@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Codice.Client.Common;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
 
@@ -173,7 +172,31 @@ namespace Galleon.Checkout
         }
         
         public bool DoesNeedToExpandToFullLine() => !IsNamespaceNode() && GetNamespace() != null;
+
+        ////////// Insert
         
+        public void InsertNodeIntoTree(DefinitionNode childNamespaceNode)
+        {
+            var namespaceNodeInThisTree = Node.Descendants()
+                                              .OfType<DefinitionNode>()
+                                              .FirstOrDefault(n => n.IsNamespace  
+                                                                && n.GetNamespace() == childNamespaceNode.GetNamespace());
+            
+            var parentNodeInThisTree = namespaceNodeInThisTree.Node.Children.Count > 0 
+                                     ? namespaceNodeInThisTree.Node.Children.First()
+                                     : namespaceNodeInThisTree.Node.Entity;
+            
+            foreach (var child in childNamespaceNode.Node.Children.OfType<DefinitionNode>())
+            {
+                var cloneTree = child.CloneTree();
+                parentNodeInThisTree.Node.AddChild(cloneTree);
+                foreach (var textNode in cloneTree.TextNode.Node.Descendants().OfType<TextNode>())
+                {
+                    textNode.RawText = "    " + textNode.RawText;
+                }
+            }
+            
+        }
     }
     
     /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// ///
