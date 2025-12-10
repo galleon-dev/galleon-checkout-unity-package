@@ -15,6 +15,8 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         public string   ID;
         public IEntity  OperationParent;
        
+        public string   OperationType = "plus";
+        
         public LiveNode OriginalTree;
         public LiveNode ChildVirtualTree;
         public LiveNode FullVirtualTree;
@@ -102,12 +104,18 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
             {
                 Element childElement  = Elements.GetElementByName(OriginalTree.DefinitionNode.EntityType);
                  
+                // Create tree from Element 
                 this.ChildVirtualTree = new LiveNode()
                                       {
                                           DefinitionNode = childElement.Definition.CloneTree(),
                                           Operation      = this
                                       };
                 
+                // Set name from Operation Original Tree
+                var childInstanceName = OriginalTree.DefinitionNode.EntityName;
+                ChildVirtualTree.DefinitionNode.ApplyVariable("$name", childInstanceName);
+                
+                // Log
                 foreach (var node in ChildVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
                     s.Log(node.RawText);
             });        
@@ -143,25 +151,47 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
             new Step(action : async (s) =>
             {
                 // Create Zipped Tree
-                var zipTree = CreateZippedTree();
-                s.Log($"zipped tree : {zipTree.TextNode.ToTreeString()}");
+                DefinitionNode fullTree = CreateZippedTree();
+                
+                // Add #exists Tag
+                foreach (var node in fullTree.Node.Descendants().OfType<DefinitionNode>())
+                    node.AddTag("#exists");
+                
+                foreach (var node in fullTree.Node.Descendants().OfType<DefinitionNode>())
+                   s.Log(node.TextNode.RawText);
                 
                 // Insert Child
                 var childTree               = ChildVirtualTree.DefinitionNode.Node.Descendants().OfType<DefinitionNode>();
                 var childTreeNamespaceNodes = childTree.Where(n => n.IsNamespaceNode()).ToList();
-                
-                // insert
                 foreach (var childNamespaceNode in childTreeNamespaceNodes)
-                    zipTree.InsertNodeIntoTree(childNamespaceNode);
+                    fullTree.InsertNodeIntoTree(childNamespaceNode);
+                
+                // Mark Live Action for inserted child nodes
+                string actionTag = $"#{OperationType}";
+                foreach (var node in fullTree.Node.Descendants().OfType<DefinitionNode>())
+                    if (node.TextNode.Hashtags.Count == 0)
+                        node.AddTag(actionTag);
                 
                 // Log
                 s.Log("---");
-                foreach (var node in zipTree.Node.Descendants().OfType<DefinitionNode>())
+                foreach (var node in fullTree.Node.Descendants().OfType<DefinitionNode>())
                     s.Log(node.TextNode.RawText);
+                
+                // Done
+                this.FullVirtualTree = new LiveNode() { DefinitionNode = fullTree };
             });
         
+        public Step DumpVirtualTree()
+        =>
+            new Step(action : async (s) =>
+            {
+                foreach (var node in FullVirtualTree.DefinitionNode.Node.Descendants().OfType<DefinitionNode>())
+                    s.Log(node.TextNode.RawText);
+            });
+       
+        
         public Step RunLiveFlow() 
-            =>
+        =>
             new Step(name   : $"run_live_flow"
                     ,action : async (s) =>
                     {   
@@ -173,16 +203,6 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                                 s.ParentStep.AddChildStep(vNode.DoAction());
                         }                          
                     });
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper debug steps
-       
-        public Step DumpVirtualTree()
-        =>
-            new Step(action : async (s) =>
-            {
-                foreach (var textNode in FullVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
-                    s.Log(textNode.RawText);
-            });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Parse Methods
         
@@ -201,10 +221,10 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         public DefinitionNode CreateZippedTree()
         {
             // Definitions
-            Element parentElement = this.OperationParent.Node.GetElement();
-            Element childElement  = Elements.GetElement(this.ChildVirtualTree.DefinitionNode.TextNode.LineWords.ElementAt(1)); 
-            var     parentTree    = parentElement.Definition.CloneTree();
-            var     childTree     = childElement.Definition.CloneTree();
+            Element parentElement    = this.OperationParent.Node.GetElement();
+            Element childElement     = Elements.GetElement(this.ChildVirtualTree.DefinitionNode.TextNode.LineWords.ElementAt(1)); 
+            var     parentTree       = parentElement.Definition.CloneTree();
+            var     childTree        = childElement.Definition.CloneTree();
             
             // Get child namespaces
             var childNamespacesNodes = childTree.Node.Descendants().OfType<DefinitionNode>().Where(n => n.IsNamespaceNode()).ToList();

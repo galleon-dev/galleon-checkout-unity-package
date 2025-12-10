@@ -17,9 +17,9 @@ namespace Galleon.Checkout.Foundation
             Element Folder    = new Element(name : "Folder"); this.Collection.Add(Folder);
             Folder.Definition = DefinitionNode.Parse(new []
                                                      {
-                                                        "> Element Folder "
-                                                     ,  "   > (Assets)    "
-                                                     ,  "       > Folder  "
+                                                        "> Element Folder $name "
+                                                     ,  "   > (Assets)          "
+                                                     ,  "       > Folder $name  "
                                                      });
             
           //    Folder.Definition           = new DefinitionNode() { TextNode = "> Element Folder" }; 
