@@ -224,19 +224,20 @@ namespace Galleon.Checkout
                         
                         s.AddPostStep(name   : "save_used_payment_method_if_success"
                                      ,action : async x =>
-                                               {
-                                                   if (this.lastChargeResult.is_success)
-                                                       x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
-                                               });
+                                             {
+                                                 if (this.lastChargeResult != null
+                                                 &&  this.lastChargeResult.is_success
+                                                 && !this.lastChargeResult.is_canceled)
+                                                 
+                                                     x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
+                                             });
                         
                         
                         // Refresh user payment methods
                         s.AddPostStep(CHECKOUT.PaymentMethods.RefreshPaymentMethods());
                         
-                        
                         // Finally, handle transaction result
-                        s.AddPostStep(HandleTransactionResult());
-                        
+                        s.AddPostStep(HandleTransactionResult());                
                     });
         
         
