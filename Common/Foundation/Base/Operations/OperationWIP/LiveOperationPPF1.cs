@@ -61,18 +61,24 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         =>
             new Step(action : async (s) =>
             {
-                 s.Log(OriginalTree.TextNode.ToTreeString());
+                /// > Folder f1
+                
+                s.Log(OriginalTree.TextNode.ToTreeString());
             });
         
         public Step DumpChildElement() 
         =>
             new Step(action : async (s) =>
             {
-                 Element childElement = Elements.GetElementByName(OriginalTree.DefinitionNode.EntityType);
-                 var     dump         = childElement.DumpDefinition();
+                /// > Element Folder $name
+                ///     > (Assets)
+                ///         > Folder $name 
+                
+                Element childElement = Elements.GetElementByName(OriginalTree.DefinitionNode.EntityType);
+                var     dump         = childElement.DumpDefinition();
                  
-                 foreach (var line in dump)
-                     s.Log(line);
+                foreach (var line in dump)
+                    s.Log(line);
             });
         
         public Step DumpParentElement() 
@@ -102,6 +108,10 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         =>
             new Step(action : async (s) =>
             {
+                /// > Element Folder f1
+                ///     > (Assets)
+                ///         > Folder f1
+                
                 Element childElement  = Elements.GetElementByName(OriginalTree.DefinitionNode.EntityType);
                  
                 // Create tree from Element 
@@ -124,6 +134,19 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         =>
             new Step(action : async (s) =>
             {
+                /// > Package
+                ///     > (definition)
+                ///         > definition
+                ///     > (Elements)
+                ///         > Element
+                ///     > (Assets)
+                ///         > Folder "package1"
+                ///     > (Hierarchy)
+                ///         > Scene "main"
+                ///     > (whatever)
+                ///         > Whatever "..."
+                
+                
                 Element parentElement = this.OperationParent.Node.GetElement();
                 var     parentTree    = parentElement.Definition.CloneTree();
                 
@@ -135,6 +158,10 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         =>
             new Step(action : async (s) =>
             {
+                /// > Package
+                ///     > (Assets)
+                ///         > Folder "package1"
+                
                 // Create zip tree
                 var zipTree = CreateZippedTree();
                 
@@ -150,6 +177,12 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         =>
             new Step(action : async (s) =>
             {
+                /// > Package                       #exists
+                ///     > (Assets)                  #exists
+                ///         > Folder "package1"     #exists
+                ///             > Folder f1         #plus
+                
+                
                 // Create Zipped Tree
                 DefinitionNode fullTree = CreateZippedTree();
                 
@@ -185,6 +218,11 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         =>
             new Step(action : async (s) =>
             {
+                /// > Package                       #exists
+                ///     > (Assets)                  #exists
+                ///         > Folder "package1"     #exists
+                ///             > Folder f1         #plus
+                
                 foreach (var node in FullVirtualTree.DefinitionNode.Node.Descendants().OfType<DefinitionNode>())
                     s.Log(node.TextNode.RawText);
             });
