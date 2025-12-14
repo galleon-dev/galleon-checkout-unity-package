@@ -179,7 +179,6 @@ namespace Galleon.Checkout
             CHECKOUT.Storage.ClearAll();
         }
         
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last used
         
         public Step SaveUsedUserPaymentMethod() 
