@@ -116,6 +116,49 @@ namespace Galleon.Checkout
             CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
         }
         
+        public async Task RemoveUserPaymentMethod(UserPaymentMethod userPaymentMethod)
+        {
+            UserPaymentMethods.Remove(userPaymentMethod);
+            
+            if (userPaymentMethod.Data.id != null)
+            {
+                var result = await CHECKOUT.Network.Post<RemovePaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/remove-payment-method" 
+                                                                                     ,headers  : new ()
+                                                                                               {
+                                                                                                   { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
+                                                                                               }
+                                                                                     ,body     : new RemovePaymentMethodRequest()
+                                                                                               {
+                                                                                                   payment_method_id = userPaymentMethod.Data.id,
+                                                                                               });
+                
+            }
+            
+            foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
+                method.Unselect();
+
+            if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count != 0)
+                CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
+            
+            if (UserPaymentMethodsToDisplay.Count < 3
+            &&  UserPaymentMethods.All(x => x.Type != "empty_card"))
+            {
+                this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                            {
+                                                Data               = new ()
+                                                                   {
+                                                                      type = "empty_card"
+                                                                   },
+                                                DisplayName        = "Add Credit Card",
+                                                IsNewPaymentMethod = false,
+                                                IsSelected         = false,
+                                                SortOrder          = float.PositiveInfinity, 
+                                                Type               = "empty_card"
+                                            });
+            }
+            
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Storage
         
         public async Task Save()

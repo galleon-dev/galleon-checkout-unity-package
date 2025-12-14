@@ -49,9 +49,16 @@ namespace Galleon.Checkout.UI
         private RectTransform               InputFieldRect; // SafeArea related
 
         private bool                        isPending                = false;
-        private float?                      overrideContentSize      = null;
+        private float?                      overrideContentSize      = null; 
         public  int                         CloseAnimationDurationMS = 300;
         public  float                       SafeAreaHeight           = 0f;
+        
+        private float                       currentKeyboardHeight    = 0f;
+        private float                       targetKeyboardHeight     = 0f; 
+        private float                       maxKeyboardHeight        = 0f;
+        private float                       keyboardHideDelay        = 0.2f;
+        private float                       keyboardHideTimer        = 0f;
+        private bool                        hasInputFocus            = false;
 
         // Propertiews
         
@@ -549,21 +556,57 @@ namespace Galleon.Checkout.UI
                 return keyboardHeight - footerHeight;
             }
 
-            
-            
             #elif UNITY_ANDROID && !UNITY_EDITOR
             
+            // Get the current Android Activity and View to measure visible frame
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
             {
-                AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                AndroidJavaObject view = activity.Get<AndroidJavaObject>("mUnityPlayer").Call<AndroidJavaObject>("getView");
-                AndroidJavaObject rect = new AndroidJavaObject("android.graphics.Rect");
-                view.Call("getWindowVisibleDisplayFrame", rect);
-                int visibleHeight  = rect.Call<int>("height");
-                var footerHeight   = (this.FooterPanelView.transform as RectTransform).rect.height;
+                AndroidJavaObject activity  = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");                          // Get the current Android Activity
+                AndroidJavaObject view      = activity.Get<AndroidJavaObject>("mUnityPlayer").Call<AndroidJavaObject>("getView");   // Get the Unity view
+                AndroidJavaObject rect      = new AndroidJavaObject("android.graphics.Rect");                                       // Create rect to store visible frame
+                view.Call("getWindowVisibleDisplayFrame", rect);                                                                    // Get visible frame dimensions
+                int visibleHeight           = rect.Call<int>("height");                                                             // Get height of visible frame
+                var footerHeight            = (this.FooterPanelView.transform as RectTransform).rect.height;                        // Get footer height
             
-                return (UnityEngine.Screen.height - visibleHeight) - footerHeight;
+                // Calculate actual keyboard height by comparing screen height to visible frame height
+                float actualKeyboardHeight = (UnityEngine.Screen.height - visibleHeight) - footerHeight;
+
+                // Track maximum keyboard height
+                if (actualKeyboardHeight > maxKeyboardHeight)
+                    maxKeyboardHeight = actualKeyboardHeight;
+
+                // If keyboard size is more than 0, consider it shown
+                if (actualKeyboardHeight > 0)
+                {
+                    targetKeyboardHeight = actualKeyboardHeight;
+                    keyboardHideTimer    = keyboardHideDelay;
+                    hasInputFocus        = true;
+                    
+                    if (maxKeyboardHeight > currentKeyboardHeight)
+                        targetKeyboardHeight = maxKeyboardHeight;
+                }
+                // If keyboard was shown but now hidden, animate height back to 0
+                else if (hasInputFocus)
+                {
+                    keyboardHideTimer -= Time.deltaTime;
+
+                    if (keyboardHideTimer <= 0)
+                    {
+                        targetKeyboardHeight = 0;
+                        hasInputFocus        = false;
+                        maxKeyboardHeight = 0;
+                    }
+                }
+
+                // Smoothly interpolate current height to target height
+                currentKeyboardHeight = Mathf.Lerp(currentKeyboardHeight, targetKeyboardHeight, Time.deltaTime * 15f);
+                
+                if (actualKeyboardHeight > 0 || hasInputFocus)
+                    currentKeyboardHeight = maxKeyboardHeight;
+                
+                return currentKeyboardHeight;
             }
+            
             
             #elif UNITY_IOS && !UNITY_EDITOR
             

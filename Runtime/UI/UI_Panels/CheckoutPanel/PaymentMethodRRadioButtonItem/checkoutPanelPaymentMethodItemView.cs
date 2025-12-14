@@ -81,8 +81,8 @@ namespace Galleon.Checkout.UI
             this.Icon.sprite = this.PaymentMethod.GetIconSprite();
             
             // Set button Sprite
-            if (this.PaymentMethod.IsSelected)
-                CheckoutPanelView.SetPurchaseButtonSprite(this.PaymentMethod.GetButtonSprite());
+            // if (this.PaymentMethod.IsSelected)
+            //     CheckoutPanelView.SetPurchaseButtonSprite(this.PaymentMethod.GetButtonSprite());
             
             // Set Seperator Color 
             if (this.PaymentMethod.IsSelected)
@@ -143,39 +143,10 @@ namespace Galleon.Checkout.UI
         {
             Debug.Log("SetPaymentMethod: " + paymentMethod.Type + "  CheckoutPanelView: " + CheckoutPanelView);
          
-            this.PaymentMethod = paymentMethod;
-            
+            this.PaymentMethod     = paymentMethod;
             this.CheckoutPanelView = CheckoutPanelView;
-
             this.PaymentMethod?.Select();
 
-            // Refresh();
-
-            // if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Visa.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowPurchaseButton();
-            // }
-            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.MasterCard.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowPurchaseButton();
-            // }
-            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.GPay.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowGooglePayButton();
-            // }
-            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.PayPal.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowPaypalPayButton();
-            // }
-            // else if (this.PaymentMethod.Type == UserPaymentMethod.PaymentMethodType.Apple.ToString())
-            // {
-            //     if (this.PaymentMethod.IsSelected)
-            //         CheckoutPanelView.ShowApplePayButton();
-            // }
            
         }
     }

@@ -894,7 +894,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3778832535672624747}
   m_HandleRect: {fileID: 5944293240596519095}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -930,6 +930,18 @@ PrefabInstance:
     - target: {fileID: 352942952970455416, guid: 489617f8f9bae4b0b954c835fcbbff30, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1539891402707906731, guid: 489617f8f9bae4b0b954c835fcbbff30, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2166846520750625667, guid: 489617f8f9bae4b0b954c835fcbbff30, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2166846520750625667, guid: 489617f8f9bae4b0b954c835fcbbff30, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3727052664297547827, guid: 489617f8f9bae4b0b954c835fcbbff30, type: 3}
       propertyPath: m_Name

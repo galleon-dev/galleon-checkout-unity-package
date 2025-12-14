@@ -52,31 +52,7 @@ namespace Galleon.Checkout
         
         public async void RemovePaymentMethod(UserPaymentMethod userPaymentMethod)
         {
-            CHECKOUT.PaymentMethods.UserPaymentMethods.Remove(userPaymentMethod);
-            
-            if (userPaymentMethod.Data.id != null)
-            {
-                var body = new RemovePaymentMethodRequest()
-                           {
-                               payment_method_id = userPaymentMethod.Data.id,
-                           };
-                
-                var result = await CHECKOUT.Network.Post<RemovePaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/remove-payment-method" 
-                                                                                     ,headers  : new ()
-                                                                                               {
-                                                                                                   { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
-                                                                                               }
-                                                                                     ,body     : body);
-                
-            }
-            
-            foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
-                method.Unselect();
-
-            if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count != 0)
-            {
-                CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
-            }
+            await CHECKOUT.PaymentMethods.RemoveUserPaymentMethod(userPaymentMethod);
         }
     }
 }

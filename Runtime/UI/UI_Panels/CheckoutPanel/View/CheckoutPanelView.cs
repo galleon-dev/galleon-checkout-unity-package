@@ -130,17 +130,25 @@ namespace Galleon.Checkout.UI
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
             }
 
-            // Add defult add card button
-            if (AddCreditCardButtonElement)
-            {
-                this.AddCreditCardButtonElement.SetActive(paymentMethods.Count() == 0);
-            }
+            // Add defult add card button - OLD - NOT USED
+            // if (AddCreditCardButtonElement)
+            // {
+            //     int amoutOfCreditCardUserPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x?.Data?.type == "credit_card");
+            //     int amountOfPaymentMethodsToDisplay     = paymentMethods.Count();
+            //     bool shouldShowAddCardButton            = amoutOfCreditCardUserPaymentMethods == 0 && amountOfPaymentMethodsToDisplay < 3;
+            //     this.AddCreditCardButtonElement.SetActive(shouldShowAddCardButton);
+            // }
 
             // Set Dropdown Options
             if (DropdownMenu)
             {
                 SetDropdown();
             }
+            
+            // Set Button Display
+            var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
+            if (selectedPaymentMethod != null)
+                SetButtonDisplay(selectedPaymentMethod);
 
             ///////////////
             // checkoutPanelPaymentMethodItemView[] methods = this.gameObject.GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
@@ -168,8 +176,7 @@ namespace Galleon.Checkout.UI
                 item.Unselect();
             }
 
-            var image = PurchaseButton.gameObject.GetComponent<Image>();
-            image.sprite = SelectedItem.PaymentMethod.GetButtonSprite();
+            SetButtonDisplay(SelectedItem?.PaymentMethod);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -208,16 +215,17 @@ namespace Galleon.Checkout.UI
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
-
-        public void SetPurchaseButtonSprite(Sprite sprite)
-        {
-            var image = this.PurchaseButton.GetComponentInChildren<Image>();
-            image.sprite = sprite;
-        }
-
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
 
+        private void SetButtonDisplay(UserPaymentMethod upm)
+        {
+            if (upm == null) return;
+            
+            var image    = PurchaseButton.gameObject.GetComponent<Image>();
+            image.sprite = upm.GetButtonSprite();
+        }
+        
+        
         public void SetDropdown()
         {
             DropdownMenu.ClearOptions();

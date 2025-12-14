@@ -225,9 +225,9 @@ namespace Galleon.Checkout
                         s.AddPostStep(name   : "save_used_payment_method_if_success"
                                      ,action : async x =>
                                              {
-                                                 if (this.lastChargeResult != null
-                                                 &&  this.lastChargeResult.is_success
-                                                 && !this.lastChargeResult.is_canceled)
+                                                 //if (this.lastChargeResult != null
+                                                 //&&  this.lastChargeResult.is_success
+                                                 //&& !this.lastChargeResult.is_canceled)
                                                  
                                                      x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
                                              });

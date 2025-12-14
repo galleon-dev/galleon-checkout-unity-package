@@ -211,7 +211,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                     s.Log(node.TextNode.RawText);
                 
                 // Done
-                this.FullVirtualTree = new LiveNode() { DefinitionNode = fullTree };
+                this.FullVirtualTree = new LiveNode(definitionRoot: fullTree);
             });
         
         public Step DumpVirtualTree()
@@ -259,10 +259,11 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         public DefinitionNode CreateZippedTree()
         {
             // Definitions
-            Element parentElement    = this.OperationParent.Node.GetElement();
-            Element childElement     = Elements.GetElement(this.ChildVirtualTree.DefinitionNode.TextNode.LineWords.ElementAt(1)); 
-            var     parentTree       = parentElement.Definition.CloneTree();
-            var     childTree        = childElement.Definition.CloneTree();
+            Element        parentElement    = this.OperationParent.Node.GetElement();
+            Element        childElement     = Elements.GetElement(this.ChildVirtualTree.DefinitionNode.TextNode.LineWords.ElementAt(1)); 
+            DefinitionNode parentTree       = parentElement.Definition.CloneTree();
+            DefinitionNode childTree        = childElement.Definition.CloneTree();
+            
             
             // Get child namespaces
             var childNamespacesNodes = childTree.Node.Descendants().OfType<DefinitionNode>().Where(n => n.IsNamespaceNode()).ToList();
@@ -322,14 +323,18 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         public static LiveNode ParseTree(string lines) => ParseTree(lines.Split('\n'));
         public static LiveNode ParseTree(IEnumerable<string> lines)
         {
+            // Initialize root variables
             LiveNode rootLiveNode = null;
             TextNode rootTextNode = TextNode.Parse(lines);
-            
+    
+            // Process each text node to create corresponding live nodes
             foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
+                // Parse and create live node from text node
                 var liveNode = ParseNode(textNode);
                 textNode.Node.SetData(key : "live_node", value : liveNode);
-                
+        
+                // Set parent-child relationship
                 if (textNode.Node.Parent != null)
                 {
                     var parentText     = textNode  .Node.Parent;
@@ -341,24 +346,26 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                     rootLiveNode = liveNode;
                 }
             }
-            
-            // cleanup
+    
+            // cleanup temporary live node references from text nodes
             foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
                 textNode.Node.RemoveData(key : "live_node");
             }
-            
+    
             return rootLiveNode;
         }
-        
+
         public static LiveNode ParseNode(TextNode textNode)
         {
+            // Create new live node and set definition
             var node            = new LiveNode();
             node.DefinitionNode = new DefinitionNode(textNode.RawText);
-            
+    
+            // Set action flag if node has "plus" tag
             if (node.TextNode.Hashtags.Contains("plus"))
                 node.DoesNeedToDoAction = true;
-            
+    
             return node;
         }
         
@@ -366,6 +373,11 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
 
         public LiveNode()
         {
+        }
+
+        public LiveNode(DefinitionNode definitionRoot)
+        {
+            DefinitionNode = definitionRoot;   
         }
         
         public LiveNode CloneNode()
@@ -393,6 +405,10 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
 
             return clone;
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Parse methods
+        
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Actions
         
