@@ -550,24 +550,24 @@ namespace Galleon.Checkout
             
             public async Task Plus_APF(string text)
             {                
-                var   plusOperation = new Foundation.LiveOperationAPF.LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
-                                                                                   ,parent     : this.Entity
-                                                                                   ,definition : new Foundation.LiveOperationAPF.APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
+                var   plusOperation = new Foundation.LiveOperationAPF.LiveOperation(id                  : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
+                                                                                   ,parent              : this.Entity
+                                                                                   ,definition          : new Foundation.LiveOperationAPF.APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
                 
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_APFE1(string text)
             {   
-                var   plusOperation = new Foundation.LiveOperationAPFE1.LiveOperation(id         : $"APFE1"
-                                                                                     ,parent     : this.Entity
-                                                                                     ,definition : text);
+                var   plusOperation = new Foundation.LiveOperationAPFE1.LiveOperation(id                : $"APFE1"
+                                                                                     ,parent            : this.Entity
+                                                                                     ,definition        : text);
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_PPFE1M(string text)
             {   
-                var   plusOperation = new Foundation.LiveOperationPPF1M.LiveOperation(id         : $"PPFE1M"
-                                                                                     ,parent     : this.Entity
-                                                                                     ,definition : text);
+                var   plusOperation = new Foundation.LiveOperationPPF1M.LiveOperation(id                : $"PPFE1M"
+                                                                                     ,parent            : this.Entity
+                                                                                     ,definition        : text);
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_PPFE1(string text)
