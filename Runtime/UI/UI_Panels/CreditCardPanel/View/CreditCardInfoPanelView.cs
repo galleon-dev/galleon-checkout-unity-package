@@ -212,6 +212,12 @@ namespace Galleon.Checkout.UI
                 DateErrorTextBackground.SetActive(true);
                 InputFieldsCorrect = false;
             }
+            else if (!ValidateDateExpiry(DateInputField.Text, out string dateError))
+            {
+                DateErrorText.text = dateError;
+                DateErrorTextBackground.SetActive(true);
+                InputFieldsCorrect = false;
+            }
 
             if (!IsValidCVV && !IsValidCreditCardNumber && !IsValidDate)
             {
