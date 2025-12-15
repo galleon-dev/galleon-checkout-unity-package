@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.ELEMENTS;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,7 +12,7 @@ using UnityEngine.UIElements;
 using UnityEditor;
 #endif
 
-namespace   Galleon.Checkout.Assets
+namespace Galleon.Checkout.Assets
 {
     [Element("Folder")]
     public class Folder : Asset

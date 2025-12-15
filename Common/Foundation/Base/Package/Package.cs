@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Galleon.Checkout.Assets;
+using Galleon.Checkout.ELEMENTS;
 
 #if UNITY_EDITOR
 using UnityEditor;

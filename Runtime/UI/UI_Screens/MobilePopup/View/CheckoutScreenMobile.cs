@@ -51,7 +51,6 @@ namespace Galleon.Checkout.UI
         private bool                        isPending                = false;
         private float?                      overrideContentSize      = null; 
         public  int                         CloseAnimationDurationMS = 300;
-        public  float                       SafeAreaHeight           = 0f;
         
         private float                       currentKeyboardHeight    = 0f;
         private float                       targetKeyboardHeight     = 0f; 
@@ -522,18 +521,16 @@ namespace Galleon.Checkout.UI
                 }
             }
             
-            if (!IsLandscape)
+            if (IsPortrait)
             {
                 ParentPanel.TryGetComponent(out RectTransform parentTransform);
-                var keyboardHeight         = Math.Max(0, GetKeyboardHeight()) - SafeAreaHeight;
+                var keyboardHeight         = Math.Max(0, GetKeyboardHeight());
                 var targetSize             = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + keyboardHeight);
                 
                 if (overrideContentSize.HasValue)
                     targetSize = new Vector2(parentTransform.sizeDelta.x, overrideContentSize.Value + keyboardHeight);
                 
-                parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
-
-                CheckSafeaArea();
+                parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 4;
             }
         }
 
@@ -617,79 +614,6 @@ namespace Galleon.Checkout.UI
             #endif
         }
 
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// SAFEAREA / NOTCH ESTIMATION
-
-
-        // Whichever InputField is selected/activates we are checking whether it touches Notch zone or not
-        void CheckSafeaArea()
-        {
-            if (IsInTopNotchZone(InputFieldRect))
-            {
-              //Debug.LogWarning("InputField is in the top notch zone!");
-                IncreaseSafeAreaHeight();
-            }
-        }
-
-        public Camera UI_Camera;
-        public override void Awake()
-        {
-            this.UI_Camera = Camera.main;
-        }
-
-        bool IsInTopNotchZone(RectTransform rectTransform)
-        {
-            if (!rectTransform) 
-                return false;
-
-            // Get world corners
-            Vector3[] corners = new Vector3[4];
-            rectTransform.GetWorldCorners(corners);
-
-            float safeTopY = UnityEngine.Screen.safeArea.yMax;
-            // float screenTopY = UnityEngine.Screen.height;
-
-            foreach (Vector3 corner in corners)
-            {
-                Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(UI_Camera, corner);
-
-                if (screenPoint.y > safeTopY)
-                {
-                    // This corner is in the top notch zone
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void IncreaseSafeAreaHeight()
-        {
-            SafeAreaHeight += 50;
-        }
-
-        public void SetInputFieldRect(RectTransform _RectTransform)
-        {
-            Debug.Log("SetInputFieldRect()");
-            StartCoroutine(SetInputFieldRectDelay(_RectTransform));
-        }
-
-        IEnumerator SetInputFieldRectDelay(RectTransform _RectTransform)
-        {
-            yield return new WaitForSeconds(0.02f);
-            // Debug.Log("SetInputFieldRect: " + _RectTransform.name);
-            InputFieldRect = _RectTransform;
-            SafeAreaHeight = 0;
-        }
-
-        public void ResetSafeAreaHeight()
-        {
-            if (InputFieldRect)
-            {
-                //  Debug.Log("ResetSafeAreaHeight: " + InputFieldRect.name);
-                InputFieldRect = null;
-                SafeAreaHeight = 0;
-            }
-        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Pages
 

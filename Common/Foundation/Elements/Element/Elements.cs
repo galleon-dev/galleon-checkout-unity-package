@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Galleon.Checkout.Foundation;
 
-namespace Galleon.Checkout.Foundation
+namespace Galleon.Checkout.ELEMENTS
 {
     public class Elements : Entity
     {

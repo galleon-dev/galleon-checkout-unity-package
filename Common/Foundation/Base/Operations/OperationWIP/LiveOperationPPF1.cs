@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.ELEMENTS;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationPPF1;
 using UnityEngine;

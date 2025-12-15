@@ -5,15 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Galleon.Checkout.ELEMENTS;
 using Galleon.Checkout.Foundation;
-using Galleon.Checkout.Foundation.LiveOperationAPF;
-using Galleon.Checkout.Foundation.LiveOperationAPFE1;
-using Galleon.Checkout.Foundation.LiveOperationPPF1;
-using Galleon.Checkout.Foundation.LiveOperationPPF1M;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UIElements;
-using LiveOperation = Galleon.Checkout.Foundation.LiveOperationPPF1.LiveOperation;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -556,7 +552,7 @@ namespace Galleon.Checkout
             {                
                 var   plusOperation = new Foundation.LiveOperationAPF.LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
                                                                                    ,parent     : this.Entity
-                                                                                   ,definition : new APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
+                                                                                   ,definition : new Foundation.LiveOperationAPF.APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
                 
                 await plusOperation.Flow().Execute();
             }
