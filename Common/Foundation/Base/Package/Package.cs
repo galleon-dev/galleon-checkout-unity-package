@@ -86,6 +86,12 @@ namespace Galleon.Checkout.Foundation
                     {
                         await this.Node.Live.Plus_PPFE1("> Folder f1");
                     });
+        public Step Do_PpS1() 
+        =>
+            new Step(action : async (s) =>
+                    {
+                        await this.Node.Live.Plus_PpS1("> Scene s1");
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
         
@@ -103,21 +109,25 @@ namespace Galleon.Checkout.Foundation
                 
                 ///
                 
-                Button btn_APF                = new Button(); this.Add(btn_APF);
-                btn_APF.clicked              += () => target.Do_APF().Execute(); 
-                btn_APF.text                  = "A+F";
+                Button btn_APF                 = new Button(); this.Add(btn_APF);
+                btn_APF.clicked               += () => target.Do_APF().Execute(); 
+                btn_APF.text                   = "A+F";
                 
-                Button btn_APFE1              = new Button(); this.Add(btn_APFE1);
-                btn_APFE1.clicked            += () => target.Do_APFE1().Execute(); 
-                btn_APFE1.text                = "A+FE1";
+                Button btn_APFE1               = new Button(); this.Add(btn_APFE1);
+                btn_APFE1.clicked             += () => target.Do_APFE1().Execute(); 
+                btn_APFE1.text                 = "A+FE1";
                 
                 Button btn_PPFE1M              = new Button(); this.Add(btn_PPFE1M);
                 btn_PPFE1M.clicked            += () => target.Do_PPFE1M().Execute(); 
                 btn_PPFE1M.text                = "PPF1_M";
                 
                 Button btn_PPFE1               = new Button(); this.Add(btn_PPFE1);
-                btn_PPFE1.clicked            += () => target.Do_PPFE1().Execute(); 
-                btn_PPFE1.text                = "PPF1";
+                btn_PPFE1.clicked             += () => target.Do_PPFE1().Execute(); 
+                btn_PPFE1.text                 = "P+F1";
+                
+                Button btn_PpS1                = new Button(); this.Add(btn_PpS1);
+                btn_PpS1.clicked              += () => target.Do_PpS1().Execute(); 
+                btn_PpS1.text                  = "P+S1";
                 
             }
         }   

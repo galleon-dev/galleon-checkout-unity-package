@@ -564,21 +564,28 @@ namespace Galleon.Checkout
             {   
                 var   plusOperation = new Foundation.LiveOperationAPFE1.LiveOperation(id         : $"APFE1"
                                                                                      ,parent     : this.Entity
-                                                                                     ,definition : "> Folder f1");
+                                                                                     ,definition : text);
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_PPFE1M(string text)
             {   
                 var   plusOperation = new Foundation.LiveOperationPPF1M.LiveOperation(id         : $"PPFE1M"
                                                                                      ,parent     : this.Entity
-                                                                                     ,definition : "> Folder f1");
+                                                                                     ,definition : text);
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_PPFE1(string text)
             {   
                 var   plusOperation = new Foundation.LiveOperationPPF1.LiveOperation(id                 : $"PPFE1"
                                                                                     ,operationParent    : this.Entity
-                                                                                    ,definitionText     : "> Folder f1");
+                                                                                    ,definitionText     : text); // > Folder f1
+                await plusOperation.Flow().Execute();
+            }
+            public async Task Plus_PpS1(string text)
+            {   
+                var   plusOperation = new Foundation.LiveOperationPpS1.LiveOperation(id                 : $"PpS1"
+                                                                                    ,operationParent    : this.Entity
+                                                                                    ,definitionText     : text); // > Scene s1
                 await plusOperation.Flow().Execute();
             }
             

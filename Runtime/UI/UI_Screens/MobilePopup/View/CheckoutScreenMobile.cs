@@ -90,7 +90,6 @@ namespace Galleon.Checkout.UI
                                       IsLandscapeMode = true;
                                   }
 
-
                                   #if UNITY_EDITOR
                                   
                                   if (CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape)
@@ -442,18 +441,17 @@ namespace Galleon.Checkout.UI
 
         public Step UI_Close()
         =>
-            new Step(name: $"UI_CLOSE"
-                    , action: async (s) =>
+            new Step(name     : $"UI_CLOSE"
+                    ,action   : async (s) =>
                               {
-                                  // await Close();
                                   s.ParentStep.RemoveStepsAfterThisInParentFlow();
                                   s.ParentStep.AddPostStep(CHECKOUT.Session.On_CheckoutScreenClosed());
                               });
 
         public Step UI_Back()
         =>
-            new Step(name: $"UI_Back"
-                    , action: async (s) =>
+            new Step(name     : $"UI_Back"
+                    ,action   : async (s) =>
                               {
                                   // var previousPage = NavigationHistory[^2];
                                   // s.ParentStep.AddChildStep(ViewPage(previousPage));
@@ -467,11 +465,11 @@ namespace Galleon.Checkout.UI
 
         public Step UI_PaymentMethods()
         =>
-           new Step(name: $"UI_PaymentMethods"
-                   , action: async (s) =>
-                   {
-                       s.ParentStep.AddChildStep(ViewPage(SelectPaymentMethodsPage));
-                   });
+           new Step(name      : $"UI_PaymentMethods"
+                   ,action    : async (s) =>
+                              {
+                                  s.ParentStep.AddChildStep(ViewPage(SelectPaymentMethodsPage));
+                              });
 
         /////////////////////// UI Events
 

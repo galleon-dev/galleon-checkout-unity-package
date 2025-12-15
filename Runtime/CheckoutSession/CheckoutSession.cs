@@ -307,18 +307,18 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                               {
                                   var paypalPM = new UserPaymentMethod()
-                                                 {
-                                                    Data = new ()
-                                                         {
-                                                             type           = "paypal",
-                                                             display_name   = "paypal",
-                                                             id             = "local_pm_id_paypal"
-                                                         },
-                                                    DisplayName             = "PayPal",
-                                                    IsNewPaymentMethod      = true,
-                                                    ShouldSavePaymentMethod = true,
-                                                    Type                    = "paypal",
-                                                 };
+                                               {
+                                                  Data                    = new ()
+                                                                          {
+                                                                              type           = "paypal",
+                                                                              display_name   = "paypal",
+                                                                              id             = "local_pm_id_paypal"
+                                                                          },
+                                                  DisplayName             = "PayPal",
+                                                  IsNewPaymentMethod      = true,
+                                                  ShouldSavePaymentMethod = true,
+                                                  Type                    = "paypal",
+                                               };
                                   CHECKOUT.PaymentMethods.UserPaymentMethods.Add(paypalPM);
                                   CHECKOUT.User.SelectPaymentMethod(paypalPM);
                                   
