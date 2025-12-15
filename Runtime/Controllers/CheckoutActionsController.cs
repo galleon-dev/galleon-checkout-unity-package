@@ -280,6 +280,7 @@ namespace Galleon.Checkout
                         {
                             Debug.LogError($"Error in Charge: {ex.Message}");
                             s.RemoveStepsAfterThisInParentFlow();
+                            s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
                         }
                     });      
@@ -334,6 +335,7 @@ namespace Galleon.Checkout
                                       {
                                           Debug.Log("max reattempts reached - transaction failed.");
                                           s.RemoveStepsAfterThisInParentFlow();
+                                          s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
                                           s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
                                                                     ,CheckoutClient.Instance.CheckoutScreenMobile.Navigate()
                                                                     );
@@ -344,6 +346,7 @@ namespace Galleon.Checkout
                                   {
                                       Debug.LogError($"Error in CheckStatus: {ex.Message}");
                                       s.RemoveStepsAfterThisInParentFlow();
+                                      s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
                                       s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
                                   }
                               });

@@ -17,7 +17,7 @@ public class DefinitionNode : Entity
         public string   EntityType  => TextNode.LineFirstWord;
         public bool     IsNamespace => TextNode.LineSplits.Any(s => s.StartsWith("(") && s.EndsWith(")"));
         public string   Namespace   => TextNode.FirstLineParenthesisContent;
-        public string   EntityName  => TextNode.LineWords.ElementAt(1);
+        public string   EntityName  => TextNode.LineWords.Count > 1 ? TextNode.LineWords.ElementAt(1) : "";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -135,19 +135,25 @@ public class DefinitionNode : Entity
         {
             try
             {
+                // Get all nodes in current tree
                 var thisTree                 = this.Node.Descendants().OfType<DefinitionNode>();
                 
+                // Find namespace nodes in current tree matching child's namespace
                 var namespaceNodesInThisTree = thisTree.Where(n => n.IsNamespace && n.GetNamespace() == childNamespaceNode.GetNamespace());  
                 var namespaceNodeInThisTree  = namespaceNodesInThisTree.FirstOrDefault();
                 
+                // Get parent node where child will be inserted
                 var parentNodeInThisTree     = namespaceNodeInThisTree.Node.Children.Count > 0 
                                              ? namespaceNodeInThisTree.Node.Children.First()
                                              : namespaceNodeInThisTree.Node.Entity;
                 
-                foreach (var child in childNamespaceNode.Node.Children.OfType<DefinitionNode>())
+                // Insert child nodes
+                foreach (DefinitionNode child in childNamespaceNode.Node.Children.OfType<DefinitionNode>())
                 {
                     var cloneTree = child.CloneTree();
                     parentNodeInThisTree.Node.AddChild(cloneTree);
+                    
+                    // Add indentation to text nodes
                     foreach (var textNode in cloneTree.TextNode.Node.Descendants().OfType<TextNode>())
                     {
                         textNode.RawText = "    " + textNode.RawText;

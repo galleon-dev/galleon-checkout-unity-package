@@ -571,7 +571,7 @@ namespace Galleon.Checkout.UI
 
         bool IsValidLuhn(string digits)
         {
-            int sum = 0;
+            int  sum = 0;
             bool alt = false;
             for (int i = digits.Length - 1; i >= 0; i--)
             {
@@ -582,7 +582,7 @@ namespace Galleon.Checkout.UI
                     if (n > 9) n -= 9;
                 }
                 sum += n;
-                alt = !alt;
+                alt =  !alt;
             }
             return digits.Length >= 12 && sum % 10 == 0; // avoid false positive on short input
         }

@@ -35,7 +35,6 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                                  };
         }
         
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow
         
         public Step Flow() 
@@ -187,10 +186,10 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                 DefinitionNode fullTree = CreateZippedTree();
                 
                 // Add #exists Tag
-                foreach (var node in fullTree.Node.Descendants().OfType<DefinitionNode>())
+                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
                     node.AddTag("#exists");
                 
-                foreach (var node in fullTree.Node.Descendants().OfType<DefinitionNode>())
+                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
                    s.Log(node.TextNode.RawText);
                 
                 // Insert Child
@@ -199,19 +198,29 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                 foreach (var childNamespaceNode in childTreeNamespaceNodes)
                     fullTree.InsertNodeIntoTree(childNamespaceNode);
                 
+                // Expand nodes of full tree
+                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
+                    if (node.DoesNeedToExpandToFullLine())
+                    {
+                        node.TextNode.RawText = node.ExpandToFullLine().RawText;
+                    }
+                
                 // Mark Live Action for inserted child nodes
                 string actionTag = $"#{OperationType}";
-                foreach (var node in fullTree.Node.Descendants().OfType<DefinitionNode>())
+                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
                     if (node.TextNode.Hashtags.Count == 0)
                         node.AddTag(actionTag);
                 
                 // Log
                 s.Log("---");
-                foreach (var node in fullTree.Node.Descendants().OfType<DefinitionNode>())
+                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
                     s.Log(node.TextNode.RawText);
                 
-                // Done
-                this.FullVirtualTree = new LiveNode(definitionRoot: fullTree);
+                // Assign Field
+                this.FullVirtualTree = LiveNode.ParseTreeFromDefinition(fullTree);
+                
+                foreach (LiveNode node in this.FullVirtualTree.Node.Descendants().OfType<LiveNode>())
+                    node.Operation = this;
             });
         
         public Step DumpVirtualTree()
@@ -233,6 +242,10 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
             new Step(name   : $"run_live_flow"
                     ,action : async (s) =>
                     {   
+                        Debug.Log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+                        this.FullVirtualTree.DumpLiveTreeToLog();
+                        Debug.Log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+                        
                         foreach (var vNode in FullVirtualTree.Node.Descendants().OfType<LiveNode>())
                         {
                             s.Log($"- {vNode.TextNode.RawText} { (vNode.DoesNeedToDoAction ? "<-- action" : "") } ");
@@ -246,7 +259,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         
         public LiveNode ParseTree(string[] lines)
         {
-            var root = LiveNode.ParseTree(lines);
+            var root = LiveNode.ParseTreeFromText(lines);
 
             foreach (var node in root.Node.Descendants().OfType<LiveNode>())
                 node.Operation = this;
@@ -320,8 +333,8 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Static
         
-        public static LiveNode ParseTree(string lines) => ParseTree(lines.Split('\n'));
-        public static LiveNode ParseTree(IEnumerable<string> lines)
+        public static LiveNode ParseTreeFromText(string lines) => ParseTreeFromText(lines.Split('\n'));
+        public static LiveNode ParseTreeFromText(IEnumerable<string> lines)
         {
             // Initialize root variables
             LiveNode rootLiveNode = null;
@@ -331,7 +344,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
             foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
             {
                 // Parse and create live node from text node
-                var liveNode = ParseNode(textNode);
+                var liveNode = ParseNodeFromText(textNode);
                 textNode.Node.SetData(key : "live_node", value : liveNode);
         
                 // Set parent-child relationship
@@ -356,28 +369,67 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
             return rootLiveNode;
         }
 
-        public static LiveNode ParseNode(TextNode textNode)
+        public static LiveNode ParseNodeFromText(TextNode textNode)
         {
             // Create new live node and set definition
             var node            = new LiveNode();
             node.DefinitionNode = new DefinitionNode(textNode.RawText);
     
-            // Set action flag if node has "plus" tag
-            if (node.TextNode.Hashtags.Contains("plus"))
-                node.DoesNeedToDoAction = true;
+            // Initialize node
+            node.Initialize();
     
             return node;
+        }
+        
+        public static LiveNode ParseTreeFromDefinition(DefinitionNode definitionRootNode)
+        {
+            // Initialize root variables
+            LiveNode rootLiveNode = null;
+
+            // Process each definition node to create corresponding live nodes
+            foreach (var defNode in definitionRootNode.Node.Descendants().OfType<DefinitionNode>())
+            {
+                // Parse and create live node from definition node
+                var liveNode = ParseNodeFromDefinition(defNode);
+                defNode.Node.SetData(key: "live_node", value: liveNode);
+
+                // Set parent-child relationship
+                if (defNode.Node.Parent != null)
+                {
+                    var parentDef      = defNode.Node.Parent;
+                    var parentLiveNode = parentDef.Node.GetData<LiveNode>(key: "live_node");
+                    liveNode.Node.SetParent(parentLiveNode);
+                }
+                else
+                {
+                    rootLiveNode = liveNode;
+                }
+            }
+
+            // Cleanup temporary live node references from definition nodes
+            foreach (var defNode in definitionRootNode.Node.Descendants().OfType<DefinitionNode>())
+            {
+                defNode.Node.RemoveData(key: "live_node");
+            }
+
+            return rootLiveNode;
+        }
+        
+        public static LiveNode ParseNodeFromDefinition(DefinitionNode definitionNode)
+        {
+            // Create new live node with current definition
+            var liveNode = new LiveNode { DefinitionNode = definitionNode };
+            
+            // Initialize node
+            liveNode.Initialize();
+
+            return liveNode;
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public LiveNode()
         {
-        }
-
-        public LiveNode(DefinitionNode definitionRoot)
-        {
-            DefinitionNode = definitionRoot;   
         }
         
         public LiveNode CloneNode()
@@ -406,9 +458,13 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
             return clone;
         }
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Parse methods
-        
-        
+        public void Initialize()
+        {
+            
+            // Set action flag if node has "plus" tag
+            if (TextNode.Hashtags.Contains("plus"))
+                DoesNeedToDoAction = true;
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Actions
         
@@ -457,6 +513,17 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                 // Create child entity
                 childEntity.Node.Live.LiveHandler.Create();
             });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug Methods
+        
+        public void DumpLiveTreeToLog()
+        {
+            foreach (var liveNode in this.Node.Descendants().OfType<LiveNode>())
+            {
+                Debug.Log($"[{liveNode.TextNode?.RawText}]{"",-20}[def.{liveNode?.DefinitionNode?.EntityName ?? ""}]");
+            }
+        }
+        
         
     }
 }

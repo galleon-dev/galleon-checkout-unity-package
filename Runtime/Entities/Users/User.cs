@@ -13,7 +13,7 @@ namespace Galleon.Checkout
        
         public string                AppUserID;
         public Shared.UserInfo       UserInfo;
-        public string Email => UserInfo.email;
+        public string                Email => UserInfo.email;
  
         public List<Transaction>     Transactions           = new();
         public Transaction           CurrentTransaction;

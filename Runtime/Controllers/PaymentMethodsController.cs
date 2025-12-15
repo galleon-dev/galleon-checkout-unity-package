@@ -140,7 +140,7 @@ namespace Galleon.Checkout
             if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count != 0)
                 CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
             
-            if (UserPaymentMethodsToDisplay.Count < 3
+            if (UserPaymentMethodsToDisplay.Count < MAX_LAST_USED_PAYMENT_METHODS
             &&  UserPaymentMethods.All(x => x.Type != "empty_card"))
             {
                 this.UserPaymentMethods.Add(new UserPaymentMethod()

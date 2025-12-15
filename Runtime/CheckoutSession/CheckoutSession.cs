@@ -228,7 +228,9 @@ namespace Galleon.Checkout
                                                  if (this.lastChargeResult != null
                                                  &&  this.lastChargeResult.is_success
                                                  && !this.lastChargeResult.is_canceled)
+                                                 {
                                                      x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
+                                                 }
                                              });
                         
                         
@@ -269,6 +271,17 @@ namespace Galleon.Checkout
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc Steps
+        
+        
+        public Step On_ChargeError()
+        => 
+            new Step(name    : $"on_charge_error_or_cancel"
+                     ,action : async (s) =>
+                             {
+                                 var localPMs = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.ID.StartsWith("local_pm_id"));
+                                 CHECKOUT.PaymentMethods.UserPaymentMethods.RemoveAll(x => x.ID.StartsWith("local_pm_id"));
+                             });
+        
         
         public Step On_CheckoutScreenClosed()
         => 
