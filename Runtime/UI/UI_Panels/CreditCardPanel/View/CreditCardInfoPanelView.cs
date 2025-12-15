@@ -371,7 +371,7 @@ namespace Galleon.Checkout.UI
 
             if (month < 1 || month > 12)
             {
-                error = "Invalid month (01–12 only)";
+                error = "Invalid date (MM/YY)";
                 return false;
             }
 
