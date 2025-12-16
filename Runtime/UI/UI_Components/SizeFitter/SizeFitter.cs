@@ -9,5 +9,6 @@ namespace Galleon.Checkout.UI
     public class SizeFitter : LayoutElement
     {
         public override float preferredHeight => ((RectTransform)this.transform).sizeDelta.y;
+        public override float minHeight       => ((RectTransform)this.transform).sizeDelta.y;
     }
 }

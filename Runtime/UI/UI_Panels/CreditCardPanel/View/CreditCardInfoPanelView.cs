@@ -156,7 +156,7 @@ namespace Galleon.Checkout.UI
                 
                 // Set card Data
                 card.Type                    = CurrentCardFormat.Name;
-                card.DisplayName             = $"{card.Type} - **** - {CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
+                card.DisplayName             = $"{CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
                 card.CardHolderName          = NameInputField.Text;
                 card.CardNumber              = CreditCardNumberField.Text;
                 card.CardCCV                 = CVVInputField.Text;
@@ -230,34 +230,42 @@ namespace Galleon.Checkout.UI
 
         IEnumerator CheckIfFocusOnCVV()
         {
+            // Wait a short time before checking input fields
             yield return new WaitForSeconds(0.1f);
-            if (!string.IsNullOrEmpty(NameInputField.Text) && !string.IsNullOrEmpty(CreditCardNumberField.Text) && !string.IsNullOrEmpty(DateInputField.Text) && string.IsNullOrEmpty(CVVInputField.Text))
+            
+            // Check if name, card number and date are filled but CVV is empty
+            if (string.IsNullOrEmpty(NameInputField.Text) ||  string.IsNullOrEmpty(CreditCardNumberField.Text) ||
+                string.IsNullOrEmpty(DateInputField.Text) || !string.IsNullOrEmpty(CVVInputField.Text))
             {
+                // Cannot focus CVV yet as other fields are not complete
+            }
+            else
+            {
+                // Get card format based on entered number
                 CardFormat CF = GetFormatForDigits(CreditCardNumberField.Text);
                 if (MaxLength == 0)
                 {
                     MaxLength = CF.MaxLength;
                 }
 
-                if (DateInputField.Text.Length == 4 && (CreditCardNumberField.Text.Length == MaxLength || (CreditCardNumberField.Text.Length == 16) && CF.Name.ToLower() == "visa"))
+                // Check if date is complete and card number matches required length
+                if (DateInputField.Text.Length == 4 
+                && (CreditCardNumberField.Text.Length == MaxLength || (CreditCardNumberField.Text.Length == 16) && CF.Name.ToLower() == "visa"))
                 {
-                    // Debug.Log("SELECT CVV");
+                    // Deselect any currently selected input field
                     int AdvancedInputFieldsAmount = AdvancedInputFields.Count;
                     for (int i = 0; i < AdvancedInputFieldsAmount; i++)
                     {
                         if (AdvancedInputFields[i].Selected)
                         {
-                            // Debug.Log("Deselected: " + AdvancedInputFields[i].name);
                             AdvancedInputFields[i].ManualDeselect(EndEditReason.PROGRAMMATIC_DESELECT);
                             yield return new WaitForEndOfFrame();
                         }
                     }
+
+                    // Auto-focus the CVV input field
                     CVVInputField.ManualSelect();
                 }
-            }
-            else
-            {
-                // Debug.Log("Some of the InputFields are not empty, therefore we don't focus on CVV");
             }
         }
 
@@ -655,27 +663,27 @@ namespace Galleon.Checkout.UI
             
             switch (cardType.ToLower())
             {
-                case "visa" :
-                {
-                    NameInputField.Text        = "Vincent Visa"; // new []{"Victoria Visa", "Vincent Visa", "Vanessa Visa", "Victor Visa"}.RandomItem();
-                    CreditCardNumberField.Text = "4242424242424242";
-                    DateInputField.Text        = "0929";
-                    CVVInputField.Text         = "111";
-                     
-                    break;
-                }
                 case "master_card" :
                 {
-                    NameInputField.Text        = "Maria MasterCard"; // Ronald McMasterCard, Marcus MasterCard, Michael MasterCard, Maria MasterCard, Melissa MasterCard
+                    NameInputField.Text        = new [] { "Ronald McMasterCard", "Marcus MasterCard", "Maria MasterCard", "Michael MasterCard", "Melissa MasterCard" }.RandomItem();
                     CreditCardNumberField.Text = "5555555555554444";
                     DateInputField.Text        = "0929";
                     CVVInputField.Text         = "123";
                      
                     break;
                 }
+                case "visa" :
+                {
+                    NameInputField.Text        = new [] { "Vincent Visa", "Victoria Visa", "Vanessa Visa", "Victor Visa", "Vladimir Visa" }.RandomItem();
+                    CreditCardNumberField.Text = "4242424242424242";
+                    DateInputField.Text        = "0929";
+                    CVVInputField.Text         = "111";
+                     
+                    break;
+                }
                 case "amex" :
                 {
-                    NameInputField.Text        = "Alex Amex"; // Andrew Amex, Alice Amex, Aaron Amex, Ashley Amex, Anthony Amex
+                    NameInputField.Text        = new [] { "Alexander Amex", "Alice Amex", "Alex Amex", "Amanda Amex"}.RandomItem();
                     CreditCardNumberField.Text = "378282246310005";
                     DateInputField.Text        = "0929";
                     CVVInputField.Text         = "1234";
@@ -684,7 +692,7 @@ namespace Galleon.Checkout.UI
                 }
                 case "discover" :
                 {
-                    NameInputField.Text        = "Douglas Discover"; // Diana Discover, Derek Discover, Daniel Discover, Dominic Discover, Dorothy Discover, Denise Discover, Dylan Discover, Donna Discover, Douglas Discover, Deborah Discover
+                    NameInputField.Text        = new [] { "Douglas Discover", "Dominic Discover", "Dorothy Discover", "Doris Discover", "Daisy Discover" }.RandomItem();
                     CreditCardNumberField.Text = "6011111111111117";
                     DateInputField.Text        = "0929";
                     CVVInputField.Text         = "123";
@@ -693,7 +701,7 @@ namespace Galleon.Checkout.UI
                 }
                 case "diners" :
                 {
-                    NameInputField.Text        = "Daenerys Diners"; // Dante Diners, Duncan Diners, Dean Diners, Donna Diners, Douglas Diners
+                    NameInputField.Text        = new [] { "Daenerys Diners", "Dante Diners", "Duncan Diners", "Dean Diners", "Donna Diners", "Diana Diners" }.RandomItem();
                     CreditCardNumberField.Text = "3056930009020004";
                     DateInputField.Text        = "0929";
                     CVVInputField.Text         = "123";

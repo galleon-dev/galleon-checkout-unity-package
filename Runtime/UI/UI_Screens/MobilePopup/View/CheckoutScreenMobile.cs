@@ -533,6 +533,8 @@ namespace Galleon.Checkout.UI
                     targetSize = new Vector2(parentTransform.sizeDelta.x, overrideContentSize.Value + keyboardHeight);
                 
                 parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 3;
+                
+                // parentTransform.sizeDelta = new Vector2(parentTransform.sizeDelta.x, 2000);
             }
         }
 
