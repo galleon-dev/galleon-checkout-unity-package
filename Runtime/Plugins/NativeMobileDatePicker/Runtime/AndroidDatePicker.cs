@@ -33,11 +33,23 @@ namespace GalleonDatePicker
                 }));
         }
 
-        private void DateSelectedHandler(DateTime date)
+    /*    private void DateSelectedHandler(DateTime date)
         {
             var monthYear = new DateTime(date.Year, date.Month, 28);
             _dateSelectedCallback?.Invoke(monthYear);
         }
+    */
+
+        private void DateSelectedHandler(DateTime date)
+        {
+            var monthYear = new DateTime(date.Year, date.Month, 28);
+
+            UnityMainThreadDispatcher.RunOnMainThread(() =>
+            {
+                _dateSelectedCallback?.Invoke(monthYear);
+            });
+        }
+
 
         /*
         public void Show(DateTime initDate, Action<DateTime> callback)
