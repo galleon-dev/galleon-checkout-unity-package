@@ -55,3 +55,13 @@ namespace Galleon.Checkout.Hierarchy
         }
     }
 }
+
+/// [Pps1] :
+///     > print scene Asset
+///     > DONT print scene hierarchy
+///     > Physycal state aplly refresh
+///     > Entity
+///             > PME
+///             > CRUD
+///                 > CRUD_Params
+///             

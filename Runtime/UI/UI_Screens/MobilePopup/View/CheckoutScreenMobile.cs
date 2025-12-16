@@ -324,7 +324,8 @@ namespace Galleon.Checkout.UI
                         HeaderPanelView.RefreshState();
                         FooterPanelView.RefreshState();
 
-                        View[] views = this.GetComponentsInChildren<View>();
+                        // 1
+                        var views = this.GetComponentsInChildren<View>().Where(v => v.AutoRefresh);
                         foreach (var view in views)
                             view.Refresh();
                         
@@ -399,7 +400,8 @@ namespace Galleon.Checkout.UI
                         HeaderPanelView.RefreshState();
                         FooterPanelView.RefreshState();
 
-                        View[] views = this.GetComponentsInChildren<View>();
+                        // 2
+                        var views = this.GetComponentsInChildren<View>().Where(v => v.AutoRefresh);
                         foreach (var view in views)
                             view.Refresh();
                         
@@ -530,7 +532,7 @@ namespace Galleon.Checkout.UI
                 if (overrideContentSize.HasValue)
                     targetSize = new Vector2(parentTransform.sizeDelta.x, overrideContentSize.Value + keyboardHeight);
                 
-                parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 4;
+                parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 3;
             }
         }
 

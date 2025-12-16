@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -34,6 +35,17 @@ namespace Galleon.Checkout
                 return "";
             
             return target.ToString();
+        }
+    }
+    
+    public static class IEnumerableExtentions
+    {
+        public static T RandomItem<T>(this IEnumerable<T> items)
+        {
+            if (items == null || !items.Any())
+                return default;
+
+            return items.ElementAt(UnityEngine.Random.Range(0, items.Count()));
         }
     }
 }

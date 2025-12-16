@@ -20,50 +20,50 @@ namespace Galleon.Checkout.UI
 {
     public class CreditCardInfoPanelView : View
     {
-       // #if UNITY_ANDROID
+        // #if UNITY_ANDROID
         
         //////////////////////////////////////////////////////////////////////////// Members
 
         public List<AdvancedInputField> AdvancedInputFields;
 
-        public AdvancedInputField CreditCardNumberField;
-        public AdvancedInputField NameInputField;
-        public AdvancedInputField DateInputField;
-        public AdvancedInputField CVVInputField;
+        public AdvancedInputField       CreditCardNumberField;
+        public AdvancedInputField       NameInputField;
+        public AdvancedInputField       DateInputField;
+        public AdvancedInputField       CVVInputField;
 
-        public GameObject CardNumberErrorTextBackground;
-        public GameObject NameErrorTextBackground;
-        public GameObject CVVNumberErrorTextBackground;
-        public GameObject DateErrorTextBackground;
+        public GameObject               CardNumberErrorTextBackground;
+        public GameObject               NameErrorTextBackground;
+        public GameObject               CVVNumberErrorTextBackground;
+        public GameObject               DateErrorTextBackground;
 
-        public TMP_Text CardNumberErrorText;
-        public TMP_Text NameErrorText;
-        public TMP_Text CVVNumberErrorText;
-        public TMP_Text DateErrorText;
+        public TMP_Text                 CardNumberErrorText;
+        public TMP_Text                 NameErrorText;
+        public TMP_Text                 CVVNumberErrorText;
+        public TMP_Text                 DateErrorText;
 
-        string NameMissingInfoText = "* Please Enter Name";
-        string CardNumberInfoText = "* Please Enter Card Number";
-        string CVVNumberInfoText = "* Please Enter CVV";
-        string DateInfoText = "* Please Enter Date";
+        string                          NameMissingInfoText = "* Please Enter Name";
+        string                          CardNumberInfoText  = "* Please Enter Card Number";
+        string                          CVVNumberInfoText   = "* Please Enter CVV";
+        string                          DateInfoText        = "* Please Enter Date";
 
-        public Image CardTypeIcon;
-        public Sprite CardIcon_MasterCard;
-        public Sprite CardIcon_Visa;
-        public Sprite CardIcon_Amex;
-        public Sprite CardIcon_Diners;
-        public Sprite CardIcon_Discover;
+        public Image                    CardTypeIcon;
+        public Sprite                   CardIcon_MasterCard;
+        public Sprite                   CardIcon_Visa;
+        public Sprite                   CardIcon_Amex;
+        public Sprite                   CardIcon_Diners;
+        public Sprite                   CardIcon_Discover;
 
-        public CheckboxButton cbx_SaveCardDetails;
+        public CheckboxButton           cbx_SaveCardDetails;
 
-        private CardFormat CurrentCardFormat = default;
-        private CardFormat lastFormatUsed;
+        private CardFormat              CurrentCardFormat = default;
+        private CardFormat              lastFormatUsed;
 
-        bool IsValidCVV = false;
-        bool IsValidCreditCardNumber = false;
-        bool IsValidDate = false;
-        int expectedCVVLength = 3;
+        bool                            IsValidCVV              = false;
+        bool                            IsValidCreditCardNumber = false;
+        bool                            IsValidDate             = false;
+        int                             expectedCVVLength       = 3;
         
-        public GameObject TestCardButton;
+        public GameObject               TestCardButton;
         
         //////////////////////////////////////////////////////////////////////////// View Result
 
@@ -91,21 +91,21 @@ namespace Galleon.Checkout.UI
                 CardNumberErrorTextBackground.SetActive(false);
             }
 
-          /*  if (CVVInputField)
-            {
-                CVVInputField.OnValueChanged.AddListener(OnCVVValueChanged);
-            }
+            /*  if (CVVInputField)
+              {
+                  CVVInputField.OnValueChanged.AddListener(OnCVVValueChanged);
+              }
 
-            if (DateInputField)
-            {
-                DateInputField.OnValueChanged.AddListener(OnDateValueChanged);
-            }
+              if (DateInputField)
+              {
+                  DateInputField.OnValueChanged.AddListener(OnDateValueChanged);
+              }
 
-            if (NameInputField)
-            {
-                NameInputField.OnValueChanged.AddListener(OnNameValueChanged);
-            }
-          */
+              if (NameInputField)
+              {
+                  NameInputField.OnValueChanged.AddListener(OnNameValueChanged);
+              }
+            */
         }
 
         private void OnEnable()
@@ -131,7 +131,7 @@ namespace Galleon.Checkout.UI
             RemoveCardIcon();
 
             #if DEBUG
-            TestCardButton.SetActive(true);
+            TestCardButton.SetActive(false);
             #else
             TestCardButton.SetActive(false);
             #endif
@@ -360,10 +360,10 @@ namespace Galleon.Checkout.UI
             }
 
             string monthStr = formatted.Substring(0, 2);
-            string yearStr = formatted.Substring(2, 2);
+            string yearStr  = formatted.Substring(2, 2);
 
             if (!int.TryParse(monthStr, out int month) ||
-                !int.TryParse(yearStr, out int yy))
+                !int.TryParse(yearStr,  out int yy))
             {
                 error = "Month/year must be numeric";
                 return false;
@@ -377,7 +377,7 @@ namespace Galleon.Checkout.UI
 
             // Interpret e.g. "24" as 2024 (assumes 2000–2099 range)
             int fullYear = 2000 + yy;
-            var now = DateTime.Now;
+            var now      = DateTime.Now;
 
             // Cards expire at end of month — valid if expiry >= end-of-month of current:
             var expiryEnd = new DateTime(fullYear, month, DateTime.DaysInMonth(fullYear, month), 23, 59, 59);
@@ -398,18 +398,21 @@ namespace Galleon.Checkout.UI
 
         public void OnCVVValueChanged(string digits)
         {
-            // Debug.Log("<color=green>OnCVVValueChanged. rawInput: " + digits + "</color>");
-
-            bool isAmex = CreditCardNumberField.Text.Replace(" ", "").StartsWith("34") ||
-            CreditCardNumberField.Text.Replace(" ", "").StartsWith("37");
+            // Check if the credit card number starts with Amex prefix (34 or 37)
+            bool isAmex =  CreditCardNumberField.Text.Replace(" ", "").StartsWith("34") 
+                        || CreditCardNumberField.Text.Replace(" ", "").StartsWith("37");
+            
+            // Set expected CVV length based on card type (4 for Amex, 3 for others)
             int expectedCVVLength = isAmex ? 4 : 3;
 
+            // Update placeholder text based on expected CVV length
             if (expectedCVVLength == 4)
             {
                 CVVInputField.PlaceHolderText = "0000";
             }
             else
             {
+                // If current input is 4 digits but expecting 3, remove last digit
                 if (digits.Length == 4)
                 {
                     CVVInputField.Text = digits.Remove(digits.Length - 1);
@@ -417,22 +420,24 @@ namespace Galleon.Checkout.UI
                 CVVInputField.PlaceHolderText = "000";
             }
 
+            // Truncate input if longer than expected length
             if (digits.Length > expectedCVVLength)
             {
                 digits = digits.Remove(digits.Length - 1);
             }
 
-            Debug.Log("CVV Digits Length: " + digits.Length);
-
+            // Validate CVV input
             if (digits.Length != 0)
             {
                 if (digits.Length == expectedCVVLength)
                 {
+                    // Valid CVV entered
                     CVVNumberErrorTextBackground.SetActive(false);
                     IsValidCVV = true;
                 }
                 else
                 {
+                    // Show error for incomplete CVV
                     CVVNumberErrorText.text = $"Enter a {expectedCVVLength}-digit CVV";
                     CVVNumberErrorTextBackground.SetActive(true);
                     IsValidCVV = false;
@@ -440,6 +445,7 @@ namespace Galleon.Checkout.UI
             }
             else
             {
+                // Empty CVV input is considered valid
                 CVVNumberErrorTextBackground.SetActive(false);
                 IsValidCVV = true;
             }
@@ -522,56 +528,54 @@ namespace Galleon.Checkout.UI
         public struct CardFormat
         {
             public string Name;
-            public int MaxLength;
-            public int[] GroupSizes;
-            public int InputFieldLimit;
+            public int    MaxLength;
+            public int[]  GroupSizes;
+            public int    InputFieldLimit;
             public CardFormat(string name, int maxLength, int[] groupSizes, int inputFieldLimit)
             {
-                Name = name;
-                MaxLength = maxLength;
-                GroupSizes = groupSizes;
+                Name            = name;
+                MaxLength       = maxLength;
+                GroupSizes      = groupSizes;
                 InputFieldLimit = inputFieldLimit;
             }
         }
 
-        private static readonly List<(Func<string, bool> matcher, CardFormat format)> cardFormats = new()
+        private static readonly List<(Func<string, bool> matcher, CardFormat format)> cardFormats 
+        = new()
         {
             // Amex: 15 digits → 4-6-5
-            (d => d.StartsWith("34")
-               || d.StartsWith("37"),
-                new CardFormat("Amex", 15, new[] { 4, 6, 5 },
-                    21)),
+            (d => d.StartsWith("34") || d.StartsWith("37"),
+                   new CardFormat("Amex", 15, new[] { 4, 6, 5 }, 21)),
 
             // Visa: starts with 4, up to 19 digits → 4-4-4-4-3
             (d => d.StartsWith("4"),
-                new CardFormat("Visa", 19, new[] { 4, 4, 4, 4, 3 },
-                    31)),
+                  new CardFormat("Visa", 19, new[] { 4, 4, 4, 4, 3 }, 31)),
 
             // MasterCard: 51–55, 2221–2720 → 16 digits → 4-4-4-4
             (d => (d.Length >= 2 && int.TryParse(d.Substring(0, 2), out var p2) && p2 >= 51 && p2 <= 55)
                || (d.Length >= 4 && int.TryParse(d.Substring(0, 4), out var p4) && p4 >= 2221 && p4 <= 2720),
-                new CardFormat("MasterCard", 16, new[] { 4, 4, 4, 4 },
-                    25)),
+                  new CardFormat("MasterCard", 16, new[] { 4, 4, 4, 4 }, 25)),
 
             // Discover: 6011, 65, 644–649 → 16 digits
-            (d => d.StartsWith("6011")
-               || d.StartsWith("65")
-               || (d.Length >= 3 && int.TryParse(d.Substring(0, 3), out var p3) && p3 >= 644 && p3 <= 649),
-                new CardFormat("Discover", 16, new[] { 4, 4, 4, 4 },
-                    28)),
+            (d => d.StartsWith("6011")  || d.StartsWith("65") || (d.Length >= 3 && int.TryParse(d.Substring(0, 3), out var p3) && p3 >= 644 && p3 <= 649),
+                  new CardFormat("Discover", 16, new[] { 4, 4, 4, 4 }, 28)),
 
             // // JCB: 3528–3589 → 16–19 digits
             // (d => d.Length >= 4 && int.TryParse(d.Substring(0, 4), out var pJcb) && pJcb >= 3528 && pJcb <= 3589,
             //     new CardFormat("JCB", 19, new[] { 4, 4, 4, 4, 3 })),
 
-            // Diners Club: starts with 36, 38, 39 → 14 digits → 4-6-4
-            (d => d.StartsWith("36") || d.StartsWith("38") || d.StartsWith("39"),
-                new CardFormat("Diners", 14, new[] { 4, 6, 4 },
-                    20)),
+            // Diners Club International: starts with 300-305, 36, 38, 39 → 14 or 16 digits → 4-6-4 or 4-4-4-4
+            (d => (d.StartsWith("300") || d.StartsWith("301") || d.StartsWith("302") 
+               ||  d.StartsWith("303") || d.StartsWith("304") || d.StartsWith("305")
+               ||  d.StartsWith("36")  || d.StartsWith("38")  || d.StartsWith("39")),
+                   new CardFormat("Diners", 16, new[] { 4, 4, 4, 4 }, 25)),
 
+            // Default US & Canada : starts with 54,55 → 16 digits → 4-4-4-4  
+            (d => d.StartsWith("54") || d.StartsWith("55"),
+                  new CardFormat("DinersUS", 16, new[] { 4, 4, 4, 4 }, 25)),
+            
             // Default fallback
-            (_ => true, new CardFormat("Unknown", 16, new[] { 4, 4, 4, 4 },
-                25))
+            (_ => true, new CardFormat("Unknown", 16, new[] { 4, 4, 4, 4 }, 25))
 
         };
 
@@ -598,7 +602,7 @@ namespace Galleon.Checkout.UI
         
         public void On_TestFakeCardButtonClicked()
         {
-            NameInputField.Text        = "jhon doe";
+            NameInputField.Text        = "veronica visa";
             CreditCardNumberField.Text = "4242424242424242";
             DateInputField.Text        = "0929";
             CVVInputField.Text         = "111";
@@ -609,37 +613,110 @@ namespace Galleon.Checkout.UI
             
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Events
+        
+        public void On_PaymentIconClicked(string cardType)
+        {
+            #if DEBUG
+            
+            switch (cardType.ToLower())
+            {
+                case "visa" :
+                {
+                    NameInputField.Text        = "Vincent Visa"; // new []{"Victoria Visa", "Vincent Visa", "Vanessa Visa", "Victor Visa"}.RandomItem();
+                    CreditCardNumberField.Text = "4242424242424242";
+                    DateInputField.Text        = "0929";
+                    CVVInputField.Text         = "111";
+                     
+                    break;
+                }
+                case "master_card" :
+                {
+                    NameInputField.Text        = "Maria MasterCard"; // Ronald McMasterCard, Marcus MasterCard, Michael MasterCard, Maria MasterCard, Melissa MasterCard
+                    CreditCardNumberField.Text = "5555555555554444";
+                    DateInputField.Text        = "0929";
+                    CVVInputField.Text         = "123";
+                     
+                    break;
+                }
+                case "amex" :
+                {
+                    NameInputField.Text        = "Alex Amex"; // Andrew Amex, Alice Amex, Aaron Amex, Ashley Amex, Anthony Amex
+                    CreditCardNumberField.Text = "378282246310005";
+                    DateInputField.Text        = "0929";
+                    CVVInputField.Text         = "1234";
+                
+                    break;
+                }
+                case "discover" :
+                {
+                    NameInputField.Text        = "Douglas Discover"; // Diana Discover, Derek Discover, Daniel Discover, Dominic Discover, Dorothy Discover, Denise Discover, Dylan Discover, Donna Discover, Douglas Discover, Deborah Discover
+                    CreditCardNumberField.Text = "6011111111111117";
+                    DateInputField.Text        = "0929";
+                    CVVInputField.Text         = "123";
+                
+                    break;
+                }
+                case "diners" :
+                {
+                    NameInputField.Text        = "Daenerys Diners"; // Dante Diners, Duncan Diners, Dean Diners, Donna Diners, Douglas Diners
+                    CreditCardNumberField.Text = "3056930009020004";
+                    DateInputField.Text        = "0929";
+                    CVVInputField.Text         = "123";
+                
+                    break;
+                }
+                default :
+                {
+                    NameInputField.Text        = "John Doe";
+                    CreditCardNumberField.Text = "1234567890123456";
+                    DateInputField.Text        = "0929";
+                    CVVInputField.Text         = "123";
+
+                    break;
+                }
+            }
+            
+            OnDateValueChanged(DateInputField.Text);
+            OnCVVValueChanged(CVVInputField.Text);
+            OnValueChanged(CreditCardNumberField.Text);
+         
+            cbx_SaveCardDetails.IsChecked = true;
+            
+            #endif // DEBUG
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Scenarios
         
         public Step test_fill_card_data() => new Step(name   : "credit_card_info_panel_fill_test_card"
                                                      ,action : async (s) =>
-                                                             {
-                                                                 NameInputField.Text        = "jhon doe";
-                                                                 CreditCardNumberField.Text = "4242424242424242";
-                                                                 DateInputField.Text        = "0926";
-                                                                 CVVInputField.Text         = "111";
+                                                               {
+                                                                   NameInputField.Text        = "veronica visa";
+                                                                   CreditCardNumberField.Text = "4242424242424242";
+                                                                   DateInputField.Text        = "0929";
+                                                                   CVVInputField.Text         = "111";
                                                                  
-                                                                 OnValueChanged(CreditCardNumberField.Text);
-                                                                 OnDateValueChanged(DateInputField.Text);
-                                                                 OnCVVValueChanged(CVVInputField.Text);
+                                                                   OnValueChanged(CreditCardNumberField.Text);
+                                                                   OnDateValueChanged(DateInputField.Text);
+                                                                   OnCVVValueChanged(CVVInputField.Text);
                                                                  
-                                                                 // IsValidCreditCardNumber = true;
-                                                                 // IsValidCVV              = true;
-                                                                 // IsValidDate             = true;
+                                                                   // IsValidCreditCardNumber = true;
+                                                                   // IsValidCVV              = true;
+                                                                   // IsValidDate             = true;
                                                                  
-                                                                 cbx_SaveCardDetails.IsChecked = true;
+                                                                   cbx_SaveCardDetails.IsChecked = true;
                                                                  
-                                                                 CreditCardNumberField.Select();
+                                                                   CreditCardNumberField.Select();
                                                                  
-                                                                 await Task.Delay(500);
-                                                                 await new Step(name: $"set_test_credit_card", tags: new [] {"report"} ).Execute();
+                                                                   await Task.Delay(500);
+                                                                   await new Step(name: $"set_test_credit_card", tags: new [] {"report"} ).Execute();
                                                                  
-                                                             });
+                                                               });
         
         public Step test_confirm() => new Step(name   : "credit_card_info_panel_confirm"
                                               ,action : async (s) => On_OkClick() );
     
-    //    #endif // ANDROID
+        //    #endif // ANDROID
     
     }
 

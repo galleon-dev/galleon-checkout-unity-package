@@ -31,8 +31,9 @@ namespace Galleon.Checkout.UI
         public PaymentMethodDefinition      PaymentMethodDefinition      { get; set; }
         public UserPaymentMethod            UserPaymentMethod            { get; set; }
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView { get; set; }
-        
-        
+
+        public override bool AutoRefresh => false;
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public void Initialize(PaymentMethodDefinition      paymentMethodDefinition, 
@@ -76,11 +77,8 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
         
-        public override async void RefreshState()
+        public override void RefreshState()
         {    
-            this.DropdownButton.gameObject.SetActive(false);
-            this.DropdownArrow .gameObject.SetActive(false);
-            
             if (PaymentMethodDefinition != null)
                 this.Label.text = PaymentMethodDefinition.DisplayName;
             else if (UserPaymentMethod != null)

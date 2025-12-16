@@ -88,30 +88,14 @@ namespace Galleon.Checkout.UI
         {
             if (CheckoutClient.Instance.CurrentSession == null) return;
 
-            // // Panel config
-            // var configText = CheckoutClient.Instance.CheckoutScreenMobile.CurrentPage.panelConfiguration;
-            // if (configText != null)
-            //     this.Configutation = JsonConvert.DeserializeObject<Config>(configText);
-            // if (this.Configutation == null)
-            //     this.Configutation = new Config() { ShowMinimalOptions = false };
-            // 
-            // if (this.Configutation.ShowMinimalOptions)
-            // {
-            //     this.TaxesContainer.SetActive(false);
-            // }
-
-            // Debug.Log("<color=green>RefreshState</color>");
-
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
             this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
 
             ///////////////
 
             // Remove children (if any)
-            // Debug.Log("<color=orange>- Removing Payment Methods</color>");
             foreach (Transform child in PaymentMethodsPanel.transform)
             {
-                // Debug.Log($"-Removing Item {child.gameObject.name}");
                 Destroy(child.gameObject);
             }
 
@@ -119,9 +103,6 @@ namespace Galleon.Checkout.UI
             var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
             foreach (var paymentMethod in paymentMethods)
             {
-                // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
-                //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
-
                 var go   = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
                 item.Initialize(paymentMethod, this);
@@ -149,13 +130,6 @@ namespace Galleon.Checkout.UI
             var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
             if (selectedPaymentMethod != null)
                 SetButtonDisplay(selectedPaymentMethod);
-
-            ///////////////
-            // checkoutPanelPaymentMethodItemView[] methods = this.gameObject.GetComponentsInChildren<checkoutPanelPaymentMethodItemView>();
-            // foreach (var method in methods)
-            //     method.Refresh();
-
-            //CheckoutClient.Instance.CheckoutScreenMobile.ShowInitialCheckoutPanelLoader();
 
             if (TaxesContainer != null)
             {
@@ -288,24 +262,23 @@ namespace Galleon.Checkout.UI
             if (Checkout.CheckoutClient.Instance != null)
             {
                 float SubTotal = 0f;
-                if (float.TryParse(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText.Replace("$", ""), NumberStyles.Float, CultureInfo.InvariantCulture, out float result))
+                
+                if (float.TryParse(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText.Replace("$", "")
+                                  ,NumberStyles.Float
+                                  ,CultureInfo.InvariantCulture
+                                  ,out float result))
                 {
                     SubTotal = result;
                 }
-
-                //Debug.Log("SubTotal Parsed: " + SubTotal);
 
                 // CultureInfo.InvariantCulture is important from parsing perspective from string to float as on mobile devices it can appear ",", instead "." in float values
                 SubtotalPriceText.text = $"${SubTotal.ToString(CultureInfo.InvariantCulture)}";
 
                 decimal TaxesAmount = 0;
 
-                // Debug.Log("Taxes Amount: " + taxes.Count);
-
                 // If Location is USA or Canada generate taxes
                 if (CHECKOUT.Globals.ShowTaxBreakdown)
                 {
-                    // Debug.Log("USA/CANADA USER");
                     foreach (var tax in taxes)
                     {
                         CreateTaxPrefab(tax.Key, tax.Value.tax_amount.ToString(CultureInfo.InvariantCulture));
@@ -320,10 +293,8 @@ namespace Galleon.Checkout.UI
                 }
                 else
                 {
-                   // Debug.Log("NOT USA/CANADA USER");
                     foreach (var tax in taxes)
                     {
-                        //CreateTaxPrefab(tax.Key, tax.Value.tax_amount.ToString(CultureInfo.InvariantCulture));
                         TaxesAmount += tax.Value.tax_amount;
                     }
 

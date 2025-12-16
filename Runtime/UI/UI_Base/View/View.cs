@@ -23,6 +23,8 @@ namespace Galleon.Checkout.UI
         public string State = "";
         public string Style = "";
         
+        public virtual bool AutoRefresh => true;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flow
         
         public Step Flow;
