@@ -111,10 +111,10 @@ namespace Galleon.Checkout.UI
         private void OnEnable()
         {
             // Clear input fields
-            if (NameInputField)        NameInputField.Text        = string.Empty;
+            if (NameInputField)        NameInputField       .Text = string.Empty;
             if (CreditCardNumberField) CreditCardNumberField.Text = string.Empty;
-            if (DateInputField)        DateInputField.Text        = string.Empty;
-            if (CVVInputField)         CVVInputField.Text         = string.Empty;
+            if (DateInputField)        DateInputField       .Text = string.Empty;
+            if (CVVInputField)         CVVInputField        .Text = string.Empty;
 
             // Reset validation flags
             IsValidCVV              = false;
@@ -544,38 +544,72 @@ namespace Galleon.Checkout.UI
         = new()
         {
             // Amex: 15 digits → 4-6-5
-            (d => d.StartsWith("34") || d.StartsWith("37"),
-                   new CardFormat("Amex", 15, new[] { 4, 6, 5 }, 21)),
+            (d => d.StartsWith("34") 
+               || d.StartsWith("37"),
+                   new CardFormat(name            : "Amex"
+                                 ,maxLength       : 15
+                                 ,groupSizes      : new[] { 4, 6, 5 }
+                                 ,inputFieldLimit : 21)),
 
             // Visa: starts with 4, up to 19 digits → 4-4-4-4-3
             (d => d.StartsWith("4"),
-                  new CardFormat("Visa", 19, new[] { 4, 4, 4, 4, 3 }, 31)),
+                  new CardFormat(name            : "Visa"
+                                ,maxLength       : 19
+                                ,groupSizes      : new[] { 4, 4, 4, 4, 3 }
+                                ,inputFieldLimit : 31)),
 
             // MasterCard: 51–55, 2221–2720 → 16 digits → 4-4-4-4
-            (d => (d.Length >= 2 && int.TryParse(d.Substring(0, 2), out var p2) && p2 >= 51 && p2 <= 55)
+            (d => (d.Length >= 2 && int.TryParse(d.Substring(0, 2), out var p2) && p2 >= 51   && p2 <= 55)
                || (d.Length >= 4 && int.TryParse(d.Substring(0, 4), out var p4) && p4 >= 2221 && p4 <= 2720),
-                  new CardFormat("MasterCard", 16, new[] { 4, 4, 4, 4 }, 25)),
+                  new CardFormat(name            : "MasterCard"
+                                ,maxLength       : 16
+                                ,groupSizes      : new[] { 4, 4, 4, 4 }
+                                ,inputFieldLimit : 25)),
 
             // Discover: 6011, 65, 644–649 → 16 digits
-            (d => d.StartsWith("6011")  || d.StartsWith("65") || (d.Length >= 3 && int.TryParse(d.Substring(0, 3), out var p3) && p3 >= 644 && p3 <= 649),
-                  new CardFormat("Discover", 16, new[] { 4, 4, 4, 4 }, 28)),
+            (d => d.StartsWith("6011")  
+               || d.StartsWith("65") 
+               || (d.Length >= 3 && int.TryParse(d.Substring(0, 3), out var p3) && p3 >= 644 && p3 <= 649),
+                  new CardFormat(name            : "Discover"
+                                ,maxLength       : 16
+                                ,groupSizes      : new[] { 4, 4, 4, 4 }
+                                ,inputFieldLimit : 28)),
 
-            // // JCB: 3528–3589 → 16–19 digits
+            // JCB: 3528–3589 → 16–19 digits
             // (d => d.Length >= 4 && int.TryParse(d.Substring(0, 4), out var pJcb) && pJcb >= 3528 && pJcb <= 3589,
-            //     new CardFormat("JCB", 19, new[] { 4, 4, 4, 4, 3 })),
+            //        new CardFormat(name            : "JCB"
+            //                     ,maxLength       : 19
+            //                     ,groupSizes      : new[] { 4, 4, 4, 4, 3 }
+            //                     ,inputFieldLimit : 31)),
 
             // Diners Club International: starts with 300-305, 36, 38, 39 → 14 or 16 digits → 4-6-4 or 4-4-4-4
-            (d => (d.StartsWith("300") || d.StartsWith("301") || d.StartsWith("302") 
-               ||  d.StartsWith("303") || d.StartsWith("304") || d.StartsWith("305")
-               ||  d.StartsWith("36")  || d.StartsWith("38")  || d.StartsWith("39")),
-                   new CardFormat("Diners", 16, new[] { 4, 4, 4, 4 }, 25)),
+            (d =>  d.StartsWith("300") 
+               ||  d.StartsWith("301") 
+               ||  d.StartsWith("302") 
+               ||  d.StartsWith("303")
+               ||  d.StartsWith("304")
+               ||  d.StartsWith("305")
+               ||  d.StartsWith("36")  
+               ||  d.StartsWith("38")  
+               ||  d.StartsWith("39"),
+                   new CardFormat(name            : "Diners"
+                                 ,maxLength       : 16
+                                 ,groupSizes      : new[] { 4, 4, 4, 4 }
+                                 ,inputFieldLimit : 25)),
 
             // Default US & Canada : starts with 54,55 → 16 digits → 4-4-4-4  
-            (d => d.StartsWith("54") || d.StartsWith("55"),
-                  new CardFormat("DinersUS", 16, new[] { 4, 4, 4, 4 }, 25)),
+            (d => d.StartsWith("54") 
+               || d.StartsWith("55"),
+                  new CardFormat(name            : "DinersUS"
+                                ,maxLength       : 16
+                                ,groupSizes      : new[] { 4, 4, 4, 4 }
+                                ,inputFieldLimit : 25)),
             
             // Default fallback
-            (_ => true, new CardFormat("Unknown", 16, new[] { 4, 4, 4, 4 }, 25))
+            (_ => true, new CardFormat(name            : "Unknown"
+                                      ,maxLength       : 16
+                                      ,groupSizes      : new[] { 4, 4, 4, 4 }
+                                      ,inputFieldLimit : 25))
 
         };
 
@@ -615,7 +649,7 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Events
         
-        public void On_PaymentIconClicked(string cardType)
+        public async void On_PaymentIconClicked(string cardType)
         {
             #if DEBUG
             
@@ -681,6 +715,11 @@ namespace Galleon.Checkout.UI
             OnCVVValueChanged(CVVInputField.Text);
             OnValueChanged(CreditCardNumberField.Text);
          
+            await Task.Yield();
+            
+            FormatCreditCardInput(CreditCardNumberField.Text);
+         
+            
             cbx_SaveCardDetails.IsChecked = true;
             
             #endif // DEBUG
