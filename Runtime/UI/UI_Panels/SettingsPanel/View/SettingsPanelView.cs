@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AdvancedInputFieldPlugin;
 using Galleon.Checkout;
@@ -15,6 +16,7 @@ public class SettingsPanelView : View
     [Header("Email")]
     public GameObject EmailInputfieldBorder;
     public AdvancedInputField EmailInputField;
+    public TextMeshProUGUI emailErrorText;
     public GameObject EmailEditButton;
 
     [Header("Payment Methods")]
@@ -220,10 +222,15 @@ public class SettingsPanelView : View
         EmailEditButton.SetActive(true);
         IsEditingEmail = false;
 
-        this.EmailInputField.Text = str;
-        CHECKOUT.Session.User.UserInfo.email = str;
-        await CHECKOUT.Actions.SetEmail().Execute();
-
+        bool valid = ValidateEmail(EmailInputField.Text);
+        emailErrorText.text = valid ? "" : "Invalid email format";
+       
+        if (valid)
+        {
+            this.EmailInputField.Text = str;
+            CHECKOUT.Session.User.UserInfo.email = str;
+            await CHECKOUT.Actions.SetEmail().Execute();
+        } 
         // if(SuccessPanelEmailInputField)
         // {
         //     SuccessPanelEmailInputField.Text = EmailInputField.Text;
@@ -239,6 +246,16 @@ public class SettingsPanelView : View
         //     PlayerPrefs.Save();
         // } 
     }
+
+    private bool ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        // Basic email regex
+        return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+    }
+
 
     public void On_Done()
     {
