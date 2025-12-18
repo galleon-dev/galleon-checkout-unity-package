@@ -1,3 +1,4 @@
+using System;
 using Galleon.Checkout;
 using Galleon.Checkout.ELEMENTS;
 using UnityEngine;
@@ -27,8 +28,26 @@ namespace Galleon.Checkout.Assets
     [Element("Scene")]
     public class Scene : Asset
     {
-        public void CreateSceneAsset() { Debug.Log($"Created Scene Asset {Node.GetData<EntityNode.CRUD_Params>("CRUD_params")?.Name}"); } 
-        public void OnAddedToParent (IEntity Parent) {} 
+        public void CreateSceneAsset() 
+        {
+            var name       = Node.GetData<EntityNode.CRUD_Params>("CRUD_params")?.Name;                                                         Debug.Log($"name        : {name}");
+            var scene      = UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene);     Debug.Log($"scene       : {scene.name} - {scene.IsValid()} - {scene.path}");
+          //var parentPath = this.Path;                                                                                                         Debug.Log($"parent path : {parentPath}");
+          //var path       = $"{parentPath}/{name}.unity";                                                                                      Debug.Log($"path        : {path}");
+            var path       = this.Path;                                                                                                         Debug.Log($"path        : {path}");
+            
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, path);
+            Debug.Log($"Created Scene Asset {path}");
+        }
+        
+        public void OnAddedToParent (IEntity parent)
+        {
+            if (parent is not Asset parentAsset)
+                throw new Exception("Assets.Scene.OnAddedToParent(): Parent is not Asset");
+
+            var name       = Node.GetData<EntityNode.CRUD_Params>("CRUD_params")?.Name;
+            this.Path = System.IO.Path.Combine(parentAsset.Path, name + ".unity");
+        }
         
         ////////////////////////////////////////////////////////////////////////
         public class LiveHandler : Foundation.LiveHandler<Scene> 
@@ -57,11 +76,11 @@ namespace Galleon.Checkout.Hierarchy
 }
 
 /// [Pps1] :
-///     > print scene Asset
-///     > DONT print scene hierarchy
-///     > Physycal state aplly refresh
-///     > Entity
-///             > PME
-///             > CRUD
-///                 > CRUD_Params
+///     > print scene Asset             [V]
+///     > DONT print scene hierarchy    [ ]
+///     > Physycal state aplly refresh  [ ]
+///     > Entity                        [ ]
+///             > PME                   [ ] 
+///             > CRUD                  [ ]
+///                 > CRUD_Params       [ ]
 ///             
