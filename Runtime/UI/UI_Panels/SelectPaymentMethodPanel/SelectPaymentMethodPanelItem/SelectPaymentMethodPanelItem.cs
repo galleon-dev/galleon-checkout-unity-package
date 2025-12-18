@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
 using TMPro;
@@ -21,13 +22,18 @@ namespace Galleon.Checkout.UI
         public GameObject                   BonusContainer;
         public BonusItemView                bonusItemView;
         
+        [Header("Dropdown")]
+        public GameObject                   DropdownArrow;
+        public TMP_Dropdown                 DropdownButton;
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public PaymentMethodDefinition      PaymentMethodDefinition      { get; set; }
         public UserPaymentMethod            UserPaymentMethod            { get; set; }
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView { get; set; }
-        
-        
+
+        public override bool AutoRefresh => false;
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public void Initialize(PaymentMethodDefinition      paymentMethodDefinition, 
@@ -71,7 +77,7 @@ namespace Galleon.Checkout.UI
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
         
-        public override async void RefreshState()
+        public override void RefreshState()
         {    
             if (PaymentMethodDefinition != null)
                 this.Label.text = PaymentMethodDefinition.DisplayName;
@@ -108,6 +114,37 @@ namespace Galleon.Checkout.UI
             
             bonusItemView? .gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
             BonusContainer?.gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
+            
+            // Dropdown
+            PopulateDropdownItems();
+        }
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Events 
+        
+        public void On_DropdownValueChanged(int newValue)
+        {
+            var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault();
+            
+            if (paymentMethod == null)
+                throw new System.Exception("No Payment Methods Found");
+            
+            UpdateItemPaymentMethod(paymentMethod);
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Methods
+        
+        public void PopulateDropdownItems()
+        {
+            DropdownButton.ClearOptions();
+            DropdownButton.AddOptions(CHECKOUT.PaymentMethods.UserPaymentMethods.Select(upm => upm.DisplayName).ToList());
+        }
+        
+        public void UpdateItemPaymentMethod(UserPaymentMethod upm)
+        {
+            this.PaymentMethodDefinition = null;
+            this.UserPaymentMethod       = upm;
+            this.Refresh();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events

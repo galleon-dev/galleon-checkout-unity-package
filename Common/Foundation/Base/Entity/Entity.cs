@@ -5,15 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Galleon.Checkout.ELEMENTS;
 using Galleon.Checkout.Foundation;
-using Galleon.Checkout.Foundation.LiveOperationAPF;
-using Galleon.Checkout.Foundation.LiveOperationAPFE1;
-using Galleon.Checkout.Foundation.LiveOperationPPF1;
-using Galleon.Checkout.Foundation.LiveOperationPPF1M;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UIElements;
-using LiveOperation = Galleon.Checkout.Foundation.LiveOperationPPF1.LiveOperation;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -554,31 +550,38 @@ namespace Galleon.Checkout
             
             public async Task Plus_APF(string text)
             {                
-                var   plusOperation = new Foundation.LiveOperationAPF.LiveOperation(id         : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
-                                                                                   ,parent     : this.Entity
-                                                                                   ,definition : new APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
+                var   plusOperation = new Foundation.LiveOperationAPF.LiveOperation(id                  : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
+                                                                                   ,parent              : this.Entity
+                                                                                   ,definition          : new Foundation.LiveOperationAPF.APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
                 
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_APFE1(string text)
             {   
-                var   plusOperation = new Foundation.LiveOperationAPFE1.LiveOperation(id         : $"APFE1"
-                                                                                     ,parent     : this.Entity
-                                                                                     ,definition : "> Folder f1");
+                var   plusOperation = new Foundation.LiveOperationAPFE1.LiveOperation(id                : $"APFE1"
+                                                                                     ,parent            : this.Entity
+                                                                                     ,definition        : text);
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_PPFE1M(string text)
             {   
-                var   plusOperation = new Foundation.LiveOperationPPF1M.LiveOperation(id         : $"PPFE1M"
-                                                                                     ,parent     : this.Entity
-                                                                                     ,definition : "> Folder f1");
+                var   plusOperation = new Foundation.LiveOperationPPF1M.LiveOperation(id                : $"PPFE1M"
+                                                                                     ,parent            : this.Entity
+                                                                                     ,definition        : text);
                 await plusOperation.Flow().Execute();
             }
             public async Task Plus_PPFE1(string text)
             {   
                 var   plusOperation = new Foundation.LiveOperationPPF1.LiveOperation(id                 : $"PPFE1"
                                                                                     ,operationParent    : this.Entity
-                                                                                    ,definitionText     : "> Folder f1");
+                                                                                    ,definitionText     : text); // > Folder f1
+                await plusOperation.Flow().Execute();
+            }
+            public async Task Plus_PpS1(string text)
+            {   
+                var   plusOperation = new Foundation.LiveOperationPpS1.LiveOperation(id                 : $"PpS1"
+                                                                                    ,operationParent    : this.Entity
+                                                                                    ,definitionText     : text); // > Scene s1
                 await plusOperation.Flow().Execute();
             }
             

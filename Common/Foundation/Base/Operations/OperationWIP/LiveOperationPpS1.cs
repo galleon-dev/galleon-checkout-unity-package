@@ -7,7 +7,7 @@ using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationPPF1;
 using UnityEngine;
 
-namespace Galleon.Checkout.Foundation.LiveOperationPPF1
+namespace Galleon.Checkout.Foundation.LiveOperationPpS1
 {
     public class LiveOperation : Entity
     {   
@@ -498,10 +498,6 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                 Type entityType             = Type.GetType(childEntityTypeName);
                 var  childEntity            = (IEntity)Activator.CreateInstance(entityType);
                 
-                // Add child entity
-                parentEntity.Node.AddChild(childEntity);
-                childEntity.Node.Live.LiveHandler.OnAddedToParent(parentEntity);
-                
                 // Store CRUD params
                 EntityNode.CRUD_Params crud = new ()
                                               {
@@ -510,6 +506,10 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                 
                 childEntity.Node.SetData("CRUD_params", crud);
                 s.Log($"name : {crud.Name}");
+                
+                // Add child entity
+                parentEntity.Node.AddChild(childEntity);
+                childEntity.Node.Live.LiveHandler.OnAddedToParent(parentEntity);
                 
                 // Create child entity
                 childEntity.Node.Live.LiveHandler.Create();

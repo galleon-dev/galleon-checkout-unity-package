@@ -39,11 +39,9 @@ namespace Galleon.Checkout.UI
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
-
-        public override void RefreshState()
+        
+        public async override void RefreshState()
         {
-            /////////////////////
-            
             // Remove children (if any)
             foreach (Transform child in SelectPaymentMethodItemsHolder.transform)
             {
@@ -67,6 +65,7 @@ namespace Galleon.Checkout.UI
 
             // Add payment method definitions children
             var paymentMethodDefinitions = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions;
+            int currentIndex             = 0;
             foreach (var definition in paymentMethodDefinitions)
             {
                 // Skip credit card - we already have it as the first item
@@ -80,6 +79,9 @@ namespace Galleon.Checkout.UI
 
                 // Add ui separator
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
+                
+                if (currentIndex++ > ScrollRectMaxSize)
+                    await Task.Yield();
             }
             
             /////////////////////
@@ -88,13 +90,16 @@ namespace Galleon.Checkout.UI
             var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToSelect;
             foreach (var userPaymentMethod in userPaymentMethods)
             {
-                var go = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
+                var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
             
                 item.Initialize(userPaymentMethod:userPaymentMethod, this);
             
                 // Add ui separator
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
+                
+                if (currentIndex++ > ScrollRectMaxSize)
+                    await Task.Yield();
             }
             
             /////////////////////

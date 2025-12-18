@@ -7,8 +7,8 @@ namespace Galleon.Checkout.UI
 {
     public class SetDropdownOption : MonoBehaviour
     {
-        public CheckoutPanelView CheckoutPanelView;
-        public Toggle Toggle;
+        public CheckoutPanelView                  CheckoutPanelView;
+        public Toggle                             Toggle;
         public checkoutPanelPaymentMethodItemView checkoutPanelPaymentMethodItemView;
 
         public void SetSelectionInfo(checkoutPanelPaymentMethodItemView _checkoutPanelPaymentMethodItemView)

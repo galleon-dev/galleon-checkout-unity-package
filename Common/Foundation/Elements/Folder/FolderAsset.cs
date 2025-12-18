@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.ELEMENTS;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,7 +12,7 @@ using UnityEngine.UIElements;
 using UnityEditor;
 #endif
 
-namespace   Galleon.Checkout.Assets
+namespace Galleon.Checkout.Assets
 {
     [Element("Folder")]
     public class Folder : Asset
@@ -70,7 +71,7 @@ namespace   Galleon.Checkout.Assets
         
         public void Rename(string newFolderName)
         {
-            //Debug.Log($"Renaming {FolderName} to {folderName}");
+                                                                                                                            //Debug.Log($"Renaming {FolderName} to {folderName}");
             
             //////////////////////////////////////////
             
@@ -80,13 +81,13 @@ namespace   Galleon.Checkout.Assets
             if (Directory.Exists(newPath))
                 Debug.Log("Destination already exists!");
             
-            //Debug.Log($"old path = {oldPath}");
-            //Debug.Log($"new path = {newPath}");
+                                                                                                                            //Debug.Log($"old path = {oldPath}");
+                                                                                                                            //Debug.Log($"new path = {newPath}");
             
             Directory.Move(oldPath, newPath);
             
-            //Debug.Log($"Exists1 = {Directory.Exists(oldPath)}");
-            //Debug.Log($"Exists2 = {Directory.Exists(newPath)}");
+                                                                                                                            //Debug.Log($"Exists1 = {Directory.Exists(oldPath)}");
+                                                                                                                            //Debug.Log($"Exists2 = {Directory.Exists(newPath)}");
             
             this.Path = newPath;
             
@@ -99,11 +100,11 @@ namespace   Galleon.Checkout.Assets
             if (File.Exists(oldMetaPath))
             {
                 File.Move(oldMetaPath, newMetaPath);
-                //Debug.Log($"Renamed meta file from {oldMetaPath} to {newMetaPath}");
+                                                                                                                            //Debug.Log($"Renamed meta file from {oldMetaPath} to {newMetaPath}");
             }
             else
             {
-                //Debug.LogError($"Meta file not found at {oldMetaPath}, skipping rename.");
+                                                                                                                            //Debug.LogError($"Meta file not found at {oldMetaPath}, skipping rename.");
             }
             
             //////////////////////////////////////////

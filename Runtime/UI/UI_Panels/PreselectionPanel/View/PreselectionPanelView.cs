@@ -70,7 +70,7 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
-        public override void RefreshState()
+        public async override void RefreshState()
         {
             if (CheckoutClient.Instance.CurrentSession == null) return;
             
@@ -92,9 +92,7 @@ namespace Galleon.Checkout.UI
             paymentMethods.Reverse();
             foreach (var paymentMethod in paymentMethods)
             {
-                // if (this.Configutation != null && this.Configutation.ShowMinimalOptions)
-                //     if (paymentMethod.Type != "native" && paymentMethod.Type != "card") continue;
-                
+                // Instantiate
                 var go   = Instantiate(original: PreselectionItemPrefab, parent: PaymentMethodsPanel.transform);
                 var item = go.GetComponent<PreselectionPanelItemView>();
                 item.Initialize(paymentMethod, this);

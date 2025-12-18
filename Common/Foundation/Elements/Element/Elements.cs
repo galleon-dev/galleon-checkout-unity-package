@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Galleon.Checkout.Foundation;
 
-namespace Galleon.Checkout.Foundation
+namespace Galleon.Checkout.ELEMENTS
 {
     public class Elements : Entity
     {
@@ -17,14 +18,10 @@ namespace Galleon.Checkout.Foundation
             Element Folder    = new Element(name : "Folder"); this.Collection.Add(Folder);
             Folder.Definition = DefinitionNode.Parse(new []
                                                      {
-                                                        "> Element Folder "
-                                                     ,  "   > (Assets)    "
-                                                     ,  "       > Folder  "
+                                                        "> Element Folder $name "
+                                                     ,  "   > (Assets)          "
+                                                     ,  "       > Folder $name  "
                                                      });
-            
-          //    Folder.Definition           = new DefinitionNode() { TextNode = "> Element Folder" }; 
-          //    var folderAssetsNS          = new DefinitionNode() { TextNode = "   > (assets)" };                  Folder.Definition.Node.AddChild(folderAssetsNS);
-          //        var Assets              = new DefinitionNode() { TextNode = "       > Folder" };                folderAssetsNS.Node.AddChild(Assets);
             
             Element Package                 = new Element(name : "Package"); this.Collection.Add(Package);
             Package.Definition = DefinitionNode.Parse(new []
@@ -40,16 +37,17 @@ namespace Galleon.Checkout.Foundation
                                                       ,  "       > Scene main           "
                                                       });
             
+            Element Scene    = new Element(name : "Scene"); this.Collection.Add(Scene);
+            Scene.Definition = DefinitionNode.Parse(new []
+                                                     {
+                                                        "> Element Scene $name  "
+                                                     ,  "   > (Assets)          "
+                                                     ,  "       > Scene $name   "
+                                                     ,  "   > (Hierarchy)       "
+                                                     ,  "       > Scene $name   "
+                                                     });
             
-          //    Package.Definition          = new DefinitionNode() { TextNode = "> Element Package" }; 
-          //    var packageDefinitionsNS    = new DefinitionNode() { TextNode = "   > (definitions)" };             Package.Definition.Node.AddChild(packageDefinitionsNS);
-          //        var FolderDefinition    = new DefinitionNode() { TextNode = "       > Definition Folder" };     packageDefinitionsNS.Node.AddChild(FolderDefinition);
-          //    var packageElementsNS       = new DefinitionNode() { TextNode = "   > (elements)" };                Package.Definition.Node.AddChild(packageElementsNS);
-          //        var FolderElement       = new DefinitionNode() { TextNode = "       > Element Folder" };        packageElementsNS.Node.AddChild(FolderElement);
-          //    var packageAssetsNS         = new DefinitionNode() { TextNode = "   > (assets)" };                  Package.Definition.Node.AddChild(packageAssetsNS);
-          //        var AssetsFolder        = new DefinitionNode() { TextNode = "       > Folder top" };            packageAssetsNS.Node.AddChild(AssetsFolder);
-          //    var packageHierarchyNS      = new DefinitionNode() { TextNode = "   > (hierarchy)" };               Package.Definition.Node.AddChild(packageHierarchyNS);
-          //        var Scene               = new DefinitionNode() { TextNode = "       > Scene main" };            packageHierarchyNS.Node.AddChild(Scene);
+            
         }
         
         public static Element GetElement(string typeName)

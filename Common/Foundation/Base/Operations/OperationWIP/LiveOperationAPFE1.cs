@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.ELEMENTS;
 using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationAPFE1;
 
@@ -100,7 +101,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
             Element              targetElement      = AllElements.Single(x => x.Name == targetElementName);
             
             // Add Folder Asset Live Node To VTree
-            APFE1_LiveNode       folderAssetLiveNode = targetElement.APFE1_Get_AssetFolderNode();
+            APFE1_LiveNode       folderAssetLiveNode = new () { TextNode = new TextNode( "> Assets.Folder f1" ) }; //targetElement.APFE1_Get_AssetFolderNode();
             folderAssetLiveNode.Operation            = this.Operation;
             
             // Add Assets.Folder node to this
@@ -168,14 +169,14 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
     /// /// ///
     /// /// ///
 
-namespace Galleon.Checkout
-{
-    public partial class Element
-    {
-        public APFE1_LiveNode  APFE1_Get_AssetFolderNode() =>  new APFE1_LiveNode()
-        {
-            TextNode = new TextNode( "> Assets.Folder f1" ) 
-        };
-    }
-}
+// namespace Galleon.Checkout
+// {
+//     public partial class Element
+//     {
+//         public APFE1_LiveNode  APFE1_Get_AssetFolderNode() =>  new APFE1_LiveNode()
+//         {
+//             TextNode = new TextNode( "> Assets.Folder f1" ) 
+//         };
+//     }
+// }
 
