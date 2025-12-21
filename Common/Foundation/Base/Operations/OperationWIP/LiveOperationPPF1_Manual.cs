@@ -278,7 +278,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
                 
                 // Add child entity
                 parentEntity.Node.AddChild(childEntity);
-                childEntity.Node.Live.LiveHandler.OnAddedToParent(parentEntity);
+                childEntity.Node.Live.LiveComponent.OnAddedToParent(parentEntity);
                 
                 // Store CRUD params
                 EntityNode.CRUD_Params crud = new ()
@@ -290,7 +290,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1M
                 s.Log($"name : {crud.Name}");
                 
                 // Create child entity
-                childEntity.Node.Live.LiveHandler.Create();
+                childEntity.Node.Live.LiveComponent.Create();
             });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Utility Methods

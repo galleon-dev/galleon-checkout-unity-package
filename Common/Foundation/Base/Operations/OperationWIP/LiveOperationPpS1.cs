@@ -509,10 +509,10 @@ namespace Galleon.Checkout.Foundation.LiveOperationPpS1
                 
                 // Add child entity
                 parentEntity.Node.AddChild(childEntity);
-                childEntity.Node.Live.LiveHandler.OnAddedToParent(parentEntity);
+                childEntity.Node.Live.LiveComponent.OnAddedToParent(parentEntity);
                 
                 // Create child entity
-                childEntity.Node.Live.LiveHandler.Create();
+                childEntity.Node.Live.LiveComponent.Create();
             });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug Methods

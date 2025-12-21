@@ -584,20 +584,28 @@ namespace Galleon.Checkout
                                                                                     ,definitionText     : text); // > Scene s1
                 await plusOperation.Flow().Execute();
             }
+            public async Task Plus_SpGO1(string text)
+            {   
+                var   plusOperation = new Foundation.LiveOperationPpS1.LiveOperation(id                 : $"SpGO"
+                                                                                    ,operationParent    : this.Entity
+                                                                                    ,definitionText     : text); // > Gameobjecg go1
+                await plusOperation.Flow().Execute();
+            }
+            
             
             //////////////////////////////////////////////////
             
-            public LiveHandler LiveHandler
+            public LiveComponent LiveComponent
             {
                 get
                 {
                     var liveHandlerType = Entity.GetType()
                                                 .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
-                                                .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveHandler)));
+                                                .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveComponent)));
 
                     if (liveHandlerType != null)
                     {
-                        var liveHandler = (LiveHandler)Activator.CreateInstance(liveHandlerType);
+                        var liveHandler = (LiveComponent)Activator.CreateInstance(liveHandlerType);
                         liveHandler.SetTarget(this.Entity);
                         return liveHandler;
                     }
@@ -606,16 +614,16 @@ namespace Galleon.Checkout
                 }
             }
             
-            public LiveHandler LiveHandlerByType(string entityTypeName)
+            public LiveComponent LiveComponentByType(string entityTypeName)
             {
                 Type entityType      = Type.GetType("Galleon.Checkout." + entityTypeName);
                 var  liveHandlerType = entityType
                                       .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
-                                      .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveHandler)));
+                                      .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveComponent)));
 
                 if (liveHandlerType != null)
                 {
-                    var liveHandler = (LiveHandler)Activator.CreateInstance(liveHandlerType);
+                    var liveHandler = (LiveComponent)Activator.CreateInstance(liveHandlerType);
                     liveHandler.SetTarget(this.Entity);
                     return liveHandler;
                 }

@@ -500,7 +500,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                 
                 // Add child entity
                 parentEntity.Node.AddChild(childEntity);
-                childEntity.Node.Live.LiveHandler.OnAddedToParent(parentEntity);
+                childEntity.Node.Live.LiveComponent.OnAddedToParent(parentEntity);
                 
                 // Store CRUD params
                 EntityNode.CRUD_Params crud = new ()
@@ -512,7 +512,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPPF1
                 s.Log($"name : {crud.Name}");
                 
                 // Create child entity
-                childEntity.Node.Live.LiveHandler.Create();
+                childEntity.Node.Live.LiveComponent.Create();
             });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug Methods

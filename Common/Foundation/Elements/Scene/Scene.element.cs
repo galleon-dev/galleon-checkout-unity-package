@@ -50,7 +50,7 @@ namespace Galleon.Checkout.Assets
         }
         
         ////////////////////////////////////////////////////////////////////////
-        public class LiveHandler : Foundation.LiveHandler<Scene> 
+        public class LiveComponent : Foundation.LiveComponent<Scene> 
         {
             public override void Create()                        => Target.CreateSceneAsset();
             public override void OnAddedToParent(IEntity Parent) => Target.OnAddedToParent(Parent);
@@ -67,7 +67,7 @@ namespace Galleon.Checkout.Hierarchy
         public void OnAddedToParent (IEntity Parent) {} 
         
         ////////////////////////////////////////////////////////////////////////
-        public class LiveHandler : Foundation.LiveHandler<Scene> 
+        public class LiveComponent : Foundation.LiveComponent<Scene> 
         {
             public override void Create()                        => Target.CreateSceneAsset();
             public override void OnAddedToParent(IEntity Parent) => Target.OnAddedToParent(Parent);
