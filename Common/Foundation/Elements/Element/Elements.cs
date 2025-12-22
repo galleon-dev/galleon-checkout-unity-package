@@ -50,7 +50,7 @@ namespace Galleon.Checkout.ELEMENTS
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
             
-            Element Thing    = new Element(name : "Package"); this.Collection.Add(Thing);
+            Element Thing    = new Element(name : "Thing"); this.Collection.Add(Thing);
             Thing.Definition = DefinitionNode.Parse(new []
                                                       {
                                                          "> Element Thing $name              "

@@ -68,7 +68,26 @@ namespace Galleon.Checkout.Foundation.LiveOperationPpT1_M
         =>
             new Step(action : async (s) =>
             {
-
+                /// > Element Thing $name       
+                ///     > (Assets)               
+                ///         > Prefab   $name       
+                ///         > Script   $name       
+                ///         > Material $name       
+                ///     > (Hierarchy)            
+                ///         > Prefab $name       
+                ///            > Component $name 
+                ///            > GO 'Model'      
+                ///                > C U.Cube    
+                ///     > (Setup)                
+                ///        #size                 
+                ///        #pivot                
+                ///        #color                
+                ///        #collider             
+                
+                Element childElement = Elements.GetElementByName("Thing");
+                var dump = childElement.DumpDefinition();
+                foreach (var line in dump)
+                    s.Log(line);
             });
         
         public Step DumpParentElement() 
@@ -119,18 +138,30 @@ namespace Galleon.Checkout.Foundation.LiveOperationPpT1_M
         =>
             new Step(action : async (s) =>
             {
-
+                this.FullVirtualTree = LiveNode.ParseTreeFromText(new []
+                                     {
+                                        "> Package                                #exists  "
+                                     ,  "    > (Assets)                           #exists  "
+                                     ,  "        > Folder 'package1'              #exists  "
+                                     ,  "            > Folder 't1'                #plus    "
+                                     ,  "               > prefab   't1'           #plus    "
+                                     ,  "               > script   't1'           #plus    "
+                                     ,  "               > Material 't1'           #plus    "
+                                     ,  "    > (Hierarchy)                        #exists  "
+                                     ,  "         > Scene s1                      #exists  "
+                                     ,  "            > Prefab 't1'                #plus    "
+                                     ,  "               > Component 't1'          #plus    "
+                                     ,  "               > GameObject Model        #plus    "
+                                     ,  "                   > Component 'Mesh'    #plus    "
+                                     ,  "                       > Ref Material=t1 #plus    "
+                                     ,  "                                                  "
+                                     });
             });
         
         public Step DumpVirtualTree()
         =>
             new Step(action : async (s) =>
             {
-                /// > Package                       #exists
-                ///     > (Assets)                  #exists
-                ///         > Folder "package1"     #exists
-                ///             > Folder f1         #plus
-                
                 foreach (var node in FullVirtualTree.DefinitionNode.Node.Descendants().OfType<DefinitionNode>())
                     s.Log(node.TextNode.RawText);
             });

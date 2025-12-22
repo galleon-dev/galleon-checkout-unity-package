@@ -593,9 +593,9 @@ namespace Galleon.Checkout
             }
             public async Task Plus_PpT1_M(string text)
             {   
-                var   plusOperation = new Foundation.LiveOperationPpS1.LiveOperation(id                 : $"PpT1_M"
-                                                                                    ,operationParent    : this.Entity
-                                                                                    ,definitionText     : text); // > Thing t1
+                var   plusOperation = new Foundation.LiveOperationPpT1_M.LiveOperation(id                 : $"PpT1_M"
+                                                                                      ,operationParent    : this.Entity
+                                                                                      ,definitionText     : text); // > Thing t1
                 await plusOperation.Flow().Execute();
             }
             

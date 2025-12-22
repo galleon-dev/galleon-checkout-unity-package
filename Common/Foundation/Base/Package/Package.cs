@@ -103,7 +103,7 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        await this.Node.Live.Plus_SpGO1("> Gameobject go1");
+                        await this.Node.Live.Plus_SpGO1("> Thing t1");
                     });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
@@ -147,8 +147,8 @@ namespace Galleon.Checkout.Foundation
                 btn_SpGO1.text                 = "P+S1";
                 
                 Button btn_PpT1_M              = new Button(); this.Add(btn_PpT1_M);
-                btn_PpT1_M.clicked            += () => target.Do_SpGO1().Execute(); 
-                btn_PpT1_M.text                = "P+S1_M";
+                btn_PpT1_M.clicked            += () => target.Do_PpT1_M().Execute(); 
+                btn_PpT1_M.text                = "P+T1_M";
                 
             }
         }   
