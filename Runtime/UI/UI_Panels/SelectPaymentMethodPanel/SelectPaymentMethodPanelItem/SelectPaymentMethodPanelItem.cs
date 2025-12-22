@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -124,20 +125,39 @@ namespace Galleon.Checkout.UI
         
         public void On_DropdownValueChanged(int newValue)
         {
-            var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault();
-            
-            if (paymentMethod == null)
-                throw new System.Exception("No Payment Methods Found");
-            
-            UpdateItemPaymentMethod(paymentMethod);
+            // var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault();
+            // 
+            // if (paymentMethod == null)
+            //     throw new System.Exception("No Payment Methods Found");
+            // 
+            // UpdateItemPaymentMethod(paymentMethod);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Methods
         
-        public void PopulateDropdownItems()
+        public async void PopulateDropdownItems()
         {
+            // Clear
             DropdownButton.ClearOptions();
-            DropdownButton.AddOptions(CHECKOUT.PaymentMethods.UserPaymentMethods.Select(upm => upm.DisplayName).ToList());
+            
+            // Definitions
+            var pms = CHECKOUT.PaymentMethods.UserPaymentMethods.ToList();
+            
+            // Add options
+            foreach (var pm in pms)
+            {
+                DropdownButton.options.Add(new TMP_Dropdown.OptionData(pm.DisplayName, pm.GetIconSprite()));
+            }
+            
+            // DropdownButton.onValueChanged.Invoke(DropdownButton.value); // Forces the event
+            // DropdownButton.RefreshShownValue();
+            
+            // for (int i = 0; i < dropdownItems.Count(); i++)
+            // {
+            //     var pm = pms[i];
+            //     var id = pm.DisplayName;
+            //     dropdownItems[i].Setup(id);
+            // }
         }
         
         public void UpdateItemPaymentMethod(UserPaymentMethod upm)
@@ -147,6 +167,12 @@ namespace Galleon.Checkout.UI
             this.Refresh();
         }
 
+        
+        /// > populate
+        /// > on select -> refresh
+        /// > only when upms available
+
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
         
         public void On_Click()
