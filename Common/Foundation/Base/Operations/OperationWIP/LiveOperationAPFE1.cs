@@ -119,8 +119,8 @@ namespace Galleon.Checkout.Foundation.LiveOperationAPFE1
             IEntity target     = (IEntity)Activator.CreateInstance(targetType);
             
             Parent.Node.AddChild(target);
-            target.Node.Live.LiveHandler.OnAddedToParent(Parent);
-            target.Node.Live.LiveHandler.Create();
+            target.Node.Live.LiveComponent.OnAddedToParent(Parent);
+            target.Node.Live.LiveComponent.Create();
             
             LinkedCreatedEntity = target;
         }

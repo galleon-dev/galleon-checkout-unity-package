@@ -112,7 +112,7 @@ namespace Galleon.Checkout.Assets
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Live Handler
         
-        public class LiveHandler : Foundation.LiveHandler<Folder> 
+        public class LiveComponent : Foundation.LiveComponent<Folder> 
         {
             public override void Create()                        => Target.CreateFolder();
             public override void OnAddedToParent(IEntity Parent) => Target.OnAddedToParent(Parent);

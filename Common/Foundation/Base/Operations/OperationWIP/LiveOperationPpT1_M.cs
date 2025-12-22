@@ -7,7 +7,7 @@ using Galleon.Checkout.Foundation;
 using Galleon.Checkout.Foundation.LiveOperationPPF1;
 using UnityEngine;
 
-namespace Galleon.Checkout.Foundation.LiveOperationPpS1
+namespace Galleon.Checkout.Foundation.LiveOperationPpT1_M
 {
     public class LiveOperation : Entity
     {   
@@ -61,8 +61,6 @@ namespace Galleon.Checkout.Foundation.LiveOperationPpS1
         =>
             new Step(action : async (s) =>
             {
-                /// > Folder f1
-                
                 s.Log(OriginalTree.TextNode.ToTreeString());
             });
         
@@ -70,15 +68,7 @@ namespace Galleon.Checkout.Foundation.LiveOperationPpS1
         =>
             new Step(action : async (s) =>
             {
-                /// > Element Folder $name
-                ///     > (Assets)
-                ///         > Folder $name 
-                
-                Element childElement = Elements.GetElementByName(OriginalTree.DefinitionNode.EntityType);
-                var     dump         = childElement.DumpDefinition();
-                 
-                foreach (var line in dump)
-                    s.Log(line);
+
             });
         
         public Step DumpParentElement() 
@@ -108,120 +98,28 @@ namespace Galleon.Checkout.Foundation.LiveOperationPpS1
         =>
             new Step(action : async (s) =>
             {
-                /// > Element Folder f1
-                ///     > (Assets)
-                ///         > Folder f1
-                
-                Element childElement  = Elements.GetElementByName(OriginalTree.DefinitionNode.EntityType);
-                 
-                // Create tree from Element 
-                this.ChildVirtualTree = new LiveNode()
-                                      {
-                                          DefinitionNode = childElement.Definition.CloneTree(),
-                                          Operation      = this
-                                      };
-                
-                // Set name from Operation Original Tree
-                var childInstanceName = OriginalTree.DefinitionNode.EntityName;
-                ChildVirtualTree.DefinitionNode.ApplyVariable("$name", childInstanceName);
-                
-                // Log
-                foreach (var node in ChildVirtualTree.TextNode.Node.Descendants().OfType<TextNode>())
-                    s.Log(node.RawText);
+
             });        
         
         public Step CreateParentVirtualTree() 
         =>
             new Step(action : async (s) =>
             {
-                /// > Package
-                ///     > (definition)
-                ///         > definition
-                ///     > (Elements)
-                ///         > Element
-                ///     > (Assets)
-                ///         > Folder "package1"
-                ///     > (Hierarchy)
-                ///         > Scene "main"
-                ///     > (whatever)
-                ///         > Whatever "..."
-                
-                
-                Element parentElement = this.OperationParent.Node.GetElement();
-                var     parentTree    = parentElement.Definition.CloneTree();
-                
-                foreach (var node in parentTree.TextNode.Node.Descendants().OfType<TextNode>())
-                    s.Log(node.RawText);
+
             });        
         
         public Step CreateZipTree() 
         =>
             new Step(action : async (s) =>
             {
-                /// > Package
-                ///     > (Assets)
-                ///         > Folder "package1"
-                
-                // Create zip tree
-                var zipTree = CreateZippedTree();
-                
-                // Log zip tree
-                foreach (var node in zipTree.Node.Descendants().OfType<DefinitionNode>())
-                {
-                    var expanded = node.DoesNeedToExpandToFullLine() ? node.ExpandToFullLine() : node.TextNode;
-                    s.Log($"{node.TextNode.RawText} - (ns:{node.GetNamespace() + ")", -15} ---> | {expanded.RawText}");
-                }        
+      
             });
         
         public Step CreateFullVirtualTree() 
         =>
             new Step(action : async (s) =>
             {
-                /// > Package                       #exists
-                ///     > (Assets)                  #exists
-                ///         > Folder "package1"     #exists
-                ///             > Folder f1         #plus
-                
-                
-                // Create Zipped Tree
-                DefinitionNode fullTree = CreateZippedTree();
-                
-                // Add #exists Tag
-                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
-                    node.AddTag("#exists");
-                
-                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
-                   s.Log(node.TextNode.RawText);
-                
-                // Insert Child
-                var childTree               = ChildVirtualTree.DefinitionNode.Node.Descendants().OfType<DefinitionNode>();
-                var childTreeNamespaceNodes = childTree.Where(n => n.IsNamespaceNode()).ToList();
-                foreach (var childNamespaceNode in childTreeNamespaceNodes)
-                    fullTree.InsertNodeIntoTree(childNamespaceNode);
-                
-                // Expand nodes of full tree
-                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
-                    if (node.DoesNeedToExpandToFullLine())
-                    {
-                        node.TextNode.RawText = node.ExpandToFullLine().RawText;
-                    }
-                
-                // Mark Live Action for inserted child nodes
-                string actionTag = $"#{OperationType}";
-                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
-                    if (node.TextNode.Hashtags.Count == 0)
-                        node.AddTag(actionTag);
-                
-                // Log
-                s.Log("---");
-                foreach (DefinitionNode node in fullTree.Node.Descendants().OfType<DefinitionNode>())
-                    s.Log(node.TextNode.RawText);
-                
-                // Assign Field
-                this.FullVirtualTree = LiveNode.ParseTreeFromDefinition(fullTree);
-                
-                foreach (LiveNode node in this.FullVirtualTree.Node.Descendants().OfType<LiveNode>())
-                    node.Operation = this;
+
             });
         
         public Step DumpVirtualTree()

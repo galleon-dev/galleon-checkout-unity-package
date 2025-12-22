@@ -41,7 +41,7 @@ namespace Galleon.Checkout
         public TaxController                TaxController               = new();  
         
         // Payment Actions
-        public CheckoutActionsController    CheckoutActions              = new();
+        public CheckoutActionsController    CheckoutActions             = new();
         
         // Entities
         [Header("Entities")]

@@ -93,6 +93,18 @@ namespace Galleon.Checkout.Foundation
                     {
                         await this.Node.Live.Plus_PpS1("> Scene s1");
                     });
+        public Step Do_SpGO1() 
+        =>
+            new Step(action : async (s) =>
+                    {
+                        await this.Node.Live.Plus_SpGO1("> Gameobject go1");
+                    });
+        public Step Do_PpT1_M() 
+        =>
+            new Step(action : async (s) =>
+                    {
+                        await this.Node.Live.Plus_SpGO1("> Gameobject go1");
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
         
@@ -129,6 +141,14 @@ namespace Galleon.Checkout.Foundation
                 Button btn_PpS1                = new Button(); this.Add(btn_PpS1);
                 btn_PpS1.clicked              += () => target.Do_PpS1().Execute(); 
                 btn_PpS1.text                  = "P+S1";
+                
+                Button btn_SpGO1               = new Button(); this.Add(btn_SpGO1);
+                btn_SpGO1.clicked             += () => target.Do_SpGO1().Execute(); 
+                btn_SpGO1.text                 = "P+S1";
+                
+                Button btn_PpT1_M              = new Button(); this.Add(btn_PpT1_M);
+                btn_PpT1_M.clicked            += () => target.Do_SpGO1().Execute(); 
+                btn_PpT1_M.text                = "P+S1_M";
                 
             }
         }   

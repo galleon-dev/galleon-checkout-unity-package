@@ -47,6 +47,27 @@ namespace Galleon.Checkout.ELEMENTS
                                                      ,  "       > Scene $name   "
                                                      });
             
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+            
+            Element Thing    = new Element(name : "Package"); this.Collection.Add(Thing);
+            Thing.Definition = DefinitionNode.Parse(new []
+                                                      {
+                                                         "> Element Thing $name              "
+                                                      ,  "   > (Assets)                      "
+                                                      ,  "       > Prefab $name              " 
+                                                      ,  "       > Script $name              "
+                                                      ,  "   > (Hierarchy)                   "
+                                                      ,  "       > Prefab $name              "
+                                                      ,  "          > Component $name        "
+                                                      ,  "          > GO 'Model'             "
+                                                      ,  "              > C U.Cube           "
+                                                      ,  "   > (Setup)                       "
+                                                      ,  "      #size                        "
+                                                      ,  "      #pivot                       "
+                                                      ,  "      #color                       "
+                                                      ,  "      #collider                    "
+                                                      });
             
         }
         
