@@ -136,6 +136,24 @@ namespace Galleon.Checkout.UI
                 GenerateTaxes();
             }
         }
+        
+        public void SoftRefreshState()
+        {
+            if (CheckoutClient.Instance.CurrentSession == null) return;
+
+            this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
+            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+
+            // Set Button Display
+            var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
+            if (selectedPaymentMethod != null)
+                SetButtonDisplay(selectedPaymentMethod);
+
+            foreach (var item in PaymentMethodItemViews)
+            {
+                item.RefreshState();
+            }
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Radio Buttons
 
@@ -144,13 +162,13 @@ namespace Galleon.Checkout.UI
         {
             foreach (var item in PaymentMethodItemViews)
             {
-                if (item == SelectedItem)
+                if (item.PaymentMethod == SelectedItem.PaymentMethod)
                     continue;
 
                 item.Unselect();
             }
 
-            SetButtonDisplay(SelectedItem?.PaymentMethod);
+            // SetButtonDisplay(SelectedItem?.PaymentMethod);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -332,4 +350,3 @@ namespace Galleon.Checkout.UI
         public Step test_settings_page()        => new Step(action: async (s) => { OnSettingsClick(); });
     }
 }
-

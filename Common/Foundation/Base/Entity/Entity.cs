@@ -598,7 +598,16 @@ namespace Galleon.Checkout
                                                                                       ,definitionText     : text); // > Thing t1
                 await plusOperation.Flow().Execute();
             }
-            
+            public async Task Plus_PpQuickSlices(string text)
+            {   
+                Debug.Log("Oh Boy !");
+                return;
+                
+                var   plusOperation = new Foundation.LiveOperationPpQuickSlices.LiveOperation(id                 : $"PpQuickSlices"
+                                                                                             ,operationParent    : this.Entity
+                                                                                             ,definitionText     : text); // > Quick Slices
+                await plusOperation.Flow().Execute();
+            }
             //////////////////////////////////////////////////
             
             public LiveComponent LiveComponent

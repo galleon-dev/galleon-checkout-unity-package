@@ -28,6 +28,11 @@ namespace Galleon.Checkout.UI
         public BonusItemView   bonusItemView;
         public IBonusItemView  IBonusItemView;
         
+        [Header("Dropdown")]
+        public GameObject      DropdownArrow;
+        public TMP_Dropdown    DropdownButton;
+
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
         public UserPaymentMethod PaymentMethod     { get; set; }
@@ -99,6 +104,8 @@ namespace Galleon.Checkout.UI
             //     if (this.PaymentMethod.Type == "native")
             //         (IBonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
             // }
+            
+            PopulateDropdownItems();
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -115,7 +122,7 @@ namespace Galleon.Checkout.UI
             this.PaymentMethod?.Select();
             this.CheckoutPanelView.OnRadiobuttonSelected(this);
             
-            this.CheckoutPanelView.Refresh();
+            this.CheckoutPanelView.SoftRefreshState();
             //Refresh();
         }
 
@@ -123,9 +130,52 @@ namespace Galleon.Checkout.UI
         {
             this.PaymentMethod?.Unselect();
             
-            this.CheckoutPanelView.Refresh();
+            this.CheckoutPanelView.SoftRefreshState();
             //Refresh();
         }
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Events 
+        
+        public void On_DropdownValueChanged(int newValue)
+        {
+            var displayName   = DropdownButton.options[newValue].text;
+            var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.DisplayName == displayName);
+            
+            if (paymentMethod == null)
+                throw new System.Exception("No Payment Methods Found");
+            
+            UpdateItemPaymentMethod(paymentMethod);
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Methods
+        
+        public async void PopulateDropdownItems()
+        {
+            // Clear
+            DropdownButton.ClearOptions();
+            
+            // Definitions
+            var pms = CHECKOUT.PaymentMethods.UserPaymentMethods.ToList();
+            
+            // add fake option
+            DropdownButton.options.Add(new TMP_Dropdown.OptionData("select saved payment method :"));
+            
+            // Add options
+            foreach (var pm in pms)
+            {
+                DropdownButton.options.Add(new TMP_Dropdown.OptionData(pm.DisplayName, pm.GetIconSprite()));
+            }
+        }
+        
+        public void UpdateItemPaymentMethod(UserPaymentMethod upm)
+        {
+            this.PaymentMethod = upm;
+            Select();
+            this.Refresh();
+        }
+
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
         

@@ -79,7 +79,7 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
         
         public override void RefreshState()
-        {    
+        {   
             if (PaymentMethodDefinition != null)
                 this.Label.text = PaymentMethodDefinition.DisplayName;
             else if (UserPaymentMethod != null)
@@ -99,11 +99,15 @@ namespace Galleon.Checkout.UI
 
                 if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)
                     this.Label.text  = "Add Credit or Debit Card";
+                
+                // Dropdown
+                DropdownButton.gameObject.SetActive(this.PaymentMethodDefinition.ShouldShowDropdown);
+                DropdownArrow .gameObject.SetActive(this.PaymentMethodDefinition.ShouldShowDropdown);
             }
             //////////////////////////////////////////////// UserPaymentMethods
             else if (this.UserPaymentMethod != null)
             {
-                this.Label.text  = "**** - " + this.UserPaymentMethod.DisplayName;
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
                 this.Icon.sprite = this.UserPaymentMethod.GetIconSprite();
             }
             
@@ -125,12 +129,13 @@ namespace Galleon.Checkout.UI
         
         public void On_DropdownValueChanged(int newValue)
         {
-            // var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault();
-            // 
-            // if (paymentMethod == null)
-            //     throw new System.Exception("No Payment Methods Found");
-            // 
-            // UpdateItemPaymentMethod(paymentMethod);
+            var displayName   = DropdownButton.options[newValue].text;
+            var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.DisplayName == displayName);
+            
+            if (paymentMethod == null)
+                throw new System.Exception("No Payment Methods Found");
+            
+            UpdateItemPaymentMethod(paymentMethod);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Methods
@@ -143,14 +148,14 @@ namespace Galleon.Checkout.UI
             // Definitions
             var pms = CHECKOUT.PaymentMethods.UserPaymentMethods.ToList();
             
+            // add fake option
+            DropdownButton.options.Add(new TMP_Dropdown.OptionData("select saved payment method :"));
+            
             // Add options
             foreach (var pm in pms)
             {
                 DropdownButton.options.Add(new TMP_Dropdown.OptionData(pm.DisplayName, pm.GetIconSprite()));
             }
-            
-            // DropdownButton.onValueChanged.Invoke(DropdownButton.value); // Forces the event
-            // DropdownButton.RefreshShownValue();
             
             // for (int i = 0; i < dropdownItems.Count(); i++)
             // {
@@ -166,11 +171,6 @@ namespace Galleon.Checkout.UI
             this.UserPaymentMethod       = upm;
             this.Refresh();
         }
-
-        
-        /// > populate
-        /// > on select -> refresh
-        /// > only when upms available
 
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events

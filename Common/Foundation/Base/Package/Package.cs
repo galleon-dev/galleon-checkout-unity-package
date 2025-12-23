@@ -105,6 +105,12 @@ namespace Galleon.Checkout.Foundation
                     {
                         await this.Node.Live.Plus_SpGO1("> Thing t1");
                     });
+        public Step Do_PpQuickSlices() 
+        =>
+            new Step(action : async (s) =>
+                    {
+                        await this.Node.Live.Plus_PpQuickSlices("Oh Boy !");
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
         
@@ -149,6 +155,10 @@ namespace Galleon.Checkout.Foundation
                 Button btn_PpT1_M              = new Button(); this.Add(btn_PpT1_M);
                 btn_PpT1_M.clicked            += () => target.Do_PpT1_M().Execute(); 
                 btn_PpT1_M.text                = "P+T1_M";
+                
+                Button btn_PpQS              = new Button(); this.Add(btn_PpQS);
+                btn_PpQS.clicked            += () => target.Do_PpQuickSlices().Execute(); 
+                btn_PpQS.text                = "P + Quick-Slices";
                 
             }
         }   

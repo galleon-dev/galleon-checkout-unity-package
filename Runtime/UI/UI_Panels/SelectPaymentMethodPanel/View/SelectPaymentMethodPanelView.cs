@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
@@ -72,13 +73,28 @@ namespace Galleon.Checkout.UI
                 if (definition.Type == "card")
                     continue;
                 
+                // Instantiate Menu Item
                 var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
-
                 item.Initialize(paymentMethodDefinition:definition, this);
-
-                // Add ui separator
-                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
+                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform); // add ui seperator
+                
+                ///////////////////////////////////
+                #region UPMS
+                if (definition.ShouldAddSavedUPMS)
+                {
+                    var upms = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Data.type == definition.Data.type);
+                    foreach (var upm in upms)
+                    {
+                        var upmGO   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
+                        var upmItemitem = upmGO.GetComponent<SelectPaymentMethodPanelItem>();
+                        upmItemitem.Initialize(userPaymentMethod:upm, this);
+                        Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform); // seporator
+                        currentIndex++;
+                    }
+                }
+                #endregion
+                ///////////////////////////////////
                 
                 if (currentIndex++ > ScrollRectMaxSize)
                     await Task.Yield();
@@ -92,11 +108,8 @@ namespace Galleon.Checkout.UI
             {
                 var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
-            
                 item.Initialize(userPaymentMethod:userPaymentMethod, this);
-            
-                // Add ui separator
-                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform);
+                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform); // seporator
                 
                 if (currentIndex++ > ScrollRectMaxSize)
                     await Task.Yield();

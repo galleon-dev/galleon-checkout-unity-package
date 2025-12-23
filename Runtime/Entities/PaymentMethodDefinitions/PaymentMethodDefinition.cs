@@ -34,11 +34,17 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public string       DisplayName => Data?.type ?? Type.ToString();
+        public string       DisplayName         => Data?.type ?? Type.ToString();
         
-        public string       LocalID     => $"local_pm_id_{this.Type}";
+        public string       LocalID             => $"local_pm_id_{this.Type}";
         
-        public BonusItem    BonusItem   => CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
+        public BonusItem    BonusItem           => CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
+        
+        public bool         ShouldAddSavedUPMS  => true;
+        public bool         AllowOnlyOneUPM     => true;
+        public bool         ShouldShowDropdown  => true;
+        
+        public IEnumerable<UserPaymentMethod> SavedUPMS => CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Data.type == this.Data.type);
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
