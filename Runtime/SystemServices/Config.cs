@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -90,6 +91,17 @@ namespace Galleon.Checkout
             this.Key   = key;
             this._value = value;
         }
+        
+        //// Value Properties
+        
+        public bool   GetsBool                        => bool .Parse(Value.ToString());
+        public int    GetsInt                         => int  .Parse(Value.ToString());
+        public float  GetsFloat                       => float.Parse(Value.ToString());
+        public string GetsString                      => Value.ToString();
+        public T      Get<T>() where T : IConvertible => (T)Convert.ChangeType(Value, typeof(T));
+        
+        
+        
         
         //// Methods
         

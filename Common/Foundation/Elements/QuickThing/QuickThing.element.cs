@@ -37,6 +37,8 @@ namespace Galleon.Checkout.Assets
     [Element("QuickThing")]
     public class QuickThing : Asset, ICRUD
     {
+        public string thingName;
+        
         public void CreateQuickThingAsset() 
         {
             #if UNITY_EDITOR
@@ -48,16 +50,16 @@ namespace Galleon.Checkout.Assets
                 Directory.CreateDirectory(FolderPath);
              
              // Create all components t
-             CreatePrefab  (thingName: "quick_thing");
-             CreateScript  (thingName: "quick_thing");
-             CreateMaterial(thingName: "quick_thing");
+             CreatePrefab  (thingName: thingName);
+             CreateScript  (thingName: thingName);
+             CreateMaterial(thingName: thingName);
             
             #endif
         }
         
         public void OnAddedToParent (IEntity parent)
         {
-            this.FolderPath = (this.Node.Parent as Asset)?.FolderPath + "Thing";   
+            this.FolderPath = (this.Node.Parent as Asset)?.FolderPath + thingName;   
         }
         
         //////////////////////////////////////////////////////////////////////// ICRUD
@@ -199,8 +201,3 @@ namespace Galleon.Checkout.Hierarchy
         }
     }
 }
-
-/// w1 - Direct / Indirect
-/// w2 - Thing + Tags
-/// w3 - Prompt
-/// w4 - Elements

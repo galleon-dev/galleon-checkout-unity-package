@@ -102,6 +102,7 @@ namespace Galleon.Checkout
                                   s.AddChildStep(Logger                         .Initialize());
                                   s.AddChildStep(Network                        .Initialize());
                                   s.AddChildStep(Config                         .Initialize());
+                                  s.AddChildStep(CheckoutGlobals                .Initialize());
                                   s.AddChildStep(Analytics                      .Initialize());
                         
                                   // Controllers

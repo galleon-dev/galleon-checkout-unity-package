@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Galleon.Checkout
 {
     public class CheckoutGlobals : Entity
@@ -26,6 +29,26 @@ namespace Galleon.Checkout
         public CheckoutGlobals()
         {
         }
+        
+        public Step Initialize() 
+        =>
+            new Step(name   : $"initialize_globals"
+                    ,tags   : new[] { "init" }
+                    ,action : async (s) =>
+                    {
+                        // CHECKOUT.Config.Collection.Add(new ConfigValue("is_preselection_screen_enabled", true));
+                        // CHECKOUT.Config.Collection.Add(new ConfigValue("show_tax_breakdown", true));
+                        // CHECKOUT.Config.Collection.Add(new ConfigValue("show_log_footer", true));
+                        // 
+                        // List<ConfigValue> GlobalValues = new();
+                        // GlobalValues.Add(CHECKOUT.Config.Collection.FirstOrDefault(x => x.Key == "is_preselection_screen_enabled"));
+                        // GlobalValues.Add(CHECKOUT.Config.Collection.FirstOrDefault(x => x.Key == "show_tax_breakdown"));
+                        // GlobalValues.Add(CHECKOUT.Config.Collection.FirstOrDefault(x => x.Key == "show_log_footer"));
+                        // 
+                        // var preselection = GlobalValues.FirstOrDefault();
+                        // var b = preselection.GetsBool;
+                        // s.Log(b);
+                    });
         
         public CheckoutConfiguration CheckoutConfiguration;
     }

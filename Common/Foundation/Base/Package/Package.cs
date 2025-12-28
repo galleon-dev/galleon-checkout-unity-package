@@ -110,12 +110,60 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
+                        ///         /////////////////////// T.A
+                        ///         > P.A.F + T.A [v]
+                        ///         > P.A   + T.A [ ]
+                        ///         > P     + T.A [ ]
+                        ///         > P.A.F + T   [ ]
+                        ///         > P.A   + T   [ ]
+                        ///         > P     + T   [ ]
+                        ///         /////////////////////// F.A + T.A
+                        ///         > P.A.F + F.A + T.A [v]
+                        ///         > P.A   + F.A + T.A [ ]
+                        ///         > P     + F.A + T.A [ ]
+                        ///         > P.A.F + F   + T   [ ]
+                        ///         > P.A   + F   + T   [ ]
+                        ///         > P     + F   + T   [ ]
+                        
                         #if UNITY_EDITOR
                         
                         this.Report().Execute();
                         
-                        // 1 - P.A.F + T.A
-                        this.Assets.rootFolder.Node.Live.Plus_QT_A_Direct(new Checkout.Assets.QuickThing());
+                        s.Log("// 1 - P.A.F + T.A");
+                        this.Assets.rootFolder.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_paf_p_qta" } );
+                        
+                        s.Log("// 2 - P.A + T.A");
+                        this.Assets.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_pa_p_qta" } );
+                        
+                        s.Log("// 2 - P + T.A");
+                        this.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_p_p_qta" } );
+                        
+                        
+                        #endif
+                    });
+        
+        public Step Do_P_Plus_T_Indirect() 
+        =>
+            new Step(action : async (s) =>
+                    {
+                        /// /////////////////////// T.A
+                        ///         > P.A.F + T.A [v]
+                        ///         > P.A   + T.A [ ]
+                        ///         > P     + T.A [ ]
+                        ///         > P.A.F + T   [ ]
+                        ///         > P.A   + T   [ ]
+                        ///         > P     + T   [ ]
+                                
+                        #if UNITY_EDITOR
+                        
+                        this.Report().Execute();
+                        
+                        
+                        s.Log("// 1 - P.A.F + T.A");
+                        this.Assets.rootFolder.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_paf_p_qta" } );
+                        
+                        s.Log("// 2 - P.A + T.A");
+                        this.Assets.rootFolder.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_pa_p_qta" } );
                         
                         #endif
                     });
@@ -168,8 +216,16 @@ namespace Galleon.Checkout.Foundation
                 btn_PpQS.clicked            += () => target.Do_PpQuickSlices().Execute(); 
                 btn_PpQS.text                = "P + Quick-Slices";
                 
-                this.Add(new Button(() => target.Do_P_Plus_T_Direct().Execute()) { text = "P + T direct",       style = { marginRight = 500 }});
+                this.Add(new Button(() => target.Do_P_Plus_T_Direct()  .Execute()) { text = "P + T direct",   style = { marginRight = 500 }});
+                this.Add(new Button(() => target.Do_P_Plus_T_Indirect().Execute()) { text = "P + T indirect", style = { marginRight = 500 }});
                 
+                /// w1 - Direct / Indirect
+                ///     > Direct
+                ///     > Indirect
+                /// w2 - Thing + Tags
+                /// w3 - Prompt
+                /// w4 - Elements
+
             }
         }   
     }

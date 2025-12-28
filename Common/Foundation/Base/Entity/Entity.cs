@@ -33,10 +33,10 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public EntityNode(                  IEntity entity
-                        ,[CallerMemberName] string  callerName = ""
-                        ,[CallerLineNumber] int     callerLine = 0
-                        ,[CallerFilePath  ] string  callerPath = "")
+        public EntityNode(                   IEntity entity
+                         ,[CallerMemberName] string  callerName = ""
+                         ,[CallerLineNumber] int     callerLine = 0
+                         ,[CallerFilePath  ] string  callerPath = "")
         {
             if (entity == null)
                 throw new Exception("entity is null in EntityNode constructor");
@@ -608,15 +608,21 @@ namespace Galleon.Checkout
                                                                                              ,definitionText     : text); // > Quick Slices
                 await plusOperation.Flow().Execute();
             }
-            public async Task Plus_QT_A_Direct(Assets.QuickThing qta)
+            public async Task Plus(IEntity child)
             {
+                var qta = child as Assets.QuickThing;
+                
+                this.Entity.Node.AddChild(qta);
+                qta.OnAddedToParent(this.Entity);
+                qta.CreateQuickThingAsset();                
+            }
+            public async Task Plus_Indirect(IEntity child)
+            {
+                var qta = child as Assets.QuickThing;
+                
                 this.Entity.Node.AddChild(qta);
                 qta.OnAddedToParent(this.Entity);
                 qta.CreateQuickThingAsset();
-            }
-            public async Task Plus(IEntity child)
-            {
-                
             }
             
             //////////////////////////////////////////////////
