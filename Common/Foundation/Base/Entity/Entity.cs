@@ -608,6 +608,17 @@ namespace Galleon.Checkout
                                                                                              ,definitionText     : text); // > Quick Slices
                 await plusOperation.Flow().Execute();
             }
+            public async Task Plus_QT_A_Direct(Assets.QuickThing qta)
+            {
+                this.Entity.Node.AddChild(qta);
+                qta.OnAddedToParent(this.Entity);
+                qta.CreateQuickThingAsset();
+            }
+            public async Task Plus(IEntity child)
+            {
+                
+            }
+            
             //////////////////////////////////////////////////
             
             public LiveComponent LiveComponent

@@ -24,9 +24,6 @@ namespace Galleon.Checkout.Foundation
         public Package()
         {
             #if UNITY_EDITOR
-          
-            var rootFolderPath     = Application.dataPath + "/" + "package1/";
-            this.Assets.rootFolder = new Folder() { Path = rootFolderPath };
             
             if (!this.Assets.rootFolder.DoesFolderExist())
                 this.Assets.rootFolder.CreateFolder();
@@ -50,11 +47,9 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        var tree = Assets.rootFolder.Node.Descendants().OfType<Folder>().ToList();
-                        foreach (var folder in tree)
-                        {
-                            s.Log(folder.Path);
-                        }
+                        Debug.Log($"Package.Asset.Elements = {string.Join(", ", this.Elements.Collection.Select(x => x.Name))}");
+                        Debug.Log($"Package.Asset.Folder   = {this.Assets.rootFolder.FolderPath}");
+                        Debug.Log($"Package.Asset.Scene    = {"TBD"}");
                     });
         public Step Do_Rescan() 
         =>
@@ -111,6 +106,19 @@ namespace Galleon.Checkout.Foundation
                     {
                         await this.Node.Live.Plus_PpQuickSlices("Oh Boy !");
                     });
+        public Step Do_P_Plus_T_Direct() 
+        =>
+            new Step(action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
+                        
+                        this.Report().Execute();
+                        
+                        // 1 - P.A.F + T.A
+                        this.Assets.rootFolder.Node.Live.Plus_QT_A_Direct(new Checkout.Assets.QuickThing());
+                        
+                        #endif
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
         
@@ -159,6 +167,8 @@ namespace Galleon.Checkout.Foundation
                 Button btn_PpQS              = new Button(); this.Add(btn_PpQS);
                 btn_PpQS.clicked            += () => target.Do_PpQuickSlices().Execute(); 
                 btn_PpQS.text                = "P + Quick-Slices";
+                
+                this.Add(new Button(() => target.Do_P_Plus_T_Direct().Execute()) { text = "P + T direct",       style = { marginRight = 500 }});
                 
             }
         }   

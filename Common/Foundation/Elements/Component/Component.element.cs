@@ -1,4 +1,7 @@
+#if UNITY_EDITOR
+
 using System;
+using System.IO;
 using Galleon.Checkout;
 using Galleon.Checkout.ELEMENTS;
 using UnityEngine;
@@ -70,5 +73,80 @@ namespace Galleon.Checkout.Hierarchy
             public override void Create()                        => Target.CreateComponentAsset();
             public override void OnAddedToParent(IEntity Parent) => Target.OnAddedToParent(Parent);
         }
-    }
+        
+        ////////////////////////////////////////////////////////////////
+        
+        public void Do_H()
+        {
+            var PrefabPath   = "";
+            var ScriptPath   = "";
+            var MaterialPath = "";
+           
+            //////////////////////////////////////////// Open prefab for edit
+            
+            string     prefabAssetPath = PrefabPath;
+            string     relativePath    = "Assets" + PrefabPath.Substring(Application.dataPath.Length);
+            GameObject prefabRoot      = PrefabUtility.LoadPrefabContents(relativePath);
+            
+            if (prefabRoot == null)
+            {
+                Debug.LogError($"Failed to load prefab at path: {relativePath}");
+                return;
+            }
+            
+            //////////////////////////////////////////// Add component from script
+            
+            string      scriptName = Path.GetFileNameWithoutExtension(ScriptPath);
+            System.Type scriptType = System.Type.GetType($"TEST_THING.{scriptName}" + ", Assembly-CSharp");
+            
+            if (scriptType != null)
+            {
+                prefabRoot.AddComponent(scriptType);
+                Debug.Log($"Added component {scriptName} to prefab");
+            }
+            else
+            {
+                Debug.LogError($"Could not find script type {scriptName}. Make sure the script has been compiled.");
+            }
+            
+            //////////////////////////////////////////// Add cube named "model"
+            
+            GameObject cubeObj              = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cubeObj.name                    = "model";
+            cubeObj.transform               .SetParent(prefabRoot.transform);
+            cubeObj.transform.localPosition = Vector3.zero;
+            cubeObj.transform.localScale    = Vector3.one;
+            
+            //////////////////////////////////////////// Add material to cube
+            
+            string   materialAssetPath = "Assets" + MaterialPath.Substring(Application.dataPath.Length);
+            var      material          = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>(materialAssetPath);
+            
+            if (material != null)
+            {
+                MeshRenderer renderer = cubeObj.GetComponent<MeshRenderer>();
+                if (renderer != null)
+                {
+                    renderer.material = material;
+                    Debug.Log($"Applied material to cube model");
+                }
+            }
+            else
+            {
+                Debug.LogError($"Could not find material at path: {materialAssetPath}");
+            }
+            
+            //////////////////////////////////////////// Save the prefab
+            
+            PrefabUtility.SaveAsPrefabAsset(prefabRoot, prefabAssetPath);
+            PrefabUtility.UnloadPrefabContents(prefabRoot);
+            
+            ////////////////////////////////////////////
+            
+            Debug.Log($"Finished updating prefab at {prefabAssetPath}");
+        }
+    }    
 }
+
+
+#endif

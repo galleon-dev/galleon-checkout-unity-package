@@ -21,6 +21,7 @@ namespace Galleon.Checkout.Foundation
         {
             rootFolder            = new Folder();
             rootFolder.Path       = Folder.PACKAGE_ROOT_FOLDER_PATH;
+            rootFolder.FolderPath = Folder.PACKAGE_ROOT_FOLDER_PATH;
             rootFolder.FolderName = "package1";
         }
         

@@ -4,6 +4,5 @@ namespace Galleon.Checkout.Assets
     {
         public string Path;
         public string FolderPath;
-        
     }
 }

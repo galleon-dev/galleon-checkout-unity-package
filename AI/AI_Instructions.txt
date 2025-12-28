@@ -155,6 +155,14 @@ This is an instruction file for AI.
         > line
         > content
         
+        
+> Minimal
+    > Everything is a tree.
+        > Assets Tree, Hierarchy Tree, App Tree.
+        > Entity is a tree node. has actions such as AddChild, RemoveChild, OnAddedToTree, etc.
+        > When adding a child to a tree directly, the child is initialized/created and is an active part of the system.
+        > When adding a child via an operation, the child node is added but is considered a virtual "preview" and not active. when the operation will Apply, then the childs' content will be initialized. 
+        
 > Virtual Trees
     > Actual Tree
         > You can think of the project and the runtime app as a tree 

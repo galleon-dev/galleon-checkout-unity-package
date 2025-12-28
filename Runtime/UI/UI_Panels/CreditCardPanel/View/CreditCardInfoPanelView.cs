@@ -61,7 +61,6 @@ namespace Galleon.Checkout.UI
         bool                            IsValidCVV              = false;
         bool                            IsValidCreditCardNumber = false;
         bool                            IsValidDate             = false;
-        int                             expectedCVVLength       = 3;
         
         public GameObject               TestCardButton;
         
@@ -130,6 +129,10 @@ namespace Galleon.Checkout.UI
             // Remove card icon
             RemoveCardIcon();
 
+            // Reset card format
+            lastFormatUsed    = default;
+            CurrentCardFormat = default;
+            
             #if DEBUG
             TestCardButton.SetActive(false);
             #else
@@ -180,6 +183,11 @@ namespace Galleon.Checkout.UI
         {
             bool InputFieldsCorrect = true;
 
+            // Check if the credit card number starts with Amex prefix (34 or 37)
+            bool isAmex =  CreditCardNumberField.Text.Replace(" ", "").StartsWith("34") 
+                        || CreditCardNumberField.Text.Replace(" ", "").StartsWith("37");
+            int expectedCVVLength = isAmex ? 4 : 3;
+            
             string Info = "* Please Enter Information";
 
             if (string.IsNullOrEmpty(NameInputField.Text))

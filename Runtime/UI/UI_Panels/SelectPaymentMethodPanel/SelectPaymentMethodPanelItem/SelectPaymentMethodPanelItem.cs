@@ -121,7 +121,22 @@ namespace Galleon.Checkout.UI
             BonusContainer?.gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
             
             // Dropdown
-            PopulateDropdownItems();
+            bool shouldShowDropdown =  this.UserPaymentMethod != null 
+                                    && this.UserPaymentMethod.Data.type == "credit_card"
+                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Data.type == "credit_card") > 1;
+
+            if (shouldShowDropdown)
+            {                
+                this.DropdownButton.gameObject.SetActive(true);
+                this.DropdownArrow .gameObject.SetActive(true);
+                PopulateDropdownItems();
+            }
+            else
+            {
+                this.DropdownButton.gameObject.SetActive(false);
+                this.DropdownArrow .gameObject.SetActive(false);
+            }
+            
         }
         
         

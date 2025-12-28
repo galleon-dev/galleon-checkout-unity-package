@@ -167,8 +167,16 @@ namespace Galleon.Checkout.UI
 
                 item.Unselect();
             }
+            
+            SoftRefreshState();
 
             // SetButtonDisplay(SelectedItem?.PaymentMethod);
+        }
+        
+        public void SelectUserPaymentMethod(UserPaymentMethod selectedUPM)
+        {
+            selectedUPM.SelectExclusive();
+            SoftRefreshState();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events

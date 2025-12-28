@@ -105,7 +105,21 @@ namespace Galleon.Checkout.UI
             //         (IBonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
             // }
             
-            PopulateDropdownItems();
+            // Dropdown
+            bool shouldShowDropdown =  this.PaymentMethod.Data.type == "credit_card"
+                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Data.type == "credit_card") > 1;
+
+            if (shouldShowDropdown)
+            {
+                this.DropdownButton.gameObject.SetActive(true);
+                this.DropdownArrow .gameObject.SetActive(true);
+                PopulateDropdownItems();
+            }
+            else
+            {
+                this.DropdownButton.gameObject.SetActive(false);
+                this.DropdownArrow .gameObject.SetActive(false);
+            }
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -119,10 +133,12 @@ namespace Galleon.Checkout.UI
 
         public void Select()
         {
-            this.PaymentMethod?.Select();
-            this.CheckoutPanelView.OnRadiobuttonSelected(this);
+            this.CheckoutPanelView.SelectUserPaymentMethod(this.PaymentMethod);
             
-            this.CheckoutPanelView.SoftRefreshState();
+            // this.PaymentMethod?.Select();
+            // this.CheckoutPanelView.OnRadiobuttonSelected(this);
+            // 
+            // this.CheckoutPanelView.SoftRefreshState();
             //Refresh();
         }
 
@@ -130,7 +146,7 @@ namespace Galleon.Checkout.UI
         {
             this.PaymentMethod?.Unselect();
             
-            this.CheckoutPanelView.SoftRefreshState();
+            // this.CheckoutPanelView.SoftRefreshState();
             //Refresh();
         }
         

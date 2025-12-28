@@ -462,3 +462,17 @@ namespace Galleon.Checkout.Foundation.LiveOperationPpQuickSlices
 /// 1 - button that takes ">Thing #tags" and prints the Thing Asset, Puts the Thing in hierarchy, and applies the Tags.
 /// 2 - button that takes ">Bus:Thing #tags" and prints the Bus Asset inheriting from Thing, aplplies the Tags, and Puts the Bus in hierarchy.
 
+/// > Start from Package (with Folder p1 and Scene s1)
+/// > Read ">thing bla #tag tag tag"
+/// > Print Thing-Bla Assets
+///     > Apply Print Tags
+/// > Reload
+/// > Print Thing-Bla Hierarchy
+///     > Apply H Tags
+/// > Print Thing App node in app-tree > slice
+
+/// > Buttons :
+///     > [Package.Assets    + Thing.Asset]
+///     > [Package.Hierarchy + Thing.H    ]
+///     > [Thing.H           + Thing.Tags ]
+///     > [Package.Slice     + Thing.App  ]

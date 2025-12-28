@@ -46,6 +46,7 @@ namespace Galleon.Checkout.Assets
                 var oldPath     = Path;
                 var newPath     = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(oldPath) ?? string.Empty, this.FolderName);
                 this.Path       = newPath;
+                this.FolderPath = this.Path;
             }
             
             Directory.CreateDirectory(Path);
@@ -66,7 +67,8 @@ namespace Galleon.Checkout.Assets
             if (parent is not Asset parentAsset)
                 throw new Exception("FolderAsset.OnAddedToParent: Parent is not Asset");
 
-            this.Path = System.IO.Path.Combine(parentAsset.Path, this.FolderName);
+            this.Path       = System.IO.Path.Combine(parentAsset.Path, this.FolderName);
+            this.FolderPath = this.Path;
         }
         
         public void Rename(string newFolderName)
@@ -89,7 +91,8 @@ namespace Galleon.Checkout.Assets
                                                                                                                             //Debug.Log($"Exists1 = {Directory.Exists(oldPath)}");
                                                                                                                             //Debug.Log($"Exists2 = {Directory.Exists(newPath)}");
             
-            this.Path = newPath;
+            this.Path       = newPath;
+            this.FolderPath = this.Path;
             
             //////////////////////////////////////////
             

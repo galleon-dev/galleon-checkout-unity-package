@@ -111,7 +111,7 @@ namespace Galleon.Checkout.UI
                 item.Initialize(userPaymentMethod:userPaymentMethod, this);
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform); // seporator
                 
-                if (currentIndex++ > ScrollRectMaxSize)
+                if (currentIndex++ > 3)
                     await Task.Yield();
             }
             
