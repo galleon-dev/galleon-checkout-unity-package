@@ -74,25 +74,34 @@ namespace Galleon.Checkout
     
     public class ConfigValue : Entity
     {
-        //// Members
+        //////////////////////////////////////////////////// Types
         
-        public  string Key;
-        private object _value; 
-        public  object valueOverride = null;
+        public class PossibleValue { public string DisplayName; public  object Value; }
         
-        //// Properties
+        //////////////////////////////////////////////////// Members
         
-        public object Value => valueOverride != null ? valueOverride : _value;
+        public  string              Key;
+        private object              _value; 
+        public  object              valueOverride   = null;
         
-        //// Lifecycle
+        public string               displayName     = "";
+        public List<PossibleValue>  possibleValues  = new();
+        
+        public string               tag             = "";
+        
+        //////////////////////////////////////////////////// Properties
+        
+        public object               Value           => valueOverride != null ? valueOverride : _value;
+        
+        //////////////////////////////////////////////////// Lifecycle
 
         public ConfigValue(string key, object value)
         {
-            this.Key   = key;
+            this.Key    = key;
             this._value = value;
         }
         
-        //// Value Properties
+        //////////////////////////////////////////////////// Value Properties
         
         public bool   GetsBool                        => bool .Parse(Value.ToString());
         public int    GetsInt                         => int  .Parse(Value.ToString());
@@ -100,12 +109,16 @@ namespace Galleon.Checkout
         public string GetsString                      => Value.ToString();
         public T      Get<T>() where T : IConvertible => (T)Convert.ChangeType(Value, typeof(T));
         
+        //////////////////////////////////////////////////// Methods
         
-        
-        
-        //// Methods
-        
-        public void OverrideValue(object value) => this.valueOverride = value;
-        public void ClearOverrideValue()        => this.valueOverride = null;
+        public void OverrideValue(object value)
+        {
+            this.valueOverride = value;
+        }
+
+        public void ClearOverrideValue()
+        {
+            this.valueOverride = null;
+        }
     }
 }

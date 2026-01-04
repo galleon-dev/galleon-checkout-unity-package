@@ -172,16 +172,13 @@ namespace Galleon.Checkout.UI
             DropdownButton.ClearOptions();
             
             // Definitions
-            var pms = CHECKOUT.PaymentMethods.UserPaymentMethods.ToList();
-            
-            // add fake option
-            DropdownButton.options.Add(new TMP_Dropdown.OptionData("select saved payment method :"));
+            var myType      = this.PaymentMethod.Data.type;
+            var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Data.type == myType).Except(new []{this.PaymentMethod}).ToList();
+            var upms        = (new List<UserPaymentMethod>() { this.PaymentMethod }).Concat(otherUpms).ToList( );
             
             // Add options
-            foreach (var pm in pms)
-            {
+            foreach (var pm in upms)
                 DropdownButton.options.Add(new TMP_Dropdown.OptionData(pm.DisplayName, pm.GetIconSprite()));
-            }
         }
         
         public void UpdateItemPaymentMethod(UserPaymentMethod upm)

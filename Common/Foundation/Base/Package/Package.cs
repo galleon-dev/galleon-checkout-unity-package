@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Galleon.Checkout.Assets;
 using Galleon.Checkout.ELEMENTS;
+using Thing = Galleon.Checkout.ELEMENTS.Thing;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11,7 +12,7 @@ using UnityEditor;
 
 namespace Galleon.Checkout.Foundation
 {
-    public class Package : Entity
+    public class Package : VirtualEntity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
@@ -58,114 +59,260 @@ namespace Galleon.Checkout.Foundation
                         this.Assets.rootFolder.Node.Scan.Register();
                         this.Assets.rootFolder.Node.Scan.ScanRecursive();
                     });
-        public Step Do_APF() 
+        
+        
+        public Step DoAI() 
         =>
-            new Step(action : async (s) =>
+            new Step(name   : $"do_ai"
+                    ,action : async (s) =>
                     {
-                        await this.Assets.rootFolder.Node.Live.Plus_APF("> Folder f1");
-                    });
-        public Step Do_APFE1() 
-        =>
-            new Step(action : async (s) =>
-                    {
-                        await this.Assets.rootFolder.Node.Live.Plus_APFE1("> Folder f1");
-                    });
-        public Step Do_PPFE1M() 
-        =>
-            new Step(action : async (s) =>
-                    {
-                        await this.Node.Live.Plus_PPFE1M("> Folder f1");
-                    });
-        public Step Do_PPFE1() 
-        =>
-            new Step(action : async (s) =>
-                    {
-                        await this.Node.Live.Plus_PPFE1("> Folder f1");
-                    });
-        public Step Do_PpS1() 
-        =>
-            new Step(action : async (s) =>
-                    {
-                        await this.Node.Live.Plus_PpS1("> Scene s1");
-                    });
-        public Step Do_SpGO1() 
-        =>
-            new Step(action : async (s) =>
-                    {
-                        await this.Node.Live.Plus_SpGO1("> Gameobject go1");
-                    });
-        public Step Do_PpT1_M() 
-        =>
-            new Step(action : async (s) =>
-                    {
-                        await this.Node.Live.Plus_SpGO1("> Thing t1");
-                    });
-        public Step Do_PpQuickSlices() 
-        =>
-            new Step(action : async (s) =>
-                    {
-                        await this.Node.Live.Plus_PpQuickSlices("Oh Boy !");
-                    });
-        public Step Do_P_Plus_T_Direct() 
-        =>
-            new Step(action : async (s) =>
-                    {
-                        ///         /////////////////////// T.A
-                        ///         > P.A.F + T.A [v]
-                        ///         > P.A   + T.A [ ]
-                        ///         > P     + T.A [ ]
-                        ///         > P.A.F + T   [ ]
-                        ///         > P.A   + T   [ ]
-                        ///         > P     + T   [ ]
-                        ///         /////////////////////// F.A + T.A
-                        ///         > P.A.F + F.A + T.A [v]
-                        ///         > P.A   + F.A + T.A [ ]
-                        ///         > P     + F.A + T.A [ ]
-                        ///         > P.A.F + F   + T   [ ]
-                        ///         > P.A   + F   + T   [ ]
-                        ///         > P     + F   + T   [ ]
-                        
-                        #if UNITY_EDITOR
-                        
-                        this.Report().Execute();
-                        
-                        s.Log("// 1 - P.A.F + T.A");
-                        this.Assets.rootFolder.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_paf_p_qta" } );
-                        
-                        s.Log("// 2 - P.A + T.A");
-                        this.Assets.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_pa_p_qta" } );
-                        
-                        s.Log("// 2 - P + T.A");
-                        this.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_p_p_qta" } );
-                        
-                        
-                        #endif
+                        /// Entity
+                        /// Live
+                        /// Element
+                        /// Thing
+                        /// create code that does the things
                     });
         
-        public Step Do_P_Plus_T_Indirect() 
+        #region OLD
+        // public Step Do_APF() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 await this.Assets.rootFolder.Node.Live.Plus_APF("> Folder f1");
+        //             });
+        // public Step Do_APFE1() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 await this.Assets.rootFolder.Node.Live.Plus_APFE1("> Folder f1");
+        //             });
+        // public Step Do_PPFE1M() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 await this.Node.Live.Plus_PPFE1M("> Folder f1");
+        //             });
+        // public Step Do_PPFE1() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 await this.Node.Live.Plus_PPFE1("> Folder f1");
+        //             });
+        // public Step Do_PpS1() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 await this.Node.Live.Plus_PpS1("> Scene s1");
+        //             });
+        // public Step Do_SpGO1() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 await this.Node.Live.Plus_SpGO1("> Gameobject go1");
+        //             });
+        // public Step Do_PpT1_M() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 await this.Node.Live.Plus_SpGO1("> Thing t1");
+        //             });
+        // public Step Do_PpQuickSlices() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 await this.Node.Live.Plus_PpQuickSlices("Oh Boy !");
+        //             });
+        // public Step Do_P_Plus_T_Direct() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 ///         /////////////////////// T.A
+        //                 ///   1      > P.A.F + T.A [v]
+        //                 ///   2      > P.A   + T.A [v]
+        //                 ///   3      > P     + T.A [v]
+        //                 ///   4      > P.A.F + T   [ ]
+        //                 ///   5      > P.A   + T   [ ]
+        //                 ///   6      > P     + T   [ ]
+        //                 ///         /////////////////////// F.A + T.A
+        //                 ///   7      > P.A.F + F.A + T.A [v]
+        //                 ///   8      > P.A   + F.A + T.A [ ]
+        //                 ///   9      > P     + F.A + T.A [ ]
+        //                 ///   10     > P.A.F + F   + T   [ ]
+        //                 ///   11     > P.A   + F   + T   [ ]
+        //                 ///   12     > P     + F   + T   [ ]
+        //                 
+        //                 #if UNITY_EDITOR
+        //                 
+        //                 this.Report().Execute();
+        //                 
+        //                 s.Log("// 1 - P.A.F + T.A");
+        //                 // - Straign Forward add child + create
+        //                 this.Assets.rootFolder.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_1_paf_p_qta" } );
+        //                 
+        //                 s.Log("// 2 - P.A + T.A");
+        //                 // - parent = Get Default Entity
+        //                 this.Assets.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_2_pa_p_qta" } );
+        //                 
+        //                 s.Log("// 3 - P + T.A");
+        //                 // - mostly the same as 2
+        //                 this.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_3_p_p_qta" } );
+        //                 
+        //                 // theoretical : P.A.F + T.(A).A
+        //                 //
+        //                 
+        //                 s.Log("// 4 - P.A.F + T");
+        //                 // - zip namespaces - get only relevant tree using namespace
+        //                 this.Assets.rootFolder.Node.Live.Plus(new Checkout.ELEMENTS.QuickThing("thing_4_paf_p_t"));
+        //                 
+        //                 s.Log("// 5 - P.A + T");
+        //                 // - mostly same as 5
+        //                 this.Assets.Node.Live.Plus(new Checkout.ELEMENTS.QuickThing("thing_5_pa_p_t"));
+        //                 
+        //                 s.Log("// 6 - P + T");
+        //                 // - zip namespaces - add all namespaces 
+        //                 this.Node.Live.Plus(new Checkout.ELEMENTS.QuickThing("thing_6_p_p_t"));
+        //                 
+        //                 
+        //                 #endif
+        //             });
+        // 
+        // public Step Do_P_Plus_T_Indirect() 
+        // =>
+        //     new Step(action : async (s) =>
+        //             {
+        //                 /// /////////////////////// T.A
+        //                 ///         > P.A.F + T.A [v]
+        //                 ///         > P.A   + T.A [ ]
+        //                 ///         > P     + T.A [ ]
+        //                 ///         > P.A.F + T   [ ]
+        //                 ///         > P.A   + T   [ ]
+        //                 ///         > P     + T   [ ]
+        //                         
+        //                 #if UNITY_EDITOR
+        //                 
+        //                 this.Report().Execute();
+        //                 
+        //                 s.Log("// 1 - P.A.F + QT.A");
+        //                 this.Assets.rootFolder.Node.Live.Plus_Indirect("> Assets.QuickThing qta");
+        //                 
+        //                 #endif
+        //             });
+        
+        //////////////////////////////////////////////////////////////////////////////////// Thing
+        #endregion // OLD
+        
+        public Step PrepForThing() 
         =>
-            new Step(action : async (s) =>
+            new Step(name   : $"prep_for_thing"
+                    ,action : async (s) =>
                     {
-                        /// /////////////////////// T.A
-                        ///         > P.A.F + T.A [v]
-                        ///         > P.A   + T.A [ ]
-                        ///         > P     + T.A [ ]
-                        ///         > P.A.F + T   [ ]
-                        ///         > P.A   + T   [ ]
-                        ///         > P     + T   [ ]
-                                
-                        #if UNITY_EDITOR
+                        /// Package
+                        /// Element
+                        /// Core
+                    });
+        
+        
+        public Step CreateThing() 
+        =>
+            new Step(name   : $"create_thing"
+                    ,action : async (s) =>
+                    {   
+                        /// Pre :
+                        /// > Package Foundation
+                        ///     > Element Thing
+                        ///         > Assets    (Hardcoded) = Prefab, Script, Material.
+                        ///         > Hierarchy (Hardcoded) = Prefab, Component, GO_"model", Cube, Rigindbody, Collider.
+                        ///     > Assets
+                        ///         > Folder Thing
+                        ///             > Prefab Thing
+                        ///             > Script Thing
+                        ///             > Material Thing
+                        ///     > Hierarchy
+                        ///         > Scene S1
+                        ///         > Prefab Thing
+                        ///             > Component ting
+                        ///             > GO model
+                        ///                 > C Cube
+                        ///                     > ref material
+                        ///     > Core
+                        ///         > class with fields and flow.
+                        ///
+                        /// Prep :
+                        /// > Package1
+                        ///     > Dependencies = Foundation.
+                        ///
+                        /// Print text :
+                        /// > package1
+                        ///     > core
+                        ///         > thing t1
+                        ///         > thing t1 #tags
+                        ///         > thing t3 #tags "prompt"
+                        ///
+                        /// Result :
+                        /// > Package package1
+                        ///     > Assets
+                        ///         > A.Scene s1
+                        ///     > Hierarchy
+                        ///         > H.Scene s1
+                        ///             > prefab t1
+                        ///             > prefab t2
+                        ///             > prefab t3
+                        ///     > Core
+                        ///         > field Thing t1 
+                        ///         > field Thing t2 
+                        ///         > field Thing t3 
+
                         
-                        this.Report().Execute();
+                        //////////////////////////////////////////////////////////////////
                         
+                        /// Definitions
+                        Core           core         = new Core();
+                        ELEMENTS.Thing thingElement = new ELEMENTS.Thing(name : "Thing");
                         
-                        s.Log("// 1 - P.A.F + T.A");
-                        this.Assets.rootFolder.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_paf_p_qta" } );
+                        //////////////////////////////////////////////////////////////////
                         
-                        s.Log("// 2 - P.A + T.A");
-                        this.Assets.rootFolder.Node.Live.Plus(new Checkout.Assets.QuickThing() { thingName = "thing_pa_p_qta" } );
+                        /// Create default Hardcoded thing
+                        /// Thing t1 = new Thing(name : "t1");
+                        VirtualEntity thing1 = await thingElement.Instantiate(new Thing.ThingParams() { Name = "t1"});
                         
-                        #endif
+                        //////////////////////////////////////////////////////////////////
+                        
+                        /// Create default Hardcoded thing
+                        /// Thing t1 = new Thing(name : "t1");
+                        VirtualEntity thing2 = await thingElement.Instantiate(new Thing.ThingParams()
+                        {
+                                Name   = "t2",
+                                Tags   = new[] { "#tag" },
+                                Prompt = "",
+                        });
+                        
+                        //////////////////////////////////////////////////////////////////
+                        
+                        /// Plus Direct
+                        /// Package.Node.Plus(new Thing(name : "t1"));
+                        
+                        //////////////////////////////////////////////////////////////////
+                        
+                        /// Plus Op
+                        /// Package.Node.Plus("> Thing t1");
+                        
+                        //////////////////////////////////////////////////////////////////
+                    });
+        
+        public Step HardCopyThing() 
+        =>
+            new Step(name   : $"hard_copy_thing"
+                    ,action : async (s) =>
+                    {
+                        
+                    });
+        
+        public Step InheritThing() 
+        =>
+            new Step(name   : $"inherit_thing"
+                    ,action : async (s) =>
+                    {
+                        
                     });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
@@ -174,58 +321,53 @@ namespace Galleon.Checkout.Foundation
         {
             public Inspector(Package target) : base(target)
             {
-                Button btn_Report             = new Button(); this.Add(btn_Report);
-                btn_Report.clicked           += () => target.Report().Execute(); 
-                btn_Report.text               = "Report";
+                this.Add(new Button(() => target.Report       ().Execute()) { text = "report"         });
+                this.Add(new Button(() => target.Do_Rescan    ().Execute()) { text = "rescan"         });
+                this.Add(new Button(() => target.DoAI         ().Execute()) { text = "doai"           });
                 
-                Button btn_Rescan             = new Button(); this.Add(btn_Rescan);
-                btn_Rescan.clicked           += () => target.Do_Rescan().Execute(); 
-                btn_Rescan.text               = "Scan";
+                this.Add(new Button(() => target.CreateThing  ().Execute()) { text = "prep for thing" });
+                this.Add(new Button(() => target.CreateThing  ().Execute()) { text = "create thing"   });
+                this.Add(new Button(() => target.HardCopyThing().Execute()) { text = "hard copy thing"});
+                this.Add(new Button(() => target.InheritThing ().Execute()) { text = "inherit thing"  });
                 
-                ///
+                #region OLD
                 
-                Button btn_APF                 = new Button(); this.Add(btn_APF);
-                btn_APF.clicked               += () => target.Do_APF().Execute(); 
-                btn_APF.text                   = "A+F";
-                
-                Button btn_APFE1               = new Button(); this.Add(btn_APFE1);
-                btn_APFE1.clicked             += () => target.Do_APFE1().Execute(); 
-                btn_APFE1.text                 = "A+FE1";
-                
-                Button btn_PPFE1M              = new Button(); this.Add(btn_PPFE1M);
-                btn_PPFE1M.clicked            += () => target.Do_PPFE1M().Execute(); 
-                btn_PPFE1M.text                = "PPF1_M";
-                
-                Button btn_PPFE1               = new Button(); this.Add(btn_PPFE1);
-                btn_PPFE1.clicked             += () => target.Do_PPFE1().Execute(); 
-                btn_PPFE1.text                 = "P+F1";
-                
-                Button btn_PpS1                = new Button(); this.Add(btn_PpS1);
-                btn_PpS1.clicked              += () => target.Do_PpS1().Execute(); 
-                btn_PpS1.text                  = "P+S1";
-                
-                Button btn_SpGO1               = new Button(); this.Add(btn_SpGO1);
-                btn_SpGO1.clicked             += () => target.Do_SpGO1().Execute(); 
-                btn_SpGO1.text                 = "P+S1";
-                
-                Button btn_PpT1_M              = new Button(); this.Add(btn_PpT1_M);
-                btn_PpT1_M.clicked            += () => target.Do_PpT1_M().Execute(); 
-                btn_PpT1_M.text                = "P+T1_M";
-                
-                Button btn_PpQS              = new Button(); this.Add(btn_PpQS);
-                btn_PpQS.clicked            += () => target.Do_PpQuickSlices().Execute(); 
-                btn_PpQS.text                = "P + Quick-Slices";
-                
-                this.Add(new Button(() => target.Do_P_Plus_T_Direct()  .Execute()) { text = "P + T direct",   style = { marginRight = 500 }});
-                this.Add(new Button(() => target.Do_P_Plus_T_Indirect().Execute()) { text = "P + T indirect", style = { marginRight = 500 }});
-                
-                /// w1 - Direct / Indirect
-                ///     > Direct
-                ///     > Indirect
-                /// w2 - Thing + Tags
-                /// w3 - Prompt
-                /// w4 - Elements
+                // Button btn_APF                 = new Button(); this.Add(btn_APF);
+                // btn_APF.clicked               += () => target.Do_APF().Execute(); 
+                // btn_APF.text                   = "A+F";
+                // 
+                // Button btn_APFE1               = new Button(); this.Add(btn_APFE1);
+                // btn_APFE1.clicked             += () => target.Do_APFE1().Execute(); 
+                // btn_APFE1.text                 = "A+FE1";
+                // 
+                // Button btn_PPFE1M              = new Button(); this.Add(btn_PPFE1M);
+                // btn_PPFE1M.clicked            += () => target.Do_PPFE1M().Execute(); 
+                // btn_PPFE1M.text                = "PPF1_M";
+                // 
+                // Button btn_PPFE1               = new Button(); this.Add(btn_PPFE1);
+                // btn_PPFE1.clicked             += () => target.Do_PPFE1().Execute(); 
+                // btn_PPFE1.text                 = "P+F1";
+                // 
+                // Button btn_PpS1                = new Button(); this.Add(btn_PpS1);
+                // btn_PpS1.clicked              += () => target.Do_PpS1().Execute(); 
+                // btn_PpS1.text                  = "P+S1";
+                // 
+                // Button btn_SpGO1               = new Button(); this.Add(btn_SpGO1);
+                // btn_SpGO1.clicked             += () => target.Do_SpGO1().Execute(); 
+                // btn_SpGO1.text                 = "P+S1";
+                // 
+                // Button btn_PpT1_M              = new Button(); this.Add(btn_PpT1_M);
+                // btn_PpT1_M.clicked            += () => target.Do_PpT1_M().Execute(); 
+                // btn_PpT1_M.text                = "P+T1_M";
+                // 
+                // Button btn_PpQS              = new Button(); this.Add(btn_PpQS);
+                // btn_PpQS.clicked            += () => target.Do_PpQuickSlices().Execute(); 
+                // btn_PpQS.text                = "P + Quick-Slices";
+                // 
+                // this.Add(new Button(() => target.Do_P_Plus_T_Direct()  .Execute()) { text = "P + T direct",   style = { marginRight = 500 }});
+                // this.Add(new Button(() => target.Do_P_Plus_T_Indirect().Execute()) { text = "P + T indirect", style = { marginRight = 500 }});
 
+                #endregion // OLD
             }
         }   
     }

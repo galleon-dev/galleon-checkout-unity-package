@@ -484,7 +484,12 @@ namespace Galleon.Checkout.UI
             if (CurrentPage == PreselectionPage)
                 OnPageFinishedWithResult(NavigationStates.Close.ToString());
             else
-                OnPageFinishedWithResult(NavigationStates.Back.ToString());
+            {
+                if (CHECKOUT.Globals.IsPreselectionEnabled)
+                    OnPageFinishedWithResult(NavigationStates.Back.ToString());
+                else
+                    OnPageFinishedWithResult(NavigationStates.Close.ToString());
+            }
         }
 
         public void On_CloseClicked()

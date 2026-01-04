@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
@@ -102,10 +103,19 @@ namespace Galleon.Checkout.UI
             
             /////////////////////
             
+            List<string> addedPmTypes = new();
+            
+            
             // Add user payment methods children
             var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToSelect;
             foreach (var userPaymentMethod in userPaymentMethods)
             {
+                if (addedPmTypes.Contains(userPaymentMethod.Data.type))
+                    continue;
+                
+                addedPmTypes.Add(userPaymentMethod.Data.type);
+            
+                
                 var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
                 item.Initialize(userPaymentMethod:userPaymentMethod, this);

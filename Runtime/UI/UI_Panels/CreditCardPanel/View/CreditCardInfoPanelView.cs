@@ -227,7 +227,7 @@ namespace Galleon.Checkout.UI
                 InputFieldsCorrect = false;
             }
 
-            if (!IsValidCVV && !IsValidCreditCardNumber && !IsValidDate)
+            if (!IsValidCVV || !IsValidCreditCardNumber || !IsValidDate)
             {
                 Debug.Log("Invalid Entered Information");
                 InputFieldsCorrect = false;

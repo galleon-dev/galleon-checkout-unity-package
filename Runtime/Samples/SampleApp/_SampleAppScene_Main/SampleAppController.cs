@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.Samples;
@@ -39,13 +40,14 @@ namespace Galleon.SampleApp
         {
             ReportText.text = "> Initializing ... ";
             
-          //await CheckoutAPI.Initialize(new CheckoutConfiguration() { AppUserID = $"levan", ApplicationDisplayName = "Dice Dreams"} );
+            var user = $"test_user_{DateTime.Now.ToString()}";
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
                                             AppUserID              = $"test_user_{DateTime.Now.ToString()}",
                                             ApplicationDisplayName = "Dice Dreams"
-                                         
                                          } );
+            
+            StoreView.RefreshConfigPanel();
             
             Debug.Log($"Is Test Mode : {CHECKOUT.IsTest}");
             if (CHECKOUT.IsTest)
@@ -56,11 +58,83 @@ namespace Galleon.SampleApp
             }
             
             CHECKOUT.PaymentMethods.ClearSavedData();
-            RefreshConfig();
             
             SampleAppStart().Execute();
             
-            ReportText.text = "> ready";
+            ReportText.text = $"> ready. \n> user is <color=yellow>{user}</color>.";
+        }
+        
+        
+        public async Task Reinitialize()
+        {
+            ///////////////////////////////////////////////////////////////////////////////////// Reinitialize
+            
+            ReportText.text = "> User swapped - Reinitializing ... ";
+            
+            // cleanup
+            CheckoutClient.Instance.Cleanup();
+         
+            // define user Id
+            var appUserID = CHECKOUT.Globals.TestUser == "new" 
+                                                       ? $"test_user_{DateTime.Now.ToString()}" 
+                                                       : CHECKOUT.Globals.TestUser;
+            
+            // Reinitialize if needed
+            await CheckoutAPI.Initialize(new CheckoutConfiguration()
+                                         {
+                                            AppUserID              = appUserID,
+                                            ApplicationDisplayName = "Dice Dreams"
+                                         } );
+            
+            ReportText.text = $"> ready. \n> user is <color=yellow>{appUserID}</color>.";
+            
+        }
+        
+        public async Task Purchase()
+        { 
+            if (isInitializing) return;
+            
+            PurchaseResult result = default;
+            
+            if (CHECKOUT.Globals.TestProduct == "coins")
+            {
+                result = await CheckoutAPI.Purchase(new CheckoutProduct
+                                           { 
+                                               DisplayName = "Bunch Of Coins",
+                                               PriceText   = "$24.99",
+                                             //Sku         = "sku-1-3DS", 
+                                               Sku         = "sku-1",
+                                               Amount      = 100,
+                                               Currency    = "USD",
+                                           });
+                    
+            }
+            else if (CHECKOUT.Globals.TestProduct == "spins")
+            {
+                result = await CheckoutAPI.Purchase(new CheckoutProduct
+                                           { 
+                                               DisplayName = "Bunch Of Spins",
+                                               PriceText   = "$1000.99",
+                                               Sku         = "sku-2", 
+                                               Amount      = 200,
+                                               Currency    = "USD",
+                                           });
+            }
+            else if (CHECKOUT.Globals.TestProduct == "spins 3DS")
+            {
+                result = await CheckoutAPI.Purchase(new CheckoutProduct
+                                           { 
+                                               DisplayName = "Bunch Of Spins (3DS)",
+                                               PriceText   = "$1000.99",
+                                               Sku         = "sku-3-3DS", 
+                                               Amount      = 200,
+                                               Currency    = "USD",
+                                           });
+            }
+            
+            Debug.Log("==========================================");
+            Debug.Log("Purchase Result: " + result?.ToString());
+            Debug.Log("==========================================");
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle Steps
@@ -80,40 +154,32 @@ namespace Galleon.SampleApp
                     ,action : async (s) =>
                     {   
                     });
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
-        
-        public void On_DropdownValueChanged(int value)
-        {
-            RefreshConfig();
-        }
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
-        
-        public void RefreshConfig()
-        {
-            switch (this.StoreView.drp_preselection.captionText.text.ToLower())
-            {
-                case "enabled"  : CHECKOUT.Globals.IsPreselectionEnabled = true;           break;
-                case "disabled" : CHECKOUT.Globals.IsPreselectionEnabled = false;          break;
-                default         : CHECKOUT.Globals.clear_override_IsPreselectionEnabled(); break;
-            }
 
-            switch (this.StoreView.drp_footer.captionText.text.ToLower())
-            {
-                case "regular"    : CHECKOUT.Globals.ShowLongFooter = false;                break;
-                case "california" : CHECKOUT.Globals.ShowLongFooter = true;                 break;
-                default           : CHECKOUT.Globals.clear_override_ShowLongFooter();       break;
-            }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
 
-            switch (this.StoreView.drp_tax.captionText.text.ToLower())
+        string lastUser       = "new";
+        bool   isInitializing = false;
+        
+        public void Update()
+        {
+            if (isInitializing) return;
+            
+            if (lastUser != CHECKOUT.Globals.TestUser)
             {
-                case "inclusive" : CHECKOUT.Globals.ShowTaxBreakdown = false;               break;
-                case "show full" : CHECKOUT.Globals.ShowTaxBreakdown = true;                break;
-                default          : CHECKOUT.Globals.clear_override_ShowTaxBreakdown();      break;
+                lastUser = CHECKOUT.Globals.TestUser;
+                StartReinitializing();    
             }
         }
         
+        public async void StartReinitializing()
+        {
+            isInitializing = true;
+            StoreView.GetComponentsInChildren<TMP_Dropdown>().ToList().ForEach(x=> x.interactable = false);
+            await Reinitialize();
+            StoreView.GetComponentsInChildren<TMP_Dropdown>().ToList().ForEach(x=> x.interactable = true);
+            isInitializing = false;
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
         
         public Step TestPurchaseProduct1() 

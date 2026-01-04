@@ -1,74 +1,187 @@
 using System;
+using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.ELEMENTS;
+using Galleon.Checkout.Foundation;
 using UnityEngine;
 
 #if UNITY_EDITOR
+using System.IO;
 using UnityEditor;
 #endif
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace Galleon.Checkout.ELEMENTS
 {
     [Element("Thing")]
     public class Thing : Element
     {
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
+        
+        public class ThingParams
+        {
+            public string   Name;
+            public string[] Tags;
+            public string   Prompt;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
+        
         public Thing(string name) : base(name)
         {
         }
-    }
-}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-namespace Galleon.Checkout.RT
-{
-    [Element("Thing")]
-    public class Thing : Entity
-    {
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-namespace Galleon.Checkout.Assets
-{
-    [Element("Thing")]
-    public class Thing : Asset
-    {
-        public void CreateThingAsset() 
+        public async Task<VirtualEntity> Instantiate(ThingParams @thingParams)
         {
-            #if UNITY_EDITOR   
+            // create asset
+            // create hirarchy
+            // create app entity
+            
+            return default;
+        }
+        
+        
+        public void CreateQuickThingAsset()
+        {
+            #if UNITY_EDITOR
+            
+            ThingParams @params = new ThingParams()
+                                {
+                                    Name   = "t1",
+                                    Prompt = "",
+                                    Tags   = new [] { "" }
+                                };
+
+            Debug.Log($"Creating QuickThing Asset at {FolderPath}");
+
+            // Ensure the folder exists
+            if (!Directory.Exists(FolderPath))
+                Directory.CreateDirectory(FolderPath);
+
+            // Create all components t
+            CreatePrefab  (thingName: @params.Name);
+            CreateScript  (thingName: @params.Name);
+            CreateMaterial(thingName: @params.Name);
+
             #endif
         }
         
-        public void OnAddedToParent (IEntity parent)
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
+
+        public string FolderPath;
+        
+        #region Helper Methods
+        
+        /// <summary>
+        /// Creates a prefab with the given name
+        /// </summary>
+        /// <param name="thingName">Name of the prefab to create</param>
+        private void CreatePrefab(string thingName)
         {
+            #if UNITY_EDITOR
+
+            // Create a simple GameObject
+            GameObject gameObject = new GameObject(thingName);
+
+            // Create prefab path
+            string prefabFolder = System.IO.Path.Combine(FolderPath, "Prefabs");
+            if (!Directory.Exists(prefabFolder))
+                Directory.CreateDirectory(prefabFolder);
+
+            // Convert to relative asset path
+            string relativePath = "Assets" + prefabFolder.Substring(Application.dataPath.Length);
+            string prefabPath   = System.IO.Path.Combine(relativePath, thingName + ".prefab");
+
+            // Create the prefab
+            PrefabUtility.SaveAsPrefabAsset(gameObject, prefabPath);
+
+            // Destroy the temporary GameObject
+            UnityEngine.Object.DestroyImmediate(gameObject);
+
+            Debug.Log($"Created prefab: {prefabPath}");
+
+            #endif // UNITY_EDITOR
         }
-        
-        ////////////////////////////////////////////////////////////////////////
-        
-        public class LiveComponent : Foundation.LiveComponent<Thing> 
+
+        /// <summary>
+        /// Creates a MonoBehaviour script with the given name
+        /// </summary>
+        /// <param name="thingName">Name of the script to create</param>
+        private void CreateScript(string thingName)
         {
-            public override void Create()                        => Target.CreateThingAsset();
-            public override void OnAddedToParent(IEntity Parent) => Target.OnAddedToParent(Parent);
+            #if UNITY_EDITOR
+
+            // Create script folder
+            string scriptFolder = System.IO.Path.Combine(FolderPath, "Scripts");
+            if (!Directory.Exists(scriptFolder))
+            {
+                Directory.CreateDirectory(scriptFolder);
+            }
+
+            // Script template
+            string scriptTemplate =
+            @"using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace TEST_THING
+{
+    public class CLASS_NAME : MonoBehaviour
+    {
+        void Start()
+        {
+            
         }
     }
 }
+";
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-namespace Galleon.Checkout.Hierarchy
-{
-    [Element("Thing")]
-    public class Thing : Entity
-    {
-        public void CreateThingAsset() { Debug.Log($"Created Thing Hierarchy {Node.GetData<EntityNode.CRUD_Params>("CRUD_params")?.Name}"); } 
-        public void OnAddedToParent (IEntity Parent) {} 
-        
-        ////////////////////////////////////////////////////////////////////////
-        public class LiveComponent : Foundation.LiveComponent<Thing> 
-        {
-            public override void Create()                        => Target.CreateThingAsset();
-            public override void OnAddedToParent(IEntity Parent) => Target.OnAddedToParent(Parent);
+            // Format the template with the thing name
+            string scriptContent = scriptTemplate.Replace("CLASS_NAME", thingName);
+
+            // Write the script file
+            string scriptPath = System.IO.Path.Combine(scriptFolder, thingName + ".cs");
+            File.WriteAllText(scriptPath, scriptContent);
+
+            // Refresh the asset database
+            AssetDatabase.Refresh();
+
+            Debug.Log($"Created script: {scriptPath}");
+
+            #endif // UNITY_EDITOR
         }
+
+        /// <summary>
+        /// Creates a material with the given name
+        /// </summary>
+        /// <param name="thingName">Name of the thing to create material for</param>
+        private void CreateMaterial(string thingName)
+        {
+            #if UNITY_EDITOR
+
+            // Create material folder
+            string materialFolder = System.IO.Path.Combine(FolderPath, "Materials");
+            if (!Directory.Exists(materialFolder))
+                Directory.CreateDirectory(materialFolder);
+
+            // Create a new material
+            UnityEngine.Material material = new UnityEngine.Material(Shader.Find("Standard"));
+            material.color = Color.white;
+
+            // Convert to relative asset path
+            string relativePath = "Assets" + materialFolder.Substring(Application.dataPath.Length);
+            string materialPath = System.IO.Path.Combine(relativePath, thingName + "_material.mat");
+
+            // Save the material as an asset
+            AssetDatabase.CreateAsset(material, materialPath);
+            AssetDatabase.SaveAssets();
+
+            Debug.Log($"Created material: {materialPath}");
+
+            #endif // UNITY_EDITOR
+        }
+
+        #endregion // Helper Methods
     }
 }

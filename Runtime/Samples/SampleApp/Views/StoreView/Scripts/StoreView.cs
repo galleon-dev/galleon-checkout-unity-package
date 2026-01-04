@@ -25,8 +25,19 @@ namespace Galleon.Checkout.Samples
         public TMP_Dropdown drp_tax;
         public TMP_Dropdown drp_footer;
         
+        [Header("Config")]
+        public GameObject ConfigPanel;
+        public GameObject ConfigPanelItemTemplate;
+        
+        
         // Products
         public List<CheckoutProduct> Products = new List<CheckoutProduct>();
+        
+        
+        //////////////////////////////////////////////////////////////////////// Properties
+        
+        private SampleAppController _sampleAppController;
+        public SampleAppController SampleAppController => _sampleAppController ??= GameObject.FindObjectOfType<SampleAppController>();
         
         //////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -55,21 +66,59 @@ namespace Galleon.Checkout.Samples
         
         public async void PurchaseGalleon()
         {   
-            var result = await CheckoutAPI.Purchase(new CheckoutProduct
-                                           { 
-                                               DisplayName = "Bunch Of Coins",
-                                               PriceText   = "$24.99",
-                                             //Sku         = "sku-1-3DS", 
-                                               Sku         = "sku-1",
-                                               Amount      = 100,
-                                               Currency    = "USD",
-                                           });
-            
-            Debug.Log("==========================================");
-            Debug.Log("Purchase Result: " + result);
-            Debug.Log("==========================================");
+            await SampleAppController.Purchase();
         }   
         
+        //////////////////////////////////////////////////////////////////////// Config Dropdown Methods
+        
+        public async Task RefreshConfigPanel()
+        {
+            foreach (var configValue in CHECKOUT.Globals.GlobalValues)
+            {
+                // Instantiate item
+                var item     = Instantiate(ConfigPanelItemTemplate, ConfigPanel.transform);
+                item.SetActive(true);
+                
+                // Get ui components
+                var label    = item.GetComponentInChildren<TMP_Text>();
+                var dropdown = item.GetComponentInChildren<TMP_Dropdown>();
+                dropdown.gameObject.name = $"drp_{configValue.displayName}";
+                
+                // set label
+                label.text = configValue.displayName;
+                
+                // set options
+                dropdown.options.Clear();
+                foreach (var possibleValue in configValue.possibleValues)
+                    dropdown.options.Add(new TMP_Dropdown.OptionData(possibleValue.DisplayName));
+                
+                // set event
+                dropdown.onValueChanged.AddListener(delegate { ON_DropdownValueChanged(dropdown.value); });
+            }
+        }
+        
+        public void ON_DropdownValueChanged(int value)
+        {
+            var dropdowns = GetComponentsInChildren<TMP_Dropdown>();
+            foreach (var dropdown in dropdowns)
+            {
+                var configValue = CHECKOUT.Globals.GlobalValues.Find(x => x.displayName == dropdown.gameObject.name.Replace("drp_", ""));
+                
+                if (dropdown.value.ToString().ToLower() == "dont override")
+                    configValue.ClearOverrideValue();
+                else
+                {
+                    var valueDisplayName = dropdown.options[dropdown.value].text;
+                    var actualValue      = configValue.possibleValues.Find(x => x.DisplayName == valueDisplayName);
+                    configValue.OverrideValue(actualValue.Value);
+                }
+            }
+
+            foreach (var v in CHECKOUT.Globals.GlobalValues)
+            {
+                Debug.Log($"- {v.displayName, -15} = ({v.Value.GetType().Name}) {v.Value}");
+            }
+        }
         
         //////////////////////////////////////////////////////////////////////// Helper Methods
         

@@ -11,7 +11,7 @@ using UnityEditor;
 
 namespace Galleon.Checkout.Foundation
 {
-    public class Assets : Entity
+    public class Assets : VirtualEntity
     {
         public Folder rootFolder;
         

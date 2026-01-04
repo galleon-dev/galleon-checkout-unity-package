@@ -99,10 +99,17 @@ namespace Galleon.Checkout.UI
                 Destroy(child.gameObject);
             }
 
+            List<string> addedPmTypes = new();
+            
             // Add children
             var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
             foreach (var paymentMethod in paymentMethods)
             {
+                if (addedPmTypes.Contains(paymentMethod.Data.type))
+                    continue;
+                
+                addedPmTypes.Add(paymentMethod.Data.type);
+                
                 var go   = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
                 item.Initialize(paymentMethod, this);

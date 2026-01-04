@@ -6,7 +6,7 @@ using Galleon.Checkout.Foundation;
 
 namespace Galleon.Checkout.Foundation
 {
-public class DefinitionNode : Entity
+    public class DefinitionNode : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
