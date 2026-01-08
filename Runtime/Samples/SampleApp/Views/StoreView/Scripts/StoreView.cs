@@ -73,6 +73,12 @@ namespace Galleon.Checkout.Samples
         
         public async Task RefreshConfigPanel()
         {
+            // Destroy all existing children
+            foreach (Transform child in ConfigPanel.transform)
+                if (child.gameObject.activeSelf)
+                    Destroy(child.gameObject);
+            
+            
             foreach (var configValue in CHECKOUT.Globals.GlobalValues)
             {
                 // Instantiate item

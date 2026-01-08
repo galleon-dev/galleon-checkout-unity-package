@@ -55,10 +55,10 @@ namespace Galleon.Checkout.Foundation
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-        public Operation(string ID)
+        public Operation(string id)
         {
-            this.ID                       = ID;
-            this.Flow                     = new Step(name: $"operation_{ID}");
+            this.ID                       = id;
+            this.Flow                     = new Step(name: $"operation_{id}");
             this.Flow.PreChildStepAction  = (completedChildStep) =>
                                           {       
                                               this.OperationState.Op.CompletedStepIDs.Add(completedChildStep.Name);
@@ -67,7 +67,7 @@ namespace Galleon.Checkout.Foundation
                                           };
             this.Flow.PostStepAction      = (completedStep) =>
                                           {
-                                              Root.Instance.Context.Operations.OngoingOperations.Remove(ID);
+                                              Root.Instance.Context.Operations.OngoingOperations.Remove(id);
                                               Root.Instance.Context.Operations.Save();
                                           };
         }
@@ -521,11 +521,3 @@ namespace Galleon.Checkout
     }
     
 }
-
-/// > Elements
-///     > Element
-///     > Package
-///     > (Assets)
-///         > Folder
-///     > (Hierarchy)
-///         > Scene

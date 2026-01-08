@@ -61,10 +61,9 @@ namespace Galleon.Checkout
                         PaymentMethodsDefinitions.Node.DisplayName = "Payment Method Definitions";
                         UserPaymentMethods       .Node.DisplayName = "User Payment Methods";
                         
-                        s.AddChildStep(RefreshPaymentMethods());
-                        
-                        s.AddChildStep(InitializeDefinitions());
-                        s.AddChildStep(LoadLastUsedUserPaymentMethods());
+                        s.AddChildStep(RefreshPaymentMethods());            // Get from server    
+                        s.AddChildStep(InitializeDefinitions());            // setup (e.g. download images)
+                        s.AddChildStep(LoadLastUsedUserPaymentMethods());   // Load from storage
                     });
         
         public Step RefreshPaymentMethods()

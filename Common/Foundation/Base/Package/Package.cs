@@ -206,18 +206,23 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"prep_for_thing"
                     ,action : async (s) =>
                     {
-                        /// Package
-                        /// Element
-                        /// Core
+                        /// Thins.Slice1.Plus(thing t1)
+                        
+                        /// > Package p1
+                        ///     > Elements
+                        ///     > Slice slice1
+                        ///         > thing t1
+                        ///         > thing t2
+                        ///         > thing t3
                     });
         
         
-        public Step CreateThing() 
+        public Step CreateThing1() 
         =>
-            new Step(name   : $"create_thing"
+            new Step(name   : $"create_thing_1"
                     ,action : async (s) =>
                     {   
-                        /// Pre :
+                        /// ====================== Pre :
                         /// > Package Foundation
                         ///     > Element Thing
                         ///         > Assets    (Hardcoded) = Prefab, Script, Material.
@@ -237,18 +242,18 @@ namespace Galleon.Checkout.Foundation
                         ///     > Core
                         ///         > class with fields and flow.
                         ///
-                        /// Prep :
+                        /// ====================== Prep :
                         /// > Package1
                         ///     > Dependencies = Foundation.
-                        ///
-                        /// Print text :
+                        /// ====================== Print text :
+                        /// "
                         /// > package1
                         ///     > core
                         ///         > thing t1
                         ///         > thing t1 #tags
                         ///         > thing t3 #tags "prompt"
-                        ///
-                        /// Result :
+                        /// "
+                        /// ====================== Result :
                         /// > Package package1
                         ///     > Assets
                         ///         > A.Scene s1
@@ -262,34 +267,22 @@ namespace Galleon.Checkout.Foundation
                         ///         > field Thing t2 
                         ///         > field Thing t3 
 
-                        
                         //////////////////////////////////////////////////////////////////
                         
                         /// Definitions
                         Core           core         = new Core();
-                        ELEMENTS.Thing thingElement = new ELEMENTS.Thing(name : "Thing");
+                        ELEMENTS.Thing thingElement = Elements.ThingElement;
                         
                         //////////////////////////////////////////////////////////////////
                         
                         /// Create default Hardcoded thing
                         /// Thing t1 = new Thing(name : "t1");
-                        VirtualEntity thing1 = await thingElement.Instantiate(new Thing.ThingParams() { Name = "t1"});
-                        
-                        //////////////////////////////////////////////////////////////////
-                        
-                        /// Create default Hardcoded thing
-                        /// Thing t1 = new Thing(name : "t1");
-                        VirtualEntity thing2 = await thingElement.Instantiate(new Thing.ThingParams()
-                        {
-                                Name   = "t2",
-                                Tags   = new[] { "#tag" },
-                                Prompt = "",
-                        });
+                        VirtualEntity thing1 = await thingElement.Create(new Thing.ThingParams() { Name = "t1"});
                         
                         //////////////////////////////////////////////////////////////////
                         
                         /// Plus Direct
-                        /// Package.Node.Plus(new Thing(name : "t1"));
+                        /// Package.Node.Plus(new Thing(name : "t3"));
                         
                         //////////////////////////////////////////////////////////////////
                         
@@ -297,6 +290,29 @@ namespace Galleon.Checkout.Foundation
                         /// Package.Node.Plus("> Thing t1");
                         
                         //////////////////////////////////////////////////////////////////
+                    });
+        
+        
+        public Step CreateThing2() 
+        =>
+            new Step(name   : $"create_thing_2"
+                    ,action : async (s) =>
+                    {   
+                        /// Definitions
+                        Core           core         = new Core();
+                        ELEMENTS.Thing thingElement = Elements.ThingElement;
+                        
+                        //////////////////////////////////////////////////////////////////
+                        
+                        /// Create default Hardcoded thing
+                        /// Thing t1 = new Thing(name : "t1");
+                        VirtualEntity thing2 = await thingElement.Create(new Thing.ThingParams()
+                        {
+                                Name   = "t2",
+                                Tags   = new[] { "#tag" },
+                                Prompt = "",
+                        });
+                        
                     });
         
         public Step HardCopyThing() 
@@ -321,14 +337,15 @@ namespace Galleon.Checkout.Foundation
         {
             public Inspector(Package target) : base(target)
             {
-                this.Add(new Button(() => target.Report       ().Execute()) { text = "report"         });
-                this.Add(new Button(() => target.Do_Rescan    ().Execute()) { text = "rescan"         });
-                this.Add(new Button(() => target.DoAI         ().Execute()) { text = "doai"           });
+                this.Add(new Button(() => target.Report       ().Execute()) { text = "report"          });
+                this.Add(new Button(() => target.Do_Rescan    ().Execute()) { text = "rescan"          });
+                this.Add(new Button(() => target.DoAI         ().Execute()) { text = "doai"            });
                 
-                this.Add(new Button(() => target.CreateThing  ().Execute()) { text = "prep for thing" });
-                this.Add(new Button(() => target.CreateThing  ().Execute()) { text = "create thing"   });
-                this.Add(new Button(() => target.HardCopyThing().Execute()) { text = "hard copy thing"});
-                this.Add(new Button(() => target.InheritThing ().Execute()) { text = "inherit thing"  });
+                this.Add(new Button(() => target.PrepForThing ().Execute()) { text = "prep for thing"  });
+                this.Add(new Button(() => target.CreateThing1 ().Execute()) { text = "create thing 1"  });
+                this.Add(new Button(() => target.CreateThing2 ().Execute()) { text = "create thing 2"  });
+                this.Add(new Button(() => target.HardCopyThing().Execute()) { text = "hard copy thing" });
+                this.Add(new Button(() => target.InheritThing ().Execute()) { text = "inherit thing"   });
                 
                 #region OLD
                 

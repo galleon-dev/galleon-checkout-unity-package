@@ -104,8 +104,8 @@ namespace Galleon.Checkout.UI
 
         public Step SaveEmail()
         =>
-            new Step(name: $"save_email"
-                    , action: async (s) =>
+            new Step(name   : $"save_email"
+                    ,action : async (s) =>
                     {
                         CHECKOUT.User.UserInfo.email = this.EmailInputField.Text;
                         await CHECKOUT.Actions.SetEmail().Execute();

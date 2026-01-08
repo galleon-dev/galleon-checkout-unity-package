@@ -7,6 +7,7 @@ using Galleon.Checkout;
 using Galleon.Checkout.Samples;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -52,6 +53,8 @@ namespace Galleon.SampleApp
             Debug.Log($"Is Test Mode : {CHECKOUT.IsTest}");
             if (CHECKOUT.IsTest)
             {
+                StoreView.ConfigPanel.gameObject.GetComponentInParent<ScrollRect>().gameObject.SetActive(false);
+                
                 await Task.Delay(1000);
                 CheckoutClient.Instance.Storage.ClearAll();
                 Root.Instance.Runtime.TestController.Test().Execute();    

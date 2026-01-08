@@ -188,8 +188,6 @@ namespace Galleon.Checkout.UI
             this.Refresh();
         }
 
-        
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
         
         private void SetSeperatorColor(Color _Color, bool _Status)
@@ -209,8 +207,6 @@ namespace Galleon.Checkout.UI
             this.PaymentMethod     = paymentMethod;
             this.CheckoutPanelView = CheckoutPanelView;
             this.PaymentMethod?.Select();
-
-           
         }
     }
 }

@@ -859,3 +859,35 @@ namespace Galleon.Checkout
         #endregion // Network
     }    
 }
+
+
+/// > List
+///     > (ui)
+///         > success screen ui
+///         > flickering UI - Edgaras
+///         > Credit card panel issues
+///         > Dropdown issues
+///         > download images
+///         > Safe area
+///         > error labels still active on second session
+///     > (payment methods)
+///         > Server stuff payment methods - Naboni
+///         > select panel sorting
+///         > checkout panel sorting
+///         > last used upm ids
+///         > initialization supported pms
+///         > empty pms
+///         > native store
+///         > Type vs Data.type
+///         > all credit card numbers
+///     > (big)
+///         > Taxes
+///         > Performance
+///     > (other)
+///         > behind the scenes code
+///         > Excesive Refresh
+///         > Navitation and Back button
+///     > (test)
+///         > test scenarios
+///         > test report
+///         > logs

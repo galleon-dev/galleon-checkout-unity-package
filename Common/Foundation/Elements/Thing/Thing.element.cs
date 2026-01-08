@@ -4,9 +4,9 @@ using Galleon.Checkout;
 using Galleon.Checkout.ELEMENTS;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
+using System.IO;
 
 #if UNITY_EDITOR
-using System.IO;
 using UnityEditor;
 #endif
 
@@ -24,6 +24,10 @@ namespace Galleon.Checkout.ELEMENTS
             public string   Prompt;
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
+        
+        public string FolderPath => Application.dataPath + "/" + "package1/";
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public Thing(string name) : base(name)
@@ -32,44 +36,122 @@ namespace Galleon.Checkout.ELEMENTS
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
-        public async Task<VirtualEntity> Instantiate(ThingParams @thingParams)
+        public async Task<VirtualEntity> Create(ThingParams @thingParams)
         {
-            // create asset
-            // create hirarchy
-            // create app entity
-            
+            await CreateOp.Execute();
             return default;
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Operation
+
+        public Operation CreateOp => new Operation(id: "thing_operation")
+                                         .AddStep(CreateThingAsset())
+                                         .AddStep(new Step(name : "wait", action: async s => { await Task.Delay(5000); } ))
+                                         .AddStep(CreateThingHierarchy())
+                                         .AddStep(CreateThingApp());
+                                        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
         
-        public void CreateQuickThingAsset()
-        {
-            #if UNITY_EDITOR
+        public Step CreateThingAsset() 
+        =>
+            new Step(name   : $"create_thing_asset"
+                    ,action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
             
-            ThingParams @params = new ThingParams()
-                                {
-                                    Name   = "t1",
-                                    Prompt = "",
-                                    Tags   = new [] { "" }
-                                };
+                        ThingParams @params = new ThingParams()
+                                            {
+                                                Name   = "t1",
+                                                Prompt = "",
+                                                Tags   = new [] { "" }
+                                            };
 
-            Debug.Log($"Creating QuickThing Asset at {FolderPath}");
+                        var path = $"{FolderPath}{@params.Name}";
+                        Debug.Log($"Creating QuickThing Asset at {path}");
 
-            // Ensure the folder exists
-            if (!Directory.Exists(FolderPath))
-                Directory.CreateDirectory(FolderPath);
+                        // Ensure the folder exists
+                        if (!Directory.Exists(path))
+                            Directory.CreateDirectory(path);
 
-            // Create all components t
-            CreatePrefab  (thingName: @params.Name);
-            CreateScript  (thingName: @params.Name);
-            CreateMaterial(thingName: @params.Name);
+                        // Create all components t
+                        CreatePrefab  (thingName: @params.Name);
+                        CreateScript  (thingName: @params.Name);
+                        CreateMaterial(thingName: @params.Name);
 
-            #endif
-        }
+                        #endif
+                    });
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
+        
+        public Step CreateThingHierarchy() 
+        =>
+            new Step(name   : $"create_thing_hierarchy"
+                    ,action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
 
-        public string FolderPath;
+                        ThingParams @params = new ThingParams()
+                        {
+                            Name   = "t1",
+                            Prompt = "",
+                            Tags   = new [] { "" }
+                        };
+
+                        // Get paths
+                        string prefabPath   = System.IO.Path.Combine("Assets/package1/Thing/Prefabs",   @params.Name + ".prefab");
+                        string materialPath = System.IO.Path.Combine("Assets/package1/Thing/Materials", @params.Name + "_material.mat");
+
+                        // Load and instantiate the prefab
+                        GameObject prefabAsset    = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                        GameObject prefabInstance = PrefabUtility.InstantiatePrefab(prefabAsset) as GameObject;
+
+                        // Add the script component
+                        string scriptName = @params.Name;
+                        Type scriptType   = System.Type.GetType("TEST_THING." + scriptName + ", Assembly-CSharp");
+                        
+                        if (scriptType != null)
+                            prefabInstance.AddComponent(scriptType);
+
+                        // Create child cube
+                        GameObject modelGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        modelGO.name = "model";
+
+                        // Load and assign material
+                        var material = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>(materialPath);
+                        if (material != null)
+                        {
+                            MeshRenderer renderer = modelGO.GetComponent<MeshRenderer>();
+                            if (renderer != null)
+                            {
+                                renderer.sharedMaterial = material;
+                            }
+                        }
+
+                        // Set parent
+                        modelGO.transform.SetParent(prefabInstance.transform, false);
+
+                        // Save changes
+                        PrefabUtility.SaveAsPrefabAsset(prefabInstance, prefabPath);
+
+                        // Cleanup
+                        UnityEngine.Object.DestroyImmediate(prefabInstance);
+                        UnityEngine.Object.DestroyImmediate(modelGO);
+
+                        #endif
+                    });
+        
+        
+        public Step CreateThingApp() 
+        =>
+            new Step(name   : $"create_thing_app"
+                    ,action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
+            
+                        #endif
+                    });
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper methods
         
         #region Helper Methods
         
@@ -81,11 +163,13 @@ namespace Galleon.Checkout.ELEMENTS
         {
             #if UNITY_EDITOR
 
+            var path = $"{FolderPath}{thingName}";
+            
             // Create a simple GameObject
             GameObject gameObject = new GameObject(thingName);
 
             // Create prefab path
-            string prefabFolder = System.IO.Path.Combine(FolderPath, "Prefabs");
+            string prefabFolder = System.IO.Path.Combine(path, "Prefabs");
             if (!Directory.Exists(prefabFolder))
                 Directory.CreateDirectory(prefabFolder);
 
@@ -112,8 +196,10 @@ namespace Galleon.Checkout.ELEMENTS
         {
             #if UNITY_EDITOR
 
+            var path = $"{FolderPath}{thingName}";
+            
             // Create script folder
-            string scriptFolder = System.IO.Path.Combine(FolderPath, "Scripts");
+            string scriptFolder = System.IO.Path.Combine(path, "Scripts");
             if (!Directory.Exists(scriptFolder))
             {
                 Directory.CreateDirectory(scriptFolder);
@@ -160,14 +246,17 @@ namespace TEST_THING
         {
             #if UNITY_EDITOR
 
+            var path = $"{FolderPath}{thingName}";
+            
             // Create material folder
-            string materialFolder = System.IO.Path.Combine(FolderPath, "Materials");
+            string materialFolder = System.IO.Path.Combine(path, "Materials");
+            
             if (!Directory.Exists(materialFolder))
                 Directory.CreateDirectory(materialFolder);
 
             // Create a new material
             UnityEngine.Material material = new UnityEngine.Material(Shader.Find("Standard"));
-            material.color = Color.white;
+            material.color                = Color.white;
 
             // Convert to relative asset path
             string relativePath = "Assets" + materialFolder.Substring(Application.dataPath.Length);

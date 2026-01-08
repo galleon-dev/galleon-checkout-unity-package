@@ -27,8 +27,8 @@ namespace Galleon.Checkout
         //public string SERVER_BASE_URL = "https://localhost:4000/v1";
         //public string SERVER_BASE_URL = "https://galleon-bridge-server-production.up.railway.app";
         //public string SERVER_BASE_URL = "http://localhost:3000";
-        //public string SERVER_BASE_URL = "https://bridge-staging-api.galleon.so";
-        public string SERVER_BASE_URL   = "https://galleon-bridge-server-paypal-integration.up.railway.app";
+        public string SERVER_BASE_URL = "https://bridge-staging-api.galleon.so";
+        //public string SERVER_BASE_URL   = "https://galleon-bridge-server-paypal-integration.up.railway.app";
         
         public const int TIMEOUT_MILLISECONDS = 10000;
         
