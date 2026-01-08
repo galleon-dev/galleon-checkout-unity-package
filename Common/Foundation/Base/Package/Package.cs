@@ -16,9 +16,12 @@ namespace Galleon.Checkout.Foundation
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
+        // Design Time
         public Elements Elements = new Elements();
         public Assets   Assets   = new Assets();
-        public Core     Core     = new Core();
+        
+        // Runtime
+        public Core Core = new Core();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -42,7 +45,7 @@ namespace Galleon.Checkout.Foundation
             // this.Node.Scan.Scan();
         }
         
-        //////////////////////////////////////////////////////////////////////////////////// TEMP
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// TEMP
         
         public Step Report() 
         =>
@@ -208,12 +211,45 @@ namespace Galleon.Checkout.Foundation
                     {
                         /// Thins.Slice1.Plus(thing t1)
                         
-                        /// > Package p1
-                        ///     > Elements
-                        ///     > Slice slice1
-                        ///         > thing t1
-                        ///         > thing t2
-                        ///         > thing t3
+                        /// > Root                                        [V]  # hardcoded
+                        ///     > Context                                 [V]  # hardcoded
+                        ///         > Slices
+                        ///             > Slice Slice1                    [ ]  # ve
+                        ///         > Project
+                        ///             > Package foundation              [ ]  # scan
+                        ///             > Package package1                [ ]  # scan
+                        ///                 > (Definitions)                 
+                        ///                     > Slice Sliec1            [ ]  # text
+                        ///                         > Thing t1            [ ]  # text
+                        ///                         > Thing t2            [ ]  # text
+                        ///                         > Thing t3            [ ]  # text
+                        ///                 > (Elements)                    
+                        ///                 > (Assets)                      
+                        ///                 > (Hierarchy)
+                        ///                 > (Slices)
+                        ///                     > Slice slice1            [ ]  # ve, in memory
+                        ///                         > thing t1            [ ]  # ve, in memory
+                        ///                         > thing t2            [ ]  # ve, in memory
+                        ///                         > thing t3            [ ]  # ve, in memory
+                        /// 
+                        ///     > Runtime                                 [V]  # hardcoded
+                        ///         > App                                 [ ]  # hardcoded
+                        ///             > Core                            [ ]  # class instance, hardcoded
+                        ///                 > Slice Slice1                [ ]  # class instance, runtime
+                        ///                     > Thing t1                [ ]  # class instance, runtime
+                        ///                     > Thing t2                [ ]  # class instance, runtime
+                        ///                     > Thing t3                [ ]  # class instance, runtime
+                        
+                        /// 1. Verify Package (IDs, entities, scene, core, etc)
+                        /// 2. Verify Definitions (texts)
+                        /// 3. Verify Slices (Ve)
+                        /// 4. Print.
+                        ///     > Elements (ve)
+                        ///     > t1 t2 t3 (ve)
+                        ///     > crud create
+                        ///     > Elements (classes)
+                        ///     > t1 t2 t3 (classes)
+                        /// 5. available in runtime : t1 t2 t3
                     });
         
         
@@ -389,3 +425,4 @@ namespace Galleon.Checkout.Foundation
         }   
     }
 }
+ 

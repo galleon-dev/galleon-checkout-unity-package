@@ -866,6 +866,10 @@ namespace Galleon.Checkout
 ///         > success screen ui
 ///         > flickering UI - Edgaras
 ///         > Credit card panel issues
+///             > page height with keyboard
+///             > background closeing too easily
+///             > on lose focus - goes to CVV field
+///             > doesnt offer autofill
 ///         > Dropdown issues
 ///         > download images
 ///         > Safe area
