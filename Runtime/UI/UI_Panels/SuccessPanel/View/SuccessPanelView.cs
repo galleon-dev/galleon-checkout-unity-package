@@ -96,7 +96,16 @@ namespace Galleon.Checkout.UI
         public async void On_FinishedEditingEmail(string str, EndEditReason reason)
         {
             bool valid      = ValidateEmail(EmailInputField.Text);
-            ErrorText.text  = valid ? "" : "Invalid email format";
+
+            if (!string.IsNullOrEmpty(EmailInputField.Text))
+            {
+                ErrorText.text = valid ? "" : "Invalid email format";
+            }
+            else
+            {
+                ErrorText.text = "";
+            }
+
             ErrorText.gameObject.SetActive(!valid);
         }
 
