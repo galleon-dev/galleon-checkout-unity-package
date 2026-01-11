@@ -1363,7 +1363,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 4976091989052601655}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.5380209
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11130,6 +11130,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3390146204628411425, guid: 44730b4adf4854df297dc470716bd84c, type: 3}
+      propertyPath: m_Color.b
+      value: 0.9529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 3390146204628411425, guid: 44730b4adf4854df297dc470716bd84c, type: 3}
+      propertyPath: m_Color.g
+      value: 0.7411765
+      objectReference: {fileID: 0}
+    - target: {fileID: 3390146204628411425, guid: 44730b4adf4854df297dc470716bd84c, type: 3}
+      propertyPath: m_Color.r
+      value: 0.28627452
+      objectReference: {fileID: 0}
     - target: {fileID: 4079975247515242497, guid: 44730b4adf4854df297dc470716bd84c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -11486,6 +11498,10 @@ PrefabInstance:
       propertyPath: m_Size
       value: 0.99999994
       objectReference: {fileID: 0}
+    - target: {fileID: 8231337187995558662, guid: 44730b4adf4854df297dc470716bd84c, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8897648993267363837, guid: 44730b4adf4854df297dc470716bd84c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -11502,7 +11518,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6056773106732532298, guid: 44730b4adf4854df297dc470716bd84c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 44730b4adf4854df297dc470716bd84c, type: 3}
 --- !u!114 &1850749232303880495 stripped
 MonoBehaviour:
