@@ -21,6 +21,7 @@ public class SettingsPanelView : View
 
     [Header("Payment Methods")]
     public GameObject           SettingsPanelPaymentMethodItemPrefab;
+    public GameObject           SettingsPanelTogglePrefab;
     public GameObject           PaymentMethodsHolder;
     public bool                 IsEditingEmail = false;
     public GameObject           InformationalLabel;
@@ -96,37 +97,47 @@ public class SettingsPanelView : View
             Destroy(child.gameObject);
         }
 
+        int rowCount = 0;
+        
         // Add children
         var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToRemove;
         foreach (var paymentMethod in paymentMethods)
         {
+            // Item
             var go   = Instantiate(original: SettingsPanelPaymentMethodItemPrefab, parent: PaymentMethodsHolder.transform);
             var item = go.GetComponent<SettingsPanelPaymentMethodItem>();
             item.Initialize(paymentMethod, this);
 
             // Add ui separator
             Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsHolder.transform);
+            
+            rowCount++;
+        }
+        
+        // Native store toggle Prefab
+        if (CHECKOUT.Globals.IsNativeStoreToggleEnabled)
+        {
+            // Item
+            var go   = Instantiate(original: SettingsPanelTogglePrefab, parent: PaymentMethodsHolder.transform);
+            var item = go.GetComponent<SettingsPanelToggleItem>();
+            var nativeStore = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.Data.type == "native");
+            item.Initialize(nativeStore, this);
+
+            // Add ui separator
+            Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsHolder.transform);
+            
+            rowCount++;
         }
 
-        if (paymentMethods.Count() == 0)
-        {
-            InformationalLabel.SetActive(true);
-            Gap.SetActive(true);
-            ScrollRectLayoutElement.gameObject.SetActive(false);
-        }
-        else
-        {
-            InformationalLabel.SetActive(false);
-            Gap.SetActive(false);
-            ScrollRectLayoutElement.gameObject.SetActive(true);
-        }
+        // Set UI
+        InformationalLabel.SetActive(rowCount == 0);
+        Gap.SetActive(rowCount == 0);
+        ScrollRectLayoutElement.gameObject.SetActive(rowCount != 0);
+        
 
         // Email
-        //if (!CHECKOUT.User.Email.IsNullOrEmpty())
         if (!string.IsNullOrEmpty(CHECKOUT.User.Email))
-        {
             this.EmailInputField.Text = CHECKOUT.User.Email;
-        }
 
         UpdateScrollRectMaxSize();
     }
@@ -137,6 +148,9 @@ public class SettingsPanelView : View
     {
         int PaymentMethodsAmount = CHECKOUT.PaymentMethods.UserPaymentMethodsToRemove.Count; // CHECKOUT.PaymentMethods.UserPaymentMethods.Count;
 
+        if (CHECKOUT.Globals.IsNativeStoreToggleEnabled)
+            PaymentMethodsAmount++;
+        
         // Debug.Log("<color=green>UpdateScrollRectMaxSize(): </color>" + PaymentMethodsAmount);
 
         if (PaymentMethodsAmount <= 1)
@@ -166,7 +180,7 @@ public class SettingsPanelView : View
 
     public void On_EditEmailInputFieldClicked()
     {
-        EmailInputfieldBorder.SetActive(true);
+        EmailInputfieldBorder.SetActive(true); 
         EmailEditButton.SetActive(false);
         IsEditingEmail = true;
     }

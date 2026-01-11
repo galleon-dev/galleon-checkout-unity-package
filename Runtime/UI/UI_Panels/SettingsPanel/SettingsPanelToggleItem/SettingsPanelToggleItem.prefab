@@ -39,8 +39,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 851.7, y: -100}
-  m_SizeDelta: {x: 197.6, y: 0}
+  m_AnchoredPosition: {x: 865.8667, y: -100}
+  m_SizeDelta: {x: 203.26668, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6104901097220501151
 CanvasRenderer:
@@ -268,7 +268,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8934080953449315821}
+  - {fileID: 9007981352216554665}
+  - {fileID: 5913969024948030837}
   m_Father: {fileID: 7165898315503996398}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -315,7 +316,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1 &4025923966090837628
+--- !u!1 &1550477940171877430
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -323,68 +324,66 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8934080953449315821}
-  - component: {fileID: 3888882076315451005}
-  - component: {fileID: 6609441323272793174}
-  - component: {fileID: 2700293274020976301}
-  - component: {fileID: 3962453556083895122}
+  - component: {fileID: 5913969024948030837}
+  - component: {fileID: 1601524157578160337}
+  - component: {fileID: 2948027103663408133}
+  - component: {fileID: 6230959169446321124}
   m_Layer: 5
-  m_Name: DeleteButton
+  m_Name: ToggleOn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &8934080953449315821
+--- !u!224 &5913969024948030837
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4025923966090837628}
+  m_GameObject: {fileID: 1550477940171877430}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 9007981352216554665}
+  m_Children: []
   m_Father: {fileID: 5435192764736308039}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 1, y: 0.5}
---- !u!222 &3888882076315451005
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 11.1974, y: 0}
+  m_SizeDelta: {x: 135.8718, y: 135.8718}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1601524157578160337
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4025923966090837628}
+  m_GameObject: {fileID: 1550477940171877430}
   m_CullTransparentMesh: 1
---- !u!114 &6609441323272793174
+--- !u!114 &2948027103663408133
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4025923966090837628}
+  m_GameObject: {fileID: 1550477940171877430}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 936b22414b1e346e8942fa755f58db42, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -394,13 +393,13 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2700293274020976301
+--- !u!114 &6230959169446321124
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4025923966090837628}
+  m_GameObject: {fileID: 1550477940171877430}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -413,7 +412,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -434,14 +433,13 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 5419161502324705223}
+  m_TargetGraphic: {fileID: 2948027103663408133}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2014537567208020232}
-        m_TargetAssemblyTypeName: Galleon.Checkout.UI.SettingsPanelPaymentMethodItem,
-          CheckoutRuntime
-        m_MethodName: On_Delete_Clicked
+      - m_Target: {fileID: -6475184035954769802}
+        m_TargetAssemblyTypeName: Galleon.Checkout.UI.SettingsPanelToggleItem, CheckoutRuntime
+        m_MethodName: On_ToggleClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -451,26 +449,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &3962453556083895122
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4025923966090837628}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: -1
-  m_PreferredHeight: -1
-  m_FlexibleWidth: 0
-  m_FlexibleHeight: -1
-  m_LayoutPriority: 1
 --- !u!1 &4243681361402612360
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,8 +644,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 454.6, y: -100}
-  m_SizeDelta: {x: 596.6, y: 0}
+  m_AnchoredPosition: {x: 463.1, y: -100}
+  m_SizeDelta: {x: 602.26666, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7556979255853449171
 CanvasRenderer:
@@ -778,8 +756,9 @@ GameObject:
   - component: {fileID: 9007981352216554665}
   - component: {fileID: 7247635655455920551}
   - component: {fileID: 5419161502324705223}
+  - component: {fileID: 6541505743822507245}
   m_Layer: 5
-  m_Name: Image
+  m_Name: ToggleOff
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -797,13 +776,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8934080953449315821}
+  m_Father: {fileID: 5435192764736308039}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 55, y: 55}
+  m_AnchoredPosition: {x: 11.1974, y: 0}
+  m_SizeDelta: {x: 135.8718, y: 135.8718}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7247635655455920551
 CanvasRenderer:
@@ -833,7 +812,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 890a39c6778974e3dbb45ac34669ee45, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b6e7d38fd1ced478e92aa17212e28e05, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -843,6 +822,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6541505743822507245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5164544037013861539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 0
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 5419161502324705223}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: -6475184035954769802}
+        m_TargetAssemblyTypeName: Galleon.Checkout.UI.SettingsPanelToggleItem, CheckoutRuntime
+        m_MethodName: On_ToggleClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &7171552036384497171
 GameObject:
   m_ObjectHideFlags: 0
@@ -996,8 +1031,8 @@ GameObject:
   - component: {fileID: 4828519191681380873}
   - component: {fileID: 4122679712860225624}
   - component: {fileID: 1611203847791048212}
-  - component: {fileID: 2014537567208020232}
   - component: {fileID: 5194677205292208613}
+  - component: {fileID: -6475184035954769802}
   m_Layer: 5
   m_Name: SettingsPanelToggleItem
   m_TagString: Untagged
@@ -1074,31 +1109,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &2014537567208020232
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7680502671548463619}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1e5c7a9e2b643c5b93133892d5f878, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  State: 
-  Style: 
-  Icon: {fileID: 6990231699032197488}
-  Label: {fileID: 6331362545374699674}
-  AddCreditCardSprite: {fileID: 0}
-  VisaSprite: {fileID: 21300000, guid: 54af3a5b0ad25486686bf58f83e5febb, type: 3}
-  MasterCardSprite: {fileID: 21300000, guid: 060266ce6dce0453e9d1bddca94041bd, type: 3}
-  AmexSprite: {fileID: 21300000, guid: 8cfabe0a540fd40efa7d818a3fd60580, type: 3}
-  DinersSprite: {fileID: 21300000, guid: 9399fe7c601404a018819aaee499a096, type: 3}
-  DiscoverSprite: {fileID: 21300000, guid: 3dc754117a52c4dedb763e81096a0f8e, type: 3}
-  GPaySprite: {fileID: 21300000, guid: 3a393fe2ee54c47b5bd1a96013908228, type: 3}
-  PaypalSprite: {fileID: 21300000, guid: e27a3742f02f74d9da8a1d1973bd08e5, type: 3}
-  AppleSprite: {fileID: 21300000, guid: 96a32379447a78d40955bea3c8b9f25c, type: 3}
 --- !u!114 &5194677205292208613
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1113,3 +1123,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!114 &-6475184035954769802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7680502671548463619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de0d46253c8e1466993a572d27e5405c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 
+  Style: 
+  Icon: {fileID: 6990231699032197488}
+  Label: {fileID: 6331362545374699674}
+  ToggleOffGO: {fileID: 5164544037013861539}
+  ToggleOnGO: {fileID: 1550477940171877430}

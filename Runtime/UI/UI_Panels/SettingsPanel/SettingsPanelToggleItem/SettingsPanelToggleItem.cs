@@ -15,6 +15,9 @@ namespace Galleon.Checkout.UI
         public Image    Icon;
         public TMP_Text Label;
         
+        public GameObject ToggleOffGO;
+        public GameObject ToggleOnGO;
+        
         //// Properties
         
         public UserPaymentMethod UserPaymentMethod { get; set; }
@@ -35,14 +38,17 @@ namespace Galleon.Checkout.UI
         {    
             this.Label.text  = UserPaymentMethod?.DisplayName;
             this.Icon.sprite = this.UserPaymentMethod?.GetIconSprite();
+            
+            this.ToggleOffGO.SetActive(!CHECKOUT.Globals.IsNativeStoreEnabled);
+            this.ToggleOnGO.SetActive( CHECKOUT.Globals.IsNativeStoreEnabled);
         }
 
         //// UI Events
 
-        public void On_Delete_Clicked()
+        public void On_ToggleClicked()
         {
-            Debug.Log((this.UserPaymentMethod?.DisplayName??"NULL") + "_delete clicked");
-            this.SettingsPanelView.DeletePaymentMethod(this.UserPaymentMethod);
+            CHECKOUT.Globals.IsNativeStoreEnabled = !CHECKOUT.Globals.IsNativeStoreEnabled;
+            RefreshState();
         }
     }
 }

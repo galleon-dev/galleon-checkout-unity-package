@@ -891,6 +891,7 @@ namespace Galleon.Checkout
 ///         > Taxes
 ///         > Performance
 ///     > (other)
+///         > authentication token from dice
 ///         > behind the scenes code
 ///         > Excesive Refresh
 ///         > Navitation and Back button
