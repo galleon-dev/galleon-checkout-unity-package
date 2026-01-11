@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class CheckoutAPI
+    public class CheckoutAPI 
     {   
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main API
         
