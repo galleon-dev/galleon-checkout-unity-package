@@ -871,6 +871,9 @@ namespace Galleon.Checkout
 ///             > on lose focus - goes to CVV field
 ///             > doesnt offer autofill
 ///         > Dropdown issues
+///             > ui
+///             > IDs
+///             > click area
 ///         > download images
 ///         > Safe area
 ///         > error labels still active on second session

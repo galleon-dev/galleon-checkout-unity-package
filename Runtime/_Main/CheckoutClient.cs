@@ -174,7 +174,7 @@ namespace Galleon.Checkout
          
         public static CheckoutGlobals           Globals         => CheckoutClient.Instance.CheckoutGlobals;
         
-        public static CheckoutScreenMobile      Screen         => CheckoutClient.Instance.CheckoutScreenMobile;
+        public static CheckoutScreenMobile      Screen          => CheckoutClient.Instance.CheckoutScreenMobile;
         
         public static CheckoutResources         Resources       => CheckoutClient.Instance.Resources;
         public static CheckoutSprites           Sprites         => Resources.Sprites;
