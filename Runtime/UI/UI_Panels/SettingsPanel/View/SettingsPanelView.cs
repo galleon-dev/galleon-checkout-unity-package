@@ -201,7 +201,14 @@ public class SettingsPanelView : View
         IsEditingEmail = false;
 
         bool valid = ValidateEmail(EmailInputField.Text);
-        emailErrorText.text = valid ? "" : "Invalid email format";
+
+        if (!string.IsNullOrEmpty(EmailInputField.Text))
+        {
+            emailErrorText.text = valid ? "" : "Invalid email format";
+        } else
+        {
+            emailErrorText.text = "";
+        }
        
         if (valid)
         {
