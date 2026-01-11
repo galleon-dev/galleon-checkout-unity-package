@@ -296,7 +296,6 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"View_{page.Name}_page"
                     ,action : async (s) =>
                     {
-                        
                         ///////////////////////// Setup
 
                         page.Setup?.Invoke(page);
@@ -306,7 +305,6 @@ namespace Galleon.Checkout.UI
                         this.HeaderPanelView.State = page.headerState;
                         this.State                 = page.panelState;
                         this.FooterPanelView.State = page.FooterState;
-
                         
                         ///////////////////////// Page
 
@@ -484,7 +482,12 @@ namespace Galleon.Checkout.UI
             if (CurrentPage == PreselectionPage)
                 OnPageFinishedWithResult(NavigationStates.Close.ToString());
             else
-                OnPageFinishedWithResult(NavigationStates.Back.ToString());
+            {
+                if (CHECKOUT.Globals.IsPreselectionEnabled)
+                    OnPageFinishedWithResult(NavigationStates.Back.ToString());
+                else
+                    OnPageFinishedWithResult(NavigationStates.Close.ToString());
+            }
         }
 
         public void On_CloseClicked()
@@ -507,6 +510,12 @@ namespace Galleon.Checkout.UI
         {
             IsPageActive = false;
             CurrentPage.PageResult = result;
+        }
+
+        private void LateUpdate()
+        {
+            //Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(contentTransform);
         }
 
         void Update()
@@ -566,7 +575,7 @@ namespace Galleon.Checkout.UI
                 view.Call("getWindowVisibleDisplayFrame", rect);                                                                    // Get visible frame dimensions
                 int visibleHeight           = rect.Call<int>("height");                                                             // Get height of visible frame
                 var footerHeight            = (this.FooterPanelView.transform as RectTransform).rect.height;                        // Get footer height
-            
+
                 // Calculate actual keyboard height by comparing screen height to visible frame height
                 float actualKeyboardHeight = (UnityEngine.Screen.height - visibleHeight) - footerHeight;
 

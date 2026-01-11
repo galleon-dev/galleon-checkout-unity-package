@@ -99,10 +99,17 @@ namespace Galleon.Checkout.UI
                 Destroy(child.gameObject);
             }
 
+            List<string> addedPmTypes = new();
+            
             // Add children
             var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
             foreach (var paymentMethod in paymentMethods)
             {
+                if (addedPmTypes.Contains(paymentMethod.Data.type))
+                    continue;
+                
+                addedPmTypes.Add(paymentMethod.Data.type);
+                
                 var go   = Instantiate(original: PaymentMethodItemPrefab, parent: PaymentMethodsPanel.transform);
                 var item = go.GetComponent<checkoutPanelPaymentMethodItemView>();
                 item.Initialize(paymentMethod, this);
@@ -136,6 +143,24 @@ namespace Galleon.Checkout.UI
                 GenerateTaxes();
             }
         }
+        
+        public void SoftRefreshState()
+        {
+            if (CheckoutClient.Instance.CurrentSession == null) return;
+
+            this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
+            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+
+            // Set Button Display
+            var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
+            if (selectedPaymentMethod != null)
+                SetButtonDisplay(selectedPaymentMethod);
+
+            foreach (var item in PaymentMethodItemViews)
+            {
+                item.RefreshState();
+            }
+        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Radio Buttons
 
@@ -144,13 +169,21 @@ namespace Galleon.Checkout.UI
         {
             foreach (var item in PaymentMethodItemViews)
             {
-                if (item == SelectedItem)
+                if (item.PaymentMethod == SelectedItem.PaymentMethod)
                     continue;
 
                 item.Unselect();
             }
+            
+            SoftRefreshState();
 
-            SetButtonDisplay(SelectedItem?.PaymentMethod);
+            // SetButtonDisplay(SelectedItem?.PaymentMethod);
+        }
+        
+        public void SelectUserPaymentMethod(UserPaymentMethod selectedUPM)
+        {
+            selectedUPM.SelectExclusive();
+            SoftRefreshState();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -332,4 +365,3 @@ namespace Galleon.Checkout.UI
         public Step test_settings_page()        => new Step(action: async (s) => { OnSettingsClick(); });
     }
 }
-

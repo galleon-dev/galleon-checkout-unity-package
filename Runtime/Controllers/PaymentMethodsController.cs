@@ -24,7 +24,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public  List<UserPaymentMethod>             SpecialUserPaymentMethods    => UserPaymentMethods.Where(x => x.Type == "native" || x.Type == "app").ToList();
-        public  List<UserPaymentMethod>             EmptyUserPaymentMethods      => UserPaymentMethods.Where(x => x.Type.Contains("empty")).ToList();
+        public  List<UserPaymentMethod>             EmptyUserPaymentMethods      => UserPaymentMethods.Where(x => x.Type != null && x.Type.Contains("empty")).ToList();
         public  List<UserPaymentMethod>             LastUsedUserPaymentMethods   => GetLastUsedUserPaymentMethods();
         
         public  List<UserPaymentMethod>             UserPaymentMethodsToDisplay  => UserPaymentMethods
@@ -61,10 +61,9 @@ namespace Galleon.Checkout
                         PaymentMethodsDefinitions.Node.DisplayName = "Payment Method Definitions";
                         UserPaymentMethods       .Node.DisplayName = "User Payment Methods";
                         
-                        s.AddChildStep(RefreshPaymentMethods());
-                        
-                        s.AddChildStep(InitializeDefinitions());
-                        s.AddChildStep(LoadLastUsedUserPaymentMethods());
+                        s.AddChildStep(RefreshPaymentMethods());            // Get from server    
+                        s.AddChildStep(InitializeDefinitions());            // setup (e.g. download images)
+                        s.AddChildStep(LoadLastUsedUserPaymentMethods());   // Load from storage
                     });
         
         public Step RefreshPaymentMethods()
@@ -291,39 +290,45 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////// Native
                         
-                        string nativeDisplayName = "";
-                        #if UNITY_ANDROID
-                        nativeDisplayName = "Google Play";
-                        #elif UNITY_IOS
-                        nativeDisplayName = "Apple Pay";
-                        #endif
-                        this.UserPaymentMethods.Add(new UserPaymentMethod()
-                                                    {
-                                                        Data               = new()
-                                                                           {
-                                                                              type = "native"
-                                                                           },
-                                                        DisplayName        = nativeDisplayName,
-                                                        IsNewPaymentMethod = false,
-                                                        IsSelected         = false,
-                                                        SortOrder          = float.PositiveInfinity,
-                                                        Type               = "native"
-                                                    });
+                        if (CHECKOUT.Globals.IsNativeStoreEnabled)
+                        {
+                            string nativeDisplayName = "";
+                            #if UNITY_ANDROID
+                            nativeDisplayName = "Google Play";
+                            #elif UNITY_IOS
+                            nativeDisplayName = "Apple Pay";
+                            #endif
+                            this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                        {
+                                                            Data               = new()
+                                                                               {
+                                                                                  type = "native"
+                                                                               },
+                                                            DisplayName        = nativeDisplayName,
+                                                            IsNewPaymentMethod = false,
+                                                            IsSelected         = false,
+                                                            SortOrder          = float.PositiveInfinity,
+                                                            Type               = "native"
+                                                        });
+                        }
                         
                         /////////////////////////////////// App
                         
-                        this.UserPaymentMethods.Add(new UserPaymentMethod()
-                                                    {
-                                                        Data               = new ()
-                                                                           {
-                                                                              type = "app"
-                                                                           },
-                                                        DisplayName        = CheckoutClient.Instance.ApplicationDisplayName ?? "Continue Checkout",
-                                                        IsNewPaymentMethod = false,
-                                                        IsSelected         = false,
-                                                        SortOrder          = float.PositiveInfinity, 
-                                                        Type               = "app"
-                                                    });
+                        if (CHECKOUT.Globals.IsNativeStoreEnabled)
+                        {
+                            this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                        {
+                                                            Data               = new ()
+                                                                               {
+                                                                                  type = "app"
+                                                                               },
+                                                            DisplayName        = CheckoutClient.Instance.ApplicationDisplayName ?? "Continue Checkout",
+                                                            IsNewPaymentMethod = false,
+                                                            IsSelected         = false,
+                                                            SortOrder          = float.PositiveInfinity, 
+                                                            Type               = "app"
+                                                        });    
+                        }
                         
                         /////////////////////////////////// Empty
                         

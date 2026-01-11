@@ -327,6 +327,7 @@ GameObject:
   - component: {fileID: 3390146204628411425}
   - component: {fileID: 5601826935606189797}
   - component: {fileID: 6154669702642915391}
+  - component: {fileID: 6056773106732532298}
   m_Layer: 5
   m_Name: SuccessAnimation
   m_TagString: Untagged
@@ -433,6 +434,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6056773106732532298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2527348345170513579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee1eca91c8de4f5da8f5b794f466ab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Image: {fileID: 3390146204628411425}
+  Color: {r: 0.28627452, g: 0.7411765, b: 0.9529412, a: 1}
 --- !u!1 &2801994115926376593
 GameObject:
   m_ObjectHideFlags: 0
@@ -2476,8 +2491,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8230863245052444204}
   m_HandleRect: {fileID: 8120056829619798054}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 0.98112607
+  m_Value: 0.0000033397791
+  m_Size: 0.981126
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2603,7 +2618,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8230734170264934440}
   m_HandleRect: {fileID: 8120292706636716400}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

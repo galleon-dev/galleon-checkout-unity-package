@@ -34,11 +34,17 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public string       DisplayName => Data?.type ?? Type.ToString();
+        public string       DisplayName         => Data?.type ?? Type.ToString();
         
-        public string       LocalID     => $"local_pm_id_{this.Type}";
+        public string       LocalID             => $"local_pm_id_{this.Type}";
         
-        public BonusItem    BonusItem   => CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
+        public BonusItem    BonusItem           => CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
+        
+        public bool         ShouldAddSavedUPMS  => true;
+        public bool         AllowOnlyOneUPM     => true;
+        public bool         ShouldShowDropdown  => true;
+        
+        public IEnumerable<UserPaymentMethod> SavedUPMS => CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Data.type == this.Data.type);
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
@@ -60,13 +66,13 @@ namespace Galleon.Checkout
             new Step(name   : $"Initialize_method_definition_{this.DisplayName}"
                     ,action : async (s) =>
                     {
-                        string icon_url  = "https://www.shareicon.net/data/128x128/2015/03/17/8858_512x512_512x512.png";
-                        s.Log($"downloading icon from {icon_url}");
-                        this.IconSprite  = await DownloadImageAsync(icon_url);
-                        
-                        string logo_url  = "https://epaypolicy.com/wp-content/uploads/2022/08/11.png";
-                        s.Log($"downloading logo from {logo_url}");
-                        this.LogoSprite  = await DownloadImageAsync(logo_url);            
+                        // string icon_url  = "https://www.shareicon.net/data/128x128/2015/03/17/8858_512x512_512x512.png";
+                        // s.Log($"downloading icon from {icon_url}");
+                        // this.IconSprite  = await DownloadImageAsync(icon_url);
+                        // 
+                        // string logo_url  = "https://epaypolicy.com/wp-content/uploads/2022/08/11.png";
+                        // s.Log($"downloading logo from {logo_url}");
+                        // this.LogoSprite  = await DownloadImageAsync(logo_url);            
                     });
         
         

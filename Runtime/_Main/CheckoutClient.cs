@@ -101,25 +101,39 @@ namespace Galleon.Checkout
                                   // Services
                                   s.AddChildStep(Logger                         .Initialize());
                                   s.AddChildStep(Network                        .Initialize());
-                                  s.AddChildStep(Config                         .Initialize());
+                                  s.AddChildStep(Config                         .Initialize()); //
+                                  s.AddChildStep(CheckoutGlobals                .Initialize()); //
                                   s.AddChildStep(Analytics                      .Initialize());
                         
                                   // Controllers
                                   s.AddChildStep(TokenizerController            .Initialize());
-                                  s.AddChildStep(PaymentMethodsController       .Initialize());
+                                  s.AddChildStep(PaymentMethodsController       .Initialize()); //
                                 
-                                  s.AddChildStep(TaxController                  .Initialize());
+                                  s.AddChildStep(TaxController                  .Initialize()); //
                                   
                                   // Resources
                                   s.AddChildStep(Resources                      .Initialize());
                         
                                   // Entities
                                   s.AddChildStep(Products                       .Initialize());
-                                  s.AddChildStep(Users                          .Initialize());
+                                  s.AddChildStep(Users                          .Initialize()); //
                                   
                                   // UI
                                   s.AddChildStep(CheckoutScreenMobile.InitializeCheckoutScreenMobile());
                               });
+        
+        public Step Cleanup() 
+        =>
+            new Step(name   : $"Cleanup"
+                    ,action : async (s) =>
+                    {
+                        Config.Collection.Clear();
+                        Config.ConfigData.Clear();
+                        TaxController.taxes.Clear();
+                        Users.Users.Clear();
+                        PaymentMethodsController.UserPaymentMethods.Clear();
+                        PaymentMethodsController.PaymentMethodsDefinitions.Clear();
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Flow Steps
 
@@ -160,7 +174,7 @@ namespace Galleon.Checkout
          
         public static CheckoutGlobals           Globals         => CheckoutClient.Instance.CheckoutGlobals;
         
-        public static CheckoutScreenMobile      Screen         => CheckoutClient.Instance.CheckoutScreenMobile;
+        public static CheckoutScreenMobile      Screen          => CheckoutClient.Instance.CheckoutScreenMobile;
         
         public static CheckoutResources         Resources       => CheckoutClient.Instance.Resources;
         public static CheckoutSprites           Sprites         => Resources.Sprites;

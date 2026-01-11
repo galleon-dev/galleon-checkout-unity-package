@@ -32,6 +32,9 @@ namespace Galleon.Checkout
         // Bonus Data
         public List<BonusItem>                    BonusData                 = new();
         
+        // steps
+        public Step                               OnSessionFinishedStep;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public CheckoutClient                     Client                    => CheckoutClient.Instance;
@@ -55,6 +58,10 @@ namespace Galleon.Checkout
                     ,tags   : new [] { "report" }
                     ,action : async (s) =>
                     {
+                        /////////////////////////////////////// Definitions
+                        
+                        this.OnSessionFinishedStep = new Step(name : "on_session_finished");
+                        
                         /////////////////////////////////////// Pre Steps
                          
                         // Open Screen
@@ -70,7 +77,9 @@ namespace Galleon.Checkout
                       //s.AddChildStep("wait",        async x => await Task.Delay(1000));
                         
                         bool isPreselectionScreenEnabled = CHECKOUT.Globals.IsPreselectionEnabled;
-                        if (isPreselectionScreenEnabled)
+                        bool isNativeStoreEnabled        = CHECKOUT.Globals.IsNativeStoreEnabled;
+                        
+                        if (isPreselectionScreenEnabled && isNativeStoreEnabled)
                             s.AddChildStep("view_preselection", async x => Client.CheckoutScreenMobile.NavigationNext = "preselection");
                         else
                             s.AddChildStep("view_checkout", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
@@ -82,6 +91,7 @@ namespace Galleon.Checkout
                         // Close
                         s.AddPostStep(CheckoutScreenMobile.EndCheckoutScreenMobile());
                         s.AddPostStep(EndCheckoutSession());
+                        s.AddPostStep(OnSessionFinishedStep);
                         
                         // Test Report
                         s.AddPostStep("report", async x => { Report?.Invoke(); });
@@ -222,20 +232,20 @@ namespace Galleon.Checkout
                        
                         ////////////////////////////////////////////////////////////// Post Steps
                         
-                        s.AddPostStep(name   : "save_used_payment_method_if_success"
-                                     ,action : async x =>
-                                             {
-                                                 if (this.lastChargeResult != null
-                                                 &&  this.lastChargeResult.is_success
-                                                 && !this.lastChargeResult.is_canceled)
-                                                 {
-                                                     x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
-                                                 }
-                                             });
+                        OnSessionFinishedStep.AddChildStep(name   : "save_used_payment_method_if_success"
+                                                          ,action : async x =>
+                                                                  {
+                                                                      if (this.lastChargeResult != null
+                                                                      &&  this.lastChargeResult.is_success
+                                                                      && !this.lastChargeResult.is_canceled)
+                                                                      {
+                                                                          x.AddChildStep(CHECKOUT.PaymentMethods.SaveUsedUserPaymentMethod());
+                                                                      }
+                                                                  });
                         
                         
                         // Refresh user payment methods
-                        s.AddPostStep(CHECKOUT.PaymentMethods.RefreshPaymentMethods());
+                        OnSessionFinishedStep.AddChildStep(CHECKOUT.PaymentMethods.RefreshPaymentMethods());
                         
                         // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());                

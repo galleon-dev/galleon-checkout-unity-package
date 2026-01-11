@@ -5,11 +5,13 @@ using Galleon.Checkout.Foundation;
 
 namespace Galleon.Checkout.ELEMENTS
 {
-    public class Elements : Entity
+    public class Elements : VirtualEntity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public Collection<Element> Collection = new();
+        
+        public ELEMENTS.Thing ThingElement = new Thing("thing");
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -50,24 +52,24 @@ namespace Galleon.Checkout.ELEMENTS
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
             
-            Element Thing    = new Element(name : "Package"); this.Collection.Add(Thing);
-            Thing.Definition = DefinitionNode.Parse(new []
-                                                      {
-                                                         "> Element Thing $name              "
-                                                      ,  "   > (Assets)                      "
-                                                      ,  "       > Prefab $name              " 
-                                                      ,  "       > Script $name              "
-                                                      ,  "   > (Hierarchy)                   "
-                                                      ,  "       > Prefab $name              "
-                                                      ,  "          > Component $name        "
-                                                      ,  "          > GO 'Model'             "
-                                                      ,  "              > C U.Cube           "
-                                                      ,  "   > (Setup)                       "
-                                                      ,  "      #size                        "
-                                                      ,  "      #pivot                       "
-                                                      ,  "      #color                       "
-                                                      ,  "      #collider                    "
-                                                      });
+            // Element Thing    = new Element(name : "Thing"); this.Collection.Add(Thing);
+            // Thing.Definition = DefinitionNode.Parse(new []
+            //                                           {
+            //                                              "> Element Thing $name              "
+            //                                           ,  "   > (Assets)                      "
+            //                                           ,  "       > Prefab $name              " 
+            //                                           ,  "       > Script $name              "
+            //                                           ,  "   > (Hierarchy)                   "
+            //                                           ,  "       > Prefab $name              "
+            //                                           ,  "          > Component $name        "
+            //                                           ,  "          > GO 'Model'             "
+            //                                           ,  "              > C U.Cube           "
+            //                                           ,  "   > (Setup)                       "
+            //                                           ,  "      #size                        "
+            //                                           ,  "      #pivot                       "
+            //                                           ,  "      #color                       "
+            //                                           ,  "      #collider                    "
+            //                                           });
             
         }
         

@@ -99,7 +99,7 @@ namespace Galleon.Checkout.Foundation
         
         public Operation TestOperation => new Operation 
                                           (
-                                              ID : "test_operation"
+                                              id : "test_operation"
                                           )
                                           .AddStep(new Step(name   : "test_step_0_start_asset_editing"
                                                            ,action : async s =>

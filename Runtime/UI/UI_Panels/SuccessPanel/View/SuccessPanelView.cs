@@ -24,16 +24,16 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
-        public GameObject EmailInputFieldText;
+        public GameObject       EmailInputFieldText;
         public List<GameObject> Gaps;
-        public GameObject EmailInputFieldContainer;
-        public GameObject EmailButtonGO;
-        public GameObject SuccessLabel;
-        public GameObject SuccessLabelForExistingEmail;
+        public GameObject       EmailInputFieldContainer;
+        public GameObject       EmailButtonGO;
+        public GameObject       SuccessLabel;
+        public GameObject       SuccessLabelForExistingEmail;
 
         public AdvancedInputField EmailInputField;
-        public TMP_Text ErrorText;
-        public TMP_Text MainText;
+        public TMP_Text           ErrorText;
+        public TMP_Text           MainText;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -66,54 +66,46 @@ namespace Galleon.Checkout.UI
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
             }
         }
-
-
-        //////////////////////////////////////////////////////////////////////////// UI Events
-
-        public void OnConfirmSuccessButtonClick()
+        
+        public void EndPageWithResult()
         {
             Result = ViewResult.Confirm;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
+        
+        //////////////////////////////////////////////////////////////////////////// UI Events
 
         public async void OnConfirmEmailButtonClick()
         {
-            bool valid = ValidateEmail(EmailInputField.Text);
-            ErrorText.text = valid ? "" : "Invalid email format";
+            bool valid      = ValidateEmail(EmailInputField.Text);
+            ErrorText.text  = valid ? "" : "Invalid email format";
             ErrorText.gameObject.SetActive(!valid);
 
             if (valid)
             {
-                CHECKOUT.Session.Flow().AddChildStep(SaveEmail());
+                CHECKOUT.Session.OnSessionFinishedStep.AddChildStep(SaveEmail());
+                
                 if (!CHECKOUT.IsTest)
-                    CHECKOUT.Session.Flow().AddChildStep(SendReceipt());
+                    CHECKOUT.Session.OnSessionFinishedStep.AddChildStep(SendReceipt());
 
-                OnConfirmSuccessButtonClick();
+                EndPageWithResult();
             }
         }
+        
 
         public async void On_FinishedEditingEmail(string str, EndEditReason reason)
         {
-            bool valid = ValidateEmail(EmailInputField.Text);
-            ErrorText.text = valid ? "" : "Invalid email format";
+            bool valid      = ValidateEmail(EmailInputField.Text);
+            ErrorText.text  = valid ? "" : "Invalid email format";
             ErrorText.gameObject.SetActive(!valid);
-        }
-
-        private bool ValidateEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return false;
-
-            // Basic email regex
-            return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Email storage
 
         public Step SaveEmail()
         =>
-            new Step(name: $"save_email"
-                    , action: async (s) =>
+            new Step(name   : $"save_email"
+                    ,action : async (s) =>
                     {
                         CHECKOUT.User.UserInfo.email = this.EmailInputField.Text;
                         await CHECKOUT.Actions.SetEmail().Execute();
@@ -213,17 +205,34 @@ namespace Galleon.Checkout.UI
                     , action: async (s) =>
                     {
 
-                        var message = new MailMessage("levan@galleon.so", to);
-                        message.Subject = subject;
-                        message.Body = body;
-                        message.IsBodyHtml = true;
+                        var message         = new MailMessage("levan@galleon.so", to);
+                        message.Subject     = subject;
+                        message.Body        = body;
+                        message.IsBodyHtml  = true;
 
-                        using var smtp = new SmtpClient("smtp.gmail.com", 587);
-                        smtp.EnableSsl = true;
-                        smtp.Credentials = new NetworkCredential("levan@galleon.so", "viil dbxh fvgo jcys");
+                        using var smtp      = new SmtpClient("smtp.gmail.com", 587);
+                        smtp.EnableSsl      = true;
+                        smtp.Credentials    = new NetworkCredential("levan@galleon.so", "viil dbxh fvgo jcys");
 
                         smtp.Send(message);
                     });
+
+        
+        private bool ValidateEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            /// Basic email regex pattern explained:
+            /// ^       - Start of string
+            /// [^@\s]+ - One or more characters that are not @ or whitespace
+            /// @       - Literal @ symbol
+            /// [^@\s]+ - One or more characters that are not @ or whitespace (domain name)
+            /// \.      - Literal dot
+            /// [^@\s]+ - One or more characters that are not @ or whitespace (TLD)
+            /// $       - End of string
+            return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+        }
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test

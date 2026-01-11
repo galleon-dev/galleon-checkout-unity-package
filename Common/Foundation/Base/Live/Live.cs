@@ -40,6 +40,7 @@ namespace Galleon.Checkout.Foundation
     public interface ICRUD
     {
         void Create();
+        void OnAddedToParent(IEntity Parent) {}
     }
     public class CRUD
     {

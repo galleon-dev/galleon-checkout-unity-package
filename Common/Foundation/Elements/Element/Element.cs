@@ -11,21 +11,28 @@ namespace Galleon.Checkout.ELEMENTS
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Element Class
     
     [Element("element")]   
-    public partial class Element : Entity
+    public partial class Element : VirtualEntity
     {
-        //// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public string         Name;
         public DefinitionNode Definition;
         
-        //// Lifecycle
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public Element(string name)
         {
             this.Name = name;
         }
         
-        //// Methods
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Definition Methods
+        
+        public IEntity GetDefaultParentInNamespace(string namespaceName)
+        {
+            return default;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
         
         public string[] DumpDefinition()
         {
@@ -228,7 +235,7 @@ namespace Galleon.Checkout
             public async Task OP_PLUS(IEntity entity)
             {
                 var Parent = this.Entity;
-                var op     = new Operation(ID:"op_id");
+                var op     = new Operation(id:"op_id");
                 
                 op.Flow.AddChildStep(name   : "add_child"
                                     ,action : async x =>

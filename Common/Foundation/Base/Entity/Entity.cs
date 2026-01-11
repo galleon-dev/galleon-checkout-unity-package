@@ -33,10 +33,10 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public EntityNode(                  IEntity entity
-                        ,[CallerMemberName] string  callerName = ""
-                        ,[CallerLineNumber] int     callerLine = 0
-                        ,[CallerFilePath  ] string  callerPath = "")
+        public EntityNode(                   IEntity entity
+                         ,[CallerMemberName] string  callerName = ""
+                         ,[CallerLineNumber] int     callerLine = 0
+                         ,[CallerFilePath  ] string  callerPath = "")
         {
             if (entity == null)
                 throw new Exception("entity is null in EntityNode constructor");
@@ -543,10 +543,10 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
         
-        public        LIVE Live => new(Entity);
+        public        LIVE Live => new(Entity as VirtualEntity);
         public struct LIVE
         {
-            IEntity Entity; public LIVE(IEntity entity) => this.Entity = entity;
+            VirtualEntity Entity; public LIVE(VirtualEntity entity) => this.Entity = entity;
             
             public async Task Plus_APF(string text)
             {                
@@ -593,10 +593,81 @@ namespace Galleon.Checkout
             }
             public async Task Plus_PpT1_M(string text)
             {   
-                var   plusOperation = new Foundation.LiveOperationPpS1.LiveOperation(id                 : $"PpT1_M"
-                                                                                    ,operationParent    : this.Entity
-                                                                                    ,definitionText     : text); // > Thing t1
+                var   plusOperation = new Foundation.LiveOperationPpT1_M.LiveOperation(id                 : $"PpT1_M"
+                                                                                      ,operationParent    : this.Entity
+                                                                                      ,definitionText     : text); // > Thing t1
                 await plusOperation.Flow().Execute();
+            }
+            public async Task Plus_PpQuickSlices(string text)
+            {   
+                Debug.Log("Oh Boy !");
+                return;
+                
+                var   plusOperation = new Foundation.LiveOperationPpQuickSlices.LiveOperation(id                 : $"PpQuickSlices"
+                                                                                             ,operationParent    : this.Entity
+                                                                                             ,definitionText     : text); // > Quick Slices
+                await plusOperation.Flow().Execute();
+            }
+            public async Task Plus(VirtualEntity childToAdd)
+            {
+                ////////////////////////////////////////////////////////////////////////////////////
+                
+                // get namespaces in parent
+                VirtualEntity       originParent                     = this.Entity;
+                IEnumerable<string> parentNamespaces                 = originParent.GetAllChildNamespaces();
+                IEnumerable<string> childNamespaces                  = childToAdd  .GetAllChildNamespaces();
+                IEnumerable<string> childNamespacesThatExistInParent = childNamespaces.Where(ns => parentNamespaces.Contains(ns));
+
+                foreach (var childNamespace in childNamespacesThatExistInParent)
+                {
+                    // Get Parent & Child
+                    var parent = originParent.GetDefaultParentForNamespace(childNamespace);
+                    var child  = childToAdd  .GetTopNodeForNamespace(childNamespace);
+                    
+                    // verify
+                    if (child is not ICRUD crudChild)
+                        throw new Exception($"child {child} is not ICRUD");
+
+                    // Add Child and CRUD create
+                    parent.Node.AddChild(child);
+                    crudChild.OnAddedToParent(parent);
+                    crudChild.Create();        
+                            
+                }
+            }
+            
+            public async Task Plus_Indirect(string text)
+            {
+                TextNode tree = TextNode.Parse(text);
+
+                foreach (var textNode in tree.Node.Descendants().OfType<TextNode>())
+                {
+                    // Type + Name Definitions
+                    var type = textNode.LineFirstWord;
+                    var name = textNode.LineWords.Skip(1).FirstOrDefault() ?? "";
+                    
+                    try
+                    {
+                        // Instantiate virtual entity
+                        var entityType    = Type.GetType($"Galleon.Checkout.{type}");
+                        var virtualEntity = Activator.CreateInstance(entityType) as VirtualEntity;
+                        
+                        // Get parent and child for Plus operation
+                        var parent = this.Entity;
+                        var child  = virtualEntity;
+                        
+                        // Set CRUD params
+                        child.Node.SetData("CRUD_params", new CRUD_Params() { Name = name} );
+                        
+                        // Do PLUS
+                        parent.Node.Live.Plus(child);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
+                    
+                }
             }
             
             //////////////////////////////////////////////////

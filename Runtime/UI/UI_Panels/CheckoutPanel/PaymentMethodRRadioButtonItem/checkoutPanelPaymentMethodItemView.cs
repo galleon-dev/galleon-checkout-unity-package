@@ -28,6 +28,11 @@ namespace Galleon.Checkout.UI
         public BonusItemView   bonusItemView;
         public IBonusItemView  IBonusItemView;
         
+        [Header("Dropdown")]
+        public GameObject      DropdownArrow;
+        public TMP_Dropdown    DropdownButton;
+
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
         public UserPaymentMethod PaymentMethod     { get; set; }
@@ -99,6 +104,22 @@ namespace Galleon.Checkout.UI
             //     if (this.PaymentMethod.Type == "native")
             //         (IBonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
             // }
+            
+            // Dropdown
+            bool shouldShowDropdown =  this.PaymentMethod.Data.type == "credit_card"
+                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Data.type == "credit_card") > 1;
+
+            if (shouldShowDropdown)
+            {
+                this.DropdownButton.gameObject.SetActive(true);
+                this.DropdownArrow .gameObject.SetActive(true);
+                PopulateDropdownItems();
+            }
+            else
+            {
+                this.DropdownButton.gameObject.SetActive(false);
+                this.DropdownArrow .gameObject.SetActive(false);
+            }
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -112,10 +133,12 @@ namespace Galleon.Checkout.UI
 
         public void Select()
         {
-            this.PaymentMethod?.Select();
-            this.CheckoutPanelView.OnRadiobuttonSelected(this);
+            this.CheckoutPanelView.SelectUserPaymentMethod(this.PaymentMethod);
             
-            this.CheckoutPanelView.Refresh();
+            // this.PaymentMethod?.Select();
+            // this.CheckoutPanelView.OnRadiobuttonSelected(this);
+            // 
+            // this.CheckoutPanelView.SoftRefreshState();
             //Refresh();
         }
 
@@ -123,10 +146,48 @@ namespace Galleon.Checkout.UI
         {
             this.PaymentMethod?.Unselect();
             
-            this.CheckoutPanelView.Refresh();
+            // this.CheckoutPanelView.SoftRefreshState();
             //Refresh();
         }
         
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Events 
+        
+        public void On_DropdownValueChanged(int newValue)
+        {
+            var displayName   = DropdownButton.options[newValue].text;
+            var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.DisplayName == displayName);
+            
+            if (paymentMethod == null)
+                throw new System.Exception("No Payment Methods Found");
+            
+            UpdateItemPaymentMethod(paymentMethod);
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Methods
+        
+        public async void PopulateDropdownItems()
+        {
+            // Clear
+            DropdownButton.ClearOptions();
+            
+            // Definitions
+            var myType      = this.PaymentMethod.Data.type;
+            var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Data.type == myType).Except(new []{this.PaymentMethod}).ToList();
+            var upms        = (new List<UserPaymentMethod>() { this.PaymentMethod }).Concat(otherUpms).ToList( );
+            
+            // Add options
+            foreach (var pm in upms)
+                DropdownButton.options.Add(new TMP_Dropdown.OptionData(pm.DisplayName, pm.GetIconSprite()));
+        }
+        
+        public void UpdateItemPaymentMethod(UserPaymentMethod upm)
+        {
+            this.PaymentMethod = upm;
+            Select();
+            this.Refresh();
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
         
         private void SetSeperatorColor(Color _Color, bool _Status)
@@ -146,8 +207,6 @@ namespace Galleon.Checkout.UI
             this.PaymentMethod     = paymentMethod;
             this.CheckoutPanelView = CheckoutPanelView;
             this.PaymentMethod?.Select();
-
-           
         }
     }
 }

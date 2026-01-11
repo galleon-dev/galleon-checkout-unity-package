@@ -79,7 +79,7 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
         
         public override void RefreshState()
-        {    
+        {   
             if (PaymentMethodDefinition != null)
                 this.Label.text = PaymentMethodDefinition.DisplayName;
             else if (UserPaymentMethod != null)
@@ -99,11 +99,15 @@ namespace Galleon.Checkout.UI
 
                 if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)
                     this.Label.text  = "Add Credit or Debit Card";
+                
+                // Dropdown
+                DropdownButton.gameObject.SetActive(this.PaymentMethodDefinition.ShouldShowDropdown);
+                DropdownArrow .gameObject.SetActive(this.PaymentMethodDefinition.ShouldShowDropdown);
             }
             //////////////////////////////////////////////// UserPaymentMethods
             else if (this.UserPaymentMethod != null)
             {
-                this.Label.text  = "**** - " + this.UserPaymentMethod.DisplayName;
+                this.Label.text  = this.UserPaymentMethod.DisplayName;
                 this.Icon.sprite = this.UserPaymentMethod.GetIconSprite();
             }
             
@@ -117,7 +121,22 @@ namespace Galleon.Checkout.UI
             BonusContainer?.gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
             
             // Dropdown
-            PopulateDropdownItems();
+            bool shouldShowDropdown =  this.UserPaymentMethod != null 
+                                    && this.UserPaymentMethod.Data.type == "credit_card"
+                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Data.type == "credit_card") > 1;
+
+            if (shouldShowDropdown)
+            {                
+                this.DropdownButton.gameObject.SetActive(true);
+                this.DropdownArrow .gameObject.SetActive(true);
+                PopulateDropdownItems();
+            }
+            else
+            {
+                this.DropdownButton.gameObject.SetActive(false);
+                this.DropdownArrow .gameObject.SetActive(false);
+            }
+            
         }
         
         
@@ -125,12 +144,13 @@ namespace Galleon.Checkout.UI
         
         public void On_DropdownValueChanged(int newValue)
         {
-            // var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault();
-            // 
-            // if (paymentMethod == null)
-            //     throw new System.Exception("No Payment Methods Found");
-            // 
-            // UpdateItemPaymentMethod(paymentMethod);
+            var displayName   = DropdownButton.options[newValue].text;
+            var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.DisplayName == displayName);
+            
+            if (paymentMethod == null)
+                throw new System.Exception("No Payment Methods Found");
+            
+            UpdateItemPaymentMethod(paymentMethod);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Methods
@@ -140,17 +160,15 @@ namespace Galleon.Checkout.UI
             // Clear
             DropdownButton.ClearOptions();
             
+            
             // Definitions
-            var pms = CHECKOUT.PaymentMethods.UserPaymentMethods.ToList();
+            var myType      = this.UserPaymentMethod.Data.type;
+            var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Data.type == myType).Except(new []{this.UserPaymentMethod}).ToList();
+            var upms        = (new List<UserPaymentMethod>() { this.UserPaymentMethod }).Concat(otherUpms).ToList( );
             
             // Add options
-            foreach (var pm in pms)
-            {
+            foreach (var pm in upms)
                 DropdownButton.options.Add(new TMP_Dropdown.OptionData(pm.DisplayName, pm.GetIconSprite()));
-            }
-            
-            // DropdownButton.onValueChanged.Invoke(DropdownButton.value); // Forces the event
-            // DropdownButton.RefreshShownValue();
             
             // for (int i = 0; i < dropdownItems.Count(); i++)
             // {
@@ -166,11 +184,6 @@ namespace Galleon.Checkout.UI
             this.UserPaymentMethod       = upm;
             this.Refresh();
         }
-
-        
-        /// > populate
-        /// > on select -> refresh
-        /// > only when upms available
 
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
