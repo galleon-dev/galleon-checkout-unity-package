@@ -14,26 +14,27 @@ public class SettingsPanelView : View
     //////////////////////////////////////////////////////////////////////////// Members
 
     [Header("Email")]
-    public GameObject EmailInputfieldBorder;
-    public AdvancedInputField EmailInputField;
-    public TextMeshProUGUI emailErrorText;
-    public GameObject EmailEditButton;
+    public GameObject           EmailInputfieldBorder;
+    public AdvancedInputField   EmailInputField;
+    public TextMeshProUGUI      emailErrorText;
+    public GameObject           EmailEditButton;
 
     [Header("Payment Methods")]
-    public GameObject SettingsPanelPaymentMethodItemPrefab;
-    public GameObject PaymentMethodsHolder;
-    public bool IsEditingEmail = false;
-    public GameObject InformationalLabel;
-    public GameObject Gap;
+    public GameObject           SettingsPanelPaymentMethodItemPrefab;
+    public GameObject           PaymentMethodsHolder;
+    public bool                 IsEditingEmail = false;
+    public GameObject           InformationalLabel;
+    public GameObject           Gap;
+    
     //////////////////////////////////////////////////////////////////////////// View Result
 
     public ViewResult Result = ViewResult.None;
 
-    public LayoutElement ScrollRectLayoutElement;
-    public ScrollRect ScrollRect;
-    private int ScrollRectMaxSize = 6;
-    private float PaymentPrefabHeight = 200f;
-    private float SeparatorHeight = 2f;
+    public LayoutElement    ScrollRectLayoutElement;
+    public ScrollRect       ScrollRect;
+    private int             ScrollRectMaxSize = 6;
+    private float           PaymentPrefabHeight = 200f;
+    private float           SeparatorHeight = 2f;
 
     public enum ViewResult
     {
@@ -99,7 +100,7 @@ public class SettingsPanelView : View
         var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToRemove;
         foreach (var paymentMethod in paymentMethods)
         {
-            var go = Instantiate(original: SettingsPanelPaymentMethodItemPrefab, parent: PaymentMethodsHolder.transform);
+            var go   = Instantiate(original: SettingsPanelPaymentMethodItemPrefab, parent: PaymentMethodsHolder.transform);
             var item = go.GetComponent<SettingsPanelPaymentMethodItem>();
             item.Initialize(paymentMethod, this);
 
@@ -109,37 +110,15 @@ public class SettingsPanelView : View
 
         if (paymentMethods.Count() == 0)
         {
-            if (InformationalLabel)
-            {
-                InformationalLabel.SetActive(true);
-            }
-
-            if (Gap)
-            {
-                Gap.SetActive(true);
-            }
-
-            if (ScrollRectLayoutElement)
-            {
-                ScrollRectLayoutElement.gameObject.SetActive(false);
-            }
+            InformationalLabel.SetActive(true);
+            Gap.SetActive(true);
+            ScrollRectLayoutElement.gameObject.SetActive(false);
         }
         else
         {
-            if (InformationalLabel)
-            {
-                InformationalLabel.SetActive(false);
-            }
-
-            if (Gap)
-            {
-                Gap.SetActive(false);
-            }
-
-            if (ScrollRectLayoutElement)
-            {
-                ScrollRectLayoutElement.gameObject.SetActive(true);
-            }
+            InformationalLabel.SetActive(false);
+            Gap.SetActive(false);
+            ScrollRectLayoutElement.gameObject.SetActive(true);
         }
 
         // Email
@@ -162,39 +141,24 @@ public class SettingsPanelView : View
 
         if (PaymentMethodsAmount <= 1)
         {
-            if (ScrollRect)
-            {
-                ScrollRect.vertical = false;
-            }
+            ScrollRect.vertical = false;
         }
         else
         {
-            if (ScrollRect)
-            {
-                ScrollRect.vertical = true;
-            }
+            ScrollRect.vertical = true;
         }
 
         if (PaymentMethodsAmount == 0)
         {
-            if (ScrollRectLayoutElement)
-            {
-                ScrollRectLayoutElement.preferredHeight = 0;
-            }
+            ScrollRectLayoutElement.preferredHeight = 0;
         }
         else if (PaymentMethodsAmount <= ScrollRectMaxSize)
         {
-            if (ScrollRectLayoutElement)
-            {
-                ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 2;
-            }
+            ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 2;
         }
         else
         {
-            if (ScrollRectLayoutElement)
-            {
-                ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 2;
-            }
+            ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 2;
         }
     }
 

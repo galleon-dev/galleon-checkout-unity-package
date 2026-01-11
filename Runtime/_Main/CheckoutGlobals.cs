@@ -48,6 +48,20 @@ namespace Galleon.Checkout
             set => CHECKOUT.Config.SetOverrideValue("is_native_store_enabled", value);
         }
         
+        public bool IsBonusEnabled
+        {
+            get => CHECKOUT.Config.GetBool         ("is_bonus_enabled", defaultValue : true);
+            set => CHECKOUT.Config.SetOverrideValue("is_bonus_enabled", value);
+        }
+        
+        public bool IsNativeStoreToggleEnabled
+        {
+            get => CHECKOUT.Config.GetBool         ("is_native_store_toggle_enabled", defaultValue : true);
+            set => CHECKOUT.Config.SetOverrideValue("is_native_store_toggle_enabled", value);
+        }
+
+                
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public CheckoutGlobals()
@@ -153,7 +167,37 @@ namespace Galleon.Checkout
                                                             },
                                       }
                                   );
+                                  
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "is_bonus_enabled", value: true)
+                                      {
+                                          displayName     = "Bonus",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = null    },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
+                                                            },
+                                      }
+                                  );
                       
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "is_native_store_toggle_enabled", value: true)
+                                      {
+                                          displayName     = "Native Store Toggle",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = null    },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
+                                                            },
+                                      }
+                                  );
+
                                   foreach (var configValue in globals.Where(v => v.tag == "global"))
                                   {
                                       GlobalValues.Add(configValue);
