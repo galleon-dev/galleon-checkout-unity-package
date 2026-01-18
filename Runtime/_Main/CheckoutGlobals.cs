@@ -92,7 +92,7 @@ namespace Galleon.Checkout
         }
 
         public Step Initialize() 
-            =>
+        =>
             new Step(name   : $"initialize_globals"
                     ,tags   : new[] { "init" }
                     ,action : async (s) =>

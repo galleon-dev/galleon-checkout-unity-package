@@ -54,7 +54,6 @@ namespace Galleon.Checkout
         public string                     AppUserID;
         public string                     ApplicationDisplayName;
         public CheckoutOrientation        UIPanelOrientation        = CheckoutOrientation.Auto;
-        public bool                       showPreselectionScreen    = true;
         public Dictionary<string, object> Config                    = new();
     }
     

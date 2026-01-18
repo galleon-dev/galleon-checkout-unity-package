@@ -33,7 +33,7 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         // Add Specific values
-                        var preselection = new ConfigValue("is_preselection_screen_enabled", CHECKOUT.Globals.IsPreselectionEnabled);
+                        var preselection = new ConfigValue("is_preselection_screen_enabled", CHECKOUT.Globals.CheckoutConfiguration);
                         this.SetValue(preselection);
 
                         // Add all dynamic values
