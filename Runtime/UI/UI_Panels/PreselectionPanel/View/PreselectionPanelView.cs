@@ -88,7 +88,7 @@ namespace Galleon.Checkout.UI
             }
 
             // Add children
-            var paymentMethods = CHECKOUT.PaymentMethods.SpecialUserPaymentMethods;
+            var paymentMethods = CHECKOUT.PaymentMethods.PreselectionUserPaymentMethods;
             paymentMethods.Reverse();
             foreach (var paymentMethod in paymentMethods)
             {

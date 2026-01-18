@@ -543,10 +543,10 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
         
-        public        LIVE Live => new(Entity as VirtualEntity);
+        public        LIVE Live => new(Entity as IEntity);
         public struct LIVE
         {
-            VirtualEntity Entity; public LIVE(VirtualEntity entity) => this.Entity = entity;
+            IEntity Entity; public LIVE(IEntity entity) => this.Entity = entity;
             
             public async Task Plus_APF(string text)
             {                
@@ -613,7 +613,7 @@ namespace Galleon.Checkout
                 ////////////////////////////////////////////////////////////////////////////////////
                 
                 // get namespaces in parent
-                VirtualEntity       originParent                     = this.Entity;
+                VirtualEntity       originParent                     = this.Entity as VirtualEntity;
                 IEnumerable<string> parentNamespaces                 = originParent.GetAllChildNamespaces();
                 IEnumerable<string> childNamespaces                  = childToAdd  .GetAllChildNamespaces();
                 IEnumerable<string> childNamespacesThatExistInParent = childNamespaces.Where(ns => parentNamespaces.Contains(ns));

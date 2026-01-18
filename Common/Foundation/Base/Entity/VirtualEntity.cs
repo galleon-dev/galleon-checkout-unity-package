@@ -5,6 +5,10 @@ using Galleon.Checkout.Assets;
 using Galleon.Checkout.ELEMENTS;
 using Galleon.Checkout.Foundation;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif // UNITY_EDITOR
+
 namespace Galleon.Checkout.Foundation
 {
     public class VirtualEntity : Entity
@@ -12,21 +16,61 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// General
         
         public TextNode TextNode { get; set; }
-        public Element  Element  { get; set; }
+        
+        public string ThingName => TextNode?.LineWords != null && TextNode.LineWords.Count() >= 2 
+                                  ? TextNode.LineWords.ElementAt(1) 
+                                  : string.Empty;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public VirtualEntity()
         {
         }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Operation
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Physical
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - CRUD
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Text
+        public Operation CreateOp => new Operation(id: $"operation_{ThingName}")
+                                         .AddStep(CreateAssets())
+                                         .AddStep(DomainReload())
+                                         .AddStep(CreateHierarchy());
+                                        
+        public Step CreateAssets() 
+        =>
+            new Step(name   : $"create_assets"
+                    ,action : async (s) =>
+                    {
+                            #if UNITY_EDITOR
+                                                                       
+                           AssetDatabase.StartAssetEditing();
+                           
+                           #endif
+                           
+                           // create a new default script at path
+                           string scriptPath = "Assets/TEMP/domain_reload.cs";
+                           System.IO.File.WriteAllText(scriptPath, "");
+                    });
+        public Step DomainReload() 
+        =>
+            new Step(name   : $"domain_reload"
+                    ,action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
+                        
+                        AssetDatabase.StopAssetEditing();
+                                                                       
+                        AssetDatabase.Refresh(options: ImportAssetOptions.ForceUpdate);
+                        await Task.Delay(5000);
+                       
+                        #endif
+                    });
+        public Step CreateHierarchy() 
+        =>
+            new Step(name   : $"create_hierarchy"
+                    ,action : async (s) =>
+                    {
+                        
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Semantics
 

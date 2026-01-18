@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 using System.Net;
@@ -22,6 +23,31 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
+                        s.AddChildStep(InitializeConfigFromLocal());
+                        s.AddChildStep(InitializeConfigFromServer());
+                    });
+        
+        public Step InitializeConfigFromLocal() 
+            =>
+            new Step(name   : $"initialize_config_from_local"
+                    ,action : async (s) =>
+                    {
+                        // Add Specific values
+                        var preselection = new ConfigValue("is_preselection_screen_enabled", CHECKOUT.Globals.IsPreselectionEnabled);
+                        this.SetValue(preselection);
+
+                        // Add all dynamic values
+                        foreach (var pair in CHECKOUT.Globals.CheckoutConfiguration.Config)
+                        {
+                            this.SetValue(pair.Key, pair.Value);
+                        }
+                    });
+        
+        public Step InitializeConfigFromServer() 
+            =>
+            new Step(name   : $"initialize_config_from_server"
+                    ,action : async (s) =>
+                    {
                         var result = await CHECKOUT.Network.Post(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/config"
                                                                 ,headers  : new ()
                                                                           {
@@ -42,11 +68,31 @@ namespace Galleon.Checkout
                         foreach (var pair in dictionary)
                         {
                             var configValue = new ConfigValue(key:pair.Key, value:pair.Value);
-                            this.Collection.Add(configValue);
-                            this.ConfigData.Add(pair.Key, configValue);
+                            this.SetValue(configValue);
                         }
                         
                     });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
+        
+        public void SetValue(string key, object value)
+        {
+            var configValue = new ConfigValue(key, value);
+            SetValue(configValue);
+        }
+        public void SetValue(ConfigValue configValue)
+        {
+            var collectionValue = this.Collection.FirstOrDefault(x => x.Key == configValue.Key);
+            if (collectionValue != null)
+                collectionValue.Value = configValue.Value;
+            else
+                this.Collection.Add(configValue);
+            
+            if (this.ConfigData.ContainsKey(configValue.Key))
+                this.ConfigData[configValue.Key].Value = configValue.Value;
+            else
+                this.ConfigData[configValue.Key] = configValue;
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Value Methods
         
@@ -91,11 +137,15 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////// Properties
         
-        public object               Value           => valueOverride != null ? valueOverride : _value;
-        
+        public object               Value
+        {
+            get => valueOverride != null ? valueOverride : _value;
+            set => this._value = value;
+        }
+
         //////////////////////////////////////////////////// Lifecycle
 
-        public ConfigValue(string key, object value)
+        public ConfigValue(string key, object value = null)
         {
             this.Key    = key;
             this._value = value;

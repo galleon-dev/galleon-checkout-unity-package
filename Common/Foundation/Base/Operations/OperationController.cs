@@ -84,11 +84,11 @@ namespace Galleon.Checkout.Foundation
         #endif
         public static async void InitializeOnLoad()
         {
-            await Task.Yield();
-            
-            Root.Instance.Context.Operations.AllRegisteredOperations = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Operations()).ToList();
-            
-            await Root.Instance.Context.Operations.ResumeAllOngoingOperations();
+            // await Task.Yield();
+            // 
+            // Root.Instance.Context.Operations.AllRegisteredOperations = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Operations()).ToList();
+            // 
+            // await Root.Instance.Context.Operations.ResumeAllOngoingOperations();
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Tests

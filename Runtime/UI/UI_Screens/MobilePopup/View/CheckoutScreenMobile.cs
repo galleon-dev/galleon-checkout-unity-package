@@ -541,7 +541,7 @@ namespace Galleon.Checkout.UI
                 if (overrideContentSize.HasValue)
                     targetSize = new Vector2(parentTransform.sizeDelta.x, overrideContentSize.Value + keyboardHeight);
                 
-                parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / 2;
+                parentTransform.sizeDelta += (targetSize - parentTransform.sizeDelta) / CHECKOUT.Globals.PanelSmoothness;
                 
                 // parentTransform.sizeDelta = new Vector2(parentTransform.sizeDelta.x, 2000);
             }

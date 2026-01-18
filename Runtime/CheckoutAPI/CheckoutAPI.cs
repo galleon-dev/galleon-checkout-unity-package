@@ -49,11 +49,13 @@ namespace Galleon.Checkout
     [Serializable]
     public class CheckoutConfiguration
     {
-        public string              JWT;
-        public string              Country;
-        public string              AppUserID;
-        public string              ApplicationDisplayName;
-        public CheckoutOrientation UIPanelOrientation = CheckoutOrientation.Auto;
+        public string                     JWT;
+        public string                     Country;
+        public string                     AppUserID;
+        public string                     ApplicationDisplayName;
+        public CheckoutOrientation        UIPanelOrientation        = CheckoutOrientation.Auto;
+        public bool                       showPreselectionScreen    = true;
+        public Dictionary<string, object> Config                    = new();
     }
     
     public enum CheckoutOrientation

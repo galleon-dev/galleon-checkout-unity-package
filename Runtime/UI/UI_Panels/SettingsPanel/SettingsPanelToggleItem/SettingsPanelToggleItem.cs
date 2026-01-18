@@ -40,7 +40,7 @@ namespace Galleon.Checkout.UI
             this.Icon.sprite = this.UserPaymentMethod?.GetIconSprite();
             
             this.ToggleOffGO.SetActive(!CHECKOUT.Globals.IsNativeStoreEnabled);
-            this.ToggleOnGO.SetActive( CHECKOUT.Globals.IsNativeStoreEnabled);
+            this.ToggleOnGO.SetActive ( CHECKOUT.Globals.IsNativeStoreEnabled);
         }
 
         //// UI Events

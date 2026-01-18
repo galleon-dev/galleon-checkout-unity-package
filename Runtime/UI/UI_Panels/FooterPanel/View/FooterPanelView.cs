@@ -43,6 +43,9 @@ namespace Galleon.Checkout.UI
             {
                 DisableAllPanels();
             }
+            
+            
+            ShowViewPaymentMethods(CHECKOUT.Screen.CurrentPage == CHECKOUT.Screen.CheckoutPage);    
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
