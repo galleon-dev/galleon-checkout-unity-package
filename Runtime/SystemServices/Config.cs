@@ -23,19 +23,16 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
-                        s.AddChildStep(InitializeConfigFromLocal());
+                        s.AddChildStep(CHECKOUT.Globals.PopulateGlobalConfigValues());
                         s.AddChildStep(InitializeConfigFromServer());
+                        s.AddChildStep(InitializeConfigFromLocal());
                     });
         
         public Step InitializeConfigFromLocal() 
-            =>
+        =>
             new Step(name   : $"initialize_config_from_local"
                     ,action : async (s) =>
                     {
-                        // Add Specific values
-                        var preselection = new ConfigValue("is_preselection_screen_enabled", CHECKOUT.Globals.CheckoutConfiguration);
-                        this.SetValue(preselection);
-
                         // Add all dynamic values
                         foreach (var pair in CHECKOUT.Globals.CheckoutConfiguration.Config)
                         {

@@ -44,9 +44,13 @@ namespace Galleon.SampleApp
             var user = $"test_user_{DateTime.Now.ToString()}";
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
-                                            AppUserID              = $"test_user_{DateTime.Now.ToString()}",
-                                            ApplicationDisplayName = "Dice Dreams"
-                                         } );
+                                            AppUserID               = $"test_user_{DateTime.Now.ToString()}",
+                                            ApplicationDisplayName  = "Dice Dreams",                         
+                                            Config                  = new()
+                                                                    {
+                                                                       { "is_preselection_screen_enabled", false }
+                                                                    }
+                                         });
             
             StoreView.RefreshConfigPanel();
             
