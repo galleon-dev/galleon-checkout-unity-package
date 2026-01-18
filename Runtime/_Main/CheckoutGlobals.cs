@@ -59,8 +59,31 @@ namespace Galleon.Checkout
             get => CHECKOUT.Config.GetBool         ("is_native_store_toggle_enabled", defaultValue : true);
             set => CHECKOUT.Config.SetOverrideValue("is_native_store_toggle_enabled", value);
         }
+        
+        public string SettingsBackButton
+        {
+            get => CHECKOUT.Config.GetString       ("settings_back_button", defaultValue : "Back");
+            set => CHECKOUT.Config.SetOverrideValue("settings_back_button", value);
+        }
 
-                
+        public bool IsNativeStoreEnabledInCheckoutPage
+        {
+            get => CHECKOUT.Config.GetBool         ("is_native_store_enabled_in_checkout_page", defaultValue : true);
+            set => CHECKOUT.Config.SetOverrideValue("is_native_store_enabled_in_checkout_page", value);
+        }
+
+        public bool IsNativeStoreEnabledInSelectionPage
+        {
+            get => CHECKOUT.Config.GetBool         ("is_native_store_enabled_in_selection_page", defaultValue : true);
+            set => CHECKOUT.Config.SetOverrideValue("is_native_store_enabled_in_selection_page", value);
+        }
+
+        public int PanelSmoothness
+        {
+            get => CHECKOUT.Config.GetInt          ("panel_smoothness", defaultValue : 2);
+            set => CHECKOUT.Config.SetOverrideValue("panel_smoothness", value);
+        }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
@@ -69,7 +92,7 @@ namespace Galleon.Checkout
         }
 
         public Step Initialize() 
-            =>
+        =>
             new Step(name   : $"initialize_globals"
                     ,tags   : new[] { "init" }
                     ,action : async (s) =>
@@ -197,13 +220,75 @@ namespace Galleon.Checkout
                                                             },
                                       }
                                   );
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "settings_back_button", value: "Back To Checkout")
+                                      {
+                                          displayName     = "Settings Back Button",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override",    Value = "Back"              },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "disabled",         Value = ""                  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Back",             Value = "Back"              },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Back To Checkout", Value = "Back To Checkout"  },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "is_native_store_enabled_in_checkout_page", value: true)
+                                      {
+                                          displayName     = "Native In Checkout",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = null    },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "is_native_store_enabled_in_selection_page", value: true)
+                                      {
+                                          displayName     = "Native In Select",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = null    },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "panel_smoothness", value: 2)
+                                      {
+                                          displayName     = "Panel Smoothness",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override",  Value = "2"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "2",              Value = "2"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "3",              Value = "3"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "4",              Value = "4"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "8",              Value = "8"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "16",             Value = "16" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "1x",             Value = "1"  },
+                                                            },
+                                      }
+                                  );
 
                                   foreach (var configValue in globals.Where(v => v.tag == "global"))
                                   {
                                       GlobalValues.Add(configValue);
-                                      CHECKOUT.Config.Collection.Add(configValue);
-                                      CHECKOUT.Config.ConfigData.Add(key : configValue.Key, value : configValue);
-                            
+                                      CHECKOUT.Config.SetValue(configValue);
                                   }
                         
                               });

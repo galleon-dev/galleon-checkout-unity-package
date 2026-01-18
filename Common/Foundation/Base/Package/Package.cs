@@ -12,7 +12,7 @@ using UnityEditor;
 
 namespace Galleon.Checkout.Foundation
 {
-    public class Package : VirtualEntity
+    public class Package : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
@@ -22,6 +22,9 @@ namespace Galleon.Checkout.Foundation
         
         // Runtime
         public Core Core = new Core();
+        
+        // Slice
+        public Slice Slice = new Slice();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
@@ -209,47 +212,6 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"prep_for_thing"
                     ,action : async (s) =>
                     {
-                        /// Thins.Slice1.Plus(thing t1)
-                        
-                        /// > Root                                        [V]  # hardcoded
-                        ///     > Context                                 [V]  # hardcoded
-                        ///         > Slices
-                        ///             > Slice Slice1                    [ ]  # ve
-                        ///         > Project
-                        ///             > Package foundation              [ ]  # scan
-                        ///             > Package package1                [ ]  # scan
-                        ///                 > (Definitions)                 
-                        ///                     > Slice Sliec1            [ ]  # text
-                        ///                         > Thing t1            [ ]  # text
-                        ///                         > Thing t2            [ ]  # text
-                        ///                         > Thing t3            [ ]  # text
-                        ///                 > (Elements)                    
-                        ///                 > (Assets)                      
-                        ///                 > (Hierarchy)
-                        ///                 > (Slices)
-                        ///                     > Slice slice1            [ ]  # ve, in memory
-                        ///                         > thing t1            [ ]  # ve, in memory
-                        ///                         > thing t2            [ ]  # ve, in memory
-                        ///                         > thing t3            [ ]  # ve, in memory
-                        /// 
-                        ///     > Runtime                                 [V]  # hardcoded
-                        ///         > App                                 [ ]  # hardcoded
-                        ///             > Core                            [ ]  # class instance, hardcoded
-                        ///                 > Slice Slice1                [ ]  # class instance, runtime
-                        ///                     > Thing t1                [ ]  # class instance, runtime
-                        ///                     > Thing t2                [ ]  # class instance, runtime
-                        ///                     > Thing t3                [ ]  # class instance, runtime
-                        
-                        /// 1. Verify Package (IDs, entities, scene, core, etc)
-                        /// 2. Verify Definitions (texts)
-                        /// 3. Verify Slices (Ve)
-                        /// 4. Print.
-                        ///     > Elements (ve)
-                        ///     > t1 t2 t3 (ve)
-                        ///     > crud create
-                        ///     > Elements (classes)
-                        ///     > t1 t2 t3 (classes)
-                        /// 5. available in runtime : t1 t2 t3
                     });
         
         
@@ -258,74 +220,14 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"create_thing_1"
                     ,action : async (s) =>
                     {   
-                        /// ====================== Pre :
-                        /// > Package Foundation
-                        ///     > Element Thing
-                        ///         > Assets    (Hardcoded) = Prefab, Script, Material.
-                        ///         > Hierarchy (Hardcoded) = Prefab, Component, GO_"model", Cube, Rigindbody, Collider.
-                        ///     > Assets
-                        ///         > Folder Thing
-                        ///             > Prefab Thing
-                        ///             > Script Thing
-                        ///             > Material Thing
-                        ///     > Hierarchy
-                        ///         > Scene S1
-                        ///         > Prefab Thing
-                        ///             > Component ting
-                        ///             > GO model
-                        ///                 > C Cube
-                        ///                     > ref material
-                        ///     > Core
-                        ///         > class with fields and flow.
-                        ///
-                        /// ====================== Prep :
-                        /// > Package1
-                        ///     > Dependencies = Foundation.
-                        /// ====================== Print text :
-                        /// "
-                        /// > package1
-                        ///     > core
-                        ///         > thing t1
-                        ///         > thing t1 #tags
-                        ///         > thing t3 #tags "prompt"
-                        /// "
-                        /// ====================== Result :
-                        /// > Package package1
-                        ///     > Assets
-                        ///         > A.Scene s1
-                        ///     > Hierarchy
-                        ///         > H.Scene s1
-                        ///             > prefab t1
-                        ///             > prefab t2
-                        ///             > prefab t3
-                        ///     > Core
-                        ///         > field Thing t1 
-                        ///         > field Thing t2 
-                        ///         > field Thing t3 
-
-                        //////////////////////////////////////////////////////////////////
-                        
                         /// Definitions
-                        Core           core         = new Core();
                         ELEMENTS.Thing thingElement = Elements.ThingElement;
                         
-                        //////////////////////////////////////////////////////////////////
-                        
                         /// Create default Hardcoded thing
-                        /// Thing t1 = new Thing(name : "t1");
-                        VirtualEntity thing1 = await thingElement.Create(new Thing.ThingParams() { Name = "t1"});
+                        var thing1 = new VirtualEntity() { TextNode = new TextNode("> Thing t1") };
+                        this.Slice.Node.AddChild(thing1);
                         
-                        //////////////////////////////////////////////////////////////////
-                        
-                        /// Plus Direct
-                        /// Package.Node.Plus(new Thing(name : "t3"));
-                        
-                        //////////////////////////////////////////////////////////////////
-                        
-                        /// Plus Op
-                        /// Package.Node.Plus("> Thing t1");
-                        
-                        //////////////////////////////////////////////////////////////////
+                        await thing1.CreateOp.Execute();
                     });
         
         
@@ -334,20 +236,6 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"create_thing_2"
                     ,action : async (s) =>
                     {   
-                        /// Definitions
-                        Core           core         = new Core();
-                        ELEMENTS.Thing thingElement = Elements.ThingElement;
-                        
-                        //////////////////////////////////////////////////////////////////
-                        
-                        /// Create default Hardcoded thing
-                        /// Thing t1 = new Thing(name : "t1");
-                        VirtualEntity thing2 = await thingElement.Create(new Thing.ThingParams()
-                        {
-                                Name   = "t2",
-                                Tags   = new[] { "#tag" },
-                                Prompt = "",
-                        });
                         
                     });
         
@@ -379,9 +267,9 @@ namespace Galleon.Checkout.Foundation
                 
                 this.Add(new Button(() => target.PrepForThing ().Execute()) { text = "prep for thing"  });
                 this.Add(new Button(() => target.CreateThing1 ().Execute()) { text = "create thing 1"  });
-                this.Add(new Button(() => target.CreateThing2 ().Execute()) { text = "create thing 2"  });
-                this.Add(new Button(() => target.HardCopyThing().Execute()) { text = "hard copy thing" });
-                this.Add(new Button(() => target.InheritThing ().Execute()) { text = "inherit thing"   });
+                // this.Add(new Button(() => target.CreateThing2 ().Execute()) { text = "create thing 2"  });
+                // this.Add(new Button(() => target.HardCopyThing().Execute()) { text = "hard copy thing" });
+                // this.Add(new Button(() => target.InheritThing ().Execute()) { text = "inherit thing"   });
                 
                 #region OLD
                 

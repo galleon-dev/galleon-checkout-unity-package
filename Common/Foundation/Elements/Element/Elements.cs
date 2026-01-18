@@ -5,7 +5,7 @@ using Galleon.Checkout.Foundation;
 
 namespace Galleon.Checkout.ELEMENTS
 {
-    public class Elements : VirtualEntity
+    public class Elements : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         

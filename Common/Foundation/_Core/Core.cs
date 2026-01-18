@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Galleon.Checkout.Foundation
 {
-    public class Core : VirtualEntity
+    public class Core : Entity
     {
     }
 }

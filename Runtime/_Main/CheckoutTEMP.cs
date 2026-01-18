@@ -870,6 +870,7 @@ namespace Galleon.Checkout
 ///             > background closeing too easily
 ///             > on lose focus - goes to CVV field
 ///             > doesnt offer autofill
+///             > cant "pay" if using date picker in credit card screen
 ///         > Dropdown issues
 ///             > ui
 ///             > IDs

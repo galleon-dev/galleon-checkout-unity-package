@@ -27,15 +27,18 @@ public class SettingsPanelView : View
     public GameObject           InformationalLabel;
     public GameObject           Gap;
     
+    private int                 ScrollRectMaxSize = 6;
+    private float               PaymentPrefabHeight = 200f;
+    private float               SeparatorHeight = 2f;
+
+    [Header("misc")]
+    public TMP_Text             BackButton;
+    public LayoutElement        ScrollRectLayoutElement;
+    public ScrollRect           ScrollRect;
+    
     //////////////////////////////////////////////////////////////////////////// View Result
 
     public ViewResult Result = ViewResult.None;
-
-    public LayoutElement    ScrollRectLayoutElement;
-    public ScrollRect       ScrollRect;
-    private int             ScrollRectMaxSize = 6;
-    private float           PaymentPrefabHeight = 200f;
-    private float           SeparatorHeight = 2f;
 
     public enum ViewResult
     {
@@ -99,6 +102,14 @@ public class SettingsPanelView : View
 
         int rowCount = 0;
         
+        if (CHECKOUT.PaymentMethods.UserPaymentMethodsToRemove.Count > 0
+        ||  CHECKOUT.Globals.IsNativeStoreToggleEnabled)
+        {
+            // Add ui separator
+            Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsHolder.transform);
+            Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsHolder.transform);
+        }
+        
         // Add children
         var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToRemove;
         foreach (var paymentMethod in paymentMethods)
@@ -139,6 +150,10 @@ public class SettingsPanelView : View
         if (!string.IsNullOrEmpty(CHECKOUT.User.Email))
             this.EmailInputField.Text = CHECKOUT.User.Email;
 
+        // Back Button
+        this.BackButton.gameObject.SetActive(CHECKOUT.Globals.SettingsBackButton != "");
+        this.BackButton.text = CHECKOUT.Globals.SettingsBackButton;
+        
         UpdateScrollRectMaxSize();
     }
 
@@ -168,11 +183,11 @@ public class SettingsPanelView : View
         }
         else if (PaymentMethodsAmount <= ScrollRectMaxSize)
         {
-            ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 2;
+            ScrollRectLayoutElement.preferredHeight = PaymentMethodsAmount * (PaymentPrefabHeight + SeparatorHeight) + 10;
         }
         else
         {
-            ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 2;
+            ScrollRectLayoutElement.preferredHeight = ScrollRectMaxSize * (PaymentPrefabHeight + SeparatorHeight) + 10;
         }
     }
 
@@ -190,41 +205,45 @@ public class SettingsPanelView : View
         EmailInputField.Select();
     }
 
+    public void On_BackClicked()
+    {
+        this.Result = ViewResult.Back;
+        CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
+    }
 
     public async void On_FinishedEditingEmail(string str, EndEditReason reason)
-    {
-        Debug.Log($"str = {str}");
-        Debug.Log($"reason = {reason}");
+    { 
+        await validateAndSubmitEmail(str);
+    }
 
+    //////////////////////////////////////////////////////////////////////////// Email Methods
+
+    private async Task validateAndSubmitEmail(string str)
+    {
+     
         EmailInputfieldBorder.SetActive(false);
         EmailEditButton.SetActive(true);
         IsEditingEmail = false;
 
         bool valid = ValidateEmail(EmailInputField.Text);
-        emailErrorText.text = valid ? "" : "Invalid email format";
+
+        if (!string.IsNullOrEmpty(EmailInputField.Text))
+        {
+            emailErrorText.text = valid ? "" : "Invalid email format";
+        } 
+        else
+        {
+            emailErrorText.text = "";
+        }
        
         if (valid)
         {
-            this.EmailInputField.Text = str;
+            this.EmailInputField.Text            = str;
             CHECKOUT.Session.User.UserInfo.email = str;
             await CHECKOUT.Actions.SetEmail().Execute();
-        } 
-        // if(SuccessPanelEmailInputField)
-        // {
-        //     SuccessPanelEmailInputField.Text = EmailInputField.Text;
-        // 
-        //     if(string.IsNullOrEmpty(SuccessPanelEmailInputField.Text))
-        //     {
-        //         SuccessPanelView.ShowEmail(false);
-        //     } else
-        //     {
-        //         SuccessPanelView.ShowEmail(true);
-        //     }
-        //     PlayerPrefs.SetString("Email", SuccessPanelEmailInputField.Text);
-        //     PlayerPrefs.Save();
-        // } 
+        }   
     }
-
+    
     private bool ValidateEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
@@ -241,6 +260,7 @@ public class SettingsPanelView : View
         CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
     }
 
+    
     //////////////////////////////////////////////////////////////////////////// Events
 
     public void DeletePaymentMethod(UserPaymentMethod userPaymentMethod)

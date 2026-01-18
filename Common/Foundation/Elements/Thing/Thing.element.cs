@@ -36,7 +36,7 @@ namespace Galleon.Checkout.ELEMENTS
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
-        public async Task<VirtualEntity> Create(ThingParams @thingParams)
+        public async Task<Entity> Create(ThingParams @thingParams)
         {
             await CreateOp.Execute();
             return default;
