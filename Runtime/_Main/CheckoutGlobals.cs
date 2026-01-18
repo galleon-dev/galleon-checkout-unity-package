@@ -96,6 +96,13 @@ namespace Galleon.Checkout
             new Step(name   : $"initialize_globals"
                     ,tags   : new[] { "init" }
                     ,action : async (s) =>
+                              {  
+                              });
+        
+        public Step PopulateGlobalConfigValues() 
+        =>
+            new Step(name   : $"populate_global_config_values"
+                    ,action : async (s) =>
                               {
                                   var globals = new List<ConfigValue>();
                         
