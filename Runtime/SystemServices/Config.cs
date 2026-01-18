@@ -23,8 +23,8 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
-                        s.AddChildStep(InitializeConfigFromLocal());
                         s.AddChildStep(InitializeConfigFromServer());
+                        s.AddChildStep(InitializeConfigFromLocal());
                     });
         
         public Step InitializeConfigFromLocal() 
