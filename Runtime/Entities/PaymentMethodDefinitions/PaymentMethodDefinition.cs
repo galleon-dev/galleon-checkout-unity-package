@@ -44,7 +44,7 @@ namespace Galleon.Checkout
         public bool         AllowOnlyOneUPM     => true;
         public bool         ShouldShowDropdown  => true;
         
-        public IEnumerable<UserPaymentMethod> SavedUPMS => CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Data.type == this.Data.type);
+        public IEnumerable<UserPaymentMethod> SavedUPMS => CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Type == this.Type);
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
@@ -90,7 +90,6 @@ namespace Galleon.Checkout
                                                     DisplayName        = this.DisplayName,
                                                     IsNewPaymentMethod = true,
                                                     IsSelected         = false,
-                                                    Type               = this.Type,
                                                 };
             
             return userPaymentMethod;

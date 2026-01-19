@@ -96,18 +96,19 @@ namespace Galleon.Checkout.UI
                 SetSeperatorColor(UnselectedOptionColor, false);
             
             // Bonus
-            // if (this.bonusItemView != null)
-            // {    
-            //     if (this.PaymentMethod.IsSelected) IBonusItemView.Open();
-            //     else                               IBonusItemView.Close();
-            //     
-            //     if (this.PaymentMethod.Type == "native")
-            //         (IBonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
-            // }
+            if (this.bonusItemView != null && !CHECKOUT.Globals.IsPreselectionEnabled)
+            {    
+                this.bonusItemView.gameObject.SetActive(true);
+                if (this.PaymentMethod.IsSelected) bonusItemView.Open();
+                else                               bonusItemView.Close();
+                
+                if (this.PaymentMethod.Type == "native")
+                    (bonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
+            }
             
             // Dropdown
-            bool shouldShowDropdown =  this.PaymentMethod.Data.type == "credit_card"
-                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Data.type == "credit_card") > 1;
+            bool shouldShowDropdown =  this.PaymentMethod.Type == "credit_card"
+                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Type == "credit_card") > 1;
 
             if (shouldShowDropdown)
             {
@@ -172,8 +173,8 @@ namespace Galleon.Checkout.UI
             DropdownButton.ClearOptions();
             
             // Definitions
-            var myType      = this.PaymentMethod.Data.type;
-            var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Data.type == myType).Except(new []{this.PaymentMethod}).ToList();
+            var myType      = this.PaymentMethod.Type;
+            var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Type == myType).Except(new []{this.PaymentMethod}).ToList();
             var upms        = (new List<UserPaymentMethod>() { this.PaymentMethod }).Concat(otherUpms).ToList( );
             
             // Add options

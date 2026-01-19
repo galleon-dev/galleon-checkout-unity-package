@@ -149,10 +149,9 @@ namespace Galleon.Checkout.UI
                 // Create payment method object
                 var card                     = new CreditCardUserUserPaymentMethod();
                 card.Data.type               = "credit_card";
-                card.Data.credit_card_type   = card.Type;
+                card.Data.credit_card_type   = CurrentCardFormat.Name.ToLower();
                 
                 // Set card Data
-                card.Type                    = CurrentCardFormat.Name;
                 card.DisplayName             = $"{CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
                 card.CardHolderName          = NameInputField.Text;
                 card.CardNumber              = CreditCardNumberField.Text;
@@ -671,6 +670,7 @@ namespace Galleon.Checkout.UI
             await Task.Yield();
             
             FormatCreditCardInput(CreditCardNumberField.Text);
+            CurrentCardFormat = GetFormatForDigits(digits: CreditCardNumberField.Text);
          
             
             cbx_SaveCardDetails.IsChecked = true;

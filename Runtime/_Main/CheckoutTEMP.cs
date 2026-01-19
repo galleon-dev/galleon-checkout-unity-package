@@ -900,3 +900,5 @@ namespace Galleon.Checkout
 ///         > test scenarios
 ///         > test report
 ///         > logs
+///     > (bugs)
+///         > sometimes it tries to cancel the session when it shouldnt
