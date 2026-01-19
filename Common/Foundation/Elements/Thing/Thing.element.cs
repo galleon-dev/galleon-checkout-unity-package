@@ -36,23 +36,175 @@ namespace Galleon.Checkout.ELEMENTS
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
-        public async Task<Entity> Create(ThingParams @thingParams)
+        /// Supported Tags :
+        /// Position    : 5,2       or  5,2,0 
+        /// size        : 2x4       or  2,4,1
+        /// color       : red       or  #113366FF
+        /// collider    : collider  or  no-collider
+        /// rigidboxy   : rb        or  no-rb
+                                        
+        public Vector3? GetPosition(string text)
         {
-            await CreateOp.Execute();
-            return default;
+            // Return null if input text is empty or null
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            // Remove parentheses and spaces for consistent formatting
+            // e.g. "(1, 2)" or "1,2" both become "1,2"
+            text = text.Trim().Trim('(', ')').Replace(" ", "");
+
+            // Split text by comma to get individual coordinate values
+            // e.g. "1,2" becomes ["1", "2"]
+            string[] parts = text.Split(',');
+
+            // Validate we have either 2D (x,y) or 3D (x,y,z) coordinates
+            if (parts.Length != 2 && parts.Length != 3)
+                return null;
+
+            // Parse x,y coordinates, return null if either fails
+            if (!float.TryParse(parts[0], out float x) || !float.TryParse(parts[1], out float y))
+                return null;
+
+            // Handle optional z coordinate, default to 0 if not provided
+            float z = 0f;
+            if (parts.Length == 3 && !float.TryParse(parts[2], out z))
+                return null;
+
+            return new Vector3(x, y, z);
         }
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Operation
+        public Vector3? GetSize(string text)
+        {
+            // Return null if input text is empty or null
+            if (string.IsNullOrEmpty(text))
+                return null;
 
-        public Operation CreateOp => new Operation(id: "thing_operation")
-                                         .AddStep(CreateThingAsset())
-                                         .AddStep(new Step(name : "wait", action: async s => { await Task.Delay(5000); } ))
-                                         .AddStep(CreateThingHierarchy())
-                                         .AddStep(CreateThingApp());
-                                        
+            // Remove parentheses and spaces for consistent formatting
+            text = text.Trim().Trim('(', ')').Replace(" ", "");
+
+            // Split text by 'x' to get dimensions
+            string[] parts = text.Split('x');
+
+            // Validate we have either 2D (width x height) or 3D (width x height x depth) dimensions
+            if (parts.Length != 2 && parts.Length != 3)
+                return null;
+
+            // Parse width and height, return null if either fails
+            if (!float.TryParse(parts[0], out float width) || !float.TryParse(parts[1], out float height))
+                return null;
+
+            // Handle optional depth coordinate, default to 1 if not provided
+            float depth = 1f;
+            if (parts.Length == 3 && !float.TryParse(parts[2], out depth))
+                return null;
+
+            return new Vector3(width, height, depth);
+        }
+        
+        public Color? GetColor(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            text = text.ToLower().Trim();
+
+            // Handle named colors
+            switch (text)
+            {
+                case "red":           return     Color.red;
+                case "darkred":       return new Color(0.5f, 0f,   0f,   1f);
+                case "lightred":      return new Color(1f,   0.4f, 0.4f, 1f);
+                case "pastelred":     return new Color(1f,   0.8f, 0.8f, 1f);
+                case "blue":          return     Color.blue; 
+                case "darkblue":      return new Color(0f,   0f,   0.5f, 1f);
+                case "lightblue":     return new Color(0.4f, 0.4f, 1f,   1f);
+                case "pastelblue":    return new Color(0.8f, 0.8f, 1f,   1f);
+                case "green":         return     Color.green;
+                case "darkgreen":     return new Color(0f,   0.5f, 0f,   1f);
+                case "lightgreen":    return new Color(0.4f, 1f,   0.4f, 1f);
+                case "pastelgreen":   return new Color(0.8f, 1f,   0.8f, 1f);
+                case "yellow":        return     Color.yellow;
+                case "darkyellow":    return new Color(0.5f,  0.5f,  0f,    1f);
+                case "lightyellow":   return new Color(1f,    1f,    0.4f,  1f);
+                case "pastelyellow":  return new Color(1f,    1f,    0.8f,  1f);
+                case "purple":        return new Color(0.5f,  0f,    0.5f,  1f);
+                case "darkpurple":    return new Color(0.25f, 0f,    0.25f, 1f);
+                case "lightpurple":   return new Color(0.8f,  0.4f,  0.8f,  1f);
+                case "pastelpurple":  return new Color(0.85f, 0.7f,  0.85f, 1f);
+                case "orange":        return new Color(1f,    0.5f,  0f,    1f);
+                case "darkorange":    return new Color(0.8f,  0.4f,  0f,    1f);
+                case "lightorange":   return new Color(1f,    0.7f,  0.4f,  1f);
+                case "pastelorange":  return new Color(1f,    0.8f,  0.6f,  1f);
+                case "pink":          return new Color(1f,    0.75f, 0.8f,  1f);
+                case "darkpink":      return new Color(0.8f,  0.4f,  0.6f,  1f);
+                case "lightpink":     return new Color(1f,    0.8f,  0.9f,  1f);
+                case "pastelpink":    return new Color(1f,    0.9f,  0.95f, 1f);
+                case "brown":         return new Color(0.6f,  0.4f,  0.2f,  1f);
+                case "darkbrown":     return new Color(0.4f,  0.26f, 0.13f, 1f);
+                case "lightbrown":    return new Color(0.8f,  0.6f,  0.4f,  1f);
+                case "pastelbrown":   return new Color(0.95f, 0.87f, 0.8f,  1f);
+                case "cyan":          return     Color.cyan;
+                case "darkcyan":      return new Color(0f,   0.5f, 0.5f, 1f);
+                case "lightcyan":     return new Color(0.4f, 1f,   1f,   1f);
+                case "pastelcyan":    return new Color(0.8f, 1f,   1f,   1f);
+                case "magenta":       return     Color.magenta;
+                case "darkmagenta":   return new Color(0.5f, 0f,   0.5f, 1f);
+                case "lightmagenta":  return new Color(1f,   0.4f, 1f,   1f);
+                case "pastelmagenta": return new Color(1f,   0.8f, 1f,   1f);
+                case "gray":          return     Color.gray;
+                case "darkgray":      return new Color(0.25f, 0.25f, 0.25f, 1f);
+                case "lightgray":     return new Color(0.75f, 0.75f, 0.75f, 1f);
+                case "pastelgray":    return new Color(0.9f,  0.9f,  0.9f,  1f);
+                case "grey":          return     Color.grey;
+                case "black":         return     Color.black;
+                case "white":         return     Color.white;
+                case "clear":         return     Color.clear;
+                
+            }
+
+            // Handle hex colors
+            if (text.StartsWith("#"))
+                text = text.Substring(1);
+
+            try
+            {
+                if (text.Length == 6) // RGB
+                {
+                    float r = Convert.ToInt32(text.Substring(0, 2), 16) / 255f;
+                    float g = Convert.ToInt32(text.Substring(2, 2), 16) / 255f;
+                    float b = Convert.ToInt32(text.Substring(4, 2), 16) / 255f;
+                    return new Color(r, g, b, 1);
+                }
+                else if (text.Length == 8) // RGBA
+                {
+                    float r = Convert.ToInt32(text.Substring(0, 2), 16) / 255f;
+                    float g = Convert.ToInt32(text.Substring(2, 2), 16) / 255f;
+                    float b = Convert.ToInt32(text.Substring(4, 2), 16) / 255f;
+                    float a = Convert.ToInt32(text.Substring(6, 2), 16) / 255f;
+                    return new Color(r, g, b, a);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            return null;
+        }
+        
+        public bool GetIscollder(string text)
+        {
+            return text.ToLower().Trim() == "collider";
+        }
+        
+        public bool GetIsRigidBody(string text)
+        {
+            return text.ToLower().Trim() == "rb" || text.ToLower().Trim() == "rigidbody";
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
         
-        public Step CreateThingAsset() 
+        public Step CreateThingAsset(VirtualEntity ve) 
         =>
             new Step(name   : $"create_thing_asset"
                     ,action : async (s) =>
@@ -61,7 +213,7 @@ namespace Galleon.Checkout.ELEMENTS
             
                         ThingParams @params = new ThingParams()
                                             {
-                                                Name   = "t1",
+                                                Name   = ve.ThingName,
                                                 Prompt = "",
                                                 Tags   = new [] { "" }
                                             };
@@ -82,7 +234,7 @@ namespace Galleon.Checkout.ELEMENTS
                     });
         
         
-        public Step CreateThingHierarchy() 
+        public Step CreateThingHierarchy(VirtualEntity ve) 
         =>
             new Step(name   : $"create_thing_hierarchy"
                     ,action : async (s) =>
@@ -91,14 +243,14 @@ namespace Galleon.Checkout.ELEMENTS
 
                         ThingParams @params = new ThingParams()
                         {
-                            Name   = "t1",
+                            Name   = ve.ThingName,
                             Prompt = "",
                             Tags   = new [] { "" }
                         };
 
                         // Get paths
-                        string prefabPath   = System.IO.Path.Combine("Assets/package1/Thing/Prefabs",   @params.Name + ".prefab");
-                        string materialPath = System.IO.Path.Combine("Assets/package1/Thing/Materials", @params.Name + "_material.mat");
+                        string prefabPath   = System.IO.Path.Combine($"Assets/package1/{@params.Name}/Prefabs",   @params.Name + ".prefab");
+                        string materialPath = System.IO.Path.Combine($"Assets/package1/{@params.Name}/Materials", @params.Name + "_material.mat");
 
                         // Load and instantiate the prefab
                         GameObject prefabAsset    = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -140,7 +292,7 @@ namespace Galleon.Checkout.ELEMENTS
                     });
         
         
-        public Step CreateThingApp() 
+        public Step CreateThingApp(VirtualEntity ve) 
         =>
             new Step(name   : $"create_thing_app"
                     ,action : async (s) =>
