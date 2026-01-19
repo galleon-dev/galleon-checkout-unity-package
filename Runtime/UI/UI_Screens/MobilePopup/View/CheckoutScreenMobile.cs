@@ -483,10 +483,10 @@ namespace Galleon.Checkout.UI
                 OnPageFinishedWithResult(NavigationStates.Close.ToString());
             else
             {
-                if (CHECKOUT.Globals.IsPreselectionEnabled)
-                    OnPageFinishedWithResult(NavigationStates.Back.ToString());
-                else
+                if (!CHECKOUT.Globals.IsPreselectionEnabled && CurrentPage == CheckoutPage)
                     OnPageFinishedWithResult(NavigationStates.Close.ToString());
+                else
+                    OnPageFinishedWithResult(NavigationStates.Back.ToString());
             }
         }
 
