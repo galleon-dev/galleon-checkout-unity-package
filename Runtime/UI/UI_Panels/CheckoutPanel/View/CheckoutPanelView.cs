@@ -48,6 +48,7 @@ namespace Galleon.Checkout.UI
 
         [Header("Payment Button")]
         public GameObject               PurchaseButton;
+        public TMP_Text                 PurchaseButtonText;
 
         [Header("Taxes")]
         public List<GameObject>         TaxesPanels;
@@ -230,6 +231,11 @@ namespace Galleon.Checkout.UI
             
             var image    = PurchaseButton.gameObject.GetComponent<Image>();
             image.sprite = upm.GetButtonSprite();
+            
+            if (upm.ButtonText != null)
+                PurchaseButtonText.text = upm.ButtonText;
+            else
+                PurchaseButtonText.text = "";
         }
         
         

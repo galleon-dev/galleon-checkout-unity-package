@@ -38,6 +38,8 @@ namespace Galleon.Checkout
         
         public bool                  IsNewPaymentMethod      = false;
         public bool                  ShouldSavePaymentMethod = false;
+        
+        public string                ButtonText = null;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
         

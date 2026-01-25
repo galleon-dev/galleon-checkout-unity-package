@@ -62,7 +62,7 @@ namespace Galleon.Checkout
         
         public string SettingsBackButton
         {
-            get => CHECKOUT.Config.GetString       ("settings_back_button", defaultValue : "Back");
+            get => CHECKOUT.Config.GetString       ("settings_back_button", defaultValue : "Back To Checkout");
             set => CHECKOUT.Config.SetOverrideValue("settings_back_button", value);
         }
 

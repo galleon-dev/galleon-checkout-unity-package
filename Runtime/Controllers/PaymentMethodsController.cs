@@ -147,7 +147,8 @@ namespace Galleon.Checkout
                                                 IsNewPaymentMethod = false,
                                                 IsSelected         = false,
                                                 SortOrder          = float.PositiveInfinity, 
-                                                Type               = "empty_card"
+                                                Type               = "empty_card",
+                                                ButtonText         = "Add Card"
                                             });
             }
             
@@ -298,7 +299,8 @@ namespace Galleon.Checkout
                                                             IsNewPaymentMethod = false,
                                                             IsSelected         = false,
                                                             SortOrder          = float.PositiveInfinity,
-                                                            Type               = "native"
+                                                            Type               = "native",
+                                                            ButtonText         = "Continue with google play"
                                                         });
                         }
                         
@@ -335,7 +337,8 @@ namespace Galleon.Checkout
                                                             IsNewPaymentMethod = false,
                                                             IsSelected         = false,
                                                             SortOrder          = float.PositiveInfinity, 
-                                                            Type               = "empty_card"
+                                                            Type               = "empty_card",
+                                                            ButtonText         = "Add Card"
                                                         });
                         }
                         
@@ -352,7 +355,8 @@ namespace Galleon.Checkout
                                                             IsNewPaymentMethod = false,
                                                             IsSelected         = false,
                                                             SortOrder          = float.PositiveInfinity, 
-                                                            Type               = "empty_paypal"
+                                                            Type               = "empty_paypal",
+                                                            ButtonText         = "Add Paypal Account"
                                                         });
                         }
                         

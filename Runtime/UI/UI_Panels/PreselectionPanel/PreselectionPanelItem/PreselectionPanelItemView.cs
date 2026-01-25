@@ -80,7 +80,7 @@ namespace Galleon.Checkout.UI
             
             // Set button Sprite
             if (this.PaymentMethod.IsSelected)
-                PreselectionPanelView.SetPurchaseButtonSprite(this.PaymentMethod.GetButtonSprite());
+                PreselectionPanelView.SetPurchaseButtonSprite(this.PaymentMethod);
             
             // Set Seperator Color 
             if (this.PaymentMethod.IsSelected)
