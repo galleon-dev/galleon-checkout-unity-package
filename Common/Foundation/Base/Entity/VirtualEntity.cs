@@ -26,6 +26,9 @@ namespace Galleon.Checkout.Foundation
         
         public Thing    Element   => Root.Instance.Context.Project.Package1.Elements.ThingElement;
         
+        
+        public string[] Tags => TextNode.Hashtags.Select(x => x.Trim('#')).ToArray();
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public VirtualEntity()

@@ -163,7 +163,7 @@ namespace Galleon.Checkout.Foundation
                     {
                         if (word.StartsWith("#") && word.Length > 1)
                         {
-                            var tag = new string(word.Skip(1).TakeWhile(char.IsLetterOrDigit).ToArray());
+                            var tag = new string(word.Skip(1).ToArray());
                             if (!string.IsNullOrEmpty(tag))
                                 tags.Add(tag);
                         }

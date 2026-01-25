@@ -44,6 +44,10 @@ namespace Galleon.Checkout.UI
         
         public async override void RefreshState()
         {
+            UpdateScrollRectMaxSize();
+            
+            /////////////////////
+            
             // Remove children (if any)
             foreach (Transform child in SelectPaymentMethodItemsHolder.transform)
             {
@@ -125,9 +129,6 @@ namespace Galleon.Checkout.UI
                     await Task.Yield();
             }
             
-            /////////////////////
-            
-            UpdateScrollRectMaxSize();
         }
 
 

@@ -124,6 +124,9 @@ namespace Galleon.Checkout.UI
                     bonusItemView.gameObject.SetActive(false);
             }
             
+            if (!CHECKOUT.Globals.IsBonusEnabled)
+                bonusItemView.gameObject.SetActive(false);
+            
             // Dropdown
             bool shouldShowDropdown =  this.UserPaymentMethod != null
                                     && this.UserPaymentMethod.Type == "credit_card"

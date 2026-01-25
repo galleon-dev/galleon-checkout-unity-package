@@ -27,7 +27,7 @@ namespace Galleon.Checkout.Foundation
         public Slice    Slice       = new Slice();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
-
+        
         public Package()
         {
             #if UNITY_EDITOR
@@ -58,6 +58,7 @@ namespace Galleon.Checkout.Foundation
                         Debug.Log($"Package.Asset.Folder   = {this.Assets.rootFolder.FolderPath}");
                         Debug.Log($"Package.Asset.Scene    = {"TBD"}");
                     });
+        
         public Step Do_Rescan() 
         =>
             new Step(action : async (s) =>
@@ -240,6 +241,7 @@ namespace Galleon.Checkout.Foundation
                     {   
                         var thing2 = new VirtualEntity() { TextNode = new TextNode("> Thing t2 #yellow") };
                         this.Slice.Node.AddChild(thing2);
+                        await Slice.Op().Execute();
                     });
         
         public Step CreateThing3() 
@@ -255,8 +257,7 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(name   : $"hard_copy_thing"
                     ,action : async (s) =>
-                    {
-                        
+                    {   
                     });
         
         public Step InheritThing() 
@@ -264,7 +265,6 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"inherit_thing"
                     ,action : async (s) =>
                     {
-                        
                     });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
@@ -325,4 +325,3 @@ namespace Galleon.Checkout.Foundation
         }   
     }
 }
-

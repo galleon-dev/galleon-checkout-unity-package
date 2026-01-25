@@ -52,6 +52,7 @@ namespace Galleon.Checkout.UI
             // Bonus
             if (this.bonusItemView != null)
                 this.bonusItemView.gameObject.SetActive(false);
+            
             // if (this.bonusItemView != null)
             //     Destroy(this.bonusItemView.gameObject); // destroy placeholder
             // if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
@@ -104,6 +105,9 @@ namespace Galleon.Checkout.UI
                 
                 if (this.PaymentMethod.Type == "native")
                     (bonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
+                
+                if (!CHECKOUT.Globals.IsBonusEnabled)
+                    bonusItemView.gameObject.SetActive(false);
             }
             
             // Dropdown

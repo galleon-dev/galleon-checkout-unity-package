@@ -13,6 +13,7 @@ namespace Galleon.Checkout
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         public VirtualEntity t1 =  new VirtualEntity() { TextNode = new TextNode("> Thing t1") };
+        public VirtualEntity t2 =  new VirtualEntity() { TextNode = new TextNode("> Thing t2 #yellow #4x4 #10,10 #collider #rigidbody") };
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
@@ -20,11 +21,7 @@ namespace Galleon.Checkout
         =>
             new Step(name   : $"Op"
                     ,action : async (s) =>
-                    {
-                        #if UNITY_EDITOR
-                        EditorPrefs.SetString("session_key", "bla");
-                        #endif
-                        
+                    {   
                         var ves = this.Node.Descendants().OfType<VirtualEntity>();
 
                         foreach (var ve in ves)
@@ -47,7 +44,10 @@ namespace Galleon.Checkout
                         {
                             await ve.DoNextLiveStep();
                         }
-                    });
+                    })
+                    {
+                        IsSilentLog = true,
+                    };
         
         
         #if UNITY_EDITOR
@@ -71,3 +71,55 @@ namespace Galleon.Checkout
     }
 }
 
+/// > Feb27 App
+///     > (Application)
+///         > (Services)
+///             > Log
+///             > Storage
+///             > Config
+///             > Analytics
+///             > Network
+///             > Etc.
+///         > (Core)
+///             > Flow
+///             > Segments
+///     > (UI)
+///         > Screen
+///             > Panel
+///                 > List
+///                     > Item
+///                         > Code
+///                         > Text
+///                         > Image
+///                         > Button
+///     > (Scene)
+///         > Scene
+///             > PSE
+///                 > prefab
+///                     > GO
+///                         > Component
+///                             > Field / ref
+///                     > Model
+///                         > Mesh
+///                             > Material
+///                                 > Sprite
+///                                     > Texture
+///                     > Physics
+///                         > Rigidbody
+///                         > Collider
+///                     > Aniaiton
+///                         > State?
+///                         > Clip
+///                             > Keyframe
+///                                 > Value
+///                 > Motor
+///     > (Systm)
+///         > Controller
+///         > Rule
+///             > Event
+///             > Confition
+///             > Action
+///                 > Method
+///                 > Step
+///                 > Behaviour 
+///     

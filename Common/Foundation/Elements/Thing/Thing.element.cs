@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.ELEMENTS;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -42,7 +44,7 @@ namespace Galleon.Checkout.ELEMENTS
         /// color       : red       or  #113366FF
         /// collider    : collider  or  no-collider
         /// rigidboxy   : rb        or  no-rb
-                                        
+        
         public Vector3? GetPosition(string text)
         {
             // Return null if input text is empty or null
@@ -72,7 +74,22 @@ namespace Galleon.Checkout.ELEMENTS
 
             return new Vector3(x, y, z);
         }
-        
+
+        public Vector3? GetPositionFromTags(string[] tags)
+        {
+            if (tags == null)
+                return null;
+
+            foreach (var tag in tags)
+            {
+                var position = GetPosition(tag);
+                if (position.HasValue)
+                    return position.Value;
+            }
+
+            return null;
+        }
+
         public Vector3? GetSize(string text)
         {
             // Return null if input text is empty or null
@@ -100,7 +117,22 @@ namespace Galleon.Checkout.ELEMENTS
 
             return new Vector3(width, height, depth);
         }
-        
+
+        public Vector3? GetSizeFromTags(string[] tags)
+        {
+            if (tags == null)
+                return null;
+
+            foreach (var tag in tags)
+            {
+                var size = GetSize(tag);
+                if (size.HasValue)
+                    return size.Value;
+            }
+
+            return null;
+        }
+
         public Color? GetColor(string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -111,54 +143,54 @@ namespace Galleon.Checkout.ELEMENTS
             // Handle named colors
             switch (text)
             {
-                case "red":           return     Color.red;
-                case "darkred":       return new Color(0.5f, 0f,   0f,   1f);
-                case "lightred":      return new Color(1f,   0.4f, 0.4f, 1f);
-                case "pastelred":     return new Color(1f,   0.8f, 0.8f, 1f);
-                case "blue":          return     Color.blue; 
-                case "darkblue":      return new Color(0f,   0f,   0.5f, 1f);
-                case "lightblue":     return new Color(0.4f, 0.4f, 1f,   1f);
-                case "pastelblue":    return new Color(0.8f, 0.8f, 1f,   1f);
-                case "green":         return     Color.green;
-                case "darkgreen":     return new Color(0f,   0.5f, 0f,   1f);
-                case "lightgreen":    return new Color(0.4f, 1f,   0.4f, 1f);
-                case "pastelgreen":   return new Color(0.8f, 1f,   0.8f, 1f);
-                case "yellow":        return     Color.yellow;
-                case "darkyellow":    return new Color(0.5f,  0.5f,  0f,    1f);
-                case "lightyellow":   return new Color(1f,    1f,    0.4f,  1f);
-                case "pastelyellow":  return new Color(1f,    1f,    0.8f,  1f);
-                case "purple":        return new Color(0.5f,  0f,    0.5f,  1f);
-                case "darkpurple":    return new Color(0.25f, 0f,    0.25f, 1f);
-                case "lightpurple":   return new Color(0.8f,  0.4f,  0.8f,  1f);
-                case "pastelpurple":  return new Color(0.85f, 0.7f,  0.85f, 1f);
-                case "orange":        return new Color(1f,    0.5f,  0f,    1f);
-                case "darkorange":    return new Color(0.8f,  0.4f,  0f,    1f);
-                case "lightorange":   return new Color(1f,    0.7f,  0.4f,  1f);
-                case "pastelorange":  return new Color(1f,    0.8f,  0.6f,  1f);
-                case "pink":          return new Color(1f,    0.75f, 0.8f,  1f);
-                case "darkpink":      return new Color(0.8f,  0.4f,  0.6f,  1f);
-                case "lightpink":     return new Color(1f,    0.8f,  0.9f,  1f);
-                case "pastelpink":    return new Color(1f,    0.9f,  0.95f, 1f);
-                case "brown":         return new Color(0.6f,  0.4f,  0.2f,  1f);
-                case "darkbrown":     return new Color(0.4f,  0.26f, 0.13f, 1f);
-                case "lightbrown":    return new Color(0.8f,  0.6f,  0.4f,  1f);
-                case "pastelbrown":   return new Color(0.95f, 0.87f, 0.8f,  1f);
-                case "cyan":          return     Color.cyan;
-                case "darkcyan":      return new Color(0f,   0.5f, 0.5f, 1f);
-                case "lightcyan":     return new Color(0.4f, 1f,   1f,   1f);
-                case "pastelcyan":    return new Color(0.8f, 1f,   1f,   1f);
-                case "magenta":       return     Color.magenta;
-                case "darkmagenta":   return new Color(0.5f, 0f,   0.5f, 1f);
-                case "lightmagenta":  return new Color(1f,   0.4f, 1f,   1f);
-                case "pastelmagenta": return new Color(1f,   0.8f, 1f,   1f);
-                case "gray":          return     Color.gray;
-                case "darkgray":      return new Color(0.25f, 0.25f, 0.25f, 1f);
-                case "lightgray":     return new Color(0.75f, 0.75f, 0.75f, 1f);
-                case "pastelgray":    return new Color(0.9f,  0.9f,  0.9f,  1f);
-                case "grey":          return     Color.grey;
-                case "black":         return     Color.black;
-                case "white":         return     Color.white;
-                case "clear":         return     Color.clear;
+                case "red":            return     Color.red;
+                case "dark_red":       return new Color(0.5f, 0f,   0f,   1f);
+                case "light_red":      return new Color(1f,   0.4f, 0.4f, 1f);
+                case "pastel_red":     return new Color(1f,   0.8f, 0.8f, 1f);
+                case "blue":           return     Color.blue; 
+                case "dark_blue":      return new Color(0f,   0f,   0.5f, 1f);
+                case "light_blue":     return new Color(0.4f, 0.4f, 1f,   1f);
+                case "pastel_blue":    return new Color(0.8f, 0.8f, 1f,   1f);
+                case "green":          return     Color.green;
+                case "dark_green":     return new Color(0f,   0.5f, 0f,   1f);
+                case "light_green":    return new Color(0.4f, 1f,   0.4f, 1f);
+                case "pastel_green":   return new Color(0.8f, 1f,   0.8f, 1f);
+                case "yellow":         return     Color.yellow;
+                case "dark_yellow":    return new Color(0.5f,  0.5f,  0f,    1f);
+                case "light_yellow":   return new Color(1f,    1f,    0.4f,  1f);
+                case "pastel_yellow":  return new Color(1f,    1f,    0.8f,  1f);
+                case "purple":         return new Color(0.5f,  0f,    0.5f,  1f);
+                case "dark_purple":    return new Color(0.25f, 0f,    0.25f, 1f);
+                case "light_purple":   return new Color(0.8f,  0.4f,  0.8f,  1f);
+                case "pastel_purple":  return new Color(0.85f, 0.7f,  0.85f, 1f);
+                case "orange":         return new Color(1f,    0.5f,  0f,    1f);
+                case "dark_orange":    return new Color(0.8f,  0.4f,  0f,    1f);
+                case "light_orange":   return new Color(1f,    0.7f,  0.4f,  1f);
+                case "pastel_orange":  return new Color(1f,    0.8f,  0.6f,  1f);
+                case "pink":           return new Color(1f,    0.75f, 0.8f,  1f);
+                case "dark_pink":      return new Color(0.8f,  0.4f,  0.6f,  1f);
+                case "light_pink":     return new Color(1f,    0.8f,  0.9f,  1f);
+                case "pastel_pink":    return new Color(1f,    0.9f,  0.95f, 1f);
+                case "brown":          return new Color(0.6f,  0.4f,  0.2f,  1f);
+                case "dark_brown":     return new Color(0.4f,  0.26f, 0.13f, 1f);
+                case "light_brown":    return new Color(0.8f,  0.6f,  0.4f,  1f);
+                case "pastel_brown":   return new Color(0.95f, 0.87f, 0.8f,  1f);
+                case "cyan":           return     Color.cyan;
+                case "dark_cyan":      return new Color(0f,   0.5f, 0.5f, 1f);
+                case "light_cyan":     return new Color(0.4f, 1f,   1f,   1f);
+                case "pastel_cyan":    return new Color(0.8f, 1f,   1f,   1f);
+                case "magenta":        return     Color.magenta;
+                case "dark_magenta":   return new Color(0.5f, 0f,   0.5f, 1f);
+                case "light_magenta":  return new Color(1f,   0.4f, 1f,   1f);
+                case "pastel_magenta": return new Color(1f,   0.8f, 1f,   1f);
+                case "gray":           return     Color.gray;
+                case "dark_gray":      return new Color(0.25f, 0.25f, 0.25f, 1f);
+                case "light_gray":     return new Color(0.75f, 0.75f, 0.75f, 1f);
+                case "pastel_gray":    return new Color(0.9f,  0.9f,  0.9f,  1f);
+                case "grey":           return     Color.grey;
+                case "black":          return     Color.black;
+                case "white":          return     Color.white;
+                case "clear":          return     Color.clear;
                 
             }
 
@@ -191,8 +223,33 @@ namespace Galleon.Checkout.ELEMENTS
 
             return null;
         }
-        
-        public bool GetIscollder(string text)
+
+        public Color? GetColorFromTags(string[] tags)
+        {
+            if (tags == null)
+                return null;
+
+            foreach (var tag in tags)
+            {
+                var color = GetColor(tag);
+                if (color.HasValue)
+                    return color.Value;
+            }
+
+            return null;
+        }
+
+        public bool GetIsColliderFromTags(string[] tags)
+        {
+            return tags.Any(t => GetIsCollider(t));
+        }
+
+        public bool GetIsRigidBodyFromTags(string[] tags)
+        {
+            return tags.Any(t => GetIsRigidBody(t));
+        }
+
+        public bool GetIsCollider(string text)
         {
             return text.ToLower().Trim() == "collider";
         }
@@ -226,9 +283,9 @@ namespace Galleon.Checkout.ELEMENTS
                             Directory.CreateDirectory(path);
 
                         // Create all components t
-                        CreatePrefab  (thingName: @params.Name);
+                        CreatePrefab  (ve: ve);
                         CreateScript  (thingName: @params.Name);
-                        CreateMaterial(thingName: @params.Name);
+                        CreateMaterial(ve: ve);
 
                         #endif
                     });
@@ -241,23 +298,16 @@ namespace Galleon.Checkout.ELEMENTS
                     {
                         #if UNITY_EDITOR
 
-                        ThingParams @params = new ThingParams()
-                        {
-                            Name   = ve.ThingName,
-                            Prompt = "",
-                            Tags   = new [] { "" }
-                        };
-
                         // Get paths
-                        string prefabPath   = System.IO.Path.Combine($"Assets/package1/{@params.Name}/Prefabs",   @params.Name + ".prefab");
-                        string materialPath = System.IO.Path.Combine($"Assets/package1/{@params.Name}/Materials", @params.Name + "_material.mat");
+                        string prefabPath   = System.IO.Path.Combine($"Assets/package1/{ve.ThingName}/Prefabs",   ve.ThingName + ".prefab");
+                        string materialPath = System.IO.Path.Combine($"Assets/package1/{ve.ThingName}/Materials", ve.ThingName + "_material.mat");
 
                         // Load and instantiate the prefab
                         GameObject prefabAsset    = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
                         GameObject prefabInstance = PrefabUtility.InstantiatePrefab(prefabAsset) as GameObject;
 
                         // Add the script component
-                        string scriptName = @params.Name;
+                        string scriptName = ve.ThingName;
                         Type scriptType   = System.Type.GetType("TEST_THING." + scriptName + ", Assembly-CSharp");
                         
                         if (scriptType != null)
@@ -266,6 +316,11 @@ namespace Galleon.Checkout.ELEMENTS
                         // Create child cube
                         GameObject modelGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         modelGO.name = "model";
+
+                        // Apply size from tags if available
+                        Vector3? size = GetSizeFromTags(ve.Tags);
+                        if (size.HasValue)
+                            modelGO.transform.localScale = size.Value;
 
                         // Load and assign material
                         var material = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>(materialPath);
@@ -280,6 +335,26 @@ namespace Galleon.Checkout.ELEMENTS
 
                         // Set parent
                         modelGO.transform.SetParent(prefabInstance.transform, false);
+
+                        // Handle Collider
+                        if (GetIsColliderFromTags(ve.Tags))
+                        {
+                            if (modelGO.GetComponent<Collider>() == null)
+                                modelGO.AddComponent<BoxCollider>();
+                        }
+                        else
+                        {
+                            var collider = modelGO.GetComponent<Collider>();
+                            if (collider != null)
+                                UnityEngine.Object.DestroyImmediate(collider);
+                        }
+
+                        // Handle Rigidbody
+                        if (GetIsRigidBodyFromTags(ve.Tags))
+                        {
+                            if (modelGO.GetComponent<Rigidbody>() == null)
+                                modelGO.AddComponent<Rigidbody>();
+                        }
 
                         // Save changes
                         PrefabUtility.SaveAsPrefabAsset(prefabInstance, prefabPath);
@@ -310,15 +385,35 @@ namespace Galleon.Checkout.ELEMENTS
         /// <summary>
         /// Creates a prefab with the given name
         /// </summary>
-        /// <param name="thingName">Name of the prefab to create</param>
-        private void CreatePrefab(string thingName)
+        /// <param name="ve">VirtualEntity containing the thing data</param>
+        private void CreatePrefab(VirtualEntity ve)
         {
             #if UNITY_EDITOR
 
+            string thingName = ve.ThingName;
             var path = $"{FolderPath}{thingName}";
-            
+
             // Create a simple GameObject
             GameObject gameObject = new GameObject(thingName);
+
+            // Apply position from tags if available
+            Vector3? position = GetPositionFromTags(ve.Tags);
+            if (position.HasValue)
+                gameObject.transform.position = position.Value;
+
+            // Handle Collider
+            if (GetIsColliderFromTags(ve.Tags))
+            {
+                if (gameObject.GetComponent<Collider>() == null)
+                    gameObject.AddComponent<BoxCollider>();
+            }
+
+            // Handle Rigidbody
+            if (GetIsRigidBodyFromTags(ve.Tags))
+            {
+                if (gameObject.GetComponent<Rigidbody>() == null)
+                    gameObject.AddComponent<Rigidbody>();
+            }
 
             // Create prefab path
             string prefabFolder = System.IO.Path.Combine(path, "Prefabs");
@@ -394,8 +489,11 @@ namespace TEST_THING
         /// Creates a material with the given name
         /// </summary>
         /// <param name="thingName">Name of the thing to create material for</param>
-        private void CreateMaterial(string thingName)
+        private UnityEngine.Material CreateMaterial(VirtualEntity ve)
         {
+            UnityEngine.Material material  = default;
+            string               thingName = ve.ThingName;
+            
             #if UNITY_EDITOR
 
             var path = $"{FolderPath}{thingName}";
@@ -407,8 +505,8 @@ namespace TEST_THING
                 Directory.CreateDirectory(materialFolder);
 
             // Create a new material
-            UnityEngine.Material material = new UnityEngine.Material(Shader.Find("Standard"));
-            material.color                = Color.white;
+            material       = new UnityEngine.Material(Shader.Find("Standard"));
+            material.color = GetColorFromTags(ve.Tags) ?? Color.white;
 
             // Convert to relative asset path
             string relativePath = "Assets" + materialFolder.Substring(Application.dataPath.Length);
@@ -421,6 +519,8 @@ namespace TEST_THING
             Debug.Log($"Created material: {materialPath}");
 
             #endif // UNITY_EDITOR
+            
+            return material;
         }
 
         #endregion // Helper Methods
