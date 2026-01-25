@@ -17,17 +17,17 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         // Design Time
-        public Elements Elements = new Elements();
-        public Assets   Assets   = new Assets();
+        public Elements Elements    = new Elements();
+        public Assets   Assets      = new Assets();
         
         // Runtime
-        public Core Core = new Core();
+        public Core     Core        = new Core();
         
         // Slice
-        public Slice Slice = new Slice();
+        public Slice    Slice       = new Slice();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
-
+        
         public Package()
         {
             #if UNITY_EDITOR
@@ -58,6 +58,7 @@ namespace Galleon.Checkout.Foundation
                         Debug.Log($"Package.Asset.Folder   = {this.Assets.rootFolder.FolderPath}");
                         Debug.Log($"Package.Asset.Scene    = {"TBD"}");
                     });
+        
         public Step Do_Rescan() 
         =>
             new Step(action : async (s) =>
@@ -220,14 +221,16 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"create_thing_1"
                     ,action : async (s) =>
                     {   
-                        /// Definitions
-                        ELEMENTS.Thing thingElement = Elements.ThingElement;
+                        // /// Definitions
+                        // ELEMENTS.Thing thingElement = Elements.ThingElement;
+                        // 
+                        // /// Create default Hardcoded thing
+                        // var thing1 = new VirtualEntity() { TextNode = new TextNode("> Thing t1") };
+                        // this.Slice.Node.AddChild(thing1);
+                        // 
+                        // //await thing1.CreateOp.Execute();
                         
-                        /// Create default Hardcoded thing
-                        var thing1 = new VirtualEntity() { TextNode = new TextNode("> Thing t1") };
-                        this.Slice.Node.AddChild(thing1);
-                        
-                        await thing1.CreateOp.Execute();
+                        await Slice.Op().Execute();
                     });
         
         
@@ -236,15 +239,25 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"create_thing_2"
                     ,action : async (s) =>
                     {   
-                        
+                        var thing2 = new VirtualEntity() { TextNode = new TextNode("> Thing t2 #yellow") };
+                        this.Slice.Node.AddChild(thing2);
+                        await Slice.Op().Execute();
+                    });
+        
+        public Step CreateThing3() 
+        =>
+            new Step(name   : $"create_thing_3"
+                    ,action : async (s) =>
+                    {   
+                        var thing3 = new VirtualEntity() { TextNode = new TextNode("> Thing t3 #yellow prompt='prompt'") };
+                        this.Slice.Node.AddChild(thing3);
                     });
         
         public Step HardCopyThing() 
         =>
             new Step(name   : $"hard_copy_thing"
                     ,action : async (s) =>
-                    {
-                        
+                    {   
                     });
         
         public Step InheritThing() 
@@ -252,7 +265,6 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"inherit_thing"
                     ,action : async (s) =>
                     {
-                        
                     });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
@@ -267,9 +279,9 @@ namespace Galleon.Checkout.Foundation
                 
                 this.Add(new Button(() => target.PrepForThing ().Execute()) { text = "prep for thing"  });
                 this.Add(new Button(() => target.CreateThing1 ().Execute()) { text = "create thing 1"  });
-                // this.Add(new Button(() => target.CreateThing2 ().Execute()) { text = "create thing 2"  });
-                // this.Add(new Button(() => target.HardCopyThing().Execute()) { text = "hard copy thing" });
-                // this.Add(new Button(() => target.InheritThing ().Execute()) { text = "inherit thing"   });
+             // this.Add(new Button(() => target.CreateThing2 ().Execute()) { text = "create thing 2"  });
+             // this.Add(new Button(() => target.HardCopyThing().Execute()) { text = "hard copy thing" });
+             // this.Add(new Button(() => target.InheritThing ().Execute()) { text = "inherit thing"   });
                 
                 #region OLD
                 
@@ -313,4 +325,3 @@ namespace Galleon.Checkout.Foundation
         }   
     }
 }
- 

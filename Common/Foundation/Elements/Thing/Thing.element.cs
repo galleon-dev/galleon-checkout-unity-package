@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Galleon.Checkout;
 using Galleon.Checkout.ELEMENTS;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -36,23 +38,230 @@ namespace Galleon.Checkout.ELEMENTS
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API
         
-        public async Task<Entity> Create(ThingParams @thingParams)
+        /// Supported Tags :
+        /// Position    : 5,2       or  5,2,0 
+        /// size        : 2x4       or  2,4,1
+        /// color       : red       or  #113366FF
+        /// collider    : collider  or  no-collider
+        /// rigidboxy   : rb        or  no-rb
+        
+        public Vector3? GetPosition(string text)
         {
-            await CreateOp.Execute();
-            return default;
+            // Return null if input text is empty or null
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            // Remove parentheses and spaces for consistent formatting
+            // e.g. "(1, 2)" or "1,2" both become "1,2"
+            text = text.Trim().Trim('(', ')').Replace(" ", "");
+
+            // Split text by comma to get individual coordinate values
+            // e.g. "1,2" becomes ["1", "2"]
+            string[] parts = text.Split(',');
+
+            // Validate we have either 2D (x,y) or 3D (x,y,z) coordinates
+            if (parts.Length != 2 && parts.Length != 3)
+                return null;
+
+            // Parse x,y coordinates, return null if either fails
+            if (!float.TryParse(parts[0], out float x) || !float.TryParse(parts[1], out float y))
+                return null;
+
+            // Handle optional z coordinate, default to 0 if not provided
+            float z = 0f;
+            if (parts.Length == 3 && !float.TryParse(parts[2], out z))
+                return null;
+
+            return new Vector3(x, y, z);
+        }
+
+        public Vector3? GetPositionFromTags(string[] tags)
+        {
+            if (tags == null)
+                return null;
+
+            foreach (var tag in tags)
+            {
+                var position = GetPosition(tag);
+                if (position.HasValue)
+                    return position.Value;
+            }
+
+            return null;
+        }
+
+        public Vector3? GetSize(string text)
+        {
+            // Return null if input text is empty or null
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            // Remove parentheses and spaces for consistent formatting
+            text = text.Trim().Trim('(', ')').Replace(" ", "");
+
+            // Split text by 'x' to get dimensions
+            string[] parts = text.Split('x');
+
+            // Validate we have either 2D (width x height) or 3D (width x height x depth) dimensions
+            if (parts.Length != 2 && parts.Length != 3)
+                return null;
+
+            // Parse width and height, return null if either fails
+            if (!float.TryParse(parts[0], out float width) || !float.TryParse(parts[1], out float height))
+                return null;
+
+            // Handle optional depth coordinate, default to 1 if not provided
+            float depth = 1f;
+            if (parts.Length == 3 && !float.TryParse(parts[2], out depth))
+                return null;
+
+            return new Vector3(width, height, depth);
+        }
+
+        public Vector3? GetSizeFromTags(string[] tags)
+        {
+            if (tags == null)
+                return null;
+
+            foreach (var tag in tags)
+            {
+                var size = GetSize(tag);
+                if (size.HasValue)
+                    return size.Value;
+            }
+
+            return null;
+        }
+
+        public Color? GetColor(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            text = text.ToLower().Trim();
+
+            // Handle named colors
+            switch (text)
+            {
+                case "red":            return     Color.red;
+                case "dark_red":       return new Color(0.5f, 0f,   0f,   1f);
+                case "light_red":      return new Color(1f,   0.4f, 0.4f, 1f);
+                case "pastel_red":     return new Color(1f,   0.8f, 0.8f, 1f);
+                case "blue":           return     Color.blue; 
+                case "dark_blue":      return new Color(0f,   0f,   0.5f, 1f);
+                case "light_blue":     return new Color(0.4f, 0.4f, 1f,   1f);
+                case "pastel_blue":    return new Color(0.8f, 0.8f, 1f,   1f);
+                case "green":          return     Color.green;
+                case "dark_green":     return new Color(0f,   0.5f, 0f,   1f);
+                case "light_green":    return new Color(0.4f, 1f,   0.4f, 1f);
+                case "pastel_green":   return new Color(0.8f, 1f,   0.8f, 1f);
+                case "yellow":         return     Color.yellow;
+                case "dark_yellow":    return new Color(0.5f,  0.5f,  0f,    1f);
+                case "light_yellow":   return new Color(1f,    1f,    0.4f,  1f);
+                case "pastel_yellow":  return new Color(1f,    1f,    0.8f,  1f);
+                case "purple":         return new Color(0.5f,  0f,    0.5f,  1f);
+                case "dark_purple":    return new Color(0.25f, 0f,    0.25f, 1f);
+                case "light_purple":   return new Color(0.8f,  0.4f,  0.8f,  1f);
+                case "pastel_purple":  return new Color(0.85f, 0.7f,  0.85f, 1f);
+                case "orange":         return new Color(1f,    0.5f,  0f,    1f);
+                case "dark_orange":    return new Color(0.8f,  0.4f,  0f,    1f);
+                case "light_orange":   return new Color(1f,    0.7f,  0.4f,  1f);
+                case "pastel_orange":  return new Color(1f,    0.8f,  0.6f,  1f);
+                case "pink":           return new Color(1f,    0.75f, 0.8f,  1f);
+                case "dark_pink":      return new Color(0.8f,  0.4f,  0.6f,  1f);
+                case "light_pink":     return new Color(1f,    0.8f,  0.9f,  1f);
+                case "pastel_pink":    return new Color(1f,    0.9f,  0.95f, 1f);
+                case "brown":          return new Color(0.6f,  0.4f,  0.2f,  1f);
+                case "dark_brown":     return new Color(0.4f,  0.26f, 0.13f, 1f);
+                case "light_brown":    return new Color(0.8f,  0.6f,  0.4f,  1f);
+                case "pastel_brown":   return new Color(0.95f, 0.87f, 0.8f,  1f);
+                case "cyan":           return     Color.cyan;
+                case "dark_cyan":      return new Color(0f,   0.5f, 0.5f, 1f);
+                case "light_cyan":     return new Color(0.4f, 1f,   1f,   1f);
+                case "pastel_cyan":    return new Color(0.8f, 1f,   1f,   1f);
+                case "magenta":        return     Color.magenta;
+                case "dark_magenta":   return new Color(0.5f, 0f,   0.5f, 1f);
+                case "light_magenta":  return new Color(1f,   0.4f, 1f,   1f);
+                case "pastel_magenta": return new Color(1f,   0.8f, 1f,   1f);
+                case "gray":           return     Color.gray;
+                case "dark_gray":      return new Color(0.25f, 0.25f, 0.25f, 1f);
+                case "light_gray":     return new Color(0.75f, 0.75f, 0.75f, 1f);
+                case "pastel_gray":    return new Color(0.9f,  0.9f,  0.9f,  1f);
+                case "grey":           return     Color.grey;
+                case "black":          return     Color.black;
+                case "white":          return     Color.white;
+                case "clear":          return     Color.clear;
+                
+            }
+
+            // Handle hex colors
+            if (text.StartsWith("#"))
+                text = text.Substring(1);
+
+            try
+            {
+                if (text.Length == 6) // RGB
+                {
+                    float r = Convert.ToInt32(text.Substring(0, 2), 16) / 255f;
+                    float g = Convert.ToInt32(text.Substring(2, 2), 16) / 255f;
+                    float b = Convert.ToInt32(text.Substring(4, 2), 16) / 255f;
+                    return new Color(r, g, b, 1);
+                }
+                else if (text.Length == 8) // RGBA
+                {
+                    float r = Convert.ToInt32(text.Substring(0, 2), 16) / 255f;
+                    float g = Convert.ToInt32(text.Substring(2, 2), 16) / 255f;
+                    float b = Convert.ToInt32(text.Substring(4, 2), 16) / 255f;
+                    float a = Convert.ToInt32(text.Substring(6, 2), 16) / 255f;
+                    return new Color(r, g, b, a);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            return null;
+        }
+
+        public Color? GetColorFromTags(string[] tags)
+        {
+            if (tags == null)
+                return null;
+
+            foreach (var tag in tags)
+            {
+                var color = GetColor(tag);
+                if (color.HasValue)
+                    return color.Value;
+            }
+
+            return null;
+        }
+
+        public bool GetIsColliderFromTags(string[] tags)
+        {
+            return tags.Any(t => GetIsCollider(t));
+        }
+
+        public bool GetIsRigidBodyFromTags(string[] tags)
+        {
+            return tags.Any(t => GetIsRigidBody(t));
+        }
+
+        public bool GetIsCollider(string text)
+        {
+            return text.ToLower().Trim() == "collider";
         }
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Operation
-
-        public Operation CreateOp => new Operation(id: "thing_operation")
-                                         .AddStep(CreateThingAsset())
-                                         .AddStep(new Step(name : "wait", action: async s => { await Task.Delay(5000); } ))
-                                         .AddStep(CreateThingHierarchy())
-                                         .AddStep(CreateThingApp());
-                                        
+        public bool GetIsRigidBody(string text)
+        {
+            return text.ToLower().Trim() == "rb" || text.ToLower().Trim() == "rigidbody";
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
         
-        public Step CreateThingAsset() 
+        public Step CreateThingAsset(VirtualEntity ve) 
         =>
             new Step(name   : $"create_thing_asset"
                     ,action : async (s) =>
@@ -61,7 +270,7 @@ namespace Galleon.Checkout.ELEMENTS
             
                         ThingParams @params = new ThingParams()
                                             {
-                                                Name   = "t1",
+                                                Name   = ve.ThingName,
                                                 Prompt = "",
                                                 Tags   = new [] { "" }
                                             };
@@ -74,38 +283,31 @@ namespace Galleon.Checkout.ELEMENTS
                             Directory.CreateDirectory(path);
 
                         // Create all components t
-                        CreatePrefab  (thingName: @params.Name);
+                        CreatePrefab  (ve: ve);
                         CreateScript  (thingName: @params.Name);
-                        CreateMaterial(thingName: @params.Name);
+                        CreateMaterial(ve: ve);
 
                         #endif
                     });
         
         
-        public Step CreateThingHierarchy() 
+        public Step CreateThingHierarchy(VirtualEntity ve) 
         =>
             new Step(name   : $"create_thing_hierarchy"
                     ,action : async (s) =>
                     {
                         #if UNITY_EDITOR
 
-                        ThingParams @params = new ThingParams()
-                        {
-                            Name   = "t1",
-                            Prompt = "",
-                            Tags   = new [] { "" }
-                        };
-
                         // Get paths
-                        string prefabPath   = System.IO.Path.Combine("Assets/package1/Thing/Prefabs",   @params.Name + ".prefab");
-                        string materialPath = System.IO.Path.Combine("Assets/package1/Thing/Materials", @params.Name + "_material.mat");
+                        string prefabPath   = System.IO.Path.Combine($"Assets/package1/{ve.ThingName}/Prefabs",   ve.ThingName + ".prefab");
+                        string materialPath = System.IO.Path.Combine($"Assets/package1/{ve.ThingName}/Materials", ve.ThingName + "_material.mat");
 
                         // Load and instantiate the prefab
                         GameObject prefabAsset    = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
                         GameObject prefabInstance = PrefabUtility.InstantiatePrefab(prefabAsset) as GameObject;
 
                         // Add the script component
-                        string scriptName = @params.Name;
+                        string scriptName = ve.ThingName;
                         Type scriptType   = System.Type.GetType("TEST_THING." + scriptName + ", Assembly-CSharp");
                         
                         if (scriptType != null)
@@ -114,6 +316,11 @@ namespace Galleon.Checkout.ELEMENTS
                         // Create child cube
                         GameObject modelGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         modelGO.name = "model";
+
+                        // Apply size from tags if available
+                        Vector3? size = GetSizeFromTags(ve.Tags);
+                        if (size.HasValue)
+                            modelGO.transform.localScale = size.Value;
 
                         // Load and assign material
                         var material = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>(materialPath);
@@ -129,6 +336,26 @@ namespace Galleon.Checkout.ELEMENTS
                         // Set parent
                         modelGO.transform.SetParent(prefabInstance.transform, false);
 
+                        // Handle Collider
+                        if (GetIsColliderFromTags(ve.Tags))
+                        {
+                            if (modelGO.GetComponent<Collider>() == null)
+                                modelGO.AddComponent<BoxCollider>();
+                        }
+                        else
+                        {
+                            var collider = modelGO.GetComponent<Collider>();
+                            if (collider != null)
+                                UnityEngine.Object.DestroyImmediate(collider);
+                        }
+
+                        // Handle Rigidbody
+                        if (GetIsRigidBodyFromTags(ve.Tags))
+                        {
+                            if (modelGO.GetComponent<Rigidbody>() == null)
+                                modelGO.AddComponent<Rigidbody>();
+                        }
+
                         // Save changes
                         PrefabUtility.SaveAsPrefabAsset(prefabInstance, prefabPath);
 
@@ -140,7 +367,7 @@ namespace Galleon.Checkout.ELEMENTS
                     });
         
         
-        public Step CreateThingApp() 
+        public Step CreateThingApp(VirtualEntity ve) 
         =>
             new Step(name   : $"create_thing_app"
                     ,action : async (s) =>
@@ -158,15 +385,35 @@ namespace Galleon.Checkout.ELEMENTS
         /// <summary>
         /// Creates a prefab with the given name
         /// </summary>
-        /// <param name="thingName">Name of the prefab to create</param>
-        private void CreatePrefab(string thingName)
+        /// <param name="ve">VirtualEntity containing the thing data</param>
+        private void CreatePrefab(VirtualEntity ve)
         {
             #if UNITY_EDITOR
 
+            string thingName = ve.ThingName;
             var path = $"{FolderPath}{thingName}";
-            
+
             // Create a simple GameObject
             GameObject gameObject = new GameObject(thingName);
+
+            // Apply position from tags if available
+            Vector3? position = GetPositionFromTags(ve.Tags);
+            if (position.HasValue)
+                gameObject.transform.position = position.Value;
+
+            // Handle Collider
+            if (GetIsColliderFromTags(ve.Tags))
+            {
+                if (gameObject.GetComponent<Collider>() == null)
+                    gameObject.AddComponent<BoxCollider>();
+            }
+
+            // Handle Rigidbody
+            if (GetIsRigidBodyFromTags(ve.Tags))
+            {
+                if (gameObject.GetComponent<Rigidbody>() == null)
+                    gameObject.AddComponent<Rigidbody>();
+            }
 
             // Create prefab path
             string prefabFolder = System.IO.Path.Combine(path, "Prefabs");
@@ -242,8 +489,11 @@ namespace TEST_THING
         /// Creates a material with the given name
         /// </summary>
         /// <param name="thingName">Name of the thing to create material for</param>
-        private void CreateMaterial(string thingName)
+        private UnityEngine.Material CreateMaterial(VirtualEntity ve)
         {
+            UnityEngine.Material material  = default;
+            string               thingName = ve.ThingName;
+            
             #if UNITY_EDITOR
 
             var path = $"{FolderPath}{thingName}";
@@ -255,8 +505,8 @@ namespace TEST_THING
                 Directory.CreateDirectory(materialFolder);
 
             // Create a new material
-            UnityEngine.Material material = new UnityEngine.Material(Shader.Find("Standard"));
-            material.color                = Color.white;
+            material       = new UnityEngine.Material(Shader.Find("Standard"));
+            material.color = GetColorFromTags(ve.Tags) ?? Color.white;
 
             // Convert to relative asset path
             string relativePath = "Assets" + materialFolder.Substring(Application.dataPath.Length);
@@ -269,6 +519,8 @@ namespace TEST_THING
             Debug.Log($"Created material: {materialPath}");
 
             #endif // UNITY_EDITOR
+            
+            return material;
         }
 
         #endregion // Helper Methods

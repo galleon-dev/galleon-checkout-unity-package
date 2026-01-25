@@ -23,7 +23,11 @@ namespace Galleon.Checkout
         
         public UserPaymentMethodData Data = new();
         
-        public string                Type;
+        public string Type
+        {
+            get => Data.type;
+            set => Data.type = value;
+        }
         
         public string                ID => this.Data?.id ?? "";
         
@@ -34,6 +38,8 @@ namespace Galleon.Checkout
         
         public bool                  IsNewPaymentMethod      = false;
         public bool                  ShouldSavePaymentMethod = false;
+        
+        public string                ButtonText = null;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
         
@@ -74,10 +80,10 @@ namespace Galleon.Checkout
         {
             try
             {
-                string myType = this.Data?.type;
+                string myType = this.Type;
                 myType = myType.Replace("empty_", "");
-                myType = myType == "credit_card" ? "card" : this.Data?.type;
-                return CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Data.type == myType);
+                myType = myType == "credit_card" ? "card" : this.Type;
+                return CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Type == myType);
             }
             catch (Exception e)
             {

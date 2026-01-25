@@ -112,18 +112,25 @@ namespace Galleon.Checkout.UI
             }
             
             // Bonus
-            if (this.bonusItemView != null)
-            {    
-                bonusItemView.Close();
-            }
             
             bonusItemView? .gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
             BonusContainer?.gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
             
+            if (this.bonusItemView != null)
+            {    
+                bonusItemView.Close();
+             
+                if (this.UserPaymentMethod != null && this.UserPaymentMethod.Type == "native")
+                    bonusItemView.gameObject.SetActive(false);
+            }
+            
+            if (!CHECKOUT.Globals.IsBonusEnabled)
+                bonusItemView.gameObject.SetActive(false);
+            
             // Dropdown
-            bool shouldShowDropdown =  this.UserPaymentMethod != null 
-                                    && this.UserPaymentMethod.Data.type == "credit_card"
-                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Data.type == "credit_card") > 1;
+            bool shouldShowDropdown =  this.UserPaymentMethod != null
+                                    && this.UserPaymentMethod.Type == "credit_card"
+                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Type == "credit_card") > 1;
 
             if (shouldShowDropdown)
             {                
@@ -162,8 +169,8 @@ namespace Galleon.Checkout.UI
             
             
             // Definitions
-            var myType      = this.UserPaymentMethod.Data.type;
-            var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Data.type == myType).Except(new []{this.UserPaymentMethod}).ToList();
+            var myType      = this.UserPaymentMethod.Type;
+            var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Type == myType).Except(new []{this.UserPaymentMethod}).ToList();
             var upms        = (new List<UserPaymentMethod>() { this.UserPaymentMethod }).Concat(otherUpms).ToList( );
             
             // Add options

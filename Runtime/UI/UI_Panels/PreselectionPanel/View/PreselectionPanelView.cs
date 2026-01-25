@@ -38,12 +38,8 @@ namespace Galleon.Checkout.UI
 
         [Header("Payment Buttons")]
         public GameObject           PurchaseButton;
-        public GameObject           GooglePayButton;
-        public GameObject           PaypalPayButton;
-        public GameObject           ApplePayButton;
+        public TMP_Text             PurchaseButtonText;
 
-        public  Config              Configutation;
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types
         
         [Serializable]
@@ -100,9 +96,6 @@ namespace Galleon.Checkout.UI
                 // Add ui separator
                 Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
             }
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)PaymentMethodsPanel.transform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(this.gameObject.transform as RectTransform);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Radio Buttons
@@ -116,10 +109,6 @@ namespace Galleon.Checkout.UI
 
                 item.Unselect();
             }
-            
-            //ShowPurchaseButton();
-            var image    = PurchaseButton.gameObject.GetComponent<Image>();
-            image.sprite = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.First().LogoSprite;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -152,17 +141,29 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
 
-        public void SetPurchaseButtonSprite(Sprite sprite)
+        public void SetPurchaseButtonSprite(UserPaymentMethod selectedPaymentMethod)
         {
             var image    = this.PurchaseButton.GetComponentInChildren<Image>();
-            image.sprite = sprite;
+            image.sprite = selectedPaymentMethod.GetButtonSprite();
+            
+            if (selectedPaymentMethod.Type == "app")
+            {
+                PurchaseButtonText.text = CHECKOUT.Config.GetString("preselection_app_button_text", defaultValue: "Continue with extra rolls");
+            }
+            else if (selectedPaymentMethod.Type == "native")
+            {
+                PurchaseButtonText.text = CHECKOUT.Config.GetString("preselection_native_button_text", defaultValue: "Continue");
+            }
+            else
+            {
+                PurchaseButtonText.text = CHECKOUT.Config.GetString("preselection_other_button_text", defaultValue: "Continue");
+            }
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Methods
         
         public Step test_preselect_checkout() => new Step(name : "preselection_panel_test_checkout", action : async (s) =>
                                                                                                             {
-                                                                                                                Debug.Log($"Aaaaa {DateTime.Now}");
                                                                                                                 CHECKOUT.User.SelectPaymentMethod(CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app"));
                                                                                                                 OnConfirmPurchaseClick();
                                                                                                             });

@@ -147,7 +147,8 @@ namespace Galleon.Checkout
                                                 IsNewPaymentMethod = false,
                                                 IsSelected         = false,
                                                 SortOrder          = float.PositiveInfinity, 
-                                                Type               = "empty_card"
+                                                Type               = "empty_card",
+                                                ButtonText         = "Add Card"
                                             });
             }
             
@@ -220,12 +221,8 @@ namespace Galleon.Checkout
 
                         foreach (var data in dataList)
                         {
-                            PaymentMethodDefinition pmd = new PaymentMethodDefinition();
-                            pmd.Data                    = data;
-                            
                             this.PaymentMethodsDefinitions.Add(new PayPalPaymentMethodDefinition()
                                                            {
-                                                               Type                = pmd.Type,
                                                                InitializationSteps = {},
                                                                TransactionSteps    = {},
                                                                Data                = data,
@@ -275,11 +272,10 @@ namespace Galleon.Checkout
                             pm.Data.type         = "credit_card";
                             
                             this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
-                                                        {
-                                                            Type        = pm.Data.credit_card_type ?? "credit card",
-                                                            DisplayName = pm.Data.display_name,
-                                                            Data        = data,
-                                                        });
+                            {
+                                DisplayName = pm.Data.display_name,
+                                Data        = data,
+                            });
                         }
                         
                         
@@ -303,7 +299,8 @@ namespace Galleon.Checkout
                                                             IsNewPaymentMethod = false,
                                                             IsSelected         = false,
                                                             SortOrder          = float.PositiveInfinity,
-                                                            Type               = "native"
+                                                            Type               = "native",
+                                                            ButtonText         = "Continue with google play"
                                                         });
                         }
                         
@@ -340,7 +337,8 @@ namespace Galleon.Checkout
                                                             IsNewPaymentMethod = false,
                                                             IsSelected         = false,
                                                             SortOrder          = float.PositiveInfinity, 
-                                                            Type               = "empty_card"
+                                                            Type               = "empty_card",
+                                                            ButtonText         = "Add Card"
                                                         });
                         }
                         
@@ -357,7 +355,8 @@ namespace Galleon.Checkout
                                                             IsNewPaymentMethod = false,
                                                             IsSelected         = false,
                                                             SortOrder          = float.PositiveInfinity, 
-                                                            Type               = "empty_paypal"
+                                                            Type               = "empty_paypal",
+                                                            ButtonText         = "Add Paypal Account"
                                                         });
                         }
                         

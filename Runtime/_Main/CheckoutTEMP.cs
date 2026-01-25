@@ -892,6 +892,7 @@ namespace Galleon.Checkout
 ///         > Taxes
 ///         > Performance
 ///     > (other)
+///         > configutable credit card formats
 ///         > authentication token from dice
 ///         > behind the scenes code
 ///         > Excesive Refresh
@@ -900,3 +901,5 @@ namespace Galleon.Checkout
 ///         > test scenarios
 ///         > test report
 ///         > logs
+///     > (bugs)
+///         > sometimes it tries to cancel the session when it shouldnt

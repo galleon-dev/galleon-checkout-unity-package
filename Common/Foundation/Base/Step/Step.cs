@@ -34,6 +34,7 @@ namespace Galleon.Checkout
         public DateTime           EndTime                     = DateTime.MaxValue;
         
         public List<string>       StepLog                     = new();
+        public bool               IsSilentLog                 = false;
         
         public STEP_STATE         StepState                   = STEP_STATE  .None;
         public ACTION_STATE       ActionState                 = ACTION_STATE.None;
@@ -157,7 +158,8 @@ namespace Galleon.Checkout
                 ////////////////////////////////////////////////
                 
                 // Log
-                this.Log($"<color=white>[{this.Name}]</color>");
+                if (!IsSilentLog)
+                    this.Log($"<color=white>[{this.Name}]</color>");
                 
                 ////////////////////////////////////////////////
                 

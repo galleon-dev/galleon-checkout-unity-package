@@ -44,6 +44,10 @@ namespace Galleon.Checkout.UI
         
         public async override void RefreshState()
         {
+            UpdateScrollRectMaxSize();
+            
+            /////////////////////
+            
             // Remove children (if any)
             foreach (Transform child in SelectPaymentMethodItemsHolder.transform)
             {
@@ -84,7 +88,7 @@ namespace Galleon.Checkout.UI
                 #region UPMS
                 if (definition.ShouldAddSavedUPMS)
                 {
-                    var upms = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Data.type == definition.Data.type);
+                    var upms = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Type == definition.Type);
                     foreach (var upm in upms)
                     {
                         var upmGO   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
@@ -110,10 +114,10 @@ namespace Galleon.Checkout.UI
             var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToSelect;
             foreach (var userPaymentMethod in userPaymentMethods)
             {
-                if (addedPmTypes.Contains(userPaymentMethod.Data.type))
+                if (addedPmTypes.Contains(userPaymentMethod.Type))
                     continue;
                 
-                addedPmTypes.Add(userPaymentMethod.Data.type);
+                addedPmTypes.Add(userPaymentMethod.Type);
             
                 
                 var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
@@ -125,9 +129,6 @@ namespace Galleon.Checkout.UI
                     await Task.Yield();
             }
             
-            /////////////////////
-            
-            UpdateScrollRectMaxSize();
         }
 
 
