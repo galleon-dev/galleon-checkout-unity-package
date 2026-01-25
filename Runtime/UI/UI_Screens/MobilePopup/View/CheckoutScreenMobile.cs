@@ -296,75 +296,10 @@ namespace Galleon.Checkout.UI
             new Step(name   : $"View_{page.Name}_page"
                     ,action : async (s) =>
                     {
-                        ///////////////////////// Setup
-
-                        page.Setup?.Invoke(page);
-
-                        ///////////////////////// Set Sate
-
-                        this.HeaderPanelView.State = page.headerState;
-                        this.State                 = page.panelState;
-                        this.FooterPanelView.State = page.FooterState;
-                        
-                        ///////////////////////// Page
-
-                        IsPageActive = true;
-                        CurrentPage  = page;
-                        NavigationHistory.Add(page);
-
-                        ///////////////////////// Transition
-                        
-                        // this.Transition();
-
-                        ///////////////////////// Refresh
-                        
-                        RefreshState();
-                        HeaderPanelView.RefreshState();
-                        FooterPanelView.RefreshState();
-
-                        // 1
-                        var views = this.GetComponentsInChildren<View>().Where(v => v.AutoRefresh);
-                        foreach (var view in views)
-                            view.Refresh();
-                        
-                        ///////////////////////// Focus
-                        
-                        foreach (var view in views)
-                            view.Focus();
-
-                        ///////////////////////// Await Page
-
-                        while (IsPageActive)
-                        {
-                            await Task.Yield();
-                        
-                            // if (CHECKOUT.IsTest)
-                            // {
-                            //     await Task.Delay(1000);
-                            //     OnPageFinishedWithResult(CHECKOUT.CurrentTest);
-                            //     break;
-                            // }
-                        }
-
-                        ///////////////////////// Result Helper
-
-                        page.NavigationMap[NavigationStates.Back    .ToString()] = UI_Back();
-                        page.NavigationMap[NavigationStates.Close   .ToString()] = UI_Close();
-                        page.NavigationMap[NavigationStates.Error   .ToString()] = ViewPage(ErrorPage);
-                        page.NavigationMap[NavigationStates.Settings.ToString()] = ViewPage(SettingsPage);
-
-                        ///////////////////////// Handle Result
-
-                        string pageResult   = CurrentPage.PageResult;
-                        this.NavigationNext = pageResult;
-
-                        if (NavigationNext != null && page.NavigationMap.ContainsKey(NavigationNext))
-                        {
-                            Step nextStep = page.NavigationMap?[NavigationNext];
-
-                            if (s.ParentStep != null)
-                                s.ParentStep.AddChildStep(nextStep);
-                        }
+                        s.ParentStep.AddChildStep(SetPage(page));
+                        s.ParentStep.AddChildStep(AwaitCurrentPage());
+                        s.ParentStep.AddChildStep(SetNextPage());
+                        s.ParentStep.AddChildStep(Navigate());
                     });
 
         public Step SetPage(Page page)
@@ -410,6 +345,24 @@ namespace Galleon.Checkout.UI
 
                     });
 
+        public Step AwaitCurrentPage() 
+            =>
+            new Step(name   : $"await_current_page_{CurrentPage.Name}"
+                    ,action : async (s) =>
+                    {
+                        while (IsPageActive)
+                            await Task.Yield();
+                    });
+        
+        public Step SetNextPage() 
+            =>
+            new Step(name   : $"set_next_page"
+                    ,action : async (s) =>
+                    {
+                        
+                        string pageResult   = CurrentPage.PageResult;
+                        this.NavigationNext = pageResult;
+                    });
 
         public Step Navigate()
         =>
