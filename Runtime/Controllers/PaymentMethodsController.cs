@@ -24,7 +24,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public UserPaymentMethod                    NativeStoreUserPaymentMethod => UserPaymentMethods.FirstOrDefault(x => x.Type == "native");
+        public UserPaymentMethod                    NativeStoreUserPaymentMethod => UserPaymentMethods     .FirstOrDefault(x => x.Type == "native");
         public UserPaymentMethod                    EmptyCreditCardPaymentMethod => EmptyUserPaymentMethods.FirstOrDefault(x => x.Type == "card");
         
         
@@ -161,14 +161,15 @@ namespace Galleon.Checkout
         
         public async Task Save()
         {
-            CHECKOUT.Storage.Write(key   : "saved_payment_methods"
+            CHECKOUT.Storage.Write(key   : $"saved_payment_methods_{CHECKOUT.User.AppUserID}"
                                   ,value : LastUsedUserPaymentMethodIDs.Where(x => !x.StartsWith("local_pm_id")));
         }
         
         public async Task Load()
         {
             this.LastUsedUserPaymentMethodIDs.Clear();
-            var saved = CHECKOUT.Storage.Read<List<string>>(key : "saved_payment_methods");
+
+            var saved = CHECKOUT.Storage.Read<List<string>>(key : $"saved_payment_methods_{CHECKOUT.User.AppUserID}");
             this.LastUsedUserPaymentMethodIDs.AddRange(saved.Where(x => !x.StartsWith("local_pm_id")));
         }
         
