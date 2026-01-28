@@ -15,7 +15,7 @@ namespace Galleon.Checkout
             CheckoutClient.Instance.Network.GalleonUserAccessToken = configuration.JWT;
             CHECKOUT.User.AppUserID                                = configuration.AppUserID;
             CheckoutClient.Instance.ApplicationDisplayName         = configuration.ApplicationDisplayName;
-            CHECKOUT.Globals.CheckoutConfiguration                 = configuration;
+            CHECKOUT.Globals.CheckoutInitConfiguration             = configuration;
             
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             
@@ -24,18 +24,27 @@ namespace Galleon.Checkout
         
         public static async Task<PurchaseResult> Purchase(CheckoutProduct            product
                                                          ,Dictionary<string, string> metadata      = null
-                                                         ,List<BonusItem>            bonusData     = null)
+                                                         ,List<BonusItem>            bonusData     = null
+                                                         ,Dictionary<string, object> config        = null)
         {
             // Safty
             if (metadata  == null) metadata  = new Dictionary<string, string>();
             if (bonusData == null) bonusData = new List<BonusItem>();
             
+            // apply config
+            if (config != null)
+            {
+                foreach (var kvp in config)
+                    CHECKOUT.Config.SetValue(kvp.Key, kvp.Value);
+            }
+            
             // Create and setup session
             await CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
             
-            CheckoutClient.Instance.CurrentSession.Metadata  = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            CheckoutClient.Instance.CurrentSession.BonusData = bonusData;
-                   
+            CheckoutClient.Instance.CurrentSession.Metadata              = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            CheckoutClient.Instance.CurrentSession.BonusData             = bonusData;
+            CheckoutClient.Instance.CurrentSession.PurchaseConfiguration = config;
+            
             // Run Session
             await  CheckoutClient.Instance.RunCheckoutSession().Execute();
             
@@ -79,10 +88,11 @@ namespace Galleon.Checkout
         public bool         IsError;
         public List<string> Errors;
         public bool         DidUserSelectNativeIAP;
+        public string       SelectedPaymentMethodType = "none";
 
         public override string ToString()
         {
-            return $"PurchaseResult: IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, Errors={string.Join(", ", Errors ?? new List<string>())}";
+            return $"PurchaseResult: OrderID={OrderID}, IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, SelectedPaymentMethodType={SelectedPaymentMethodType}, Errors={string.Join(", ", Errors ?? new List<string>())}";
         }
     }
 }

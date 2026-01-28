@@ -30,6 +30,10 @@ namespace Galleon.Checkout.ELEMENTS
         
         public string FolderPath => Application.dataPath + "/" + "package1/";
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
+
+        public static Func<VirtualEntity, Task<string>> DoPrompt;
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public Thing(string name) : base(name)
@@ -267,15 +271,10 @@ namespace Galleon.Checkout.ELEMENTS
                     ,action : async (s) =>
                     {
                         #if UNITY_EDITOR
-            
-                        ThingParams @params = new ThingParams()
-                                            {
-                                                Name   = ve.ThingName,
-                                                Prompt = "",
-                                                Tags   = new [] { "" }
-                                            };
+                        
+                        AssetDatabase.StartAssetEditing();
 
-                        var path = $"{FolderPath}{@params.Name}";
+                        var path = $"{FolderPath}{ve.ThingName}";
                         Debug.Log($"Creating QuickThing Asset at {path}");
 
                         // Ensure the folder exists
@@ -283,10 +282,13 @@ namespace Galleon.Checkout.ELEMENTS
                             Directory.CreateDirectory(path);
 
                         // Create all components t
-                        CreatePrefab  (ve: ve);
-                        CreateScript  (thingName: @params.Name);
-                        CreateMaterial(ve: ve);
+                        await CreatePrefab  (ve: ve);
+                        await CreateMaterial(ve: ve);
+                        await CreateScript  (ve: ve);
 
+                        AssetDatabase.StopAssetEditing();
+                        AssetDatabase.Refresh(options: ImportAssetOptions.ForceUpdate);
+                        
                         #endif
                     });
         
@@ -349,13 +351,6 @@ namespace Galleon.Checkout.ELEMENTS
                                 UnityEngine.Object.DestroyImmediate(collider);
                         }
 
-                        // Handle Rigidbody
-                        if (GetIsRigidBodyFromTags(ve.Tags))
-                        {
-                            if (modelGO.GetComponent<Rigidbody>() == null)
-                                modelGO.AddComponent<Rigidbody>();
-                        }
-
                         // Save changes
                         PrefabUtility.SaveAsPrefabAsset(prefabInstance, prefabPath);
 
@@ -386,7 +381,7 @@ namespace Galleon.Checkout.ELEMENTS
         /// Creates a prefab with the given name
         /// </summary>
         /// <param name="ve">VirtualEntity containing the thing data</param>
-        private void CreatePrefab(VirtualEntity ve)
+        private async Task CreatePrefab(VirtualEntity ve)
         {
             #if UNITY_EDITOR
 
@@ -400,13 +395,6 @@ namespace Galleon.Checkout.ELEMENTS
             Vector3? position = GetPositionFromTags(ve.Tags);
             if (position.HasValue)
                 gameObject.transform.position = position.Value;
-
-            // Handle Collider
-            if (GetIsColliderFromTags(ve.Tags))
-            {
-                if (gameObject.GetComponent<Collider>() == null)
-                    gameObject.AddComponent<BoxCollider>();
-            }
 
             // Handle Rigidbody
             if (GetIsRigidBodyFromTags(ve.Tags))
@@ -438,13 +426,12 @@ namespace Galleon.Checkout.ELEMENTS
         /// <summary>
         /// Creates a MonoBehaviour script with the given name
         /// </summary>
-        /// <param name="thingName">Name of the script to create</param>
-        private void CreateScript(string thingName)
+        private async Task CreateScript(VirtualEntity ve)
         {
             #if UNITY_EDITOR
 
-            var path = $"{FolderPath}{thingName}";
-            
+            var path = $"{FolderPath}{ve.ThingName}";
+
             // Create script folder
             string scriptFolder = System.IO.Path.Combine(path, "Scripts");
             if (!Directory.Exists(scriptFolder))
@@ -454,33 +441,39 @@ namespace Galleon.Checkout.ELEMENTS
 
             // Script template
             string scriptTemplate =
-            @"using System.Collections;
+            $@"using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace TEST_THING
-{
+{{
     public class CLASS_NAME : MonoBehaviour
-    {
+    {{
         void Start()
-        {
-            
-        }
-    }
-}
+        {{
+            // prompt = '{ve.Prompt}'
+            /// full = {ve.TextNode.Line}
+        }}
+    }}
+}}
 ";
+            
+            if (!ve.Prompt.IsNullOrEmpty() 
+            &&  DoPrompt != null)
+            {
+                scriptTemplate = await DoPrompt.Invoke(ve);
+            }
 
             // Format the template with the thing name
-            string scriptContent = scriptTemplate.Replace("CLASS_NAME", thingName);
+            string scriptContent = scriptTemplate.Replace("CLASS_NAME", ve.ThingName);
 
             // Write the script file
-            string scriptPath = System.IO.Path.Combine(scriptFolder, thingName + ".cs");
+            string scriptPath = System.IO.Path.Combine(scriptFolder, ve.ThingName + ".cs");
             File.WriteAllText(scriptPath, scriptContent);
 
-            // Refresh the asset database
-            AssetDatabase.Refresh();
-
             Debug.Log($"Created script: {scriptPath}");
+            
+            await Task.Delay(2000);            
 
             #endif // UNITY_EDITOR
         }
@@ -488,8 +481,8 @@ namespace TEST_THING
         /// <summary>
         /// Creates a material with the given name
         /// </summary>
-        /// <param name="thingName">Name of the thing to create material for</param>
-        private UnityEngine.Material CreateMaterial(VirtualEntity ve)
+        /// <param name="ve">Virtual entity to create material for</param>
+        private async Task CreateMaterial(VirtualEntity ve)
         {
             UnityEngine.Material material  = default;
             string               thingName = ve.ThingName;
@@ -520,7 +513,6 @@ namespace TEST_THING
 
             #endif // UNITY_EDITOR
             
-            return material;
         }
 
         #endregion // Helper Methods

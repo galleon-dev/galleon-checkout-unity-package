@@ -62,8 +62,8 @@ namespace Galleon.Checkout.UI
         // Propertiews
         
         public static bool                  IsPortrait  => !IsLandscape;
-        public static bool                  IsLandscape => CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape ? true
-                                                         : CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForcePortrait  ? false
+        public static bool                  IsLandscape => CHECKOUT.Globals.CheckoutInitConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape ? true
+                                                         : CHECKOUT.Globals.CheckoutInitConfiguration.UIPanelOrientation == CheckoutOrientation.ForcePortrait  ? false
                                                          : (UnityEngine.Screen.orientation == ScreenOrientation.LandscapeLeft || UnityEngine.Screen.orientation == ScreenOrientation.LandscapeRight);
         
         
@@ -91,13 +91,13 @@ namespace Galleon.Checkout.UI
 
                                   #if UNITY_EDITOR
                                   
-                                  if (CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape)
+                                  if (CHECKOUT.Globals.CheckoutInitConfiguration.UIPanelOrientation == CheckoutOrientation.ForceLandscape)
                                   {
                                       Debug.Log("Device is in Forced Landscape mode");
                                       Prefab          = CheckoutClient.Instance.Resources.CheckoutPopupLandscapePrefab;
                                       IsLandscapeMode = true;
                                   }
-                                  else if (CHECKOUT.Globals.CheckoutConfiguration.UIPanelOrientation == CheckoutOrientation.ForcePortrait)
+                                  else if (CHECKOUT.Globals.CheckoutInitConfiguration.UIPanelOrientation == CheckoutOrientation.ForcePortrait)
                                   {
                                       Debug.Log("Device is in Forced portrait mode");
                                       Prefab          = CheckoutClient.Instance.Resources.CheckoutPopupPrefab;

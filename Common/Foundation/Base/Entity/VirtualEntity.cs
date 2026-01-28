@@ -29,6 +29,8 @@ namespace Galleon.Checkout.Foundation
         
         public string[] Tags => TextNode.Hashtags.Select(x => x.Trim('#')).ToArray();
         
+        public string Prompt => TextNode.Equals.ContainsKey("prompt") ? TextNode.Equals["prompt"] : string.Empty;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public VirtualEntity()

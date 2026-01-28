@@ -208,6 +208,112 @@ namespace Galleon.Checkout.Foundation
         /// </summary>
         public string Dot => Dots.FirstOrDefault() ?? "";
 
+        /// <summary>
+        /// List of all key-value pairs found in the full text. Parses lines containing '=' signs.
+        /// Values enclosed in single quotes ('') or double quotes ("") are extracted with the quotes removed.
+        /// </summary>
+        public Dictionary<string, string> Equals
+        {
+            get
+            {
+                // Parse all lines containing '=' to extract key-value pairs
+                var pairs = new Dictionary<string, string>();
+                foreach (var line in FullTextLines)
+                {
+                    int equalsIndex = line.IndexOf('=');
+                    if (equalsIndex > 0)
+                    {
+                        // Extract the key: word directly before '='
+                        string leftPart = line.Substring(0, equalsIndex);
+                        string key = leftPart.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries).LastOrDefault()?.Trim() ?? "";
+
+                        // Extract the value: word directly after '=' (or quoted content)
+                        string rightPart = line.Substring(equalsIndex + 1).TrimStart();
+                        string value = rightPart;
+
+                        // Check for quoted values and extract content without quotes
+                        if (rightPart.Length >= 2)
+                        {
+                            // Handle single-quoted values: extract text between opening and closing quotes
+                            if ((rightPart.StartsWith("'") && rightPart.IndexOf('\'', 1) > 0))
+                            {
+                                int endQuote = rightPart.IndexOf('\'', 1);
+                                value = rightPart.Substring(1, endQuote - 1);
+                            }
+                            // Handle double-quoted values: extract text between opening and closing quotes
+                            else if ((rightPart.StartsWith("\"") && rightPart.IndexOf('"', 1) > 0))
+                            {
+                                int endQuote = rightPart.IndexOf('"', 1);
+                                value = rightPart.Substring(1, endQuote - 1);
+                            }
+                            // If no quotes, take only the first word
+                            else
+                            {
+                                value = rightPart.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? rightPart;
+                            }
+                        }
+
+                        // Add the key-value pair to the dictionary if key is valid
+                        if (!string.IsNullOrEmpty(key))
+                            pairs[key] = value;
+                    }
+                }
+                return pairs;
+            }
+        }
+
+        /// <summary>
+        /// List of all key-value pairs found in the full text. Parses lines containing ':' signs.
+        /// Values enclosed in single quotes ('') or double quotes ("") are extracted with the quotes removed.
+        /// </summary>
+        public Dictionary<string, string> Colons
+        {
+            get
+            {
+                var pairs = new Dictionary<string, string>();
+                foreach (var line in FullTextLines)
+                {
+                    int colonIndex = line.IndexOf(':');
+                    if (colonIndex > 0)
+                    {
+                        // Extract the key: word directly before ':'
+                        string leftPart = line.Substring(0, colonIndex);
+                        string key = leftPart.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries).LastOrDefault()?.Trim() ?? "";
+
+                        // Extract the value: word directly after ':' (or quoted content)
+                        string rightPart = line.Substring(colonIndex + 1).TrimStart();
+                        string value = rightPart;
+
+                        // Check for quoted values and extract content without quotes
+                        if (rightPart.Length >= 2)
+                        {
+                            // Handle single-quoted values: extract text between opening and closing quotes
+                            if ((rightPart.StartsWith("'") && rightPart.IndexOf('\'', 1) > 0))
+                            {
+                                int endQuote = rightPart.IndexOf('\'', 1);
+                                value = rightPart.Substring(1, endQuote - 1);
+                            }
+                            // Handle double-quoted values: extract text between opening and closing quotes
+                            else if ((rightPart.StartsWith("\"") && rightPart.IndexOf('"', 1) > 0))
+                            {
+                                int endQuote = rightPart.IndexOf('"', 1);
+                                value = rightPart.Substring(1, endQuote - 1);
+                            }
+                            // If no quotes, take only the first word
+                            else
+                            {
+                                value = rightPart.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? rightPart;
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(key))
+                            pairs[key] = value;
+                    }
+                }
+                return pairs;
+            }
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Parse API
 
         public static TextNode Parse(string text)
@@ -381,23 +487,31 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Unity Test Menu
 
         #if UNITY_EDITOR
-        [MenuItem("Tools/Test Parse Tree")]
+        [MenuItem("Tools/Galleon/TextNode/Test Parse Tree")]
         #endif
         public static void TestParseTree()
         {
-            string mockText = 
+            string mockText =
 @"
 > parent line #main .alpha
   second line of parent
   third line of parent #secondary_tag .beta
-    > child #nested .childdot
-      child continuation line 1
-      child continuation line 2 #child_tag
-        > subchild .deepest
-          subchild details
-    > another_child
-      another_child notes line 1
-      another_child notes line 2 #another_tag .bottom
+  #tag myKey=myValue
+  mySecondKey='my second value'
+  myThirdKey=""my third value""
+  #anotherTag colonKey:colonValue
+  colonSecond:'colon quoted value'
+  > child #nested .childdot
+    child continuation line 1
+    child continuation line 2 #child_tag
+    testKey=testValue
+    testColon:'test colon value 1'
+    testColon:""test colon value 2""
+    > subchild .deepest
+      subchild details
+  > another_child
+    another_child notes line 1
+    another_child notes line 2 #another_tag .bottom
 > second_root .rooted
      > deep
          > deeper
@@ -410,18 +524,23 @@ namespace Galleon.Checkout.Foundation
             Debug.Log("Parsed Tree:");
             foreach (var child in root.Node.Descendants().OfType<TextNode>())
             {
-                Debug.Log("---");
+                int indent = child.Indent > 0 ? child.Indent : 0;
+                string indentPrefix = new string(' ', indent);
+                Debug.Log(indentPrefix + "------------------------------------");
+
                 foreach (var line in child.FullTextLines)
                 {
-                    Debug.Log(line);
+                    Debug.Log(indentPrefix + line);
                 }
-                Debug.Log("Hashtags: [" + string.Join(", ", child.Hashtags) + "]");
-                Debug.Log("Dots: [" + string.Join(", ", child.Dots) + "]");
+                Debug.Log(indentPrefix + "Hashtags: [" + string.Join(", ", child.Hashtags) + "]");
+                Debug.Log(indentPrefix + "Dots: [" + string.Join(", ", child.Dots) + "]");
+                Debug.Log(indentPrefix + "Equals: [" + string.Join(", ", child.Equals.Select(kv => $"{kv.Key}={kv.Value}")) + "]");
+                Debug.Log(indentPrefix + "Colons: [" + string.Join(", ", child.Colons.Select(kv => $"{kv.Key}:{kv.Value}")) + "]");
             }
         }
 
         #if UNITY_EDITOR
-        [MenuItem("Tools/Test Write API")]
+        [MenuItem("Tools/Galleon/TextNode/Test Write API")]
         #endif
         public static void TestWriteAPI()
         {
