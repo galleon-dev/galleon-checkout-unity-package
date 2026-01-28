@@ -110,7 +110,7 @@ namespace Galleon.Checkout.UI
 
         public void Select()
         {
-            this.PaymentMethod?.Select();
+            this.PaymentMethod?.SelectExclusive();
             this.PreselectionPanelView.OnRadiobuttonSelected(this);
             
             CHECKOUT.Session.PreselectedPaymentMethod = this.PaymentMethod;

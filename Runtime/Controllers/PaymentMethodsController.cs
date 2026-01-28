@@ -45,6 +45,9 @@ namespace Galleon.Checkout
                                                                                           .OrderBy(x => x.SortOrder)
                                                                                           .ToList();
         
+        public List<UserPaymentMethod>              RealPaymentMethods                 => UserPaymentMethods.Except(EmptyUserPaymentMethods).Except(SpecialUserPaymentMethods).ToList();
+        public UserPaymentMethod                    LastUsedUserPaymentMethod          => RealPaymentMethods.FirstOrDefault();
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public Step Initialize() 

@@ -83,6 +83,12 @@ namespace Galleon.Checkout
             get => CHECKOUT.Config.GetInt          ("panel_smoothness", defaultValue : 2);
             set => CHECKOUT.Config.SetOverrideValue("panel_smoothness", value);
         }
+
+        public bool IsLastUsedPaymentMethodInPreselectionEnabled
+        {
+            get => CHECKOUT.Config.GetBool         ("is_last_used_payment_method_in_preselection_enabled", defaultValue : false);
+            set => CHECKOUT.Config.SetOverrideValue("is_last_used_payment_method_in_preselection_enabled", value);
+        }
         
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -288,6 +294,21 @@ namespace Galleon.Checkout
                                                                 new ConfigValue.PossibleValue() { DisplayName = "8",              Value = "8"  },
                                                                 new ConfigValue.PossibleValue() { DisplayName = "16",             Value = "16" },
                                                                 new ConfigValue.PossibleValue() { DisplayName = "1x",             Value = "1"  },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "is_last_used_payment_method_in_preselection_enabled", value: false)
+                                      {
+                                          displayName     = "Last Used in Preselection",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = null    },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
                                                             },
                                       }
                                   );

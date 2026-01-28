@@ -610,7 +610,8 @@ namespace Galleon.Checkout.UI
                                                        ,footer: FooterPanelView     .STATE.terms_privacy_return .ToString()
                                                        ,setup : page =>
                                                               {
-                                                                  page.NavigationMap[CheckoutPanelView.ViewResult.Confirm.ToString()] = CHECKOUT.Session.CheckPreselection();
+                                                                  page.NavigationMap[PreselectionPanelView.ViewResult.Confirm.ToString()] = CHECKOUT.Session.CheckPreselection();
+                                                                  page.NavigationMap[PreselectionPanelView.ViewResult.Pay.    ToString()] = CheckoutClient.Instance.CurrentSession.RunTransaction();
                                                               }
                                                         );
                     

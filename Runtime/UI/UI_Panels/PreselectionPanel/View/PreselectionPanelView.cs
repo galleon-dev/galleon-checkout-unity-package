@@ -18,9 +18,7 @@ namespace Galleon.Checkout.UI
             None,
             Back,
             Confirm,
-            Settings,
-            AddCard,
-            OtherPaymentMethods,
+            Pay,
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
@@ -82,6 +80,20 @@ namespace Galleon.Checkout.UI
                 // Debug.Log($"-Removing Item {child.gameObject.name}");
                 Destroy(child.gameObject);
             }
+            
+            if (CHECKOUT.Globals.IsLastUsedPaymentMethodInPreselectionEnabled
+            &&  CHECKOUT.PaymentMethods.LastUsedUserPaymentMethod != null)
+            {
+                var lastUsed = CHECKOUT.PaymentMethods.LastUsedUserPaymentMethod;
+                
+                // Instantiate
+                var go   = Instantiate(original: PreselectionItemPrefab, parent: PaymentMethodsPanel.transform);
+                var item = go.GetComponent<PreselectionPanelItemView>();
+                item.Initialize(lastUsed, this);
+            
+                // Add ui separator
+                Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: PaymentMethodsPanel.transform);
+            }
 
             // Add children
             var paymentMethods = CHECKOUT.PaymentMethods.PreselectionUserPaymentMethods;
@@ -117,27 +129,14 @@ namespace Galleon.Checkout.UI
         {
             // CHECKOUT.User.SelectedUserPaymentMethod.Unselect();
             
-            this.Result = ViewResult.Confirm;
+            if (CHECKOUT.PaymentMethods.RealPaymentMethods.Contains(CHECKOUT.User.SelectedUserPaymentMethod))
+                this.Result = ViewResult.Pay;
+            else
+                this.Result = ViewResult.Confirm;
+            
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
 
-        public void OnSettingsClick()
-        {
-            this.Result = ViewResult.Settings;
-            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
-        }
-
-        public void OnOtherPaymentMethodsClick()
-        {
-            this.Result = ViewResult.OtherPaymentMethods;
-            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
-        }
-
-        public void On_AddCardClicked()
-        {
-            this.Result = ViewResult.AddCard;
-            CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
-        }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
 
@@ -156,7 +155,7 @@ namespace Galleon.Checkout.UI
             }
             else
             {
-                PurchaseButtonText.text = CHECKOUT.Config.GetString("preselection_other_button_text", defaultValue: "Continue");
+                PurchaseButtonText.text = CHECKOUT.Config.GetString("preselection_other_button_text", defaultValue: "");
             }
         }
         
