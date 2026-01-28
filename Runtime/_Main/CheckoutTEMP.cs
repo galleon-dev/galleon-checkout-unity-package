@@ -108,7 +108,7 @@ namespace Galleon.Checkout
             public int number;
         }
         #if UNITY_EDITOR
-        [MenuItem("Tools/Test Temporary Method")]
+        [MenuItem("Tools/Galleon/Temp/Test Temporary Method")]
         private static void TestTemporaryMethod()
         {
             var list = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps(new temp()));

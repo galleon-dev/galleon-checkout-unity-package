@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
@@ -12,8 +13,47 @@ namespace Galleon.Checkout
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        public VirtualEntity t1 =  new VirtualEntity() { TextNode = new TextNode("> Thing t1") };
-        public VirtualEntity t2 =  new VirtualEntity() { TextNode = new TextNode("> Thing t2 #yellow #4x4 #10,10 #collider #rigidbody") };
+        //public VirtualEntity t1 =  new VirtualEntity() { TextNode = new TextNode("> Thing t1")                                          };
+        //public VirtualEntity t2 =  new VirtualEntity() { TextNode = new TextNode("> Thing t2 #yellow #4x4 #10,10 #collider #rigidbody") };
+        //public VirtualEntity t3 =  new VirtualEntity() { TextNode = new TextNode("> Thing t3 #blue #rb prompt='a moving cube'")         };
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// TEMP
+        
+        public static string OpString = "> Thing t1"
+                               + "\n" + "> Thing t2 #yellow #4x4 #10,10 #collider #rigidbody"
+                               + "\n" + "> Thing t3 #blue #rb prompt='a moving cube'"
+                               + "\n" + "";
+        
+        //////////////////////////////
+        
+        public static TextNode parsed => TextNode.Parse(OpString);
+        
+        //////////////////////////////
+        
+        public List<VirtualEntity> LoadVirtualEntities()
+        {
+            List<VirtualEntity> result = new();
+            
+            foreach (var textNode in parsed.Node.Descendants().OfType<TextNode>())
+            {
+                if (textNode.RawText.IsNullOrEmpty()
+                ||  textNode.RawText.ToLower().StartsWith("> origin") )
+                    continue;
+                
+                var ve = new VirtualEntity(){TextNode = textNode};
+                result.Add(ve);
+            }
+            
+            return result;
+        }
+        
+        //////////////////////////////
+        
+        [MenuItem("Tools/Galleon/Test Slice")]
+        public static void Test()
+        {
+            Debug.Log(parsed.ToTreeString());
+        }
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
@@ -22,8 +62,15 @@ namespace Galleon.Checkout
             new Step(name   : $"Op"
                     ,action : async (s) =>
                     {   
+                        //var loadedVEs = LoadVirtualEntities();
+                        //foreach (var ve in loadedVEs)
+                        //    this.Node.AddChild(ve);
+                        
                         var ves = this.Node.Descendants().OfType<VirtualEntity>();
 
+                        foreach (var ve in ves)
+                            Debug.Log(ve.TextNode?.RawText ?? "> NULL");
+                        
                         foreach (var ve in ves)
                         {
                             ve.State = "assets";
@@ -38,6 +85,11 @@ namespace Galleon.Checkout
             new Step(name   : $"resume"
                     ,action : async (s) =>
                     {
+                        
+                        var loadedVEs = LoadVirtualEntities();
+                        foreach (var ve in loadedVEs)
+                            this.Node.AddChild(ve);
+                        
                         var ves = this.Node.Descendants().OfType<VirtualEntity>();
 
                         foreach (var ve in ves)
@@ -52,8 +104,6 @@ namespace Galleon.Checkout
         
         #if UNITY_EDITOR
         [InitializeOnLoadMethod]
-        #else
-        [RuntimeInitializeOnLoadMethod]
         #endif
         public static async void InitializeOnLoad()
         {
@@ -70,56 +120,3 @@ namespace Galleon.Checkout
                     });
     }
 }
-
-/// > Feb27 App
-///     > (Application)
-///         > (Services)
-///             > Log
-///             > Storage
-///             > Config
-///             > Analytics
-///             > Network
-///             > Etc.
-///         > (Core)
-///             > Flow
-///             > Segments
-///     > (UI)
-///         > Screen
-///             > Panel
-///                 > List
-///                     > Item
-///                         > Code
-///                         > Text
-///                         > Image
-///                         > Button
-///     > (Scene)
-///         > Scene
-///             > PSE
-///                 > prefab
-///                     > GO
-///                         > Component
-///                             > Field / ref
-///                     > Model
-///                         > Mesh
-///                             > Material
-///                                 > Sprite
-///                                     > Texture
-///                     > Physics
-///                         > Rigidbody
-///                         > Collider
-///                     > Aniaiton
-///                         > State?
-///                         > Clip
-///                             > Keyframe
-///                                 > Value
-///                 > Motor
-///     > (Systm)
-///         > Controller
-///         > Rule
-///             > Event
-///             > Confition
-///             > Action
-///                 > Method
-///                 > Step
-///                 > Behaviour 
-///     
