@@ -19,7 +19,20 @@ namespace Galleon.Checkout
             new Step(name   : "initialize_storage"
                     ,tags   : new[] { "init" }
                     ,action : async s =>
-                    {    
+                    {  
+                        List<string> savedKeys = GetSavedKeys();
+
+                        s.Log($"Storage: Found {savedKeys.Count} saved keys");
+
+                        foreach (string key in savedKeys)
+                        {
+                            if (PlayerPrefs.HasKey(key))
+                            {
+                                string value = PlayerPrefs.GetString(key);
+                                s.Log($"Storage: {key} = {value}");
+                            }
+                        }
+                        
                     });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API

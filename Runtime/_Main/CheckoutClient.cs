@@ -100,6 +100,7 @@ namespace Galleon.Checkout
                               {   
                                   // Services
                                   s.AddChildStep(Logger                         .Initialize());
+                                  s.AddChildStep(Storage                        .Initialize());
                                   s.AddChildStep(Network                        .Initialize());
                                   s.AddChildStep(Config                         .Initialize()); //
                                   s.AddChildStep(CheckoutGlobals                .Initialize()); //

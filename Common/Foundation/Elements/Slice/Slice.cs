@@ -49,7 +49,9 @@ namespace Galleon.Checkout
         
         //////////////////////////////
         
+        #if UNITY_EDITOR
         [MenuItem("Tools/Galleon/Test Slice")]
+        #endif
         public static void Test()
         {
             Debug.Log(parsed.ToTreeString());
