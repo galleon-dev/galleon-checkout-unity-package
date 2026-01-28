@@ -44,6 +44,7 @@ namespace Galleon.SampleApp
             var user = $"test_user_{DateTime.Now.ToString()}";
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",
                                             AppUserID               = $"test_user_{DateTime.Now.ToString()}",
                                             ApplicationDisplayName  = "Dice Dreams",                         
                                             Config                  = new()
@@ -89,6 +90,7 @@ namespace Galleon.SampleApp
             // Reinitialize if needed
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
+                                            JWT                    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",
                                             AppUserID              = appUserID,
                                             ApplicationDisplayName = "Dice Dreams"
                                          } );

@@ -35,6 +35,9 @@ namespace Galleon.Checkout
         // steps
         public Step                               OnSessionFinishedStep;
         
+        // Config
+        public Dictionary<string, object>         PurchaseConfiguration     = new();
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public CheckoutClient                     Client                    => CheckoutClient.Instance;
@@ -108,11 +111,12 @@ namespace Galleon.Checkout
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                   {
-                                                      OrderID    = CHECKOUT.Session?.SessionID ?? "NULL",
-                                                      IsSuccess  = false,
-                                                      IsCanceled = true,
-                                                      IsError    = false,
-                                                      Errors     = new(),
+                                                      OrderID                   = CHECKOUT.Session?.SessionID ?? "NULL",
+                                                      IsSuccess                 = false,
+                                                      IsCanceled                = true,
+                                                      IsError                   = false,
+                                                      Errors                    = new(),
+                                                      SelectedPaymentMethodType = CHECKOUT.Session?.PreselectedPaymentMethod?.Type ?? "none",
                                                   };
                         }
                     });
@@ -128,8 +132,9 @@ namespace Galleon.Checkout
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                 {
-                                                    IsSuccess              = true,
-                                                    DidUserSelectNativeIAP = true,
+                                                    IsSuccess                 = true,
+                                                    DidUserSelectNativeIAP    = true,
+                                                    SelectedPaymentMethodType = "native"
                                                 };
                             
                             s.RemoveStepsAfterThisInParentFlow();

@@ -34,7 +34,7 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         // Add all dynamic values
-                        foreach (var pair in CHECKOUT.Globals.CheckoutConfiguration.Config)
+                        foreach (var pair in CHECKOUT.Globals.CheckoutInitConfiguration.Config)
                         {
                             this.SetValue(pair.Key, pair.Value);
                         }
