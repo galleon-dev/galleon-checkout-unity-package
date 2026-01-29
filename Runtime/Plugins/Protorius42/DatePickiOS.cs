@@ -7,6 +7,7 @@ using UnityEngine;
 public class DatePickiOS : MonoBehaviour
 {
     [SerializeField] private AdvancedInputField DateAdvancedInputField;
+    [SerializeField] Galleon.Checkout.UI.CreditCardInfoPanelView CreditCardInfoPanelView;
 
     public void OniOSDateSelected()
     {
@@ -49,6 +50,7 @@ public class DatePickiOS : MonoBehaviour
                 string formatted = FormatTimestamp(timestamp, dateTimeParam.PickerMode);
                 Debug.Log($"DateTimeDialog: user selected date {formatted}");
                 DateAdvancedInputField.Text = formatted;
+                CreditCardInfoPanelView.OnDateValueEndEdit(DateAdvancedInputField);
 
             }, TaskScheduler.FromCurrentSynchronizationContext());
     }

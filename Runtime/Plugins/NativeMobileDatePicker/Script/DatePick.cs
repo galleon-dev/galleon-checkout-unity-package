@@ -11,6 +11,7 @@ namespace GalleonDatePicker.Samples
     {
         [SerializeField] private Button _button;
         [SerializeField] private AdvancedInputField DateAdvancedInputField;
+        [SerializeField] Galleon.Checkout.UI.CreditCardInfoPanelView CreditCardInfoPanelView;
         private IDatePicker _datePicker;
         public DatePickiOS DatePickiOS;
 
@@ -39,12 +40,13 @@ namespace GalleonDatePicker.Samples
         private void OnAndroidDateSelected(DateTime value)
         {
             lastDate = value;
-            Debug.Log($"Date selected: {value.ToShortDateString()}");
+            // Debug.Log($"Date selected: {value.ToShortDateString()}");
             Debug.Log($"Date selected: {value.ToString("MM/yy")}");
             
             if (DateAdvancedInputField)
             {
                 DateAdvancedInputField.Text = value.ToString("MMyy");
+                CreditCardInfoPanelView.OnDateValueEndEdit(DateAdvancedInputField);
             }
         }
 
