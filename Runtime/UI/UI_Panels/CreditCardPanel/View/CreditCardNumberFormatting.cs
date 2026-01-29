@@ -1,4 +1,4 @@
-// Copyright (c) Jeroen van Pienbroek. All rights reserved.
+﻿// Copyright (c) Jeroen van Pienbroek. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 using UnityEngine;
@@ -117,75 +117,45 @@ namespace AdvancedInputFieldPlugin
 
         public override int DetermineProcessedCaret(string text, int caretPosition, string processedText)
         {
-            // Debug.Log("DetermineProcessedCaret(), caretPosition: " + caretPosition + " processedText: " + processedText.Length + " Only Numbers: " + CreditCardAdvancedInputField.Text.Length);
-
-            if (caretPosition == 0)
-            {
-                return 0;
-            }
-
-            int length = processedText.Length;
-            if (length == 0)
-            {
-                return 0;
-            }
+            // Focus / refocus formatting pass - DO NOT override caret
+            if (caretPosition == 0 && text.Length > 0 && processedText.Length > 0)
+                return processedText.Length;
 
             int numberCount = 0;
-            for (int i = 0; i < length; i++)
+
+            for (int i = 0; i < processedText.Length; i++)
             {
-                char c = processedText[i];
-
-                if (IsNumber(c))
+                if (IsNumber(processedText[i]))
                 {
-                    numberCount++;
-
-                    if (numberCount == caretPosition + 1)
-                    {
+                    if (numberCount == caretPosition)
                         return i;
-                    }
+
+                    numberCount++;
                 }
             }
 
-            return length;
+            return processedText.Length;
         }
 
         public override int DetermineCaret(string text, string processedText, int processedCaretPosition)
         {
-            //Debug.Log("DetermineCaret(), processedCaretPosition: " + processedCaretPosition + " processedText: " + processedText.Length + " Only Numbers: " + CreditCardAdvancedInputField.Text.Length);
-
-            if (processedCaretPosition == 0)
-            {
+            if (processedCaretPosition <= 0)
                 return 0;
-            }
-
-            int length = processedText.Length;
-            if (length == 0)
-            {
-                return 0;
-            }
-
-            if (processedCaretPosition == length)
-            {
-                return text.Length;
-            }
 
             int numberCount = 0;
+
             for (int i = 0; i < processedCaretPosition; i++)
             {
-                char c = processedText[i];
-
-                if (IsNumber(c))
-                {
+                if (IsNumber(processedText[i]))
                     numberCount++;
-                }
             }
 
-            return numberCount;
+            return Mathf.Clamp(numberCount, 0, text.Length);
         }
 
         private bool IsNumber(char c)
         {
-            return (c >= '0' && c <= '9');
+            return c >= '0' && c <= '9';
         }
     }
 }
