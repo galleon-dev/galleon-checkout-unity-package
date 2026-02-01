@@ -293,6 +293,7 @@ namespace Galleon.Checkout
                                   #if UNITY_EDITOR
                                   Application.OpenURL(url);
                                   await Task.Delay(2000);
+                                  UnityEditor.EditorApplication.isPaused = true;
                                   return;
                                   #endif
                                   
@@ -303,6 +304,9 @@ namespace Galleon.Checkout
                                   foreach (var kvp in values)
                                       Debug.Log($"+ value : {kvp}");
                               });
+        
+
+        
         
         public Step CheckStatus(int attemptNumber = 1) 
         =>

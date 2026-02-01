@@ -111,7 +111,7 @@ namespace Galleon.Pipeline.Editor
                 return false;
 
             // Add XML comment before the intent-filter
-            XmlComment comment = doc.CreateComment(" Galleon Checkout Deeplink ");
+            XmlComment comment = doc.CreateComment(" Galleon Checkout Deeplink. created from 'project settings > Galleon Checkout > Deep Link Name' "); 
             activityNode.AppendChild(comment);
             
             // Add deeplink intent-filter
