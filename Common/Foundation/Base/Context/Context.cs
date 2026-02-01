@@ -11,6 +11,7 @@ namespace Galleon.Checkout.Foundation
         public OperationController Operations     = new();
         public StepController      StepController = new StepController();
         
+        public StorageService      StorageService = new();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         

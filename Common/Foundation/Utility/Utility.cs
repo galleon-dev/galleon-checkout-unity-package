@@ -48,5 +48,20 @@ namespace Galleon.Checkout
 
             return items.ElementAt(UnityEngine.Random.Range(0, items.Count()));
         }
+        
+        public static string ToLineString<T>(this IEnumerable<T> items)
+        {
+            if (items == null || !items.Any())
+                return string.Empty;
+
+            return string.Join("'", items);
+        }
+        public static string ToMultilineString<T>(this IEnumerable<T> items)
+        {
+            if (items == null || !items.Any())
+                return string.Empty;
+
+            return string.Join("\n", items);
+        }
     }
 }

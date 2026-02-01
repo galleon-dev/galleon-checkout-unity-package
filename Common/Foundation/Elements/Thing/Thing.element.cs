@@ -310,7 +310,7 @@ namespace Galleon.Checkout.ELEMENTS
 
                         // Add the script component
                         string scriptName = ve.ThingName;
-                        Type scriptType   = System.Type.GetType("TEST_THING." + scriptName + ", Assembly-CSharp");
+                        Type   scriptType = System.Type.GetType("TEST_THING." + scriptName + ", Assembly-CSharp");
                         
                         if (scriptType != null)
                             prefabInstance.AddComponent(scriptType);
@@ -473,7 +473,7 @@ namespace TEST_THING
 
             Debug.Log($"Created script: {scriptPath}");
             
-            await Task.Delay(2000);            
+            // await Task.Delay(2000);            
 
             #endif // UNITY_EDITOR
         }

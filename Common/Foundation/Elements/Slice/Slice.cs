@@ -19,54 +19,48 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// TEMP
         
-        public static string OpString = "> Thing t1"
-                               + "\n" + "> Thing t2 #yellow #4x4 #10,10 #collider #rigidbody"
-                               + "\n" + "> Thing t3 #blue #rb prompt='a moving cube'"
-                               + "\n" + "";
+        // public Step CreateAndStoreThingOperation() 
+        // =>
+        //     new Step(name   : $"create_and_store_thing_operation"
+        //             ,action : async (s) =>
+        //                     {
+        //                         this.Node.Storage.Store("myInt", 4);
+        //                     });
+        // 
+        // public Step TestRead() 
+        // =>
+        //     new Step(name   : $"test_read"
+        //             ,action : async (s) =>
+        //                     {
+        //                         s.Log($"storage id = {this.Node.ID.StorageID}");
+        //                         s.Log($"keys : {this.Node.Storage.GetStoredKeys().ToMultilineString()}");
+        //                         
+        //                         var value = this.Node.Storage.Load("myInt");
+        //                         s.Log(value);
+        //                     });
         
-        //////////////////////////////
-        
-        public static TextNode parsed => TextNode.Parse(OpString);
-        
-        //////////////////////////////
-        
-        public List<VirtualEntity> LoadVirtualEntities()
-        {
-            List<VirtualEntity> result = new();
-            
-            foreach (var textNode in parsed.Node.Descendants().OfType<TextNode>())
-            {
-                if (textNode.RawText.IsNullOrEmpty()
-                ||  textNode.RawText.ToLower().StartsWith("> origin") )
-                    continue;
-                
-                var ve = new VirtualEntity(){TextNode = textNode};
-                result.Add(ve);
-            }
-            
-            return result;
-        }
-        
-        //////////////////////////////
-        
-        #if UNITY_EDITOR
-        [MenuItem("Tools/Galleon/Test Slice")]
-        #endif
-        public static void Test()
-        {
-            Debug.Log(parsed.ToTreeString());
-        }
-        
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        public Step Op() 
+        public Step Op(string OpString) 
         =>
             new Step(name   : $"Op"
                     ,action : async (s) =>
                     {   
-                        //var loadedVEs = LoadVirtualEntities();
-                        //foreach (var ve in loadedVEs)
-                        //    this.Node.AddChild(ve);
+                        this.Node.Storage.Store("OpString", OpString);
+                        
+                        TextNode parsed = TextNode.Parse(OpString);
+        
+                        ///////////
+                        
+                        foreach (var textNode in parsed.Node.Descendants().OfType<TextNode>())
+                        {
+                            if (textNode.RawText.IsNullOrEmpty()
+                            ||  textNode.RawText.ToLower().StartsWith("> origin") )
+                                continue;
+                            
+                            var ve = new VirtualEntity(){TextNode = textNode};
+                            this.Node.AddChild(ve);
+                        }
+                        
+                        ///////////
                         
                         var ves = this.Node.Descendants().OfType<VirtualEntity>();
 
@@ -83,14 +77,29 @@ namespace Galleon.Checkout
                     });
         
         public Step Resume() 
-        =>
+        => 
             new Step(name   : $"resume"
                     ,action : async (s) =>
                     {
+                        if (!this.Node.Storage.HasKey("OpString"))
+                            return;
                         
-                        var loadedVEs = LoadVirtualEntities();
-                        foreach (var ve in loadedVEs)
+                        string   OpString = this.Node.Storage.Load<string>("OpString");
+                        TextNode parsed   = TextNode.Parse(OpString);
+                        
+                        ///////////
+                        
+                        foreach (var textNode in parsed.Node.Descendants().OfType<TextNode>())
+                        {
+                            if (textNode.RawText.IsNullOrEmpty()
+                            ||  textNode.RawText.ToLower().StartsWith("> origin") )
+                                continue;
+                            
+                            var ve = new VirtualEntity(){TextNode = textNode};
                             this.Node.AddChild(ve);
+                        }
+                        
+                        ///////////
                         
                         var ves = this.Node.Descendants().OfType<VirtualEntity>();
 
