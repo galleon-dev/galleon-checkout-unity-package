@@ -238,11 +238,25 @@ This is an instruction file for AI.
         - Vertical 
         - Horizontal (split)
     - Refresh Logic
+        - refresh self
+        - refresh collection
     - Content
         - Raw inspector
         - Common Inspector
     - Extras
         - Favorites
+
+> create a folder called ExplorerTests, and use the namespace "ExplorerTests"
+> Create a class class "Explorer" that inherits from VisualElement and implements IEntity (a class "Explorer" already exists, so be sure to use the namespace "ExplorerTests") 
+> The explorer is a development tool to browse and inspect the entities in the project.
+> the explorer will hold children of type "ExplorerItem" (use the namespace "ExplorerTests")
+> it will have a VisualElement "ContentPanel". this will hold the inspector for the entity.
+    
+> it will have a VisualElement "ChildrenPanel" this will hold child items.
+    
+> the explorer will support a few modes
+    > Vertical - all  items are in a vertical tree (like the unity hierarchy window for example)
+    > Split - the view is split into two panes, the tree of entities on the left, the content of the selected entity on the right.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Notion & Dashboard
 

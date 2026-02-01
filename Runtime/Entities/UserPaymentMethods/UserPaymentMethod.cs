@@ -137,6 +137,11 @@ namespace Galleon.Checkout
             return CHECKOUT.Sprites.GetIconSprite(GetPaymentMethodTypeeActual());
         }
         
+        public bool HasNonEmptyButtonSprite()
+        {
+            return CHECKOUT.Sprites.GetButtonSprite(GetPaymentMethodTypeeActual()) != CHECKOUT.Sprites.CheckoutButtonSprite;
+        }
+        
         public Sprite GetButtonSprite()
         {
             return CHECKOUT.Sprites.GetButtonSprite(GetPaymentMethodTypeeActual());

@@ -111,6 +111,7 @@ namespace Galleon.Checkout
                                   s.AddChildStep(PaymentMethodsController       .Initialize()); //
                                 
                                   s.AddChildStep(TaxController                  .Initialize()); //
+                                  s.AddChildStep(TaxController                  .Initialize()); //
                                   
                                   // Resources
                                   s.AddChildStep(Resources                      .Initialize());
