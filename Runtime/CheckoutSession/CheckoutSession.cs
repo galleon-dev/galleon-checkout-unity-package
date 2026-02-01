@@ -303,8 +303,7 @@ namespace Galleon.Checkout
             new Step(name    : $"on_checkout_screen_closed"
                      ,action : async (s) =>
                                {
-                                   if (lastChargeResult is null
-                                   ||  lastChargeResult.is_success == false)
+                                   if (lastChargeResult is null)
                                        s.ParentStep.AddPostStep(CancelSession());
                                });
         

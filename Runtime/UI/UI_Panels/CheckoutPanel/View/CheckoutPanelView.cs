@@ -18,7 +18,7 @@ namespace Galleon.Checkout.UI
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
 
-        public ViewResult Result = ViewResult.None;
+        public      ViewResult Result = ViewResult.None;
         public enum ViewResult
         {
             None,
@@ -229,13 +229,24 @@ namespace Galleon.Checkout.UI
         {
             if (upm == null) return;
             
-            var image    = PurchaseButton.gameObject.GetComponent<Image>();
-            image.sprite = upm.GetButtonSprite();
-            
-            if (upm.ButtonText != null)
-                PurchaseButtonText.text = upm.ButtonText;
-            else
+            if  (upm.HasNonEmptyButtonSprite())
+            {   
+                var image    = PurchaseButton.gameObject.GetComponent<Image>();
+                image.sprite = upm.GetButtonSprite();
+                
                 PurchaseButtonText.text = "";
+                return;
+            }
+            else
+            {
+                var image    = PurchaseButton.gameObject.GetComponent<Image>();
+                image.sprite = CHECKOUT.Sprites.CheckoutButtonSprite;
+                
+                if (upm.ButtonText != null)
+                    PurchaseButtonText.text = upm.ButtonText;
+                else
+                    PurchaseButtonText.text = "";    
+            }
         }
         
         
