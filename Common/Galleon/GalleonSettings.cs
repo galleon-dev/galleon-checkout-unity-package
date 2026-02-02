@@ -14,13 +14,14 @@ namespace Common.Galleon
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public string DeepLinkName = "test.app"; // Deep link scheme name for the application
+        public string DeepLinkName = ""; // Deep link scheme name for the application
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
         
         internal const string SettingsPath = "Assets/Resources/GalleonSettings.asset";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Instance
+        
         
         private static GalleonSettings instance;
         public  static GalleonSettings Instance
@@ -113,6 +114,12 @@ namespace Common.Galleon
                                                   serializedObject.ApplyModifiedProperties();
                                                   EditorUtility.SetDirty(settings);
                                                   AssetDatabase.SaveAssets();
+                                              }
+
+                                              EditorGUILayout.Space();
+                                              if (GUILayout.Button("Apply Deep Link to Android Manifest"))
+                                              {
+                                                  EditorApplication.ExecuteMenuItem("Tools/Galleon/Patch Android Manifest");
                                               }
                                           },
                              keywords     = new System.Collections.Generic.HashSet<string>(new[] { "Galleon", "Deep Link" }) // Keywords for search functionality in Project Settings
