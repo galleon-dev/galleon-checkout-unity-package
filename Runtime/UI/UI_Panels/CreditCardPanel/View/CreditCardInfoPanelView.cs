@@ -146,6 +146,8 @@ namespace Galleon.Checkout.UI
         {
             if (IsCorrectInputFields())
             {
+                CurrentCardFormat = GetFormatForDigits(digits: CreditCardNumberField.Text);
+                
                 // Create payment method object
                 var card                     = new CreditCardUserUserPaymentMethod();
                 card.Data.type               = "credit_card";
