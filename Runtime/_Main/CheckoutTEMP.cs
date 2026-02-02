@@ -880,6 +880,7 @@ namespace Galleon.Checkout
 ///         > error labels still active on second session
 ///     > (payment methods)
 ///         > Server stuff payment methods - Naboni
+///         > bug - can add same credit card twice
 ///         > select panel sorting
 ///         > checkout panel sorting
 ///         > last used upm ids
@@ -897,9 +898,11 @@ namespace Galleon.Checkout
 ///         > behind the scenes code
 ///         > Excesive Refresh
 ///         > Navitation and Back button
+///         > Depp Link Patcher - update single deep link insted of adding many
 ///     > (test)
 ///         > test scenarios
 ///         > test report
 ///         > logs
 ///     > (bugs)
 ///         > sometimes it tries to cancel the session when it shouldnt
+///         > total price on second purchase doesnt reset

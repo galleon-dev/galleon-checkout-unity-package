@@ -13,6 +13,9 @@ namespace Galleon.Pipeline.Editor
     [InitializeOnLoad]
     public class DeeplinkPatcher
     {
+        private const string DEEPLINK_SECTION_START = "Galleon Checkout Deeplink";
+        private const string DEEPLINK_SECTION_END = "end of Galleon Checkout Deeplink";
+
         static DeeplinkPatcher()
         {
             PatchManifestIfNeeded();
@@ -88,32 +91,46 @@ namespace Galleon.Pipeline.Editor
                 return false;
             }
 
-            // Check if deeplink intent-filter already exists with the current scheme
-            XmlNodeList intentFilters = activityNode.SelectNodes("intent-filter", nsMgr);
-            bool deeplinkExists = false;
+            // Find and remove existing Galleon Checkout Deeplink section
+            XmlNode startComment = null;
+            XmlNode endComment = null;
 
-            foreach (XmlNode filter in intentFilters)
+            foreach (XmlNode child in activityNode.ChildNodes)
             {
-                XmlNode dataNode = filter.SelectSingleNode("data[@android:scheme]", nsMgr);
-                if (dataNode != null)
+                if (child.NodeType == XmlNodeType.Comment)
                 {
-                    string existingScheme = dataNode.Attributes["android:scheme"]?.Value;
-                    if (existingScheme == deeplinkScheme)
+                    if (child.Value == DEEPLINK_SECTION_START)
                     {
-                        deeplinkExists = true;
+                        startComment = child;
+                    }
+                    else if (child.Value == DEEPLINK_SECTION_END)
+                    {
+                        endComment = child;
                         break;
                     }
                 }
             }
-
-            // No changes needed if deeplink already exists
-            if (deeplinkExists)
-                return false;
-
-            // Add XML comment before the intent-filter
-            XmlComment comment = doc.CreateComment(" Galleon Checkout Deeplink. created from 'project settings > Galleon Checkout > Deep Link Name' "); 
-            activityNode.AppendChild(comment);
             
+
+            // Remove existing section if found
+            if (startComment != null && endComment != null)
+            {
+                XmlNode current = startComment.NextSibling;
+                while (current != null && current != endComment)
+                {
+                    XmlNode next = current.NextSibling;
+                    activityNode.RemoveChild(current);
+                    current = next;
+                }
+                activityNode.RemoveChild(startComment);
+                activityNode.RemoveChild(endComment);
+            }
+
+            
+            // Add XML comment before the intent-filter
+            activityNode.AppendChild(doc.CreateComment(DEEPLINK_SECTION_START));
+            activityNode.AppendChild(doc.CreateComment("(this was created automaticly from 'project settings > Galleon Checkout)"));
+
             // Add deeplink intent-filter
             XmlElement intentFilter = doc.CreateElement("intent-filter");
 
@@ -139,6 +156,8 @@ namespace Galleon.Pipeline.Editor
 
             // Append to activity
             activityNode.AppendChild(intentFilter);
+
+            activityNode.AppendChild(doc.CreateComment(DEEPLINK_SECTION_END));
 
             // Save the modified manifest
             doc.Save(manifestPath);
