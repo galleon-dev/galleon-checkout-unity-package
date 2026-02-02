@@ -117,10 +117,39 @@ namespace Common.Galleon
                                               }
 
                                               EditorGUILayout.Space();
+                                              EditorGUILayout.BeginHorizontal();
                                               if (GUILayout.Button("Apply Deep Link to Android Manifest"))
                                               {
                                                   EditorApplication.ExecuteMenuItem("Tools/Galleon/Patch Android Manifest");
                                               }
+                                              if (GUILayout.Button("Select Android Manifest File"))
+                                              {
+                                                  // Find AndroidManifest.xml
+                                                  string[] manifestGuids = AssetDatabase.FindAssets("AndroidManifest t:TextAsset");
+                                                  string manifestPath = null;
+
+                                                  foreach (string guid in manifestGuids)
+                                                  {
+                                                      string path = AssetDatabase.GUIDToAssetPath(guid);
+                                                      if (path.EndsWith("AndroidManifest.xml"))
+                                                      {
+                                                          manifestPath = path;
+                                                          break;
+                                                      }
+                                                  }
+
+                                                  if (!string.IsNullOrEmpty(manifestPath))
+                                                  {
+                                                      var manifest = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(manifestPath);
+                                                      EditorGUIUtility.PingObject(manifest);
+                                                      Selection.activeObject = manifest;
+                                                  }
+                                                  else
+                                                  {
+                                                      EditorUtility.DisplayDialog("Not Found", "AndroidManifest.xml not found in project.", "OK");
+                                                  }
+                                              }
+                                              EditorGUILayout.EndHorizontal();
                                           },
                              keywords     = new System.Collections.Generic.HashSet<string>(new[] { "Galleon", "Deep Link" }) // Keywords for search functionality in Project Settings
                          };
