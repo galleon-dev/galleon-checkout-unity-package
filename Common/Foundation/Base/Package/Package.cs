@@ -239,43 +239,17 @@ namespace Galleon.Checkout.Foundation
                     });
         
         
-        public Step CreateThing2() 
+        public Step CreateSlice() 
         =>
-            new Step(name   : $"create_thing_2"
+            new Step(name   : $"create_slice"
                     ,action : async (s) =>
                     {   
-                        var thing2 = new VirtualEntity() { TextNode = new TextNode("> Thing t2 #yellow") };
-                        this.Slice.Node.AddChild(thing2);
+                        /// p + s
+                        /// slice is a runtime clice1 class with 3 fields. used in runtime.
+                        /// slice is an entity/virtual-entity under package. usied in workflow.
                         
-                        string OpString = "> Thing t1"
-                                 + "\n" + "> Thing t2 #yellow #4x4 #10,10 #collider #rigidbody"
-                                 + "\n" + "> Thing t3 #blue #rb prompt='a moving cube'"
-                                 + "\n" + "";
-                        
-                        await Slice.Op(OpString).Execute();
-                    });
-        
-        public Step CreateThing3() 
-        =>
-            new Step(name   : $"create_thing_3"
-                    ,action : async (s) =>
-                    {   
-                        var thing3 = new VirtualEntity() { TextNode = new TextNode("> Thing t3 #yellow prompt='prompt'") };
-                        this.Slice.Node.AddChild(thing3);
-                    });
-        
-        public Step HardCopyThing() 
-        =>
-            new Step(name   : $"hard_copy_thing"
-                    ,action : async (s) =>
-                    {   
-                    });
-        
-        public Step InheritThing() 
-        =>
-            new Step(name   : $"inherit_thing"
-                    ,action : async (s) =>
-                    {
+                        var slice = new VirtualEntity() { TextNode = new TextNode("> Slice slice1") };
+                        this.Node.AddChild(slice);                
                     });
         
         //////////////////////////////////////////////////////////////////////////////////// Inspector
@@ -289,10 +263,8 @@ namespace Galleon.Checkout.Foundation
                 this.Add(new Button(() => target.DoAI         ().Execute()) { text = "doai"            });
                 
                 this.Add(new Button(() => target.PrepForThing ().Execute()) { text = "prep for thing"  });
-                this.Add(new Button(() => target.CreateThing1 ().Execute()) { text = "create thing 1"  });
-             // this.Add(new Button(() => target.CreateThing2 ().Execute()) { text = "create thing 2"  });
-             // this.Add(new Button(() => target.HardCopyThing().Execute()) { text = "hard copy thing" });
-             // this.Add(new Button(() => target.InheritThing ().Execute()) { text = "inherit thing"   });
+                this.Add(new Button(() => target.CreateThing1 ().Execute()) { text = "create thing"    });
+                this.Add(new Button(() => target.CreateThing1 ().Execute()) { text = "create Slice"    });
                 
                 #region OLD
                 

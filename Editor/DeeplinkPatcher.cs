@@ -14,7 +14,7 @@ namespace Galleon.Pipeline.Editor
     public class DeeplinkPatcher
     {
         private const string DEEPLINK_SECTION_START = "Galleon Checkout Deeplink";
-        private const string DEEPLINK_SECTION_END = "end of Galleon Checkout Deeplink";
+        private const string DEEPLINK_SECTION_END   = "end of Galleon Checkout Deeplink";
 
         static DeeplinkPatcher()
         {
@@ -94,6 +94,7 @@ namespace Galleon.Pipeline.Editor
             // Find and remove existing Galleon Checkout Deeplink section
             XmlNode startComment = null;
             XmlNode endComment = null;
+            XmlNode existingIntentFilter = null;
 
             foreach (XmlNode child in activityNode.ChildNodes)
             {
@@ -109,8 +110,26 @@ namespace Galleon.Pipeline.Editor
                         break;
                     }
                 }
+                else if (startComment != null && endComment == null && child.NodeType == XmlNodeType.Element && child.Name == "intent-filter")
+                {
+                    existingIntentFilter = child;
+                }
             }
-            
+
+            // Check if existing deeplink section matches the desired scheme
+            if (startComment != null && endComment != null && existingIntentFilter != null)
+            {
+                XmlNode dataNode = existingIntentFilter.SelectSingleNode("data[@android:scheme]", nsMgr);
+                if (dataNode != null)
+                {
+                    string existingScheme = dataNode.Attributes["scheme", "http://schemas.android.com/apk/res/android"]?.Value;
+                    if (existingScheme == deeplinkScheme)
+                    {
+                        // No change needed
+                        return false;
+                    }
+                }
+            }
 
             // Remove existing section if found
             if (startComment != null && endComment != null)
@@ -126,7 +145,7 @@ namespace Galleon.Pipeline.Editor
                 activityNode.RemoveChild(endComment);
             }
 
-            
+
             // Add XML comment before the intent-filter
             activityNode.AppendChild(doc.CreateComment(DEEPLINK_SECTION_START));
             activityNode.AppendChild(doc.CreateComment("(this was created automatically from 'project settings > Galleon Checkout)"));
