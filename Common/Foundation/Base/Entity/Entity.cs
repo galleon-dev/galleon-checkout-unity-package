@@ -85,6 +85,7 @@ namespace Galleon.Checkout
                                                           .ToList()
                                                           .Select(p => p.Node.ID.SelfPathID)
                                                           );
+            public string StorageID   => PathID;
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Tags
@@ -291,28 +292,35 @@ namespace Galleon.Checkout
         {
             private IEntity Entity;
             public  EntityStorage(IEntity entity) => Entity = entity;
-            
+
             public void Store(string key, object value)
             {
-                try
-                {
-                    var filePath = Path.Combine(Application.dataPath, "Storage", $"{key}.json");
-                    var json     = JsonConvert.SerializeObject(value);
-                    File.WriteAllText(filePath, json);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e.ToString());
-                }
+                var fullKey = $"entity_storage_{Entity.Node.ID.StorageID}_{key}";
+                Root.Instance.Context.StorageService.Store(fullKey, value);
+            }
+
+            public T      Load<T>(string key)
+            {
+                var fullKey = $"entity_storage_{Entity.Node.ID.StorageID}_{key}";
+                return Root.Instance.Context.StorageService.Load<T>(fullKey);
+            }
+
+            public object Load(string key)
+            {
+                var fullKey = $"entity_storage_{Entity.Node.ID.StorageID}_{key}";
+                return Root.Instance.Context.StorageService.Load(fullKey);
             }
             
-            public T      Load<T>(string key) => (T)Load(key);
-            public object Load   (string key)
+            public bool HasKey(string key)
             {
-                var filePath = Path.Combine(Application.dataPath, "Storage", $"{key}.json");
-                var json     = File.ReadAllText(filePath);
-                var value    = JsonConvert.DeserializeObject(json);
-                return value;
+                var fullKey = $"entity_storage_{Entity.Node.ID.StorageID}_{key}";
+                return Root.Instance.Context.StorageService.HasKey(fullKey);
+            }
+
+            public List<string> GetStoredKeys()
+            {
+                var keysListKey = $"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST";
+                return Root.Instance.Context.StorageService.GetStoredKeys(keysListKey);
             }
         }
         

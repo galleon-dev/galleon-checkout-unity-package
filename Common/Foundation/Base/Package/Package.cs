@@ -230,7 +230,12 @@ namespace Galleon.Checkout.Foundation
                         // 
                         // //await thing1.CreateOp.Execute();
                         
-                        await Slice.Op().Execute();
+                        string OpString = "> Thing t1"
+                                 + "\n" + "> Thing t2 #yellow #4x4 #10,10 #collider #rigidbody"
+                                 + "\n" + "> Thing t3 #blue #rb prompt='a moving cube'"
+                                 + "\n" + "";
+                        
+                        await Slice.Op(OpString).Execute();
                     });
         
         
@@ -241,7 +246,13 @@ namespace Galleon.Checkout.Foundation
                     {   
                         var thing2 = new VirtualEntity() { TextNode = new TextNode("> Thing t2 #yellow") };
                         this.Slice.Node.AddChild(thing2);
-                        await Slice.Op().Execute();
+                        
+                        string OpString = "> Thing t1"
+                                 + "\n" + "> Thing t2 #yellow #4x4 #10,10 #collider #rigidbody"
+                                 + "\n" + "> Thing t3 #blue #rb prompt='a moving cube'"
+                                 + "\n" + "";
+                        
+                        await Slice.Op(OpString).Execute();
                     });
         
         public Step CreateThing3() 
