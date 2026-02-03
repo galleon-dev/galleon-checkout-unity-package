@@ -899,6 +899,17 @@ namespace Galleon.Checkout
 ///         > Excesive Refresh
 ///         > Navitation and Back button
 ///         > Depp Link Patcher - update single deep link insted of adding many
+///     > (Analytics)
+///         > Open close
+///         > Page viewed
+///         > Click events
+///         > Payment Method Highlighted
+///         > Payment Method Selected
+///         > new credit card added
+///         > Opened URL
+///         > Returned from URL
+///         > Charge
+///         > Success/Fail
 ///     > (test)
 ///         > test scenarios
 ///         > test report

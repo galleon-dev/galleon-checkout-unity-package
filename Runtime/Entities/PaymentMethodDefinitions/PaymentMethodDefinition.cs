@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
@@ -34,7 +35,10 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public string       DisplayName         => Data?.type ?? Type.ToString();
+        public string       DisplayName         => Type.ToLower().Contains("paypal") ? "PayPal"
+                                                 : Type.ToLower().Contains("google_pay") ? "Google Pay"
+                                                 : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Type.Replace("_", " ").ToLower());
+        
         
         public string       LocalID             => $"local_pm_id_{this.Type}";
         
