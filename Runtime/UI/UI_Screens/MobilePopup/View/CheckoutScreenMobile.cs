@@ -565,7 +565,7 @@ namespace Galleon.Checkout.UI
                 if (actualKeyboardHeight > 0 || hasInputFocus)
                     currentKeyboardHeight = maxKeyboardHeight;
                 
-                return currentKeyboardHeight;
+                return currentKeyboardHeight - 50;
             }
             
             
