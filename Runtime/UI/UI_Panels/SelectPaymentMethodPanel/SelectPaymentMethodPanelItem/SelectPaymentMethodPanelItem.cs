@@ -14,18 +14,20 @@ namespace Galleon.Checkout.UI
     public class SelectPaymentMethodPanelItem : View
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
-        
+
         [Header("UI")]
         public Image                        Icon;
         public TMP_Text                     Label;
-        
+
         [Header("Bonus")]
         public GameObject                   BonusContainer;
         public BonusItemView                bonusItemView;
-        
+
         [Header("Dropdown")]
         public GameObject                   DropdownArrow;
         public TMP_Dropdown                 DropdownButton;
+
+        private List<UserPaymentMethod>     upms;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -151,12 +153,12 @@ namespace Galleon.Checkout.UI
         
         public void On_DropdownValueChanged(int newValue)
         {
-            var displayName   = DropdownButton.options[newValue].text;
-            var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.DisplayName == displayName);
-            
+            var paymentMethodId = upms[newValue].ID;
+            var paymentMethod   = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.ID == paymentMethodId);
+
             if (paymentMethod == null)
                 throw new System.Exception("No Payment Methods Found");
-            
+
             UpdateItemPaymentMethod(paymentMethod);
         }
         
@@ -166,17 +168,17 @@ namespace Galleon.Checkout.UI
         {
             // Clear
             DropdownButton.ClearOptions();
-            
-            
+
+
             // Definitions
             var myType      = this.UserPaymentMethod.Type;
             var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Type == myType).Except(new []{this.UserPaymentMethod}).ToList();
-            var upms        = (new List<UserPaymentMethod>() { this.UserPaymentMethod }).Concat(otherUpms).ToList( );
-            
-            // Add options
+            upms            = (new List<UserPaymentMethod>() { this.UserPaymentMethod }).Concat(otherUpms).ToList( );
+
+            // Add options (using DisplayName for visual display)
             foreach (var pm in upms)
                 DropdownButton.options.Add(new TMP_Dropdown.OptionData(pm.DisplayName, pm.GetIconSprite()));
-            
+
             // for (int i = 0; i < dropdownItems.Count(); i++)
             // {
             //     var pm = pms[i];

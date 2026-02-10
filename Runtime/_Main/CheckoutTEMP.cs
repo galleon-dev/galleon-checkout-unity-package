@@ -915,5 +915,6 @@ namespace Galleon.Checkout
 ///         > test report
 ///         > logs
 ///     > (bugs)
+///         > NO internet - show error ui
 ///         > sometimes it tries to cancel the session when it shouldnt
 ///         > total price on second purchase doesnt reset

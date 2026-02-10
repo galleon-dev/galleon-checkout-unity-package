@@ -285,52 +285,66 @@ namespace Galleon.Checkout
             this.Data.Remove(key);
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Storage
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Prefs Storage
         
-        public        EntityStorage Storage => new(Entity);
-        public struct EntityStorage
+        public        EntityPrefsStorage PrefsStorage => new(Entity);
+        public struct EntityPrefsStorage
         {
-            private IEntity Entity;
-            public  EntityStorage(IEntity entity) => Entity = entity;
+            private IEntity Entity; public  EntityPrefsStorage(IEntity entity) => Entity = entity;
 
-            public void Store(string key, object value)
-            {
-                var fullKey = $"entity_storage_{Entity.Node.ID.StorageID}_{key}";
-                Root.Instance.Context.StorageService.Store(fullKey, value);
-            }
-
-            public T      Load<T>(string key)
-            {
-                var fullKey = $"entity_storage_{Entity.Node.ID.StorageID}_{key}";
-                return Root.Instance.Context.StorageService.Load<T>(fullKey);
-            }
-
-            public object Load(string key)
-            {
-                var fullKey = $"entity_storage_{Entity.Node.ID.StorageID}_{key}";
-                return Root.Instance.Context.StorageService.Load(fullKey);
-            }
-            
-            public bool HasKey(string key)
-            {
-                var fullKey = $"entity_storage_{Entity.Node.ID.StorageID}_{key}";
-                return Root.Instance.Context.StorageService.HasKey(fullKey);
-            }
-
-            public List<string> GetStoredKeys()
-            {
-                var keysListKey = $"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST";
-                return Root.Instance.Context.StorageService.GetStoredKeys(keysListKey);
-            }
+            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public object       Load          (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public List<string> GetStoredKeys ()                         => Root.Instance.Context.SystemServices.PrefsStorageService.GetStoredKeys ($"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST"    );
         }
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - SessionState
+        
+        public        EntitySessionStorage SessionStorage => new(Entity);
+        public struct EntitySessionStorage
+        {
+            private IEntity Entity; public  EntitySessionStorage(IEntity entity) => Entity = entity;
+
+            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public object       Load          (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public List<string> GetStoredKeys ()                         => Root.Instance.Context.SystemServices.SessionStorageService.GetStoredKeys ($"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST"    );
+        }
+        
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Disk Storage
+
+        public        EntityDiskStorage DiskStorage => new(Entity);
+        public struct EntityDiskStorage
+        {
+            private IEntity Entity; public  EntityDiskStorage(IEntity entity) => Entity = entity;
+
+            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
+            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public object       Load          (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
+            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
+            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public List<string> GetStoredKeys ()                         => Root.Instance.Context.SystemServices.DiskStorageService.GetStoredKeys ($"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST"     );
+        }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Reflection
         
         public       EntityReflection Reflection => new(Entity);
         public class EntityReflection
         {
-            private IEntity Entity;
-            public  EntityReflection(IEntity entity) => Entity = entity;
+            private IEntity Entity; public  EntityReflection(IEntity entity) => Entity = entity;
             
             public IEnumerable<Step> Steps()
             {
@@ -548,7 +562,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element 
      
         public Element GetElement() => Elements.GetElement(this.Entity.GetType());
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
         
         public        LIVE Live => new(Entity as IEntity);
@@ -556,166 +570,39 @@ namespace Galleon.Checkout
         {
             IEntity Entity; public LIVE(IEntity entity) => this.Entity = entity;
             
-            public async Task Plus_APF(string text)
-            {                
-                var   plusOperation = new Foundation.LiveOperationAPF.LiveOperation(id                  : $"{this.Entity.Node.ID.SelfPathID}_plus_F"
-                                                                                   ,parent              : this.Entity
-                                                                                   ,definition          : new Foundation.LiveOperationAPF.APF_LiveNode(targetText: "Assets.Folder f1", actionText : "plus" ));
+            ////////////////////////////////////////////////////////////////////// Operation
+            
+            public Step Operation(string OpString)
+            {
+                var entity = Entity;
                 
-                await plusOperation.Flow().Execute();
+                return new Step(name   : $"Operation"
+                               ,action : async (s) =>
+                                         {
+                                             string        operationID = $"operation_{entity.Node.ID.PathID}";
+                                             LiveOperation operation   = new LiveOperation(ID            : operationID
+                                                                                          ,targetEntity  : entity
+                                                                                          ,OpString      : OpString);
+                                         });
             }
-            public async Task Plus_APFE1(string text)
-            {   
-                var   plusOperation = new Foundation.LiveOperationAPFE1.LiveOperation(id                : $"APFE1"
-                                                                                     ,parent            : this.Entity
-                                                                                     ,definition        : text);
-                await plusOperation.Flow().Execute();
+            
+            ////////////////////////////////////////////////////////////////////// VirtualEntities
+            
+            public void AddVirtualEntity(VirtualEntity ve)
+            {
+                this.Entity.Node.AddChild(ve);
+                Entity.Node.SessionStorage.AddToList("virtual_entities", ve);
             }
-            public async Task Plus_PPFE1M(string text)
-            {   
-                var   plusOperation = new Foundation.LiveOperationPPF1M.LiveOperation(id                : $"PPFE1M"
-                                                                                     ,parent            : this.Entity
-                                                                                     ,definition        : text);
-                await plusOperation.Flow().Execute();
-            }
-            public async Task Plus_PPFE1(string text)
-            {   
-                var   plusOperation = new Foundation.LiveOperationPPF1.LiveOperation(id                 : $"PPFE1"
-                                                                                    ,operationParent    : this.Entity
-                                                                                    ,definitionText     : text); // > Folder f1
-                await plusOperation.Flow().Execute();
-            }
-            public async Task Plus_PpS1(string text)
-            {   
-                var   plusOperation = new Foundation.LiveOperationPpS1.LiveOperation(id                 : $"PpS1"
-                                                                                    ,operationParent    : this.Entity
-                                                                                    ,definitionText     : text); // > Scene s1
-                await plusOperation.Flow().Execute();
-            }
-            public async Task Plus_SpGO1(string text)
-            {   
-                var   plusOperation = new Foundation.LiveOperationPpS1.LiveOperation(id                 : $"SpGO"
-                                                                                    ,operationParent    : this.Entity
-                                                                                    ,definitionText     : text); // > Gameobjecg go1
-                await plusOperation.Flow().Execute();
-            }
-            public async Task Plus_PpT1_M(string text)
-            {   
-                var   plusOperation = new Foundation.LiveOperationPpT1_M.LiveOperation(id                 : $"PpT1_M"
-                                                                                      ,operationParent    : this.Entity
-                                                                                      ,definitionText     : text); // > Thing t1
-                await plusOperation.Flow().Execute();
-            }
-            public async Task Plus_PpQuickSlices(string text)
-            {   
-                Debug.Log("Oh Boy !");
+            public void RemoveVirtualEntity(VirtualEntity ve)
+            {
+                // TBD
                 return;
                 
-                var   plusOperation = new Foundation.LiveOperationPpQuickSlices.LiveOperation(id                 : $"PpQuickSlices"
-                                                                                             ,operationParent    : this.Entity
-                                                                                             ,definitionText     : text); // > Quick Slices
-                await plusOperation.Flow().Execute();
-            }
-            public async Task Plus(VirtualEntity childToAdd)
-            {
-                ////////////////////////////////////////////////////////////////////////////////////
-                
-                // get namespaces in parent
-                VirtualEntity       originParent                     = this.Entity as VirtualEntity;
-                IEnumerable<string> parentNamespaces                 = originParent.GetAllChildNamespaces();
-                IEnumerable<string> childNamespaces                  = childToAdd  .GetAllChildNamespaces();
-                IEnumerable<string> childNamespacesThatExistInParent = childNamespaces.Where(ns => parentNamespaces.Contains(ns));
-
-                foreach (var childNamespace in childNamespacesThatExistInParent)
-                {
-                    // Get Parent & Child
-                    var parent = originParent.GetDefaultParentForNamespace(childNamespace);
-                    var child  = childToAdd  .GetTopNodeForNamespace(childNamespace);
-                    
-                    // verify
-                    if (child is not ICRUD crudChild)
-                        throw new Exception($"child {child} is not ICRUD");
-
-                    // Add Child and CRUD create
-                    parent.Node.AddChild(child);
-                    crudChild.OnAddedToParent(parent);
-                    crudChild.Create();        
-                            
-                }
+                this.Entity.Node.RemoveChild(ve);
+                Entity.Node.SessionStorage.RemoveFromList("virtual_entities", ve);
             }
             
-            public async Task Plus_Indirect(string text)
-            {
-                TextNode tree = TextNode.Parse(text);
-
-                foreach (var textNode in tree.Node.Descendants().OfType<TextNode>())
-                {
-                    // Type + Name Definitions
-                    var type = textNode.LineFirstWord;
-                    var name = textNode.LineWords.Skip(1).FirstOrDefault() ?? "";
-                    
-                    try
-                    {
-                        // Instantiate virtual entity
-                        var entityType    = Type.GetType($"Galleon.Checkout.{type}");
-                        var virtualEntity = Activator.CreateInstance(entityType) as VirtualEntity;
-                        
-                        // Get parent and child for Plus operation
-                        var parent = this.Entity;
-                        var child  = virtualEntity;
-                        
-                        // Set CRUD params
-                        child.Node.SetData("CRUD_params", new CRUD_Params() { Name = name} );
-                        
-                        // Do PLUS
-                        parent.Node.Live.Plus(child);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogException(ex);
-                    }
-                    
-                }
-            }
             
-            //////////////////////////////////////////////////
-            
-            public LiveComponent LiveComponent
-            {
-                get
-                {
-                    var liveHandlerType = Entity.GetType()
-                                                .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
-                                                .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveComponent)));
-
-                    if (liveHandlerType != null)
-                    {
-                        var liveHandler = (LiveComponent)Activator.CreateInstance(liveHandlerType);
-                        liveHandler.SetTarget(this.Entity);
-                        return liveHandler;
-                    }
-
-                    return null;
-                }
-            }
-            
-            public LiveComponent LiveComponentByType(string entityTypeName)
-            {
-                Type entityType      = Type.GetType("Galleon.Checkout." + entityTypeName);
-                var  liveHandlerType = entityType
-                                      .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
-                                      .FirstOrDefault(t => t.IsSubclassOf(typeof(LiveComponent)));
-
-                if (liveHandlerType != null)
-                {
-                    var liveHandler = (LiveComponent)Activator.CreateInstance(liveHandlerType);
-                    liveHandler.SetTarget(this.Entity);
-                    return liveHandler;
-                }
-
-                return null;
-         
-            }
         }
         
         public class CRUD_Params

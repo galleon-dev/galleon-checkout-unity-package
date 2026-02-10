@@ -8,12 +8,15 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public EntityNode Node { get; }
+        
+        public bool IsReferenceCollection = false;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public Collection()
+        public Collection(bool isReferenceCollection = false)
         {
-            Node = new EntityNode(this);
+            Node                       = new EntityNode(this);
+            this.IsReferenceCollection = isReferenceCollection;
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// List API
@@ -21,19 +24,22 @@ namespace Galleon.Checkout.Foundation
         public new void Add(T item)
         {
             base.Add(item);
-            if (item is IEntity entity)
+            
+            if (!IsReferenceCollection 
+            &&  item is IEntity entity)
                 this.Node.AddChild(entity);
         }
 
         public new void AddRange(IEnumerable<T> collection)
         {
             foreach (var item in collection)
-                Add(item);
+                this.Add(item);
         }
 
         public new bool Remove(T item)
         {
-            if (item is IEntity entity)
+            if (!IsReferenceCollection
+            &&  item is IEntity entity)
                 Node.RemoveChild(entity);
 
             return base.Remove(item);
@@ -43,7 +49,8 @@ namespace Galleon.Checkout.Foundation
         {
             foreach (var item in this)
             {
-                if (item is IEntity entity)
+                if (!IsReferenceCollection
+                &&  item is IEntity entity)
                     Node.RemoveChild(entity);
             }
             base.Clear();
@@ -52,21 +59,24 @@ namespace Galleon.Checkout.Foundation
         public new void Insert(int index, T item)
         {
             base.Insert(index, item);
-            if (item is IEntity entity)
+            
+            if (!IsReferenceCollection
+            &&  item is IEntity entity)
                 Node.AddChild(entity);
         }
 
         public new void InsertRange(int index, IEnumerable<T> collection)
         {
             foreach (var item in collection)
-                Insert(index++, item);
+                this.Insert(index++, item);
         }
 
         public new void RemoveAt(int index)
         {
             var item = this[index];
             
-            if (item is IEntity entity)
+            if (!IsReferenceCollection
+            &&  item is IEntity entity)
                 Node.RemoveChild(entity);
 
             base.RemoveAt(index);
@@ -77,7 +87,8 @@ namespace Galleon.Checkout.Foundation
             var itemsToRemove = this.FindAll(match);
             foreach (var item in itemsToRemove)
             {
-                if (item is IEntity entity)
+                if (!IsReferenceCollection
+                &&  item is IEntity entity)
                     Node.RemoveChild(entity);
             }
             return base.RemoveAll(match);

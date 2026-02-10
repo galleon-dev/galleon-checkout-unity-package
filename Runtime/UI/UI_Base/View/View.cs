@@ -133,7 +133,10 @@ namespace Galleon.Checkout.UI
                                 s.AddChildStep(OnPanelFocus());
                             }
                         }   
-                    });
+                    })
+            {
+                IsSilentLog = true,
+            };
         
         public Step OnPanelFocus()
         =>

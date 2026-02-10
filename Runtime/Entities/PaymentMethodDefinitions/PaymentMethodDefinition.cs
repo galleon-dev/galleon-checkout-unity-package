@@ -35,7 +35,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public string       DisplayName         => Type.ToLower().Contains("paypal") ? "PayPal"
+        public string       DisplayName         => Type.ToLower().Contains("paypal")     ? "PayPal"
                                                  : Type.ToLower().Contains("google_pay") ? "Google Pay"
                                                  : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Type.Replace("_", " ").ToLower());
         

@@ -19,5 +19,39 @@ namespace Galleon.Checkout.ELEMENTS
         {
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Main Steps
+
+        public Step CreateSliceAsset(VirtualEntity ve)
+        =>
+            new Step(name   : $"create_slice_asset"
+                    ,action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
+
+                        #endif
+                    });
+
+
+        public Step CreateSliceHierarchy(VirtualEntity ve)
+        =>
+            new Step(name   : $"create_slice_hierarchy"
+                    ,action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
+
+                        #endif
+                    });
+
+
+        public Step CreateSliceApp(VirtualEntity ve)
+        =>
+            new Step(name   : $"create_slice_app"
+                    ,action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
+
+                        #endif
+                    });
+
     }
 }

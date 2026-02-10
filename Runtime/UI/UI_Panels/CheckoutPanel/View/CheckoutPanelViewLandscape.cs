@@ -50,7 +50,7 @@ namespace Galleon.Checkout.UI
                 Destroy(child.gameObject);
             }
 
-            var taxes = CheckoutClient.Instance.TaxController.taxes;
+            var taxes = CheckoutClient.Instance.CurrentSession.Taxes;
 
             //   #if UNITY_EDITOR
 
