@@ -94,7 +94,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Link
         
-        public StepController StepController => Root.Instance.Context.StepController;
+        public StepController StepController => Root.Instance.Context.SystemServices.StepController;
         
         //////// TEMP
         public static event Action<Step> ReportStep;
@@ -176,7 +176,7 @@ namespace Galleon.Checkout
                 
                 // Add as linked child to step controller
                 if (this.ParentStep == null)
-                    Root.Instance.Context.StepController.Node.AddLinkedChild(this);
+                    Root.Instance.Context.SystemServices.StepController.Node.AddLinkedChild(this);
                 //else
                 //    this.ParentStep.Node.AddLinkedChild(this);
                 

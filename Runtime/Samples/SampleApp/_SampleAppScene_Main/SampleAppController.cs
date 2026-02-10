@@ -323,7 +323,7 @@ namespace Galleon.SampleApp
         #endif
         public void DumpSteps()
         {
-            Debug.Log(Root.Instance.Context.StepController.DumpSteps());
+            Debug.Log(Root.Instance.Context.SystemServices.StepController.DumpSteps());
         }
         
         #if UNITY_EDITOR

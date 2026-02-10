@@ -23,6 +23,7 @@ namespace Galleon.Checkout
         ////////////////////////////////////////////////////// Members
         
         public Context  Context  = new Context();
+        public Global   Global   = new Global();
         public Runtime  Runtime  = new Runtime();
         
         ////////////////////////////////////////////////////// Lifecycle

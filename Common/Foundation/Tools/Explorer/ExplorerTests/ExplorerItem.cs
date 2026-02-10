@@ -1,124 +1,42 @@
-using Galleon.Checkout;
+using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-namespace ExplorerTests
+namespace Galleon.Checkout.ExplorerTests
 {
-    /// <summary>
-    /// ExplorerItem represents a single entity item in the Explorer tree view.
-    /// </summary>
-    public class ExplorerItem : VisualElement, IEntity
+    public class ExplorerItem : ExplorerVisualEntity
     {
-        //////////////////////////////////////////////////////////////////////// Members
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
 
-        public EntityNode Node { get; set; }
-        
-        public Galleon.Checkout.IEntity Entity { get; private set; }
+        public object Target { get; set; }
 
-        public VisualElement ChildrenContainer { get; private set; }
-        public VisualElement ContentContainer  { get; private set; }
+        public Title                Title           { get; private set; }
+        public List<Indicator>      Indicators      { get; private set; } = new List<Indicator>();
+        public List<FoldoutArrow>   FoldoutArrows   { get; private set; } = new List<FoldoutArrow>();
+        public List<Panel>          Panels          { get; private set; } = new List<Panel>();
 
-        private Button  itemButton;
-        private Foldout itemFoldout;
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI
 
-        //////////////////////////////////////////////////////////////////////// Lifecycle
+        private VisualElement visualElement;
 
-        public ExplorerItem(Galleon.Checkout.IEntity entity)
+        public void BuildUI(VisualElement parent)
         {
-            this.Node = new EntityNode(this);
-            
-            Entity = entity;
-
-            InitializeUI();
-            PopulateChildren();
-        }
-
-        //////////////////////////////////////////////////////////////////////// Initialization
-
-        private void InitializeUI()
-        {
-            // Create foldout for this item
-            itemFoldout       = new Foldout();
-            itemFoldout.text  = Entity?.Node.DisplayName ?? "Unknown Entity";
-            itemFoldout.value = false; // Collapsed by default
-
-            // Create content container
-            ContentContainer      = new VisualElement();
-            ContentContainer.name = "ContentContainer";
-
-            // Create children container
-            ChildrenContainer                   = new VisualElement();
-            ChildrenContainer.name              = "ChildrenContainer";
-            ChildrenContainer.style.paddingLeft = 20; // Indent children
-
-            // Add to foldout
-            itemFoldout.Add(ContentContainer);
-            itemFoldout.Add(ChildrenContainer);
-
-            // Add foldout to this element
-            this.Add(itemFoldout);
-
-            // Register foldout change event
-            itemFoldout.RegisterValueChangedCallback(evt =>
-                                                     {
-                                                         if (evt.newValue)
-                                                         {
-                                                             OnExpanded();
-                                                         }
-                                                         else
-                                                         {
-                                                             OnCollapsed();
-                                                         }
-                                                     });
-        }
-
-        //////////////////////////////////////////////////////////////////////// Children Management
-
-        private void PopulateChildren()
-        {
-            if (Entity == null)
-                return;
-
-            ChildrenContainer.Clear();
-
-            // Populate child entities
-            foreach (var child in Entity.Node.Children)
+            if (visualElement == null)
             {
-                var childItem = new ExplorerItem(child);
-                ChildrenContainer.Add(childItem);
+                visualElement = new VisualElement();
+                parent.Add(visualElement);
             }
+
+            RefreshUI();
         }
 
-        public void RefreshChildren()
+        public void RefreshUI()
         {
-            PopulateChildren();
-        }
-
-        //////////////////////////////////////////////////////////////////////// Events
-
-        private void OnExpanded()
-        {
-            // Refresh children when expanded
-            RefreshChildren();
-        }
-
-        private void OnCollapsed()
-        {
-            // Optional: could clear children to save memory
-        }
-
-        //////////////////////////////////////////////////////////////////////// Helper Methods
-
-        public void SetSelected(bool selected)
-        {
-            if (selected)
+            if (Title == null)
             {
-                itemFoldout.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.3f, 0.5f, 0.7f, 0.3f));
+                Title = new Title { ExplorerItem = this };
             }
-            else
-            {
-                itemFoldout.style.backgroundColor = StyleKeyword.Null;
-            }
-        }
 
+            Title.RefreshUI(visualElement);
+        }
     }
 }

@@ -11,32 +11,36 @@ namespace Galleon.Checkout
     public class CheckoutSession : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
-        
+
         // SessionData
-        public string                             SessionID                 = "1";
-        
+        public string                             SessionID                         = "1";
+
         // Purchase data
         public CheckoutProduct                    SelectedProduct;
-        public PurchaseResult                     PurchaseResult            = default;
-        
-        public Dictionary<string, string>         Metadata                  = new();
+        public PurchaseResult                     PurchaseResult                    = default;
+
+        public Dictionary<string, string>         Metadata                          = new();
+
+        // Tax data
+        public bool                               ShouldDisplayPriceIncludingTax    = true;
+        public Dictionary<string, TaxItem>        Taxes                             = new(); // <name_of_tax, tax_data>
         
         // Simple Dialog Panel data
-        public string                             LastDialogRequest         = null;
-        public SimpleDialogPanelView.DialogResult LastDialogResult          = SimpleDialogPanelView.DialogResult.None;
-        public UserPaymentMethod                  userPaymentMethodToDelete = null;
+        public string                             LastDialogRequest                 = null;
+        public SimpleDialogPanelView.DialogResult LastDialogResult                  = SimpleDialogPanelView.DialogResult.None;
+        public UserPaymentMethod                  userPaymentMethodToDelete         = null;
         
         // Preselection 
-        public UserPaymentMethod                  PreselectedPaymentMethod = null;
+        public UserPaymentMethod                  PreselectedPaymentMethod          = null;
         
         // Bonus Data
-        public List<BonusItem>                    BonusData                 = new();
+        public List<BonusItem>                    BonusData                         = new();
         
         // steps
         public Step                               OnSessionFinishedStep;
         
         // Config
-        public Dictionary<string, object>         PurchaseConfiguration     = new();
+        public Dictionary<string, object>         PurchaseConfiguration             = new();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -171,8 +175,26 @@ namespace Galleon.Checkout
                                                                                                         expires_at = DateTime.UtcNow.AddDays(1),
                                                                                                         metadata   = new Dictionary<string, string>() { }
                                                                                                      });
-                        this.SessionID = response.session_id; 
+                        this.SessionID = response.session_id;
+
+                        // Store tax data in session
+                        var taxData = response.price_data.tax;
+                        this.Taxes.Clear();
+
+                        s.Log($"tax.should_display_taxes         : {taxData.should_display_taxes}");
+                        s.Log($"tax.taxes({taxData.taxes.Count}) : ");
+
+                        #if !UNITY_EDITOR
+                        Taxes.Add("IRS",       new TaxItem() { inclusive = true, tax_amount = 2.99m} );
+                        Taxes.Add("Levan Tax", new TaxItem() { inclusive = true, tax_amount = 4.99m} );
+                        #endif
                         
+                        foreach (var t in taxData.taxes)
+                        {
+                            s.Log($" - {t.Key} : {t.Value}");
+                            this.Taxes.Add(t.Key, new TaxItem() { inclusive = t.Value.inclusive, tax_amount = t.Value.tax_amount });
+                        }
+
                     });
         
         public Step CancelSession() 

@@ -36,9 +36,8 @@ namespace Galleon.Checkout
         
         // Controllers
         [Header("Controllers")]
-        public TokenizerController          TokenizerController         = new(); 
-        public PaymentMethodsController     PaymentMethodsController    = new();
-        public TaxController                TaxController               = new();  
+        public TokenizerController          TokenizerController         = new();
+        public PaymentMethodsController     PaymentMethodsController    = new();  
         
         // Payment Actions
         public CheckoutActionsController    CheckoutActions             = new();
@@ -109,9 +108,6 @@ namespace Galleon.Checkout
                                   // Controllers
                                   s.AddChildStep(TokenizerController            .Initialize());
                                   s.AddChildStep(PaymentMethodsController       .Initialize()); //
-                                
-                                  s.AddChildStep(TaxController                  .Initialize()); //
-                                  s.AddChildStep(TaxController                  .Initialize()); //
                                   
                                   // Resources
                                   s.AddChildStep(Resources                      .Initialize());
@@ -131,7 +127,6 @@ namespace Galleon.Checkout
                     {
                         Config.Collection.Clear();
                         Config.ConfigData.Clear();
-                        TaxController.taxes.Clear();
                         Users.Users.Clear();
                         PaymentMethodsController.UserPaymentMethods.Clear();
                         PaymentMethodsController.PaymentMethodsDefinitions.Clear();

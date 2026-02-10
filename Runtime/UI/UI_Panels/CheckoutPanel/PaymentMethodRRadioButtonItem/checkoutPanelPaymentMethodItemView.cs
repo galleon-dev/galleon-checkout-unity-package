@@ -31,6 +31,7 @@ namespace Galleon.Checkout.UI
         [Header("Dropdown")]
         public GameObject      DropdownArrow;
         public TMP_Dropdown    DropdownButton;
+        private List<string>   _dropdownPaymentMethodIds = new List<string>();
 
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
@@ -160,12 +161,15 @@ namespace Galleon.Checkout.UI
         
         public void On_DropdownValueChanged(int newValue)
         {
-            var displayName   = DropdownButton.options[newValue].text;
-            var paymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.DisplayName == displayName);
-            
+            if (newValue < 0 || newValue >= _dropdownPaymentMethodIds.Count)
+                throw new System.Exception("Invalid dropdown index");
+
+            var paymentMethodId = _dropdownPaymentMethodIds[newValue];
+            var paymentMethod   = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.ID == paymentMethodId);
+
             if (paymentMethod == null)
                 throw new System.Exception("No Payment Methods Found");
-            
+
             UpdateItemPaymentMethod(paymentMethod);
         }
         
@@ -175,15 +179,19 @@ namespace Galleon.Checkout.UI
         {
             // Clear
             DropdownButton.ClearOptions();
-            
+            _dropdownPaymentMethodIds.Clear();
+
             // Definitions
             var myType      = this.PaymentMethod.Type;
             var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Type == myType).Except(new []{this.PaymentMethod}).ToList();
             var upms        = (new List<UserPaymentMethod>() { this.PaymentMethod }).Concat(otherUpms).ToList( );
-            
-            // Add options
+
+            // Add options (display name visually, but track ID internally)
             foreach (var pm in upms)
+            {
                 DropdownButton.options.Add(new TMP_Dropdown.OptionData(pm.DisplayName, pm.GetIconSprite()));
+                _dropdownPaymentMethodIds.Add(pm.ID);
+            }
         }
         
         public void UpdateItemPaymentMethod(UserPaymentMethod upm)
@@ -215,3 +223,4 @@ namespace Galleon.Checkout.UI
         }
     }
 }
+

@@ -1,4 +1,3 @@
-using UnityEngine.Serialization;
 
 namespace Galleon.Checkout.Foundation
 {
@@ -6,12 +5,10 @@ namespace Galleon.Checkout.Foundation
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public Project             Project  = new Project();
+        public Project             Project          = new Project();
+        public Products            Products         = new Products();
         
-        public OperationController Operations     = new();
-        public StepController      StepController = new StepController();
-        
-        public StorageService      StorageService = new();
+        public SystemServices      SystemServices   = new SystemServices();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
