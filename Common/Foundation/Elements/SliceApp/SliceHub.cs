@@ -12,12 +12,12 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        [RuntimeInitializeOnLoadMethod()]
-        public static async void InitializeOnRuntime()
-        {
-            var sliceHub = Root.Instance.Node.Descendants().OfType<SliceHub>().FirstOrDefault();
-            await sliceHub?.SystemInit().Execute();
-        }
+        // [RuntimeInitializeOnLoadMethod()]
+        // public static async void InitializeOnRuntime()
+        // {
+        //     var sliceHub = Root.Instance.Node.Descendants().OfType<SliceHub>().FirstOrDefault();
+        //     await sliceHub?.SystemInit().Execute();
+        // }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Flows
         

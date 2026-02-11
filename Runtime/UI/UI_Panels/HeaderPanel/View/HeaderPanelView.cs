@@ -22,11 +22,13 @@ namespace Galleon.Checkout.UI
 
         public async void OnXButtonClicked()
         {
+            Debug.Log("Header X button clicked");
             CheckoutClient.Instance.CheckoutScreenMobile.On_CloseClicked();
         }
 
         public async void OnBackButtonClicked()
         {
+            Debug.Log("Header Back button clicked");
             CheckoutClient.Instance.CheckoutScreenMobile.On_BackClicked();
         }
 
