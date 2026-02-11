@@ -70,7 +70,7 @@ namespace Galleon.Checkout
     
             OnCheckoutAnalyticsEvent?.Invoke(@event);
             
-        }    
+        }
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types

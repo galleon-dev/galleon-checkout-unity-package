@@ -41,7 +41,7 @@ namespace Galleon.Checkout
                     this.Data[kvp.Key] = kvp.Value;
         }
         
-        public Dictionary<string, object> CommonAnalyticsParameters => new Dictionary<string, object>
+        private Dictionary<string, object> CommonAnalyticsParameters => new Dictionary<string, object>
         {
             { "date_time_utc", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") ?? "null" }, 
             { "session_id",    CHECKOUT.Session?.SessionID                     ?? "null" },
