@@ -296,7 +296,7 @@ namespace Galleon.Checkout
                         //                                                   ,transactionId  : "transactionID");
 
                         var result = this.lastChargeResult;
-                        
+
                         this.PurchaseResult = new PurchaseResult()
                                               {
                                                   OrderID     = CHECKOUT.Session?.SessionID ?? "NULL",
@@ -305,6 +305,30 @@ namespace Galleon.Checkout
                                                   Errors      = result.errors?.ToList(),
                                                   IsError     = result.errors?.Length > 0,
                                               };
+
+                        // Analytics: Payment Succeeded or Failed
+                        var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
+                        if (result.is_success && !result.is_canceled)
+                        {
+                            CheckoutAPI.InvokeAnalyticsEvent("payment_succeeded", new Dictionary<string, object>
+                            {
+                                { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""     },
+                                { "payment_method",      selectedPaymentMethod?.Type                 ?? "none" },
+                                { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m     },
+                                { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? ""     },
+                            });
+                        }
+                        else if (result.errors?.Length > 0)
+                        {
+                            CheckoutAPI.InvokeAnalyticsEvent("payment_failed", new Dictionary<string, object>
+                            {
+                                { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? "" },
+                                { "payment_method",      selectedPaymentMethod?.Type                 ?? "none" },
+                                { "fail_reason",         string.Join(", ", result.errors             ?? new string[0]) },
+                                { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m },
+                                { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? "" }
+                            });
+                        }
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc Steps

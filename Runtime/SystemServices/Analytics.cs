@@ -15,14 +15,6 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {  
-                        Task.Run(async () =>
-                                 {
-                                        await Task.Delay(2000);
-                                        
-                                        CheckoutAPI.InvokeAnalyticsEvent(name: "Analytics Test Event"
-                                                                        ,data:  default);
-                                        
-                                 });
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Common analytics parameters

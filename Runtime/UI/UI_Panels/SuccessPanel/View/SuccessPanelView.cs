@@ -44,6 +44,14 @@ namespace Galleon.Checkout.UI
 
         public override async void RefreshState()
         {
+            // Analytics: Receipt Email Screen Viewed
+            CheckoutAPI.InvokeAnalyticsEvent("receipt_email_screen_viewed", new()
+            {
+                { "checkout_session_id",    CHECKOUT.Session?.SessionID                 ?? "" },
+                { "purchase_amount",        CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m },
+                { "currency",               CHECKOUT.Session?.SelectedProduct?.Currency ?? "" }
+            });
+
             if (CHECKOUT.User.Email.IsNullOrEmpty())
             {
                 if (EmailInputFieldContainer)
@@ -83,8 +91,16 @@ namespace Galleon.Checkout.UI
 
             if (valid)
             {
+                // Analytics: Receipt Email Form Sent
+                CheckoutAPI.InvokeAnalyticsEvent("receipt_email_form_sent", new Dictionary<string, object>
+                {
+                    { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? "" },
+                    { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m },
+                    { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? "" }
+                });
+
                 CHECKOUT.Session.OnSessionFinishedStep.AddChildStep(SaveEmail());
-                
+
                 if (!CHECKOUT.IsTest)
                     CHECKOUT.Session.OnSessionFinishedStep.AddChildStep(SendReceipt());
 

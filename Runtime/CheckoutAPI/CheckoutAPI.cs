@@ -63,7 +63,13 @@ namespace Galleon.Checkout
         }
         internal static void InvokeAnalyticsEvent(CheckoutAnalyticsEvent @event)
         {
+            if (Debug.isDebugBuild)
+            {
+                Debug.Log($"<color=orange>[Checkout-Analytics-Event]</color>: {@event.Name}, \n{string.Join("\n", @event.Data?.Select(kvp => $"{kvp.Key} = {kvp.Value}") ?? Array.Empty<string>())}");
+            }
+    
             OnCheckoutAnalyticsEvent?.Invoke(@event);
+            
         }    
     }
     
