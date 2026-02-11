@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Galleon.Checkout
 {
     public class Analytics : Entity
     {
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
-        
-        public event Action<CheckoutAnalyticsEvent> OnCheckoutAnalyticsEvent;
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public Step Initialize()
@@ -18,27 +15,44 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {  
-                        OnCheckoutAnalyticsEvent?.Invoke(new CheckoutAnalyticsEvent
-                        {
-                            Name     = "Analytics Initialized",
-                            Data     = CommonAnalyticsParameters,
-                            DateTime = DateTime.UtcNow
-                        });
+                        Task.Run(async () =>
+                                 {
+                                        await Task.Delay(2000);
+                                        
+                                        CheckoutAPI.InvokeAnalyticsEvent(name: "Analytics Test Event"
+                                                                        ,data:  default);
+                                        
+                                 });
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Common analytics parameters
         
-        public Dictionary<string, object> CommonAnalyticsParameters => new Dictionary<string, object>
-        {
-            { "timestamp",  DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")   }, 
-            { "session_id", CHECKOUT.Session?.SessionID ?? "null"             },
-        };        
     }
 
     public class CheckoutAnalyticsEvent
     {
-        public string                     Name     { get; set; }
-        public Dictionary<string, object> Data     { get; set; }
-        public DateTime                   DateTime { get; set; }
+        public string                     Name        { get; set; }
+        public Dictionary<string, object> Data        { get; set; }
+
+        public CheckoutAnalyticsEvent(string name, Dictionary<string, object> data)
+        {
+            this.Name        = name;
+            this.Data        = new Dictionary<string, object>();
+
+            // Copy common parameters first
+            foreach (var kvp in CommonAnalyticsParameters)
+                this.Data[kvp.Key] = kvp.Value;
+
+            // Override with data from args (if provided)
+            if (data != null)
+                foreach (var kvp in data)
+                    this.Data[kvp.Key] = kvp.Value;
+        }
+        
+        public Dictionary<string, object> CommonAnalyticsParameters => new Dictionary<string, object>
+        {
+            { "date_time_utc", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") ?? "null" }, 
+            { "session_id",    CHECKOUT.Session?.SessionID                     ?? "null" },
+        };        
     }
 }

@@ -184,10 +184,10 @@ namespace Galleon.Checkout
                         s.Log($"tax.should_display_taxes         : {taxData.should_display_taxes}");
                         s.Log($"tax.taxes({taxData.taxes.Count}) : ");
 
-                        #if !UNITY_EDITOR
+                        
                         Taxes.Add("IRS",       new TaxItem() { inclusive = true, tax_amount = 2.99m} );
                         Taxes.Add("Levan Tax", new TaxItem() { inclusive = true, tax_amount = 4.99m} );
-                        #endif
+                        
                         
                         foreach (var t in taxData.taxes)
                         {

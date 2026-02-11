@@ -42,7 +42,7 @@ namespace Galleon.Checkout
                 throw new Exception("entity is null in EntityNode constructor");
             
             this.Entity      = entity;
-            this.DisplayName = entity.GetType().Name;
+            //this.DisplayName = entity.GetType().Name;
             
             this.Breadcrumbs.Add(new Breadcrumb(callerName, callerLine, callerPath, displayName : "creation_breadcrumb"));
             
@@ -54,18 +54,28 @@ namespace Galleon.Checkout
             foreach (var child in this.Descendants())
                 child.Node.Setup();
         }
+        public void LateInitialize()
+        {
+            foreach (var child in this.Descendants())
+                child.Node.LateSetup();
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setup
         
-        bool didSetup = false;
+        bool didSetup     = false;
+        bool didLateSetup = false;
         
         public void Setup()
         {
             PopulatePredefinedChildren();
-            
             didSetup = true;
         }
-        
+
+        public void LateSetup()
+        {
+            PopulateSavedVirtualEntities();
+            didLateSetup = true;
+        }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - General
 
         [SerializeReference] [HideInInspector] public IEntity Entity;
@@ -94,7 +104,9 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Info
         
-        public string DisplayName;
+        public string DisplayName => Entity?.ToString()?
+                                    .Replace($"{Entity?.GetType().Namespace ?? string.Empty}.", "") 
+                                  ?? "Null";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Breadcrumbs
 
@@ -234,6 +246,36 @@ namespace Galleon.Checkout
             }
         }
         
+        private void PopulateSavedVirtualEntities()
+        {
+            
+            try
+            {   
+                var savedVirtualEntities = this.SessionStorage.LoadList<string>("virtual_entities");
+
+                if (savedVirtualEntities == null || savedVirtualEntities.Count == 0)
+                    return;
+
+                foreach (var veString in savedVirtualEntities)
+                {
+                    try
+                    {
+                        var virtualEntity = new VirtualEntity() { TextNode = new TextNode(veString) }; 
+                        this.AddChild(virtualEntity);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogWarning($"Failed to load virtual entity from string: {veString}. Error: {ex.Message}");
+                    }
+                }    
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"Failed to load virtual entities from prefs storage: {ex.Message}");
+            }
+            
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Quick Debug
         
         public void LogDumpTree()
@@ -310,14 +352,14 @@ namespace Galleon.Checkout
         {
             private IEntity Entity; public  EntitySessionStorage(IEntity entity) => Entity = entity;
 
-            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public object       Load          (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public List<string> GetStoredKeys ()                         => Root.Instance.Context.SystemServices.SessionStorageService.GetStoredKeys ($"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST"    );
+            public void    Store         (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public T       Load<T>       (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public object  Load          (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public bool    HasKey        (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void    AddToList     (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public void    RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public List<T> LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public List<string> GetStoredKeys ()                    => Root.Instance.Context.SystemServices.SessionStorageService.GetStoredKeys ($"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST"    );
         }
         
 
@@ -583,6 +625,8 @@ namespace Galleon.Checkout
                                              LiveOperation operation   = new LiveOperation(ID            : operationID
                                                                                           ,targetEntity  : entity
                                                                                           ,OpString      : OpString);
+                                             
+                                             await operation.Flow().Execute();
                                          });
             }
             
@@ -591,7 +635,7 @@ namespace Galleon.Checkout
             public void AddVirtualEntity(VirtualEntity ve)
             {
                 this.Entity.Node.AddChild(ve);
-                Entity.Node.SessionStorage.AddToList("virtual_entities", ve);
+                Entity.Node.SessionStorage.AddToList("virtual_entities", ve.TextNode.ToTreeString());
             }
             public void RemoveVirtualEntity(VirtualEntity ve)
             {

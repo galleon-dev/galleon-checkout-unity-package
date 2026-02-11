@@ -66,24 +66,25 @@ namespace Galleon.Checkout
             {
                 switch (paymentMethodActualType)
                 {
-                    case "empty_card":   return AddCreditCardIconSprite;
-                    case "card":         return AddCreditCardIconSprite;
-                    case "visa":         return VisaIconSprite;
-                    case "mastercard":   return MasterCardIconSprite;
-                    case "amex":         return AmexIconSprite;
-                    case "diners":       return DinersIconSprite;
-                    case "discover":     return DiscoverIconSprite;
-                    case "google_pay":   return GPayIconSprite;
-                    case "google_play":  return GPlayIconSprite;
-                    case "empty_paypal": return PaypalIconSprite;
-                    case "paypal":       return PaypalIconSprite;
-                    case "apple":        return AppleIconSprite;
-                    case "klarna":       return KlarnaIconSprite;
-                    case "web_checkout": return WebCheckoutIconSprite;
-                    case "cashapp":      return CashAppIconSprite;
-                    case "amazon_pay":   return AmazonPayIconSprite;
-                    case "venmo":        return VenmoIconSprite;
-                    case "zelle":        return ZelleIconSprite;
+                    case "empty_card":           return AddCreditCardIconSprite;
+                    case "card":                 return AddCreditCardIconSprite;
+                    case "visa":                 return VisaIconSprite;
+                    case "mastercard":           return MasterCardIconSprite;
+                    case "amex":                 return AmexIconSprite;
+                    case "diners":               return DinersIconSprite;
+                    case "discover":             return DiscoverIconSprite;
+                    case "google_pay_browser":   return GPayIconSprite;
+                    case "google_pay":           return GPayIconSprite;
+                    case "google_play":          return GPlayIconSprite;
+                    case "empty_paypal":         return PaypalIconSprite;
+                    case "paypal":               return PaypalIconSprite;
+                    case "apple":                return AppleIconSprite;
+                    case "klarna":               return KlarnaIconSprite;
+                    case "web_checkout":         return WebCheckoutIconSprite;
+                    case "cashapp":              return CashAppIconSprite;
+                    case "amazon_pay":           return AmazonPayIconSprite;
+                    case "venmo":                return VenmoIconSprite;
+                    case "zelle":                return ZelleIconSprite;
                     case "native":
                         #if UNITY_ANDROID
                         return GPlayIconSprite;
@@ -114,20 +115,21 @@ namespace Galleon.Checkout
             {
                 switch (paymentMethodActualType)
                 {
-                    case "google_pay":   return GpaybuttonSprite;
-                    case "paypal":       return PaypalbuttonSprite;
-                    case "empty_paypal": return PaypalbuttonSprite;
-                    case "apple":        return AppleButtonSprite;
-                    case "amazon_pay":   return AmazonPayButtonSprite;
-                    case "amex":         return AmexButtonSprite;
-                    case "cashapp":      return CashAppButtonSprite;
-                    case "diners":       return DinersButtonSprite;
-                    case "discover":     return DiscoverButtonSprite;
-                    case "klarna":       return KlarnaButtonSprite;
-                    case "mastercard":   return MastercardButtonSprite;
-                    case "venmo":        return VenmoButtonSprite;
-                    case "visa":         return VisaButtonSprite;
-                    case "zelle":        return ZelleButtonSprite;
+                    case "google_pay":           return GpaybuttonSprite;
+                    case "google_pay_browser":   return GPayIconSprite;
+                    case "paypal":               return PaypalbuttonSprite;
+                    case "empty_paypal":         return PaypalbuttonSprite;
+                    case "apple":                return AppleButtonSprite;
+                    case "amazon_pay":           return AmazonPayButtonSprite;
+                    case "amex":                 return AmexButtonSprite;
+                    case "cashapp":              return CashAppButtonSprite;
+                    case "diners":               return DinersButtonSprite;
+                    case "discover":             return DiscoverButtonSprite;
+                    case "klarna":               return KlarnaButtonSprite;
+                    case "mastercard":           return MastercardButtonSprite;
+                    case "venmo":                return VenmoButtonSprite;
+                    case "visa":                 return VisaButtonSprite;
+                    case "zelle":                return ZelleButtonSprite;
 
                     default: return CheckoutButtonSprite;
                 }

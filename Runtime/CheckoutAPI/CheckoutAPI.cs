@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CodiceApp.EventTracking.Plastic;
 using UnityEngine;
 
 namespace Galleon.Checkout
@@ -51,6 +52,19 @@ namespace Galleon.Checkout
             // Return result
             return CheckoutClient.Instance.CurrentSession.PurchaseResult;
         }
+    
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Analytics
+        
+        public static event Action<CheckoutAnalyticsEvent> OnCheckoutAnalyticsEvent;
+        
+        internal static void InvokeAnalyticsEvent(string name, Dictionary<string, object> data)
+        {
+            InvokeAnalyticsEvent(new CheckoutAnalyticsEvent(name, data));
+        }
+        internal static void InvokeAnalyticsEvent(CheckoutAnalyticsEvent @event)
+        {
+            OnCheckoutAnalyticsEvent?.Invoke(@event);
+        }    
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types

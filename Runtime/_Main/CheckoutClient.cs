@@ -67,7 +67,10 @@ namespace Galleon.Checkout
         [Header("Temp")]
         public CheckoutTEMP                 Temp                        = new();
         
+        // Debug
+        public ReportController             ReportController            = new();
         
+        // Misc.
         public string                       CurrentTest                 = "test_1";
         public string                       ApplicationDisplayName      = null;
         
@@ -80,7 +83,7 @@ namespace Galleon.Checkout
             Debug.Log("CheckoutClient.EntryPoint()");
             
             Root.Instance.Runtime.Node.Children.Add(Instance);
-            Instance.Node.Initialize();
+            Instance.Node.LateInitialize();
 
             // await Instance.SystemInitFlow();
 
@@ -104,6 +107,7 @@ namespace Galleon.Checkout
                                   s.AddChildStep(Config                         .Initialize()); //
                                   s.AddChildStep(CheckoutGlobals                .Initialize()); //
                                   s.AddChildStep(Analytics                      .Initialize());
+                                  s.AddChildStep(ReportController               .Initialize());
                         
                                   // Controllers
                                   s.AddChildStep(TokenizerController            .Initialize());

@@ -56,9 +56,6 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
-                        PaymentMethodsDefinitions.Node.DisplayName = "Payment Method Definitions";
-                        UserPaymentMethods       .Node.DisplayName = "User Payment Methods";
-                        
                         s.AddChildStep(RefreshPaymentMethods());            // Get from server    
                         s.AddChildStep(InitializeDefinitions());            // setup (e.g. download images)
                         s.AddChildStep(LoadLastUsedUserPaymentMethods());   // Load from storage
@@ -271,15 +268,22 @@ namespace Galleon.Checkout
                         
                         foreach (var data in dataList)
                         {
-                            UserPaymentMethod pm = new UserPaymentMethod();
-                            pm.Data              = data;
-                            pm.Data.type         = "credit_card";
-                            
-                            this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
+                            if (data.type == "credit_card")
                             {
-                                DisplayName = pm.Data.display_name,
-                                Data        = data,
-                            });
+                                this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
+                                {
+                                    DisplayName = data.display_name,
+                                    Data        = data,
+                                });
+                            }
+                            else
+                            {
+                                this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                {
+                                    DisplayName = data.display_name,
+                                    Data        = data,
+                                });
+                            }
                         }
                         
                         
@@ -328,7 +332,7 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////// Empty
                         
-                        if (UserPaymentMethods.All(pm => pm.Data.type != "credit_card")
+                        if (UserPaymentMethods       .All(pm => pm.Data.type != "credit_card")
                         &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "card"))
                         {
                             this.UserPaymentMethods.Add(new UserPaymentMethod()
@@ -346,7 +350,7 @@ namespace Galleon.Checkout
                                                         });
                         }
                         
-                        if (UserPaymentMethods.All(pm => pm.Type != "paypal")
+                        if (UserPaymentMethods       .All(pm => pm.Type      != "paypal")
                         &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "paypal"))
                         {
                             this.UserPaymentMethods.Add(new UserPaymentMethod()
@@ -370,7 +374,7 @@ namespace Galleon.Checkout
         
         public List<UserPaymentMethod> GetUserPaymentMethodsToDisplay()
         {
-            var result = UserPaymentMethods
+            var result = UserPaymentMethods.GroupBy(x => x.Type).Select(x => x.First())
               //.Concat(SpecialUserPaymentMethods)
                 .Concat(EmptyUserPaymentMethods)
                 .Distinct()

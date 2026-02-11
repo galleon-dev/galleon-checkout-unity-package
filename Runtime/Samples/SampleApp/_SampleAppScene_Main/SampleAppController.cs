@@ -33,7 +33,7 @@ namespace Galleon.SampleApp
         {
             Debug.Log($"SampleAppController.Awake");
             
-            this.Node.Initialize();
+            this.Node.LateInitialize();
             Root.Instance.Runtime.Node.AddChild(this);
         }
         
@@ -113,7 +113,7 @@ namespace Galleon.SampleApp
                                                PriceText   = "$24.99",
                                              //Sku         = "sku-1-3DS", 
                                                Sku         = "sku-1",
-                                               Amount      = 100,
+                                               Amount      = 24.99m,
                                                Currency    = "USD",
                                            });
                     
@@ -125,7 +125,7 @@ namespace Galleon.SampleApp
                                                DisplayName = "Bunch Of Spins",
                                                PriceText   = "$1000.99",
                                                Sku         = "sku-2", 
-                                               Amount      = 200,
+                                               Amount      = 1000.99m,
                                                Currency    = "USD",
                                            });
             }
@@ -136,7 +136,7 @@ namespace Galleon.SampleApp
                                                DisplayName = "Bunch Of Spins (3DS)",
                                                PriceText   = "$1000.99",
                                                Sku         = "sku-3-3DS", 
-                                               Amount      = 200,
+                                               Amount      = 1000.99m,
                                                Currency    = "USD",
                                            });
             }
@@ -236,7 +236,7 @@ namespace Galleon.SampleApp
                                                                    PriceText       = "$5.99",
                                                                    //Sku           = "sku-1-3DS", 
                                                                    Sku             = "sku-1",
-                                                                   Amount          = 100,
+                                                                   Amount          = 5.99m,
                                                                    Currency        = "USD",
                                                                });
                         
@@ -299,7 +299,7 @@ namespace Galleon.SampleApp
                                                                    PriceText       = "$19.99",
                                                                    //Sku           = "sku-1-3DS", 
                                                                    Sku             = "sku-2",
-                                                                   Amount          = 100,
+                                                                   Amount          = 19.99m,
                                                                    Currency        = "USD",
                                                                });
                         

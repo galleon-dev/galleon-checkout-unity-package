@@ -23,6 +23,7 @@ namespace Galleon.Checkout.ELEMENTS
             thingName = name;
             this.QuickThingAsset = new Assets.QuickThing() { thingName = thingName } ;
             this.Node.Initialize();
+            this.Node.LateInitialize();
             this.QuickThingAsset.OnAddedToParent(this);
         }
     }
