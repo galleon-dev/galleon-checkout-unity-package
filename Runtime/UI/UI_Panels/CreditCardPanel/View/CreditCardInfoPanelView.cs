@@ -108,7 +108,7 @@ namespace Galleon.Checkout.UI
         private void OnEnable()
         {
             NativeKeyboardManager.ResetAutofill();
-            
+
             // Clear input fields
             NameInputField       .Text = string.Empty;
             CreditCardNumberField.Text = string.Empty;
@@ -132,12 +132,19 @@ namespace Galleon.Checkout.UI
             // Reset card format
             lastFormatUsed    = default;
             CurrentCardFormat = default;
-            
+
             #if DEBUG
             TestCardButton.SetActive(false);
             #else
             TestCardButton.SetActive(false);
             #endif
+
+            // Analytics: New Credit Card Form Viewed
+            CheckoutAPI.InvokeAnalyticsEvent("new_credit_card_form_viewed", new Dictionary<string, object>
+            {
+                { "checkout_session_id", CHECKOUT.Session?.SessionID ?? "" },
+                { "payment_method",      "credit_card"                     },
+            });
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
@@ -147,12 +154,12 @@ namespace Galleon.Checkout.UI
             if (IsCorrectInputFields())
             {
                 CurrentCardFormat = GetFormatForDigits(digits: CreditCardNumberField.Text);
-                
+
                 // Create payment method object
                 var card                     = new CreditCardUserUserPaymentMethod();
                 card.Data.type               = "credit_card";
                 card.Data.credit_card_type   = CurrentCardFormat.Name.ToLower();
-                
+
                 // Set card Data
                 card.DisplayName             = $"{CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
                 card.CardHolderName          = NameInputField.Text;
@@ -164,10 +171,17 @@ namespace Galleon.Checkout.UI
                 // Set additional data
                 card.IsNewPaymentMethod      = true;
                 card.ShouldSavePaymentMethod = cbx_SaveCardDetails.IsChecked;
-                
+
+                // Analytics: New Credit Card Details Entered
+                CheckoutAPI.InvokeAnalyticsEvent("new_credit_card_details_entered", new Dictionary<string, object>
+                {
+                    { "checkout_session_id", CHECKOUT.Session?.SessionID ?? ""  },
+                    { "payment_method",      "credit_card"                      },
+                });
+
                 // Add payment method
                 await CHECKOUT.PaymentMethods.AddNewUserPaymentMethod(card).Execute();
-                
+
                 // Finish viewing this screen
                 this.Result = ViewResult.Confirm;
                 CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());

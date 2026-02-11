@@ -18,25 +18,30 @@ namespace Galleon.Checkout.Foundation
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// General
         
-        public TextNode TextNode  { get; set; }
+        public TextNode TextNode    { get; set; }
         
-        public string   ThingName => TextNode?.LineWords != null && TextNode.LineWords.Count() >= 2 
-                                   ? TextNode.LineWords.ElementAt(1) 
-                                   : string.Empty;
+        public string   ThingName   => TextNode?.LineWords != null && TextNode.LineWords.Count() >= 2 
+                                     ? TextNode.LineWords.ElementAt(1) 
+                                     : string.Empty;
         
-        public Thing    Element   => Root.Instance.Context.Project.Package1.Elements.ThingElement;
+        public Thing    Element     => Root.Instance.Context.Project.Package1.Elements.ThingElement;
         
         
-        public string[] Tags => TextNode.Hashtags.Select(x => x.Trim('#')).ToArray();
+        public string[] Tags        => TextNode.Hashtags.Select(x => x.Trim('#')).ToArray();
         
-        public string Prompt => TextNode.Equals.ContainsKey("prompt") ? TextNode.Equals["prompt"] : string.Empty;
+        public string   Prompt      => TextNode.Equals.ContainsKey("prompt") ? TextNode.Equals["prompt"] : string.Empty;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public VirtualEntity()
         {
+            // this.Node.DisplayName = TextNode?.Line ?? "Virtual Entity"; 
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// ToString
+
+        public override string ToString() => $"(ve) " + this.TextNode?.Line ?? "Virtual Entity (null)";
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// State
         
         public string State         =  "assets";

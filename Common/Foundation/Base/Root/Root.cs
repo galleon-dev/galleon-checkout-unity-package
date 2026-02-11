@@ -10,15 +10,12 @@ using UnityEditor;
 
 namespace Galleon.Checkout
 {
-    #if UNITY_EDITOR
-    [InitializeOnLoad]
-    #endif
     public class Root : Entity
     {
         ////////////////////////////////////////////////////// Singleton
         
         private static Root _instance;
-        public  static Root Instance => _instance ??= new Root();
+        public  static Root Instance => _instance;
 
         ////////////////////////////////////////////////////// Members
         
@@ -28,15 +25,11 @@ namespace Galleon.Checkout
         
         ////////////////////////////////////////////////////// Lifecycle
         
-        static Root()
+        public static void CreateRoot()
         {
-            var root = Instance;
+            _instance = new Root();
             Instance.Node.Initialize();
-        }
-        
-        public Root()
-        {
+            Instance.Node.LateInitialize();
         }
     }
 }
-

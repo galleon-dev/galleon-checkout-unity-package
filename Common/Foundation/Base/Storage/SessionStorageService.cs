@@ -273,5 +273,39 @@ namespace Galleon.Checkout
             #endif
 
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug
+        
+        public Step DumpToLog()
+        =>
+            new Step(name   : "dump_session_storage_to_log"
+                    ,tags   : new[] { "debug" }
+                    ,action : async s =>
+                    {
+                        List<string> allKeys = GetAllStoredKeys();
+                        s.Log($"Total Keys: {allKeys.Count}");
+
+                        foreach (string key in allKeys)
+                        {
+                            #if UNITY_EDITOR
+                            string json = UnityEditor.SessionState.GetString(key, string.Empty);
+                            #else
+                            string json = _inMemoryStorage.TryGetValue(key, out string value) ? value : string.Empty;
+                            #endif
+
+                            s.Log($"Key: {key}\nValue: {json}");
+                        }
+                    });
+        
+        public Step ClearStorage()
+        =>
+            new Step(name   : "clear_session_storage"
+                    ,action : async s =>
+                    {
+                        ClearAll();
+                        s.Log("Session storage cleared");
+                    });
+        
+        
     }
 }

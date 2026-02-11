@@ -31,13 +31,11 @@ namespace Galleon.Checkout.Foundation
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Steps
         
-        public Step Execute() 
+        public Step Flow() 
         =>
-            new Step(name   : $"Execute"
+            new Step(name   : $"Flow"
                     ,action : async (s) =>
                     {
-                        
-                        
                         // Store operation
                         TargetEntity.Node.PrefsStorage.Store("OpString", OpString);
 
@@ -52,15 +50,19 @@ namespace Galleon.Checkout.Foundation
                                 continue;
 
                             var ve = new VirtualEntity() {TextNode = textNode};
-                            TargetEntity.Node.AddChild(ve);
+                            TargetEntity.Node.Live.AddVirtualEntity(ve);
                         }
 
                         // Get created VirtualEntities
                         var ves = TargetEntity.Node.Descendants().OfType<VirtualEntity>();
 
                         foreach (var ve in ves)
+                        {
                             Debug.Log(ve.TextNode?.RawText ?? "> NULL");
+                        }
 
+                        
+                        return;
                         foreach (var ve in ves)
                         {
                             // set state

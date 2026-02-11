@@ -173,6 +173,13 @@ namespace Galleon.Checkout.UI
                 if (item.PaymentMethod == SelectedItem.PaymentMethod)
                     continue;
 
+                // Analytics: Payment Method Switched
+                CheckoutAPI.InvokeAnalyticsEvent("payment_method_switched", new Dictionary<string, object>
+                {
+                    { "checkout_session_id",        CHECKOUT.Session?.SessionID      ?? ""     },
+                    { "payment_method_highlighted",  SelectedItem.PaymentMethod.Type ?? "none" },
+                });
+                
                 item.Unselect();
             }
             
@@ -201,6 +208,15 @@ namespace Galleon.Checkout.UI
                 Result = ViewResult.AddPaypal;
             else
                 this.Result = ViewResult.Confirm;
+
+            // Analytics: Pay Button Clicked
+            CheckoutAPI.InvokeAnalyticsEvent("pay_button_clicked", new Dictionary<string, object>
+            {
+                { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""      },
+                { "payment_method",      selectedPaymentMethod?.Type                 ?? "none"  },
+                { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m      },
+                { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? ""      }
+            });
 
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }

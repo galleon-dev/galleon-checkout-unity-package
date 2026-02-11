@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Galleon.Checkout.Foundation;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -60,7 +61,7 @@ namespace Galleon.Checkout
         public void InitializeSelf()
         {
             // Name
-            string entityDisplayName = Target.GetType().Name;
+            string entityDisplayName = Target?.GetType()?.Name ?? "";
             
             if (Target is IEntity e)
                 entityDisplayName = e.Node.DisplayName;
@@ -160,6 +161,9 @@ namespace Galleon.Checkout
                 foreach (var child in e.Node.Children)
                 {
                     var childItem = new ExplorerItem(child);
+                    
+                    if (childItem.Target is VirtualEntity)
+                        childItem.ButtonFoldout.Button.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f);
                     
                     // #if UNITY_EDITOR
                     // string header = child.Node.editorExtras.HeaderAttributeText;

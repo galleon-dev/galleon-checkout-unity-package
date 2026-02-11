@@ -127,6 +127,10 @@ namespace Galleon.Checkout
             this.Breadcrumbs.Add(new Breadcrumb(callerName, callerLine, callerPath, displayName : "creation_breadcrumb"));
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// ToString
+
+        public override string ToString() => $"step {this.Name ?? "null" }";
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setters
         
         private Step SET         (Action            setter) {  setter?.Invoke(); return this; }
@@ -181,7 +185,7 @@ namespace Galleon.Checkout
                 //    this.ParentStep.Node.AddLinkedChild(this);
                 
                 // set display name
-                this.Node.DisplayName = $"Step {this.Name}";
+                // this.Node.DisplayName = $"Step {this.Name}";
                 
                 ////////////////////////////////////////////////
                 
