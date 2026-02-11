@@ -173,13 +173,6 @@ namespace Galleon.Checkout.UI
                 if (item.PaymentMethod == SelectedItem.PaymentMethod)
                     continue;
 
-                // Analytics: Payment Method Switched
-                CheckoutAPI.InvokeAnalyticsEvent("payment_method_switched", new Dictionary<string, object>
-                {
-                    { "checkout_session_id",        CHECKOUT.Session?.SessionID      ?? ""     },
-                    { "payment_method_highlighted",  SelectedItem.PaymentMethod.Type ?? "none" },
-                });
-                
                 item.Unselect();
             }
             
@@ -192,6 +185,14 @@ namespace Galleon.Checkout.UI
         {
             selectedUPM.SelectExclusive();
             SoftRefreshState();
+            
+            // Analytics: Payment Method Switched
+            CheckoutAPI.InvokeAnalyticsEvent("payment_method_switched", new Dictionary<string, object>
+            {
+                { "checkout_session_id",        CHECKOUT.Session?.SessionID ?? ""     },
+                { "payment_method_highlighted", selectedUPM.Type            ?? "none" },
+            });
+            
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events

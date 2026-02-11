@@ -64,7 +64,7 @@ namespace Galleon.Checkout
         {
             if (Debug.isDebugBuild)
             {
-                Debug.Log($"<color=orange>[Checkout-Analytics-Event]</color>: {@event.Name}, \n{string.Join("\n", @event.Data?.Select(kvp => $"{kvp.Key} = {kvp.Value}") ?? Array.Empty<string>())}");
+                Debug.Log($"<color=orange>[Checkout-Analytics]</color>: {@event.Name}, \n{string.Join("\n", @event.Data?.Select(kvp => $"{kvp.Key} = {kvp.Value}") ?? Array.Empty<string>())}");
             }
     
             OnCheckoutAnalyticsEvent?.Invoke(@event);
