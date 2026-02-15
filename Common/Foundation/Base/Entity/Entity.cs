@@ -338,10 +338,10 @@ namespace Galleon.Checkout
             public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
             public object       Load          (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
             public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         Remove        (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Remove        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
             public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
             public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
             public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public List<string> GetStoredKeys ()                         => Root.Instance.Context.SystemServices.PrefsStorageService.GetStoredKeys ($"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST"    );
         }
         
         
@@ -352,14 +352,14 @@ namespace Galleon.Checkout
         {
             private IEntity Entity; public  EntitySessionStorage(IEntity entity) => Entity = entity;
 
-            public void    Store         (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public T       Load<T>       (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public object  Load          (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public bool    HasKey        (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public void    AddToList     (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public void    RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public List<T> LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public List<string> GetStoredKeys ()                    => Root.Instance.Context.SystemServices.SessionStorageService.GetStoredKeys ($"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST"    );
+            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public object       Load          (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         Remove        (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Remove        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
         }
         
 
@@ -374,10 +374,10 @@ namespace Galleon.Checkout
             public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
             public object       Load          (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
             public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public void         Remove        (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Remove        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
             public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
             public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
             public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
-            public List<string> GetStoredKeys ()                         => Root.Instance.Context.SystemServices.DiskStorageService.GetStoredKeys ($"entity_storage_{Entity.Node.ID.StorageID}_KEYS_LIST"     );
         }
         
         
@@ -644,6 +644,21 @@ namespace Galleon.Checkout
                 
                 this.Entity.Node.RemoveChild(ve);
                 Entity.Node.SessionStorage.RemoveFromList("virtual_entities", ve);
+            }
+            
+            ////////////////////////////////////////////////////////////////////// PrintME
+            
+            public Step PrintMe()
+            {
+                var type = this.Entity.GetType();
+                var method = type.GetMethod("PrintMe", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+                if (method != null && method.ReturnType == typeof(Step))
+                {
+                    return (Step)method.Invoke(this.Entity, null);
+                }
+
+                return null;
             }
             
             

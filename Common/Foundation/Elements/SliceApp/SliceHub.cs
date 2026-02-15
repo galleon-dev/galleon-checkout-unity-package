@@ -1,10 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Galleon.Checkout
 {
-    public class SliceHub : Entity
+    public partial class SliceHub : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
@@ -39,13 +41,51 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug
         
-        public Step PrepAnReport() 
+        public Step PrepAnReport()
         =>
-            new Step(name   : $"prep_and_report"
+            new Step(name   : $"report"
                     ,action : async (s) =>
                     {
+                        s.Log("Hub folder = Assets/TEMP");
+
+                        // List all types that inherit from Slice
+                        var sliceTypes = GetAllSliceTypes();
+                        s.Log($"Found {sliceTypes.Count} types that inherit from Slice:");
+                        foreach (var type in sliceTypes.OrderBy(t => t.FullName))
+                        {
+                            s.Log($"  - {type.FullName} (Assembly: {type.Assembly.GetName().Name})");
+                        }
                         
+                        List<Type> GetAllSliceTypes()
+                        {
+                            var sliceTypes = new List<Type>();
+                            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+                            foreach (var assembly in assemblies)
+                            {
+                              //Debug.Log($"+assembly {assembly.FullName}");
+                                try
+                                {
+                                    var types = assembly.GetTypes()
+                                        .Where(t => t.IsClass &&
+                                                   !t.IsAbstract &&
+                                                   typeof(Slice).IsAssignableFrom(t) &&
+                                                   t != typeof(Slice));
+
+                                    sliceTypes.AddRange(types);
+                                }
+                                catch (ReflectionTypeLoadException)
+                                {
+                                    // Skip assemblies that can't be fully loaded
+                                    continue;
+                                }
+                            }
+
+                            return sliceTypes;
+                        }
                     });
+
+        
         
         public Step PlusSlice1() 
         =>
@@ -54,29 +94,17 @@ namespace Galleon.Checkout
                     {
                         string OpString = "> Slice slice1"
                                  + "\n" + "";
-                        
                         await this.Node.Live.Operation(OpString).Execute(); 
                     });
-        
         public Step PlusSlice2() 
         =>
             new Step(name   : $"plus_slice_2"
                     ,action : async (s) =>
                     {
-                        
+                        string OpString = "> Slice slice2"
+                                 + "\n" + "";
+                        await this.Node.Live.Operation(OpString).Execute(); 
                     });
+        
     }
 }
-
-/// Hub
-/// Slice
-/// ...
-/// Hub + Slice1 + Slice2
-/// folder slice1
-///     slice1.cs
-///         class Slice1 : MonoBehaviour, IEntity
-///     slice1.txt
-/// folder slice2
-///     slice2.cs
-///         class Slice2 : MonoBehaviour, IEntity
-///     slice2.txt

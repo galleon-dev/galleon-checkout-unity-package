@@ -49,7 +49,26 @@ namespace Galleon.Checkout.Foundation
         {
             return PlayerPrefs.HasKey(key);
         }
-                
+
+        public void Remove(string key)
+        {
+            try
+            {
+                PlayerPrefs.DeleteKey(key);
+
+                // Remove key from saved keys list
+                var allKeys = GetAllStoredKeys();
+                if (allKeys.Remove(key))
+                {
+                    PlayerPrefs.SetString(ALL_KEYS_LIST, JsonConvert.SerializeObject(allKeys));
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+        }
+
 
         public List<string> GetStoredKeys(string keysListKey)
         {

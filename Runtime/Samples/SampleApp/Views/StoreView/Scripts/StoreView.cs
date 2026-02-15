@@ -19,10 +19,9 @@ namespace Galleon.Checkout.Samples
         public GameObject StoreViewItemParent; 
         
         [Header("test")]
-        public TMP_Dropdown drp_products;
-        public TMP_Dropdown drp_preselection;
-        public TMP_Dropdown drp_tax;
-        public TMP_Dropdown drp_footer;
+        public GameObject ScenarioPrefab;
+        public GameObject ScenarioParent;
+        public TMP_Text   ScenarioText;
         
         [Header("Config")]
         public GameObject ConfigPanel;

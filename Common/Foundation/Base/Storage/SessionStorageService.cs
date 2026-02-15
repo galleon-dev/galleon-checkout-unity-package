@@ -177,7 +177,29 @@ namespace Galleon.Checkout
             #endif
 
         }
-        
+
+        public void Remove(string key)
+        {
+            #if UNITY_EDITOR
+
+            string fullKey = $"{KEY_PREFIX}{key}";
+            UnityEditor.SessionState.EraseString(fullKey);
+
+            // Remove key from saved keys list
+            RemoveKeyFromSavedList(fullKey);
+
+            #else
+
+            string fullKey = $"{KEY_PREFIX}{key}";
+            _inMemoryStorage.Remove(fullKey);
+
+            // Remove key from saved keys list
+            RemoveKeyFromSavedList(fullKey);
+
+            #endif
+
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// List API
         
 
@@ -266,6 +288,32 @@ namespace Galleon.Checkout
             if (!savedKeys.Contains(key))
             {
                 savedKeys.Add(key);
+                string json = JsonConvert.SerializeObject(savedKeys);
+                _inMemoryStorage[SAVED_KEYS_KEY] = json;
+            }
+
+            #endif
+
+        }
+
+        private void RemoveKeyFromSavedList(string key)
+        {
+            #if UNITY_EDITOR
+
+            List<string> savedKeys = GetAllStoredKeys();
+
+            if (savedKeys.Remove(key))
+            {
+                string json = JsonConvert.SerializeObject(savedKeys);
+                UnityEditor.SessionState.SetString(SAVED_KEYS_KEY, json);
+            }
+
+            #else
+
+            List<string> savedKeys = GetAllStoredKeys();
+
+            if (savedKeys.Remove(key))
+            {
                 string json = JsonConvert.SerializeObject(savedKeys);
                 _inMemoryStorage[SAVED_KEYS_KEY] = json;
             }

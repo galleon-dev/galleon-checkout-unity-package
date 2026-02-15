@@ -78,6 +78,28 @@ namespace Galleon.Checkout.Foundation
           //}
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// PrintME
+        
+        public Step PrintME() 
+        =>
+            new Step(name   : $"PrintME"
+                    ,action : async (s) =>
+                    {
+                        var type = this.TextNode.LineFirstWord;
+                        var ns = "Galleon.Checkout";
+
+                        var instanceType = Type.GetType($"{ns}.{type}");
+                        var instance = Activator.CreateInstance(instanceType);
+
+                        Debug.Log($"instance is {instance.GetType().Name}");
+                        
+                        if (instance is IEntity e)
+                        {
+                            var step = e.Node.Live.PrintMe();
+                            Debug.Log($"step is {step.Name}");
+                            step.Execute();
+                        }
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Operation
         
