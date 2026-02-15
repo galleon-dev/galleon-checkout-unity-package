@@ -33,6 +33,8 @@ namespace Galleon.Checkout
             new Step(name   : $"print_slice"
                     ,action : async (s) =>
                     {
+                        #if UNITY_EDITOR
+                        
                         //this.Node.SessionStorage.Remove("SliceOperationState");
                         //return;
                         //////////////////////////////////////////////////////////////////////////
@@ -83,7 +85,7 @@ namespace Galleon.Checkout
                         after_domain_reload:
                         Debug.Log("after_domain_reload");
                         //////////////////////////////////////////////////////////////////////////
-                        #if UNITY_EDITOR
+                        //#if UNITY_EDITOR
                         var scene = EditorSceneManager.OpenScene(relativeScenePath, OpenSceneMode.Additive);
                         GameObject sliceObject = new GameObject(SliceName);
                         UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(sliceObject, scene);
@@ -94,12 +96,13 @@ namespace Galleon.Checkout
                         }
                         EditorSceneManager.SaveScene(scene);
                         EditorSceneManager.CloseScene(scene, true);
-                        #endif
+                        //#endif
                         //////////////////////////////////////////////////////////////////////////
                         this.Node.SessionStorage.Remove("SliceOperationState");
                         Debug.Log("done");
                         //////////////////////////////////////////////////////////////////////////
-                         
+                        #endif
+                        
                     });
         
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
