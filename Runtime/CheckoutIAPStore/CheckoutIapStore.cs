@@ -1,3 +1,4 @@
+#if IAP4
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -78,3 +79,4 @@ namespace Galleon.Checkout
         }
     }
 }
+#endif

@@ -28,7 +28,7 @@ namespace Galleon.Checkout
         
         // APIs
         public CheckoutAPI                  CheckoutAPI                 = new();
-        public CheckoutIAPStore             IAPStore                    = new();
+      //public CheckoutIAPStore             IAPStore                    = new();
       //public CheckoutIapStoreListener     IapStoreListener            = new(); // for testing
       
         // System
