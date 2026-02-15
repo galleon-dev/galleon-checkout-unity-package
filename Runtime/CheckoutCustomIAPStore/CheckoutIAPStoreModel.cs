@@ -22,11 +22,11 @@ public class CheckoutIAPStoreModel : AbstractPurchasingModule
     
     public override void Configure()
     {
-        RegisterStore("GalleonCheckout", InstantiateStore());
+        //RegisterStore("GalleonCheckout", InstantiateStore());
     }
 
-    private IStore InstantiateStore()
-    {
-        return new CheckoutIAPStore();
-    }
+    // private IStore InstantiateStore()
+    // {
+    //     return new CheckoutIAPStore();
+    // }
 }
