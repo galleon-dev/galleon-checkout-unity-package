@@ -83,6 +83,7 @@ namespace Galleon.Checkout
         public string                     ApplicationDisplayName;
         public CheckoutOrientation        UIPanelOrientation        = CheckoutOrientation.Auto;
         public Dictionary<string, object> Config                    = new();
+        public string                     DeepLinkName              = "checkout";
     }
     
     public enum CheckoutOrientation
