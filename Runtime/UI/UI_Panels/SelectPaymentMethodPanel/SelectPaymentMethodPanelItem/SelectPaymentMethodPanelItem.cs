@@ -49,8 +49,8 @@ namespace Galleon.Checkout.UI
                           : (UserPaymentMethod       != null) ? UserPaymentMethod?.GetPaymentMethodDefinition()?.BonusItem 
                           : null;
             
-            if (bonusData != null)
-                InitializeBonus(bonusData);
+            InitializeBonus(bonusData);
+            
             
             Refresh();
         }
@@ -74,11 +74,23 @@ namespace Galleon.Checkout.UI
             Refresh();
         }
         
-        private void InitializeBonus(BonusItem bonusItem)
+        private void InitializeBonus(BonusItem bonusData)
         {
-            // var prefab           = bonusData.BonusPrefab;
-            // var bonusGO          = Instantiate(original : prefab, parent: BonusContainer.transform);
-            // this.BonusRewardView = bonusGO.GetComponent<BonusRewardView>();
+            if (bonusData == null)
+                this.bonusItemView?.gameObject.SetActive(false);
+            
+            var customPrefab = CHECKOUT.Resources.CheckoutAssets.BonusItemPrefab;
+            
+            if (customPrefab == null)
+                return;
+            
+            // turn placeholder off
+            var placeHolderPrefab = this.bonusItemView?.gameObject;
+            if (placeHolderPrefab != null) placeHolderPrefab.SetActive(false);
+            
+            // instantiate custom prefab
+            var bonusGO          = Instantiate(original : customPrefab, parent: BonusContainer.transform);
+            this.bonusItemView   = bonusGO.GetComponent<BonusItemView>();
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
