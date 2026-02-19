@@ -224,67 +224,24 @@ namespace Galleon.Checkout
                             
                             CheckoutClient.Instance.CurrentSession.lastChargeResult = response.result;
                             var result = response.result;
-                            
-                            // Analytics: Payment Succeeded or Failed
-                            var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
-                            if (result.is_success && !result.is_canceled)
-                            {
-                                CheckoutAPI.InvokeAnalyticsEvent("payment_succeeded", new Dictionary<string, object>
-                                {
-                                    { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""     },
-                                    { "payment_method",      selectedPaymentMethod?.Type                 ?? "none" },
-                                    { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m     },
-                                    { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? ""     },
-                                });
-                            }
-                            else if (result.errors?.Length > 0 || !result.is_success)
-                            {
-                                CheckoutAPI.InvokeAnalyticsEvent("payment_failed", new Dictionary<string, object>
-                                {
-                                    { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? "" },
-                                    { "payment_method",      selectedPaymentMethod?.Type                 ?? "none" },
-                                    { "fail_reason",         string.Join(", ", result.errors             ?? new string[0]) },
-                                    { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m },
-                                    { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? "" }
-                                });
-                            }
-                            
-                            // CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
-                            //                                                         {
-                            //                                                             errors      = new [] { "error" },
-                            //                                                             is_canceled = false,
-                            //                                                             is_success  = true,
-                            //                                                             charge_id   = "12345",
-                            //                                                         };
 
-                            //////////////////////////////////////////////////////
-                            // bool hasErrors = false;
-                            // if (hasErrors)
-                            // {
-                            //     s.RemoveStepsAfterThisInParentFlow();
-                            // 
-                            //     s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
-                            //                               ,CheckoutClient.Instance.CheckoutScreenMobile.Navigate()
-                            //                               );
-                            // 
-                            //     return;
-                            // }
-                            //////////////////////////////////////////////////////
-
-                            if (response.next_actions == null)
+                            if (response.next_actions == null && result == null)
                             {
                                 // NO TRANSACTION RESULT AND NO NEXT ACTION . ERROR .
                                 throw new Exception("No transaction result and no next action.");
+                            }
+                            else if (response.next_actions == null && result != null)
+                            {
+                                // Analytics: Payment Succeeded or Failed                                
+                                if (result.is_success && !result.is_canceled)
+                                    SendSuccessAnalytics();
+                                else if (result.errors?.Length > 0 || !result.is_success)
+                                    SendErrorAnalytics();
                             }
                             else
                             {
                                 var        flow        = s; //.ParentStep;
                                 List<Step> nextActions = new();
-
-                                // foreach (var step in nextActions)
-                                // {
-                                //     flow.AddChildStep(step);
-                                // }
 
                                 foreach (var paymentAction in response.next_actions)
                                 {
@@ -354,6 +311,7 @@ namespace Galleon.Checkout
                                       if (status != null && status == "completed")
                                       {
                                           // transaction over
+                                          SendSuccessAnalytics();
                                       }
                                       else if (attemptNumber < maxAttempts)
                                       {
@@ -363,17 +321,20 @@ namespace Galleon.Checkout
                                       else
                                       {
                                           Debug.Log("max reattempts reached - transaction failed.");
+                                          SendErrorAnalytics();
                                           s.RemoveStepsAfterThisInParentFlow();
                                           s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
                                           s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
                                                                     ,CheckoutClient.Instance.CheckoutScreenMobile.Navigate()
                                                                     );
+                                          
 
                                       }
                                   }
                                   catch (Exception ex)
                                   {
                                       Debug.LogError($"Error in CheckStatus: {ex.Message}");
+                                      SendErrorAnalytics();
                                       s.RemoveStepsAfterThisInParentFlow();
                                       s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
                                       s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
@@ -533,6 +494,49 @@ namespace Galleon.Checkout
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
                         }
                     });
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Methods
+        
+        private void SendSuccessAnalytics()
+        {
+            try
+            {
+                var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
+                CheckoutAPI.InvokeAnalyticsEvent("payment_succeeded", new Dictionary<string, object>
+                                                {
+                                                    { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""     },
+                                                    { "payment_method",      selectedPaymentMethod?.Type                 ?? "none" },
+                                                    { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m     },
+                                                    { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? ""     },
+                                                });
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+        
+        public void SendErrorAnalytics()
+        {
+            try
+            {
+                var errors                = CHECKOUT.Session.lastChargeResult?.errors ?? new string[0];
+                var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
+                CheckoutAPI.InvokeAnalyticsEvent("payment_failed", new Dictionary<string, object>
+                                                {
+                                                    { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? "" },
+                                                    { "payment_method",      selectedPaymentMethod?.Type                 ?? "none" },
+                                                    { "fail_reason",         string.Join(", ", errors                    ?? new string[0]) },
+                                                    { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m },
+                                                    { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? "" }
+                                                });
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
     }
 }
 
