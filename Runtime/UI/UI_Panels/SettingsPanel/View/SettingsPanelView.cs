@@ -59,13 +59,7 @@ public class SettingsPanelView : View
 
         string Email = PlayerPrefs.GetString("Email");
 
-        if (!string.IsNullOrEmpty(Email))
-        {
-            if (EmailInputField)
-            {
-                EmailInputField.Text = Email;
-            }
-        }
+        EmailInputField.Text = Email;
 
         RefreshState();
     }
@@ -227,6 +221,11 @@ public class SettingsPanelView : View
 
         bool valid = ValidateEmail(EmailInputField.Text);
 
+        if (EmailInputField.Text == "")
+        {
+            // its ok to delete email.
+            valid = true;
+        }
         if (!string.IsNullOrEmpty(EmailInputField.Text))
         {
             emailErrorText.text = valid ? "" : "Invalid email format";

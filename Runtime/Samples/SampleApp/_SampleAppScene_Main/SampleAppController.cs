@@ -46,7 +46,8 @@ namespace Galleon.SampleApp
                                          {
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",
                                             AppUserID               = $"test_user_{DateTime.Now.ToString()}",
-                                            ApplicationDisplayName  = "Dice Dreams",                         
+                                            ApplicationDisplayName  = "Dice Dreams",
+                                            DeepLinkName            = "test.app",
                                             Config                  = new()
                                                                     {
                                                                        { "is_preselection_screen_enabled", false }

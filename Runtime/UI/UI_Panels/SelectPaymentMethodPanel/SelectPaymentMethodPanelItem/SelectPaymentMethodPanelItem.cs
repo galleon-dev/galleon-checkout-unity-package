@@ -58,6 +58,9 @@ namespace Galleon.Checkout.UI
         public void Initialize(UserPaymentMethod            userPaymentMethod, 
                                SelectPaymentMethodPanelView SelectPaymentMethodPanelView)
         {
+            if (userPaymentMethod.Type == "native")
+                Debug.Log("Native Payment Method Added");
+            
             this.UserPaymentMethod            = userPaymentMethod;
             this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
             

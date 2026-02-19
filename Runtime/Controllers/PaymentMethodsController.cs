@@ -25,6 +25,7 @@ namespace Galleon.Checkout
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public UserPaymentMethod                    NativeStoreUserPaymentMethod => UserPaymentMethods     .FirstOrDefault(x => x.Type == "native");
+        public UserPaymentMethod                    AppUserPaymentMethod         => UserPaymentMethods     .FirstOrDefault(x => x.Type == "app");
         public UserPaymentMethod                    EmptyCreditCardPaymentMethod => EmptyUserPaymentMethods.FirstOrDefault(x => x.Type == "card");
         
         
@@ -286,10 +287,50 @@ namespace Galleon.Checkout
                             }
                         }
                         
+                        /////////////////////////////////// Empty
+                        
+                        if (UserPaymentMethods       .All(pm => pm.Data.type != "credit_card")
+                        &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "card"))
+                        {
+                            this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                        {
+                                                            Data               = new ()
+                                                                               {
+                                                                                  type = "empty_card"
+                                                                               },
+                                                            DisplayName        = "Add Credit Card",
+                                                            IsNewPaymentMethod = false,
+                                                            IsSelected         = false,
+                                                            SortOrder          = float.PositiveInfinity, 
+                                                            Type               = "empty_card",
+                                                            ButtonText         = "Add Card"
+                                                        });
+                        }
+                        
+                        if (UserPaymentMethods       .All(pm => pm.Type      != "paypal")
+                        &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "paypal"))
+                        {
+                            this.UserPaymentMethods.Add(new UserPaymentMethod()
+                                                        {
+                                                            Data               = new ()
+                                                                               {
+                                                                                  type = "empty_paypal"
+                                                                               },
+                                                            DisplayName        = "Add Paypal Account",
+                                                            IsNewPaymentMethod = false,
+                                                            IsSelected         = false,
+                                                            SortOrder          = float.PositiveInfinity, 
+                                                            Type               = "empty_paypal",
+                                                            ButtonText         = "Add Paypal Account"
+                                                        });
+                        }
+                        
+                        
                         
                         /////////////////////////////////// Native
                         
-                        if (CHECKOUT.Globals.IsNativeStoreEnabled)
+                        if (CHECKOUT.Globals.IsNativeStoreEnabled
+                        && !CHECKOUT.Globals.IsPreselectionEnabled)
                         {
                             string nativeDisplayName = "";
                             #if UNITY_ANDROID
@@ -330,43 +371,6 @@ namespace Galleon.Checkout
                                                         });    
                         }
                         
-                        /////////////////////////////////// Empty
-                        
-                        if (UserPaymentMethods       .All(pm => pm.Data.type != "credit_card")
-                        &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "card"))
-                        {
-                            this.UserPaymentMethods.Add(new UserPaymentMethod()
-                                                        {
-                                                            Data               = new ()
-                                                                               {
-                                                                                  type = "empty_card"
-                                                                               },
-                                                            DisplayName        = "Add Credit Card",
-                                                            IsNewPaymentMethod = false,
-                                                            IsSelected         = false,
-                                                            SortOrder          = float.PositiveInfinity, 
-                                                            Type               = "empty_card",
-                                                            ButtonText         = "Add Card"
-                                                        });
-                        }
-                        
-                        if (UserPaymentMethods       .All(pm => pm.Type      != "paypal")
-                        &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "paypal"))
-                        {
-                            this.UserPaymentMethods.Add(new UserPaymentMethod()
-                                                        {
-                                                            Data               = new ()
-                                                                               {
-                                                                                  type = "empty_paypal"
-                                                                               },
-                                                            DisplayName        = "Add Paypal Account",
-                                                            IsNewPaymentMethod = false,
-                                                            IsSelected         = false,
-                                                            SortOrder          = float.PositiveInfinity, 
-                                                            Type               = "empty_paypal",
-                                                            ButtonText         = "Add Paypal Account"
-                                                        });
-                        }
                         
                     });
         
@@ -378,16 +382,19 @@ namespace Galleon.Checkout
               //.Concat(SpecialUserPaymentMethods)
                 .Concat(EmptyUserPaymentMethods)
                 .Distinct()
-                .OrderBy(x => x.SortOrder)
-                .Except(SpecialUserPaymentMethods)
+                .Except(new[]{AppUserPaymentMethod})
                 .Take(MAX_LAST_USED_PAYMENT_METHODS -1)
+                .OrderBy(x => x.SortOrder)
                 .ToList();
 
-            if (result.Count < MAX_LAST_USED_PAYMENT_METHODS
-            &&  CHECKOUT.Globals.IsNativeStoreEnabled 
-            &&  CHECKOUT.Globals.IsNativeStoreEnabledInCheckoutPage)
-                result.Add(NativeStoreUserPaymentMethod);
-            
+            if (result.Count >= MAX_LAST_USED_PAYMENT_METHODS
+            || !CHECKOUT.Globals.IsNativeStoreEnabled
+            || !CHECKOUT.Globals.IsNativeStoreEnabledInCheckoutPage
+            ||  CHECKOUT.Globals.IsPreselectionEnabled)
+            {
+                result.Remove(NativeStoreUserPaymentMethod);
+            }
+
             return result;
         }
         
@@ -395,16 +402,18 @@ namespace Galleon.Checkout
         {
             var result = UserPaymentMethods
                 .Distinct()
-                .OrderBy(x => x.SortOrder)
-                .Except(SpecialUserPaymentMethods)
+                .Except(new[]{AppUserPaymentMethod})
                 .Except(EmptyUserPaymentMethods)
+                .OrderBy(x => x.SortOrder)
                 .ToList();
 
-            if (result.Count < MAX_LAST_USED_PAYMENT_METHODS
-            &&  CHECKOUT.Globals.IsNativeStoreEnabled 
-            &&  CHECKOUT.Globals.IsNativeStoreEnabledInSelectionPage)
-                result.Add(NativeStoreUserPaymentMethod);
-            
+            if (result.Count >= MAX_LAST_USED_PAYMENT_METHODS
+            || !CHECKOUT.Globals.IsNativeStoreEnabled
+            || !CHECKOUT.Globals.IsNativeStoreEnabledInSelectionPage
+            ||  CHECKOUT.Globals.IsPreselectionEnabled)
+            {
+                result.Remove(NativeStoreUserPaymentMethod);
+            }
             return result;
         }
 
