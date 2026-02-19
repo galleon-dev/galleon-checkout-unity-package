@@ -28,6 +28,11 @@ namespace Galleon.Checkout.UI
         public TMP_Dropdown                 DropdownButton;
 
         private List<UserPaymentMethod>     upms;
+        
+        private IBonusItemView Ibonus;
+        IBonusItemView GetBonusItemView() => Ibonus ?? bonusItemView;
+        MonoBehaviour GetBonusItemMonoBehaviour() => (Ibonus ?? bonusItemView) as MonoBehaviour;
+        
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -36,6 +41,7 @@ namespace Galleon.Checkout.UI
         public SelectPaymentMethodPanelView SelectPaymentMethodPanelView { get; set; }
 
         public override bool AutoRefresh => false;
+        
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
@@ -97,7 +103,9 @@ namespace Galleon.Checkout.UI
             // instantiate custom prefab
             var bonusGO          = Instantiate(original : customPrefab, parent: BonusContainer.transform);
             this.bonusItemView   = bonusGO.GetComponent<BonusItemView>();
-            this.bonusItemView.Initialize(bonusData.BonusMainText, bonusData.BonusRewardText);
+            
+            this.Ibonus = bonusGO.GetComponent<IBonusItemView>();
+            Ibonus?.Initialize(bonusData.BonusMainText, bonusData.BonusRewardText);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
@@ -135,12 +143,12 @@ namespace Galleon.Checkout.UI
                 this.Icon.sprite = this.UserPaymentMethod.GetIconSprite();
             }
             
-            if (this.bonusItemView != null)
+            if (GetBonusItemView() != null)
             {    
-                bonusItemView.Close();
+                GetBonusItemView().Close();
              
                 if (this.UserPaymentMethod != null && this.UserPaymentMethod.Type == "native")
-                    bonusItemView.gameObject.SetActive(false);
+                    GetBonusItemMonoBehaviour().gameObject.SetActive(false);
             }
             
             // Dropdown

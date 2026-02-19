@@ -312,6 +312,14 @@ namespace Galleon.Checkout
                                       {
                                           // transaction over
                                           SendSuccessAnalytics();
+                                          
+                                          CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+                                                                                                    {
+                                                                                                        charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
+                                                                                                        errors      = null,
+                                                                                                        is_canceled = false,
+                                                                                                        is_success  = true,
+                                                                                                    };
                                       }
                                       else if (attemptNumber < maxAttempts)
                                       {

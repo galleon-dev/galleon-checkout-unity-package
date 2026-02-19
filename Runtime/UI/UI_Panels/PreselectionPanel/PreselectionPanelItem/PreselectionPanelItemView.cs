@@ -27,6 +27,11 @@ namespace Galleon.Checkout.UI
         public GameObject      BonusContainer;
         public BonusItemView   bonusItemView;
         
+        private IBonusItemView Ibonus;
+        IBonusItemView GetBonusItemView() => Ibonus ?? bonusItemView;
+        MonoBehaviour GetBonusItemMonoBehaviour() => (Ibonus ?? bonusItemView) as MonoBehaviour;
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
         public UserPaymentMethod     PaymentMethod         { get; set; }
@@ -72,7 +77,10 @@ namespace Galleon.Checkout.UI
             // instantiate custom prefab
             var bonusGO          = Instantiate(original : customPrefab, parent: BonusContainer.transform);
             this.bonusItemView   = bonusGO.GetComponent<BonusItemView>();
-            this.bonusItemView.Initialize(bonusData.BonusMainText, bonusData.BonusRewardText);
+            this.bonusItemView?.Initialize(bonusData.BonusMainText, bonusData.BonusRewardText);
+            
+            this.Ibonus = bonusGO.GetComponent<IBonusItemView>();
+            Ibonus?.Initialize(bonusData.BonusMainText, bonusData.BonusRewardText);
         }
         
 
@@ -107,13 +115,13 @@ namespace Galleon.Checkout.UI
                 SetSeperatorColor(UnselectedOptionColor, false);
             
             // Bonus
-            if (this.bonusItemView != null)
+            if (this.GetBonusItemView() != null)
             {    
-                if (this.PaymentMethod.IsSelected) bonusItemView.Open();
-                else                               bonusItemView.Close();
+                if (this.PaymentMethod.IsSelected) GetBonusItemView().Open();
+                else                               GetBonusItemView().Close();
                 
                 if (this.PaymentMethod.Type == "native")
-                    bonusItemView?.gameObject.SetActive(false);
+                    GetBonusItemMonoBehaviour()?.gameObject.SetActive(false);
             }
         }
         
