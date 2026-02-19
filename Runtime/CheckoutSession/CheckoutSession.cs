@@ -185,8 +185,8 @@ namespace Galleon.Checkout
                         s.Log($"tax.taxes({taxData.taxes.Count}) : ");
 
                         
-                        Taxes.Add("IRS",       new TaxItem() { inclusive = true, tax_amount = 2.99m} );
-                        Taxes.Add("Levan Tax", new TaxItem() { inclusive = true, tax_amount = 4.99m} );
+                        // Taxes.Add("IRS",       new TaxItem() { inclusive = true, tax_amount = 2.99m} );
+                        // Taxes.Add("Levan Tax", new TaxItem() { inclusive = true, tax_amount = 4.99m} );
                         
                         
                         foreach (var t in taxData.taxes)
