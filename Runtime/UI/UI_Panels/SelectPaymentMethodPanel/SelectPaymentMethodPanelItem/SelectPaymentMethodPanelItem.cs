@@ -76,8 +76,14 @@ namespace Galleon.Checkout.UI
         
         private void InitializeBonus(BonusItem bonusData)
         {
-            if (bonusData == null)
-                this.bonusItemView?.gameObject.SetActive(false);
+            if (bonusData == null
+            ||  CHECKOUT.Globals.IsPreselectionEnabled
+            ||  !CHECKOUT.Globals.IsBonusEnabled)
+            {
+                bonusItemView? .gameObject.SetActive(false);
+                BonusContainer?.gameObject.SetActive(false);
+                return;
+            }
             
             var customPrefab = CHECKOUT.Resources.CheckoutAssets.BonusItemPrefab;
             
@@ -91,6 +97,7 @@ namespace Galleon.Checkout.UI
             // instantiate custom prefab
             var bonusGO          = Instantiate(original : customPrefab, parent: BonusContainer.transform);
             this.bonusItemView   = bonusGO.GetComponent<BonusItemView>();
+            this.bonusItemView.Initialize(bonusData.BonusMainText, bonusData.BonusRewardText);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
@@ -128,11 +135,6 @@ namespace Galleon.Checkout.UI
                 this.Icon.sprite = this.UserPaymentMethod.GetIconSprite();
             }
             
-            // Bonus
-            
-            bonusItemView? .gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
-            BonusContainer?.gameObject.SetActive(!CHECKOUT.Globals.IsPreselectionEnabled);
-            
             if (this.bonusItemView != null)
             {    
                 bonusItemView.Close();
@@ -140,9 +142,6 @@ namespace Galleon.Checkout.UI
                 if (this.UserPaymentMethod != null && this.UserPaymentMethod.Type == "native")
                     bonusItemView.gameObject.SetActive(false);
             }
-            
-            if (!CHECKOUT.Globals.IsBonusEnabled)
-                bonusItemView.gameObject.SetActive(false);
             
             // Dropdown
             bool shouldShowDropdown =  this.UserPaymentMethod != null

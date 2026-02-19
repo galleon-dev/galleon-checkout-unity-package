@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 
 namespace Galleon.Checkout
@@ -22,12 +23,20 @@ namespace Galleon.Checkout
         public string     MainText;
         public string     RewardText;
         
+        public TMP_Text   MainTextLabel;
+        public TMP_Text   rewardTextLabel;
+        
         //////////////////////////////////////////////////////////////////////// Lifecycle
 
         public void Initialize(string mainText, string rewardText)
         {
             this.MainText   = mainText;
             this.RewardText = rewardText;
+            
+            if (MainTextLabel != null && !string.IsNullOrEmpty(MainTextLabel.text))
+                MainTextLabel.text = MainText;
+            if (rewardTextLabel != null && !string.IsNullOrEmpty(rewardTextLabel.text))
+                rewardTextLabel.text = RewardText;
         }
         
         //////////////////////////////////////////////////////////////////////// Methods

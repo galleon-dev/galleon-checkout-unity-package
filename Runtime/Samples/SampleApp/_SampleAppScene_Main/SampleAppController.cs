@@ -103,12 +103,13 @@ namespace Galleon.SampleApp
         public async Task Purchase()
         { 
             if (isInitializing) return;
+           
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
-            PurchaseResult result = default;
-            
-            if (CHECKOUT.Globals.TestProduct == "coins")
+            CheckoutProduct product = default;
+            switch (CHECKOUT.Globals.TestProduct.ToLower())
             {
-                result = await CheckoutAPI.Purchase(new CheckoutProduct
+                case "coins" :     product = new CheckoutProduct()
                                            { 
                                                DisplayName = "Bunch Of Coins",
                                                PriceText   = "$24.99",
@@ -116,31 +117,39 @@ namespace Galleon.SampleApp
                                                Sku         = "sku-1",
                                                Amount      = 24.99m,
                                                Currency    = "USD",
-                                           });
-                    
-            }
-            else if (CHECKOUT.Globals.TestProduct == "spins")
-            {
-                result = await CheckoutAPI.Purchase(new CheckoutProduct
+                                           }; break;
+                case "spins" :     product = new CheckoutProduct()
                                            { 
                                                DisplayName = "Bunch Of Spins",
                                                PriceText   = "$1000.99",
                                                Sku         = "sku-2", 
                                                Amount      = 1000.99m,
                                                Currency    = "USD",
-                                           });
-            }
-            else if (CHECKOUT.Globals.TestProduct == "spins 3DS")
-            {
-                result = await CheckoutAPI.Purchase(new CheckoutProduct
+                                           }; break;
+                case "spins 3ds" : product = new CheckoutProduct()
                                            { 
                                                DisplayName = "Bunch Of Spins (3DS)",
                                                PriceText   = "$1000.99",
                                                Sku         = "sku-3-3DS", 
                                                Amount      = 1000.99m,
                                                Currency    = "USD",
-                                           });
+                                           }; break;
+                
             }
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+            var bonusData = new List<BonusItem>()
+                          {
+                              new BonusItem() { PaymentMethodType = "card",    BonusMainText = "123",  BonusRewardText = "Extra" },
+                              new BonusItem() { PaymentMethodType = "default", BonusMainText = "100k", BonusRewardText = "Extra" }
+                          };
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+            var result = await CheckoutAPI.Purchase(product    : product
+                                                   ,bonusData  : bonusData);
+            
             
             Debug.Log("==========================================");
             Debug.Log("Purchase Result: " + result?.ToString());

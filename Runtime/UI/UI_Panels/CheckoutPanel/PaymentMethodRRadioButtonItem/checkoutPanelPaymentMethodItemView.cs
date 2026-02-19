@@ -26,7 +26,6 @@ namespace Galleon.Checkout.UI
         [Header("Bonus")]
         public GameObject      BonusContainer;
         public BonusItemView   bonusItemView;
-        public IBonusItemView  IBonusItemView;
         
         [Header("Dropdown")]
         public GameObject      DropdownArrow;
@@ -50,23 +49,38 @@ namespace Galleon.Checkout.UI
             this.PaymentMethod     = paymentMethod;
             this.CheckoutPanelView = CheckoutPanelView;
             
-            // Bonus
-            if (this.bonusItemView != null)
-                this.bonusItemView.gameObject.SetActive(false);
-            
-            // if (this.bonusItemView != null)
-            //     Destroy(this.bonusItemView.gameObject); // destroy placeholder
-            // if (CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab != null)
-            // {
-            //     this.IBonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<IBonusItemView>();
-            //     var bonusItem = CHECKOUT.Session.BonusData.FirstOrDefault() ?? new BonusItem() { BonusMainText = "Extra", BonusRewardText = "1000k" };
-            //     this.IBonusItemView.Initialize(bonusItem.BonusMainText, bonusItem.BonusRewardText);
-            // }
+            var def = paymentMethod.GetPaymentMethodDefinition();
+            InitializeBonus(def?.BonusItem);
             
             // Refresh
             Refresh();
         }
-
+ 
+        private void InitializeBonus(BonusItem bonusData)
+        {
+            if (bonusData == null
+            ||  CHECKOUT.Globals.IsPreselectionEnabled
+            ||  !CHECKOUT.Globals.IsBonusEnabled)
+            {
+                bonusItemView? .gameObject.SetActive(false);
+                BonusContainer?.gameObject.SetActive(false);
+                return;
+            }
+        
+            // acquire custom prefab
+            var customPrefab = CHECKOUT.Resources.CheckoutAssets.BonusItemPrefab;
+            if (customPrefab == null) return;
+            
+            // turn placeholder off
+            var placeHolderPrefab = this.bonusItemView?.gameObject;
+            if (placeHolderPrefab != null) placeHolderPrefab.SetActive(false);
+            
+            // instantiate custom prefab
+            var bonusGO          = Instantiate(original : customPrefab, parent: BonusContainer.transform);
+            this.bonusItemView   = bonusGO.GetComponent<BonusItemView>();
+            this.bonusItemView.Initialize(bonusData.BonusMainText, bonusData.BonusRewardText);
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
         public override void RefreshState()
@@ -98,17 +112,13 @@ namespace Galleon.Checkout.UI
                 SetSeperatorColor(UnselectedOptionColor, false);
             
             // Bonus
-            if (this.bonusItemView != null && !CHECKOUT.Globals.IsPreselectionEnabled)
+            if (this.bonusItemView != null)
             {    
-                this.bonusItemView.gameObject.SetActive(true);
                 if (this.PaymentMethod.IsSelected) bonusItemView.Open();
                 else                               bonusItemView.Close();
                 
                 if (this.PaymentMethod.Type == "native")
                     (bonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
-                
-                if (!CHECKOUT.Globals.IsBonusEnabled)
-                    bonusItemView.gameObject.SetActive(false);
             }
             
             // Dropdown

@@ -26,7 +26,6 @@ namespace Galleon.Checkout.UI
         [Header("Bonus")]
         public GameObject      BonusContainer;
         public BonusItemView   bonusItemView;
-        public IBonusItemView  IBonusItemView;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
@@ -45,18 +44,37 @@ namespace Galleon.Checkout.UI
             this.PreselectionPanelView = PreselectionPanelView;
             
             // Bonus
-            if (this.bonusItemView != null)
-                Destroy(this.bonusItemView.gameObject); // destroy placeholder
-            if (CheckoutClient.Instance.Resources.CheckoutAssets?.BonusItemPrefab != null)
-            {
-                this.IBonusItemView = Instantiate(CheckoutClient.Instance.Resources.CheckoutAssets.BonusItemPrefab, BonusContainer.transform).GetComponent<IBonusItemView>();
-                var bonusItem = CHECKOUT.Session.BonusData.FirstOrDefault() ?? new BonusItem() { BonusMainText = "Extra", BonusRewardText = "1000k" };
-                this.IBonusItemView.Initialize(bonusItem.BonusMainText, bonusItem.BonusRewardText);
-            }
+            InitializeBonus(paymentMethod.GetPaymentMethodDefinition()?.BonusItem);
             
             // Refresh
             Refresh();
         }
+        
+        private void InitializeBonus(BonusItem bonusData)
+        {
+            if (bonusData == null
+            ||  CHECKOUT.Globals.IsPreselectionEnabled
+            ||  !CHECKOUT.Globals.IsBonusEnabled)
+            {
+                bonusItemView? .gameObject.SetActive(false);
+                BonusContainer?.gameObject.SetActive(false);
+                return;
+            }
+        
+            // acquire custom prefab
+            var customPrefab = CHECKOUT.Resources.CheckoutAssets.BonusItemPrefab;
+            if (customPrefab == null) return;
+            
+            // turn placeholder off
+            var placeHolderPrefab = this.bonusItemView?.gameObject;
+            if (placeHolderPrefab != null) placeHolderPrefab.SetActive(false);
+            
+            // instantiate custom prefab
+            var bonusGO          = Instantiate(original : customPrefab, parent: BonusContainer.transform);
+            this.bonusItemView   = bonusGO.GetComponent<BonusItemView>();
+            this.bonusItemView.Initialize(bonusData.BonusMainText, bonusData.BonusRewardText);
+        }
+        
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 
@@ -89,13 +107,13 @@ namespace Galleon.Checkout.UI
                 SetSeperatorColor(UnselectedOptionColor, false);
             
             // Bonus
-            if (this.bonusItemView != null && IBonusItemView != null)
+            if (this.bonusItemView != null)
             {    
-                if (this.PaymentMethod.IsSelected) IBonusItemView.Open();
-                else                               IBonusItemView.Close();
+                if (this.PaymentMethod.IsSelected) bonusItemView.Open();
+                else                               bonusItemView.Close();
                 
                 if (this.PaymentMethod.Type == "native")
-                    (IBonusItemView as MonoBehaviour)?.gameObject.SetActive(false);
+                    bonusItemView?.gameObject.SetActive(false);
             }
         }
         

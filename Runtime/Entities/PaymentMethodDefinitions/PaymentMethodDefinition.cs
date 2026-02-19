@@ -42,7 +42,7 @@ namespace Galleon.Checkout
         
         public string       LocalID             => $"local_pm_id_{this.Type}";
         
-        public BonusItem    BonusItem           => CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
+        public BonusItem    BonusItem           => GetBonusItem();
         
         public bool         ShouldAddSavedUPMS  => true;
         public bool         AllowOnlyOneUPM     => true;
@@ -113,6 +113,19 @@ namespace Galleon.Checkout
         {
             var sprite = await CheckoutClient.Instance.Resources.Sprites.LoadSprite(name_or_url: url);
             return sprite;
+        }
+        
+        private BonusItem GetBonusItem()
+        {
+            var paymentMethodType = this.Type.ToLower();
+            
+            var first = CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == this.Type.ToLower());
+            if (first != null) return first;
+            
+            var @default = CHECKOUT.Session?.BonusData?.FirstOrDefault(b => b.PaymentMethodType.ToLower() == "default");
+            if (@default != null) return @default;
+            
+            return null;
         }
     }
 }

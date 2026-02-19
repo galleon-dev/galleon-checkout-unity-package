@@ -49,6 +49,16 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         s.Log($"Checkout Assets : {CheckoutAssets}");
+                        
+                        
+                        // Load Assets
+                        var assets = Resources.LoadAll<CheckoutAssets>("");
+                        this._checkoutAssets = assets.First();
+                        
+                        // Validations
+                        // if (assets.Length < 1) throw new Exception("No CheckoutAssets found");
+                        // if (assets.Length > 1) throw new Exception("More than one CheckoutAssets found");
+                        
                     });
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Members
@@ -69,29 +79,7 @@ namespace Galleon.Checkout
         /////////////////////////////////////////////////////////////////////////////////////////////////// Public Assets
         
         private CheckoutAssets _checkoutAssets;
-        public  CheckoutAssets CheckoutAssets
-        {
-            get
-            {
-                // Check Cache
-                if (_checkoutAssets != null)
-                    return _checkoutAssets;
-                
-                // Load
-                var assets = Resources.LoadAll<CheckoutAssets>("");
-                
-                // Validations
-                // if (assets.Length < 1) throw new Exception("No CheckoutAssets found");
-                // if (assets.Length > 1) throw new Exception("More than one CheckoutAssets found");
-                
-                if (assets.Length < 1) 
-                    return null;
-                
-                // Result
-                this._checkoutAssets = assets.First();
-                return _checkoutAssets;
-            }
-        }
+        public  CheckoutAssets CheckoutAssets => _checkoutAssets;
     }
     
     
