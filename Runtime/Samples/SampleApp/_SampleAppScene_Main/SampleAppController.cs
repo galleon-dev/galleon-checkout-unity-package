@@ -50,7 +50,7 @@ namespace Galleon.SampleApp
                                             DeepLinkName            = "test.app",
                                             Config                  = new()
                                                                     {
-                                                                       { "is_preselection_screen_enabled", false }
+                                                                       { "is_preselection_screen_enabled", false },
                                                                     },
                                             Country                 = "US",
                                             Currency                = "USD"
@@ -93,10 +93,17 @@ namespace Galleon.SampleApp
             // Reinitialize if needed
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
-                                            JWT                    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",
-                                            AppUserID              = appUserID,
-                                            ApplicationDisplayName = "Dice Dreams"
-                                         } );
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",
+                                            AppUserID               = $"test_user_{DateTime.Now.ToString()}",
+                                            ApplicationDisplayName  = "Dice Dreams",
+                                            DeepLinkName            = "test.app",
+                                            Config                  = new()
+                                                                    {
+                                                                       { "is_preselection_screen_enabled", false }
+                                                                    },
+                                            Country                 = "US",
+                                            Currency                = "USD"
+                                         });
             
             ReportText.text = $"> ready. \n> user is <color=yellow>{appUserID}</color>.";
             
@@ -150,7 +157,12 @@ namespace Galleon.SampleApp
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
             var result = await CheckoutAPI.Purchase(product    : product
-                                                   ,bonusData  : bonusData);
+                                                   ,bonusData  : bonusData
+                                                   ,config     : new()
+                                                               {
+                                                                   { "is_native_store_enabled",        false },
+                                                                   { "is_native_store_toggle_enabled", true  },
+                                                               });
             
             
             Debug.Log("==========================================");

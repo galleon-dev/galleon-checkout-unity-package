@@ -25,7 +25,7 @@ namespace Galleon.Checkout.Foundation
         public Core     Core        = new Core();
         
         // Slice
-        public Slice    Slice       = new Slice();
+      //public Slice    Slice       = new Slice();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
@@ -78,7 +78,7 @@ namespace Galleon.Checkout.Foundation
                                  + "\n" + "> Thing T3 #blue #rb prompt='a moving cube'"
                                  + "\n" + "";
                         
-                        await Slice.Node.Live.Operation(OpString).Execute();
+                      //await Slice.Node.Live.Operation(OpString).Execute();
                     });
         
         
