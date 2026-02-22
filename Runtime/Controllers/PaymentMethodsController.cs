@@ -211,7 +211,10 @@ namespace Galleon.Checkout
                     {
                         PaymentMethodsDefinitions.Clear();
                         
-                        var _result = await CHECKOUT.Network.Get<Shared.PaymentMethodDefinitionsResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions?currency=USD&country=US&platform=unity"
+                        var country  = CHECKOUT.Globals.CheckoutInitConfiguration.Country;
+                        var currency = CHECKOUT.Globals.CheckoutInitConfiguration.Currency;
+                        
+                        var _result = await CHECKOUT.Network.Get<Shared.PaymentMethodDefinitionsResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions?currency={currency}&country={country}&platform=unity"
                                                                                                          ,headers  : new ()
                                                                                                                    {
                                                                                                                        { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }

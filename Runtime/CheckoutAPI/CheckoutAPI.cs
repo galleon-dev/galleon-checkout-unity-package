@@ -79,6 +79,7 @@ namespace Galleon.Checkout
     {
         public string                     JWT;
         public string                     Country;
+        public string                     Currency;
         public string                     AppUserID;
         public string                     ApplicationDisplayName;
         public CheckoutOrientation        UIPanelOrientation        = CheckoutOrientation.Auto;

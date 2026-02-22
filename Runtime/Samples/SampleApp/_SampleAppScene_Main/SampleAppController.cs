@@ -51,7 +51,9 @@ namespace Galleon.SampleApp
                                             Config                  = new()
                                                                     {
                                                                        { "is_preselection_screen_enabled", false }
-                                                                    }
+                                                                    },
+                                            Country                 = "US",
+                                            Currency                = "USD"
                                          });
             
             StoreView.RefreshConfigPanel();
@@ -141,8 +143,8 @@ namespace Galleon.SampleApp
             
             var bonusData = new List<BonusItem>()
                           {
-                              new BonusItem() { PaymentMethodType = "card",    BonusMainText = "123",  BonusRewardText = "Extra" },
-                              new BonusItem() { PaymentMethodType = "default", BonusMainText = "100k", BonusRewardText = "Extra" }
+                              new BonusItem() { PaymentMethodType = "card",    BonusMainText = "123",  BonusRewardText = "Get Extra Rolls" },
+                              new BonusItem() { PaymentMethodType = "default", BonusMainText = "100k", BonusRewardText = "Get Extra Rollst" }
                           };
             
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
