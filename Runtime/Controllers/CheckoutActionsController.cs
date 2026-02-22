@@ -472,28 +472,24 @@ namespace Galleon.Checkout
                         }
                     });
         
-        public Step SetEmail() 
+        public Step UpdateEmail() 
         =>
-            new Step(name   : $"set_email"
+            new Step(name   : $"update_email"
                     ,action : async (s) =>
                     {
                         try
                         {
-                            var email     = CHECKOUT.Session.User.Email;
-                            var sessionID = CHECKOUT.Session.SessionID;
-
-                            var body      = new Shared.UpdateEmailRequest()
-                                          {
-                                              email      = email,
-                                              session_id = sessionID,
-                                          };
-
                             var response  = await CHECKOUT.Network.Post<UpdateEmailResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/update-email"
                                                                                             ,headers  : new ()
                                                                                                       {
                                                                                                           { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                       }
-                                                                                            ,body     : body);
+                                                                                            ,body     :  new Shared.UpdateEmailRequest()
+                                                                                                      {
+                                                                                                          email        = CHECKOUT.Session.User.Email,
+                                                                                                          session_id   = CHECKOUT.Session.SessionID,
+                                                                                                          delete_email = CHECKOUT.Session.User.Email.Trim() == "",
+                                                                                                      });
                         }
                         catch (Exception ex)
                         {
@@ -533,11 +529,11 @@ namespace Galleon.Checkout
                 var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
                 CheckoutAPI.InvokeAnalyticsEvent("payment_failed", new Dictionary<string, object>
                                                 {
-                                                    { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? "" },
-                                                    { "payment_method",      selectedPaymentMethod?.Type                 ?? "none" },
-                                                    { "fail_reason",         string.Join(", ", errors                    ?? new string[0]) },
-                                                    { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m },
-                                                    { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? "" }
+                                                    { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""              },
+                                                    { "payment_method",      selectedPaymentMethod?.Type                 ?? "none"          },
+                                                    { "fail_reason",         string.Join(", ", errors                    ?? new string[0])  },
+                                                    { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m              },
+                                                    { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? ""              }
                                                 });
             }
             catch (Exception e)

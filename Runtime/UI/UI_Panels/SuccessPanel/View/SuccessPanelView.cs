@@ -133,7 +133,7 @@ namespace Galleon.Checkout.UI
                     ,action : async (s) =>
                     {
                         CHECKOUT.User.UserInfo.email = this.EmailInputField.Text;
-                        await CHECKOUT.Actions.SetEmail().Execute();
+                        await CHECKOUT.Actions.UpdateEmail().Execute();
 
                     });
 

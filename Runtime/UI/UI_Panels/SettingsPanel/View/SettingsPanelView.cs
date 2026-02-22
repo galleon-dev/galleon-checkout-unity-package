@@ -60,28 +60,11 @@ public class SettingsPanelView : View
         string Email = PlayerPrefs.GetString("Email");
 
         EmailInputField.Text = Email;
-
+        EmailInputfieldBorder.SetActive(false);
+        
+        
         RefreshState();
     }
-
-    //////////////////////////////////////////////////////////////////////////// View Flow
-
-    public bool IsCompleted = false;
-
-    public Step View()
-    =>
-        new Step(name: $"view_settings_panel"
-                , action: async (s) =>
-                {
-                    IsCompleted = false;
-
-                    this.gameObject.SetActive(true);
-
-                    while (!IsCompleted)
-                        await Task.Yield();
-
-                    this.gameObject.SetActive(false);
-                });
 
     //////////////////////////////////////////////////////////////////////////// Refresh
 
@@ -239,7 +222,7 @@ public class SettingsPanelView : View
         {
             this.EmailInputField.Text            = str;
             CHECKOUT.Session.User.UserInfo.email = str;
-            await CHECKOUT.Actions.SetEmail().Execute();
+            await CHECKOUT.Actions.UpdateEmail().Execute();
         }   
     }
     
@@ -259,7 +242,6 @@ public class SettingsPanelView : View
         CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
     }
 
-    
     //////////////////////////////////////////////////////////////////////////// Events
 
     public void DeletePaymentMethod(UserPaymentMethod userPaymentMethod)
@@ -267,7 +249,7 @@ public class SettingsPanelView : View
         if (IsEditingEmail)
             return;
 
-        CheckoutClient.Instance.CurrentSession.LastDialogRequest = "delete_payment_method";
+        CheckoutClient.Instance.CurrentSession.LastDialogRequest         = "delete_payment_method";
         CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete = userPaymentMethod;
 
         this.Result = ViewResult.DeletePaymentMethod;
