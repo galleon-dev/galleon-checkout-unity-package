@@ -150,8 +150,8 @@ namespace Galleon.SampleApp
             
             var bonusData = new List<BonusItem>()
                           {
-                              new BonusItem() { PaymentMethodType = "card",    BonusMainText = "123",  BonusRewardText = "Get Extra Rolls" },
-                              new BonusItem() { PaymentMethodType = "default", BonusMainText = "100k", BonusRewardText = "Get Extra Rollst" }
+                              new BonusItem() { PaymentMethodType = "card",    BonusMainText = "200",  BonusRewardText = "Get Extra Rolls" },
+                              new BonusItem() { PaymentMethodType = "default", BonusMainText = "100k", BonusRewardText = "Get Extra Rolls" }
                           };
             
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,8 +160,8 @@ namespace Galleon.SampleApp
                                                    ,bonusData  : bonusData
                                                    ,config     : new()
                                                                {
-                                                                   { "is_native_store_enabled",        false },
-                                                                   { "is_native_store_toggle_enabled", true  },
+                                                                 //  { "is_native_store_enabled",        false },
+                                                                 //  { "is_native_store_toggle_enabled", true  },
                                                                });
             
             

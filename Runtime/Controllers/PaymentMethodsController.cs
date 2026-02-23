@@ -22,6 +22,8 @@ namespace Galleon.Checkout
         
         public List<string>                         LastUsedUserPaymentMethodIDs = new ();
         
+        public bool                                 IsGooglePayAvailableOnDevice = false;
+                        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public UserPaymentMethod                    NativeStoreUserPaymentMethod => UserPaymentMethods     .FirstOrDefault(x => x.Type == "native");
@@ -57,9 +59,10 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
-                        s.AddChildStep(RefreshPaymentMethods());            // Get from server    
-                        s.AddChildStep(InitializeDefinitions());            // setup (e.g. download images)
-                        s.AddChildStep(LoadLastUsedUserPaymentMethods());   // Load from storage
+                        s.AddChildStep(RefreshPaymentMethods());                // Get from server    
+                        s.AddChildStep(InitializeDefinitions());                // setup (e.g. download images)
+                        s.AddChildStep(LoadLastUsedUserPaymentMethods());       // Load from storage
+                        s.AddChildStep(CheckIfGooglePayIsAvailableOnDevice());
                     });
         
         public Step RefreshPaymentMethods()
@@ -226,6 +229,9 @@ namespace Galleon.Checkout
 
                         foreach (var data in dataList)
                         {
+                            if (data.type.ToLower().Contains("google_pay") && !IsGooglePayAvailableOnDevice)
+                                continue;
+                            
                             this.PaymentMethodsDefinitions.Add(new PayPalPaymentMethodDefinition()
                                                            {
                                                                InitializationSteps = {},
@@ -465,6 +471,38 @@ namespace Galleon.Checkout
             
             return result.Take(MAX_LAST_USED_PAYMENT_METHODS).ToList();
         }
+        
+        public Step CheckIfGooglePayIsAvailableOnDevice() 
+        =>
+            new Step(name   : $"check_if_google_pay_is_available_on_device"
+                    ,action : async (s) =>
+                    {
+                        ////////////////////////////////////////////////////////////
+                        
+                        #if UNITY_EDITOR
+                        // Mock For Editor
+                        IsGooglePayAvailableOnDevice = true;
+                        return;
+                        #endif
+                        
+                        ////////////////////////////////////////////////////////////
+                        
+                        #if UNITY_ANDROID 
+                      
+                        using (AndroidJavaClass  unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                        {
+                            using (AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                            {
+                                using (AndroidJavaClass plugin = new AndroidJavaClass("com.example.checkoutgpaybridge.GooglePayBridge"))
+                                {
+                                    plugin.CallStatic("CheckGPayAvailable", activity);
+                                    
+                                    IsGooglePayAvailableOnDevice = plugin.GetStatic<bool>("IsGPayAvailable"); 
+                                }
+                            }
+                        }
+                        #endif   
+                    });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Mock for testing
         
