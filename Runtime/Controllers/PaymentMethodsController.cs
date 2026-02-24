@@ -59,10 +59,10 @@ namespace Galleon.Checkout
                     ,tags   : new[] { "init" }
                     ,action : async s =>
                     {
+                        s.AddChildStep(CheckIfGooglePayIsAvailableOnDevice());
                         s.AddChildStep(RefreshPaymentMethods());                // Get from server    
                         s.AddChildStep(InitializeDefinitions());                // setup (e.g. download images)
                         s.AddChildStep(LoadLastUsedUserPaymentMethods());       // Load from storage
-                        s.AddChildStep(CheckIfGooglePayIsAvailableOnDevice());
                     });
         
         public Step RefreshPaymentMethods()
@@ -482,6 +482,7 @@ namespace Galleon.Checkout
                         #if UNITY_EDITOR
                         // Mock For Editor
                         IsGooglePayAvailableOnDevice = true;
+                        s.Log($"IsGooglePayAvailableOnDevice: {IsGooglePayAvailableOnDevice}");
                         return;
                         #endif
                         
@@ -496,12 +497,15 @@ namespace Galleon.Checkout
                                 using (AndroidJavaClass plugin = new AndroidJavaClass("com.example.checkoutgpaybridge.GooglePayBridge"))
                                 {
                                     plugin.CallStatic("CheckGPayAvailable", activity);
-                                    
-                                    IsGooglePayAvailableOnDevice = plugin.GetStatic<bool>("IsGPayAvailable"); 
+                                    await Task.Delay(1000);
+                                    IsGooglePayAvailableOnDevice = plugin.GetStatic<bool>("IsGPayAvailable");
                                 }
                             }
                         }
-                        #endif   
+                        
+                        #endif
+                        
+                        s.Log($"IsGooglePayAvailableOnDevice: {IsGooglePayAvailableOnDevice}");
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Mock for testing
