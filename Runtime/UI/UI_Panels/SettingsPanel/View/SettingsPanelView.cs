@@ -103,6 +103,7 @@ public class SettingsPanelView : View
         }
         
         // Native store toggle Prefab
+        Debug.Log($"IsNativeStoreToggleEnabled: {CHECKOUT.Globals.IsNativeStoreToggleEnabled}");
         if (CHECKOUT.Globals.IsNativeStoreToggleEnabled)
         {
             // Item
