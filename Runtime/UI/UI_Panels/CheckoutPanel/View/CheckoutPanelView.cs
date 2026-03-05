@@ -329,7 +329,8 @@ namespace Galleon.Checkout.UI
             if (Checkout.CheckoutClient.Instance != null)
             {
                 float SubTotal = 0f;
-                
+                var currencySign = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Currency;
+
                 if (float.TryParse(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText.Replace("$", "")
                                   ,NumberStyles.Float
                                   ,CultureInfo.InvariantCulture
@@ -339,7 +340,7 @@ namespace Galleon.Checkout.UI
                 }
 
                 // CultureInfo.InvariantCulture is important from parsing perspective from string to float as on mobile devices it can appear ",", instead "." in float values
-                SubtotalPriceText.text = $"${SubTotal.ToString(CultureInfo.InvariantCulture)}";
+                SubtotalPriceText.text = $"{currencySign}{SubTotal.ToString(CultureInfo.InvariantCulture)}";
 
                 decimal TaxesAmount = 0;
 
@@ -354,9 +355,12 @@ namespace Galleon.Checkout.UI
                     
                     ShowTaxesPanels(true);
                     TaxText.gameObject.SetActive(false);
-                    TaxText.text = $"${TaxesAmount.ToString(CultureInfo.InvariantCulture)}";
+                    TaxText.text = $"{currencySign}{TaxesAmount.ToString(CultureInfo.InvariantCulture)}";
                     
                     TaxesAndFeesRow.gameObject.SetActive(false);
+                    
+                    if (taxes.Count == 0)
+                        TotalPriceText.text = PriceText.text;
                 }
                 else
                 {
@@ -372,15 +376,16 @@ namespace Galleon.Checkout.UI
                     TaxesAndFeesRow.gameObject.SetActive(true);
                 }
                 
-                TotalPriceText.text = $"${(SubTotal + (float)TaxesAmount).ToString(CultureInfo.InvariantCulture)}";
+                TotalPriceText.text = $"{currencySign}{(SubTotal + (float)TaxesAmount).ToString(CultureInfo.InvariantCulture)}";
             }
         }
 
         void CreateTaxPrefab(string taxName, string taxAmount)
         {
+            var currencySign = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Currency;
             var taxPrefab = Instantiate(original: TaxPrefab, parent: TaxesContainer.transform);
             taxPrefab.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = taxName;
-            taxPrefab.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"${taxAmount}";
+            taxPrefab.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{currencySign}{taxAmount}";
         }
 
         void ShowTaxesPanels(bool status)

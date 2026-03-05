@@ -83,6 +83,7 @@ namespace Galleon.Checkout
             Debug.Log("CheckoutClient.EntryPoint()");
             
             Root.Instance.Runtime.Node.Children.Add(Instance);
+            Instance.Node.Initialize();
             Instance.Node.LateInitialize();
 
             // await Instance.SystemInitFlow();
@@ -129,7 +130,6 @@ namespace Galleon.Checkout
             new Step(name   : $"Cleanup"
                     ,action : async (s) =>
                     {
-                        Config.Collection.Clear();
                         Config.ConfigData.Clear();
                         Users.Users.Clear();
                         PaymentMethodsController.UserPaymentMethods.Clear();
