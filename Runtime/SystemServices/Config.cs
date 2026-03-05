@@ -11,9 +11,8 @@ namespace Galleon.Checkout
     public class Config : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
-        
-        public Dictionary<string, ConfigValue> ConfigData = new Dictionary<string, ConfigValue>();
-        public Collection<ConfigValue>         Collection = new();
+
+        public EntityDictionary<string, ConfigValue> ConfigData = new();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecyclew
         
@@ -41,7 +40,7 @@ namespace Galleon.Checkout
                     });
         
         public Step InitializeConfigFromServer() 
-            =>
+        =>
             new Step(name   : $"initialize_config_from_server"
                     ,action : async (s) =>
                     {
@@ -79,12 +78,6 @@ namespace Galleon.Checkout
         }
         public void SetValue(ConfigValue configValue)
         {
-            var collectionValue = this.Collection.FirstOrDefault(x => x.Key == configValue.Key);
-            if (collectionValue != null)
-                collectionValue.Value = configValue.Value;
-            else
-                this.Collection.Add(configValue);
-            
             if (this.ConfigData.ContainsKey(configValue.Key))
                 this.ConfigData[configValue.Key].Value = configValue.Value;
             else
@@ -102,15 +95,17 @@ namespace Galleon.Checkout
         
         public void SetOverrideValue(string key, object value)
         {
-            if (!ConfigData.ContainsKey(key))
-                ConfigData.Add(key, new ConfigValue(key, value));
+            var trimmedKey = key.Trim();
+            if (!ConfigData.ContainsKey(trimmedKey))
+                ConfigData.Add(trimmedKey, new ConfigValue(trimmedKey, value));
             else
-                ConfigData[key].OverrideValue(value);
+                ConfigData[trimmedKey].OverrideValue(value);
         }
         public void ClearOverrideValue(string key)
         {
-            if (ConfigData.ContainsKey(key))
-                ConfigData[key].ClearOverrideValue();
+            var trimmedKey = key.Trim();
+            if (ConfigData.ContainsKey(trimmedKey))
+                ConfigData[trimmedKey].ClearOverrideValue();
         }
         
     }
@@ -147,6 +142,10 @@ namespace Galleon.Checkout
             this.Key    = key;
             this._value = value;
         }
+        
+        //////////////////////////////////////////////////// ToString
+        
+        override public string ToString() => $"ConfigValue | {this.Key} = {this.Value}";
         
         //////////////////////////////////////////////////// Value Properties
         

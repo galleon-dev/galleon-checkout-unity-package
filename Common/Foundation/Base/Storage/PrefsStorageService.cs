@@ -85,13 +85,18 @@ namespace Galleon.Checkout.Foundation
             }
         }
 
-        public List<string> GetAllStoredKeys()
+        public List<string> GetAllStoredKeys(string beginningWith = null)
         {
             try
             {
                 var json = PlayerPrefs.GetString(ALL_KEYS_LIST, null);
                 if (json == null) return new List<string>();
-                return JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
+                var result = JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
+
+                if (beginningWith != null)
+                    return result.FindAll(key => key.StartsWith(beginningWith));
+
+                return result;
             }
             catch (Exception e)
             {

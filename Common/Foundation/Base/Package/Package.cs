@@ -90,7 +90,7 @@ namespace Galleon.Checkout.Foundation
                         /// > Slice slice1
                         ///     > Thing t1
                         ///     > Thing T2
-                        var slice = new VirtualEntity() { TextNode = new TextNode("> Slice slice1") };
+                        var slice = new VirtualEntity("> Slice slice1");
                         this.Node.AddChild(slice);                
                     });
         

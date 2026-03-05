@@ -161,7 +161,7 @@ namespace Galleon.SampleApp
                                                    ,config     : new()
                                                                {
                                                                  //  { "is_native_store_enabled",        false },
-                                                                 //  { "is_native_store_toggle_enabled", true  },
+                                                                   { "is_native_store_toggle_enabled", false  },
                                                                });
             
             

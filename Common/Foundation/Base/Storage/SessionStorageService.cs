@@ -112,7 +112,7 @@ namespace Galleon.Checkout
 
         }
 
-        public List<string> GetAllStoredKeys()
+        public List<string> GetAllStoredKeys(string beginningWith = null)
         {
             #if UNITY_EDITOR
 
@@ -120,7 +120,12 @@ namespace Galleon.Checkout
 
             if (!string.IsNullOrEmpty(json))
             {
-                return JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
+                var result = JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
+                
+                if (beginningWith != null)
+                    return result.FindAll(key => key.StartsWith(beginningWith));
+                
+                return result;
             }
 
             return new List<string>();
@@ -129,7 +134,12 @@ namespace Galleon.Checkout
 
             if (_inMemoryStorage.TryGetValue(SAVED_KEYS_KEY, out string json) && !string.IsNullOrEmpty(json))
             {
-                return JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
+                var result =  JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
+
+                if (beginningWith != null)
+                    return result.FindAll(key => key.StartsWith(beginningWith));
+                
+                return result;
             }
 
             return new List<string>();

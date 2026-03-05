@@ -49,7 +49,7 @@ namespace Galleon.Checkout.Foundation
                             ||  textNode.RawText.ToLower().StartsWith("> origin") )
                                 continue;
 
-                            var ve = new VirtualEntity() {TextNode = textNode};
+                            var ve = new VirtualEntity(textNode.RawText);
                             TargetEntity.Node.Live.AddVirtualEntity(ve);
                         }
 
@@ -61,16 +61,15 @@ namespace Galleon.Checkout.Foundation
                             Debug.Log(ve.TextNode?.RawText ?? "> NULL");
                         }
 
-                        
                         return;
                         foreach (var ve in ves)
                         {
                             // set state
-                            ve.State = "assets";
-                            await ve.SaveState();
-                            
-                            // do next op step
-                            await ve.DoNextLiveStep();
+                            // ve.State = "assets";
+                            // await ve.SaveState();
+                            // 
+                            // // do next op step
+                            // await ve.DoNextLiveStep();
                         }
                         
                     });

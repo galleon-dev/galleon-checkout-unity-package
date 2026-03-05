@@ -10,6 +10,16 @@ namespace Galleon.Checkout.Foundation
             
         }
         
+        public Step ResumeAllOperations() 
+        =>
+            new Step(name   : $"resume_all_operations"
+                    ,action : async (s) =>
+                    {
+                        foreach (var ve in Root.Instance.Node.GetEntitiesInDescendants<VirtualEntity>())
+                            if (ve.HasPendingOperation())
+                                await ve.ResumeOperation().Execute();
+                    });
+        
         public Step Resume() 
         => 
             new Step(name   : $"resume"
@@ -29,7 +39,7 @@ namespace Galleon.Checkout.Foundation
                             ||  textNode.RawText.ToLower().StartsWith("> origin") )
                                 continue;
                             
-                            var ve = new VirtualEntity(){TextNode = textNode};
+                            var ve = new VirtualEntity(textNode.RawText);
                             this.Node.AddChild(ve);
                         }
                         
@@ -39,7 +49,7 @@ namespace Galleon.Checkout.Foundation
 
                         foreach (var ve in ves)
                         {
-                            await ve.DoNextLiveStep();
+                            // await ve.DoNextLiveStep();
                         }
                     })
                     {

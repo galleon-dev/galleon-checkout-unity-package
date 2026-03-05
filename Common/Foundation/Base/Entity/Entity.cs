@@ -82,8 +82,7 @@ namespace Galleon.Checkout
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - ID
 
-        public EntityID ID => new EntityID(this.Entity);
-        
+        public        EntityID ID => new EntityID(this.Entity);
         public struct EntityID
         {
             private IEntity Entity; 
@@ -95,8 +94,11 @@ namespace Galleon.Checkout
                                                           .ToList()
                                                           .Select(p => p.Node.ID.SelfPathID)
                                                           );
-            public string StorageID   => PathID;
+            
+            public string StorageID   => Entity.Node.CustomStorageID?.Invoke() ?? PathID; 
         }
+        
+        public Func<string> CustomStorageID = null;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Tags
         
@@ -104,9 +106,11 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Info
         
-        public string DisplayName => Entity?.ToString()?
+        public string CustomDisplayName = null;
+        public string DisplayName => CustomDisplayName ?? 
+                                     Entity?.ToString()?
                                     .Replace($"{Entity?.GetType().Namespace ?? string.Empty}.", "") 
-                                  ?? "Null";
+                                    ?? "Null";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Breadcrumbs
 
@@ -205,6 +209,61 @@ namespace Galleon.Checkout
             
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Node Suger
+        
+        public T                    GetEntityInChildren            <T>()                => this.Children.OfType<T>().FirstOrDefault();
+        public T                    GetEntityInChildrenAndSelf     <T>()                => this.Entity is T self ? self : this.Children.OfType<T>().FirstOrDefault();
+        public T                    GetEntityInDescendants         <T>()                => this.Descendants().Skip(1).OfType<T>().FirstOrDefault();
+        public T                    GetEntityInDescendantsAndSelf  <T>()                => this.Descendants().OfType<T>().FirstOrDefault();
+
+        public IEntity              GetEntityInChildren            (Type type)          => this.Children.FirstOrDefault(c => type.IsInstanceOfType(c));
+        public IEntity              GetEntityInChildrenAndSelf     (Type type)          => type.IsInstanceOfType(this.Entity) ? this.Entity : this.Children.FirstOrDefault(c => type.IsInstanceOfType(c));
+        public IEntity              GetEntityInDescendants         (Type type)          => this.Descendants().Skip(1).FirstOrDefault(e => type.IsInstanceOfType(e));
+        public IEntity              GetEntityInDescendantsAndSelf  (Type type)          => this.Descendants().FirstOrDefault(e => type.IsInstanceOfType(e));
+
+        public IEnumerable<T>       GetEntitiesInChildren          <T>()                => this.Children.OfType<T>();
+        public IEnumerable<T>       GetEntitiesInChildrenAndSelf   <T>()                => (this.Entity is T self ? new[] { self } : Enumerable.Empty<T>()).Concat(this.Children.OfType<T>());
+        public IEnumerable<T>       GetEntitiesInDescendants       <T>()                => this.Descendants().Skip(1).OfType<T>();
+        public IEnumerable<T>       GetEntitiesInDescendantsAndSelf<T>()                => this.Descendants().OfType<T>();
+
+        public IEnumerable<IEntity> GetEntitiesInChildren          (Type type)          => this.Children.Where(c => type.IsInstanceOfType(c));
+        public IEnumerable<IEntity> GetEntitiesInChildrenAndSelf   (Type type)          => (type.IsInstanceOfType(this.Entity) ? new[] { this.Entity } : Enumerable.Empty<IEntity>()).Concat(this.Children.Where(c => type.IsInstanceOfType(c)));
+        public IEnumerable<IEntity> GetEntitiesInDescendants       (Type type)          => this.Descendants().Skip(1).Where(e => type.IsInstanceOfType(e));
+        public IEnumerable<IEntity> GetEntitiesInDescendantsAndSelf(Type type)          => this.Descendants().Where(e => type.IsInstanceOfType(e));
+
+        public T                    GetEntityInParent              <T>()                => this.Parent is T parent ? parent : default;
+        public T                    GetEntityInParentAndSelf       <T>()                => this.Entity is T self ? self : (this.Parent is T parent ? parent : default);
+        public T                    GetEntityInAncestors           <T>()                => this.Ancestors().Skip(1).OfType<T>().FirstOrDefault();
+        public T                    GetEntityInAncestorsAndSelf    <T>()                => this.Ancestors().OfType<T>().FirstOrDefault();
+
+        public IEntity              GetEntityInParent              (Type type)          => type.IsInstanceOfType(this.Parent) ? this.Parent : null;
+        public IEntity              GetEntityInParentAndSelf       (Type type)          => type.IsInstanceOfType(this.Entity) ? this.Entity : (type.IsInstanceOfType(this.Parent) ? this.Parent : null);
+        public IEntity              GetEntityInAncestors           (Type type)          => this.Ancestors().Skip(1).FirstOrDefault(e => type.IsInstanceOfType(e));
+        public IEntity              GetEntityInAncestorsAndSelf    (Type type)          => this.Ancestors().FirstOrDefault(e => type.IsInstanceOfType(e));
+
+        public IEnumerable<T>       GetEntitiesInParent            <T>()                => this.Parent is T parent ? new[] { parent } : Enumerable.Empty<T>();
+        public IEnumerable<T>       GetEntitiesInParentAndSelf     <T>()                => (this.Entity is T self ? new[] { self } : Enumerable.Empty<T>()).Concat(this.Parent is T parent ? new[] { parent } : Enumerable.Empty<T>());
+        public IEnumerable<T>       GetEntitiesInAncestors         <T>()                => this.Ancestors().Skip(1).OfType<T>();
+        public IEnumerable<T>       GetEntitiesInAncestorsAndSelf  <T>()                => this.Ancestors().OfType<T>();
+
+        public IEnumerable<IEntity> GetEntitiesInParent            (Type type)          => this.Parent != null && type.IsInstanceOfType(this.Parent) ? new[] { this.Parent } : Enumerable.Empty<IEntity>();
+        public IEnumerable<IEntity> GetEntitiesInParentAndSelf     (Type type)          => (type.IsInstanceOfType(this.Entity) ? new[] { this.Entity } : Enumerable.Empty<IEntity>()).Concat(this.Parent != null && type.IsInstanceOfType(this.Parent) ? new[] { this.Parent } : Enumerable.Empty<IEntity>());
+        public IEnumerable<IEntity> GetEntitiesInAncestors         (Type type)          => this.Ancestors().Skip(1).Where(e => type.IsInstanceOfType(e));
+        public IEnumerable<IEntity> GetEntitiesInAncestorsAndSelf  (Type type)          => this.Ancestors().Where(e => type.IsInstanceOfType(e));
+        
+        public bool                 ContainsChild                  (IEntity child)      => this.Children.Contains(child);
+        public bool                 ContainsDescendant             (IEntity entity)     => this.Descendants().Contains(entity);
+        public IEntity              GetChildAt                     (int index)          => (index < 0 || index >= this.Children.Count) ? null : this.Children[index];
+        public int                  GetChildCount                  ()                   => this.Children.Count;
+        public IEnumerable<IEntity> GetSiblings                    ()                   => this.Parent?.Node.Children.Where(c => c != this.Entity) ?? Enumerable.Empty<IEntity>();
+        public T                    GetSibling<T>                  ()                   => this.GetSiblings().OfType<T>().FirstOrDefault();
+        public IEnumerable<T>       GetSiblings<T>                 ()                   => this.GetSiblings().OfType<T>();
+        public int                  GetDepth                       ()                   => this.Ancestors().Count() - 1;
+        public bool                 IsAncestorOf                   (IEntity entity)     => entity.Node.Ancestors().Contains(this.Entity);
+        public bool                 IsDescendantOf                 (IEntity entity)     => this.Ancestors().Contains(entity);
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Initialization
         
         public void PopulatePredefinedChildren()
         {
@@ -227,6 +286,7 @@ namespace Galleon.Checkout
                     
                     if (value != null && value is IEntity e)
                     {
+                        e.Node.CustomDisplayName = member.Name;
                         this.AddChild(e);
                         
                         #if UNITY_EDITOR
@@ -248,32 +308,41 @@ namespace Galleon.Checkout
         
         private void PopulateSavedVirtualEntities()
         {
-            
-            try
-            {   
-                var savedVirtualEntities = this.SessionStorage.LoadList<string>("virtual_entities");
 
-                if (savedVirtualEntities == null || savedVirtualEntities.Count == 0)
+            try
+            {
+                var savedVirtualEntityIDs = this.SessionStorage.LoadList<string>("virtual_entities");
+
+                if (savedVirtualEntityIDs == null || savedVirtualEntityIDs.Count == 0)
                     return;
 
-                foreach (var veString in savedVirtualEntities)
+                foreach (var veID in savedVirtualEntityIDs)
                 {
                     try
                     {
-                        var virtualEntity = new VirtualEntity() { TextNode = new TextNode(veString) }; 
+                        // Load the virtual entity from general session storage using its ID
+                        var veString = Root.Instance.Context.SystemServices.SessionStorageService.Load<string>($"virtual_entity_{veID}");
+
+                        if (string.IsNullOrEmpty(veString))
+                        {
+                            Debug.LogWarning($"Failed to load virtual entity with ID: {veID}. No data found in session storage.");
+                            continue;
+                        }
+
+                        var virtualEntity = new VirtualEntity(veString);
                         this.AddChild(virtualEntity);
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogWarning($"Failed to load virtual entity from string: {veString}. Error: {ex.Message}");
+                        Debug.LogWarning($"Failed to load virtual entity with ID: {veID}. Error: {ex.Message}");
                     }
-                }    
+                }
             }
             catch (Exception ex)
             {
                 Debug.LogWarning($"Failed to load virtual entities from prefs storage: {ex.Message}");
             }
-            
+
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Quick Debug
@@ -334,14 +403,15 @@ namespace Galleon.Checkout
         {
             private IEntity Entity; public  EntityPrefsStorage(IEntity entity) => Entity = entity;
 
-            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public object       Load          (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public void         Remove        (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Remove        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.Store           ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Load<T>         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public object       Load          (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Load            ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.HasKey          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         Remove        (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.Remove          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.AddToList       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.PrefsStorageService.RemoveFromList  ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.PrefsStorageService.LoadList<T>     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public List<string> GetAllStoredKeys()                       => Root.Instance.Context.SystemServices.PrefsStorageService.GetAllStoredKeys(beginningWith:$"entity_storage_{Entity.Node.ID.StorageID}_");
         }
         
         
@@ -352,14 +422,15 @@ namespace Galleon.Checkout
         {
             private IEntity Entity; public  EntitySessionStorage(IEntity entity) => Entity = entity;
 
-            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public object       Load          (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public void         Remove        (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Remove        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
-            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
-            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         Store           (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.Store           ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public T            Load<T>         (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load<T>         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public object       Load            (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Load            ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public bool         HasKey          (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.HasKey          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         Remove          (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.Remove          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public void         AddToList       (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.AddToList       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public void         RemoveFromList  (string key, object value) => Root.Instance.Context.SystemServices.SessionStorageService.RemoveFromList  ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value );
+            public List<T>      LoadList<T>     (string key)               => Root.Instance.Context.SystemServices.SessionStorageService.LoadList<T>     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"        );
+            public List<string> GetAllStoredKeys()                         => Root.Instance.Context.SystemServices.SessionStorageService.GetAllStoredKeys(beginningWith:$"entity_storage_{Entity.Node.ID.StorageID}_");
         }
         
 
@@ -370,14 +441,15 @@ namespace Galleon.Checkout
         {
             private IEntity Entity; public  EntityDiskStorage(IEntity entity) => Entity = entity;
 
-            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.Store         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
-            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Load<T>       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
-            public object       Load          (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Load          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
-            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.HasKey        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
-            public void         Remove        (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Remove        ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
-            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.AddToList     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
-            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.RemoveFromList($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
-            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.LoadList<T>   ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public void         Store         (string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.Store           ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
+            public T            Load<T>       (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Load<T>         ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public object       Load          (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Load            ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public bool         HasKey        (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.HasKey          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public void         Remove        (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.Remove          ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public void         AddToList     (string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.AddToList       ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
+            public void         RemoveFromList(string key, object value) => Root.Instance.Context.SystemServices.DiskStorageService.RemoveFromList  ($"entity_storage_{Entity.Node.ID.StorageID}_{key}", value  );
+            public List<T>      LoadList<T>   (string key)               => Root.Instance.Context.SystemServices.DiskStorageService.LoadList<T>     ($"entity_storage_{Entity.Node.ID.StorageID}_{key}"         );
+            public List<string> GetAllStoredKeys()                       => Root.Instance.Context.SystemServices.DiskStorageService.GetAllStoredKeys(beginningWith:$"entity_storage_{Entity.Node.ID.StorageID}_");
         }
         
         
@@ -506,13 +578,14 @@ namespace Galleon.Checkout
         {
             public EntityInspector(IEntity target) : base(target)
             {
-                // Main
+                //////////////////////////////////////////////////////////// Main
                 Foldout foldout = new Foldout() { text = $"{target.Node.DisplayName} entity" , value = true}; this.Add(foldout);
                 //foldout.Add(new Label(" "));
                 //foldout.Add(new Label(" "));
                 foldout.contentContainer.style.backgroundColor = new Color(0.3f,0.3f,0.3f);
                 
-                // Breadcrumbs
+                //////////////////////////////////////////////////////////// Breadcrumbs
+                
                 var breadcrumbsFoldout = new Foldout() { text = "Breadcrumbs", value = false }; foldout.Add(breadcrumbsFoldout);
                 breadcrumbsFoldout?.Clear();
                 foreach (var breadcrumb in Target.Node.Breadcrumbs)
@@ -521,7 +594,90 @@ namespace Galleon.Checkout
                     breadcrumbsFoldout.Add(breadcrumbInspector);
                 }
                 
-                // Steps
+                //////////////////////////////////////////////////////////// Session Storage
+                
+                var sessionStorageFoldout = new Foldout() { text = "Session Storage", value = false }; foldout.Add(sessionStorageFoldout);
+                sessionStorageFoldout.RegisterValueChangedCallback(evt =>
+                {
+                    if (evt.previousValue == false && evt.newValue == true)
+                    {
+                        RefreshSessionStorage();
+                    }
+                });
+                                
+                
+                RefreshSessionStorage();
+                void RefreshSessionStorage()
+                {
+                    sessionStorageFoldout.Clear();
+
+                    // Add Dump Storage button
+                    Button dumpButton = new Button(() =>
+                    {
+                        var keys = Target.Node.SessionStorage.GetAllStoredKeys();
+                        foreach (var key in keys)
+                            Debug.Log($"  {key}: {Target.Node.SessionStorage.Load(key)}");
+                    });
+                    dumpButton.text = "Dump Storage";
+                    sessionStorageFoldout.Add(dumpButton);
+
+                    // Add Clear Storage button
+                    Button clearButton = new Button(() =>
+                    {
+                        var keys = Target.Node.SessionStorage.GetAllStoredKeys();
+                        foreach (var key in keys)
+                            Target.Node.SessionStorage.Remove(key);
+                        Debug.Log($"Cleared {keys.Count} session storage keys for {Target}");
+                        RefreshSessionStorage();
+                    });
+                    clearButton.text = "Clear Storage";
+                    sessionStorageFoldout.Add(clearButton);
+
+                    ////////
+    
+                    var keys = Target.Node.SessionStorage.GetAllStoredKeys();
+                    Debug.Log($"Session  ({Target}) keys: {string.Join(", ", keys)}");
+                    foreach (var key in keys)
+                    {
+                        var value = Target.Node.SessionStorage.Load(key);
+                        sessionStorageFoldout.Add(new Label($"{key}: {value}"));
+                    }
+                }
+
+                //////////////////////////////////////////////////////////// Virtual Entities
+                
+                var virtualEntitiesFoldout = new Foldout() { text = "Virtual Entities", value = false }; foldout.Add(virtualEntitiesFoldout);
+                virtualEntitiesFoldout.RegisterValueChangedCallback(evt =>
+                {
+                    if (evt.previousValue == false && evt.newValue == true)
+                    {
+                        RefreshVirtualEntities();
+                    }
+                });
+
+                RefreshVirtualEntities();
+                void RefreshVirtualEntities()
+                {
+                    virtualEntitiesFoldout.Clear();
+                    var virtualEntityIDs = Target.Node.SessionStorage.LoadList<string>("virtual_entities");
+
+                    if (virtualEntityIDs == null || virtualEntityIDs.Count == 0)
+                    {
+                        virtualEntitiesFoldout.Add(new Label("No virtual entities"));
+                        return;
+                    }
+
+                    Debug.Log($"Virtual Entities ({Target}) count: {virtualEntityIDs.Count}");
+                    foreach (var veID in virtualEntityIDs)
+                    {
+                        var veString = Root.Instance.Context.SystemServices.SessionStorageService.Load<string>($"virtual_entity_{veID}");
+                        virtualEntitiesFoldout.Add(new Label($"ID: {veID}"));
+                        virtualEntitiesFoldout.Add(new Label($"  Data: {(string.IsNullOrEmpty(veString) ? "(empty)" : veString.Substring(0, System.Math.Min(50, veString.Length)) + "...")}"));
+                    }
+                }
+                
+
+                //////////////////////////////////////////////////////////// Steps
                 #region STEPS
                 
                 // get all methods that return void and have no params
@@ -632,18 +788,42 @@ namespace Galleon.Checkout
             
             ////////////////////////////////////////////////////////////////////// VirtualEntities
             
+            public void AddVirtualEntity(string text)
+            {
+                // create node
+                var textNode = new TextNode(text);
+                var ve       = new VirtualEntity(textNode.RawText);
+                
+                // add node
+                this.AddVirtualEntity(ve);
+            }
             public void AddVirtualEntity(VirtualEntity ve)
             {
                 this.Entity.Node.AddChild(ve);
-                Entity.Node.SessionStorage.AddToList("virtual_entities", ve.TextNode.ToTreeString());
+
+                // Get or create the unique storage ID for this virtual entity
+                var veID = ve.GetStorageID();
+
+                // Store the virtual entity itself in general session storage
+                ve.StoreState();
+
+                // Store only the ID in the parent's virtual entities list
+                Entity.Node.SessionStorage.AddToList("virtual_entities", veID);
+                Debug.Log($"Added VE {veID} to {Entity.Node.ID.PathID} ");
+                
             }
             public void RemoveVirtualEntity(VirtualEntity ve)
             {
-                // TBD
-                return;
-                
+                var veID = ve.GetStorageID();
+
+                // Remove from parent's children
                 this.Entity.Node.RemoveChild(ve);
-                Entity.Node.SessionStorage.RemoveFromList("virtual_entities", ve);
+
+                // Remove the ID from the parent's list
+                Entity.Node.SessionStorage.RemoveFromList("virtual_entities", veID);
+
+                // Remove the virtual entity from general session storage
+                Root.Instance.Context.SystemServices.SessionStorageService.Remove($"virtual_entity_{veID}");
             }
             
             ////////////////////////////////////////////////////////////////////// PrintME

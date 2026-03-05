@@ -17,6 +17,10 @@ namespace Galleon.Checkout
         private static Root _instance;
         public  static Root Instance => _instance;
 
+        ////////////////////////////////////////////////////// Static
+        
+        public static Home Home => Instance.Context.Home;
+        
         ////////////////////////////////////////////////////// Members
         
         public Context  Context  = new Context();
