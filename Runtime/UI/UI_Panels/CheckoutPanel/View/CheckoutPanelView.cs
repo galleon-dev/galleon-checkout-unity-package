@@ -358,9 +358,6 @@ namespace Galleon.Checkout.UI
                     TaxText.text = $"{currencySign}{TaxesAmount.ToString(CultureInfo.InvariantCulture)}";
                     
                     TaxesAndFeesRow.gameObject.SetActive(false);
-                    
-                    if (taxes.Count == 0)
-                        TotalPriceText.text = PriceText.text;
                 }
                 else
                 {
@@ -377,6 +374,9 @@ namespace Galleon.Checkout.UI
                 }
                 
                 TotalPriceText.text = $"{currencySign}{(SubTotal + (float)TaxesAmount).ToString(CultureInfo.InvariantCulture)}";
+                
+                if (taxes.Count == 0)
+                    TotalPriceText.text = PriceText.text;
             }
         }
 
