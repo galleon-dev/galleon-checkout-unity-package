@@ -199,10 +199,13 @@ namespace Galleon.Checkout.UI
 
         public void OnConfirmPurchaseClick()
         {
-            var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault(x => x.IsSelected);
+            var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
 
             if (selectedPaymentMethod == null)
+            {
+                Debug.LogError("No Payment Method Selected - this should never happen");
                 return; // (Should never happen)
+            }
             else if (selectedPaymentMethod.Type == "empty_card")
                 Result = ViewResult.AddCard;
             else if (selectedPaymentMethod.Type == "empty_paypal")
