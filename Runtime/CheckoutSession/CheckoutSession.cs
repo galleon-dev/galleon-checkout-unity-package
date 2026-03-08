@@ -204,6 +204,16 @@ namespace Galleon.Checkout
                             this.Taxes.Add(t.Key, new TaxItem() { inclusive = t.Value.inclusive, tax_amount = t.Value.tax_amount });
                         }
 
+                        // Analytics: Checkout Window Opened
+                        var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
+                        CheckoutAPI.InvokeAnalyticsEvent("checkout_window_opened", new Dictionary<string, object>
+                        {
+                            { "checkout_session_id",          CHECKOUT.Session?.SessionID                 ?? ""     },
+                            { "purchase_amount",              CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m     },
+                            { "currency",                     CHECKOUT.Session?.SelectedProduct?.Currency ?? ""     },
+                            { "payment_method_highlighted",   selectedPaymentMethod?.Type                 ?? "none" },
+                        });
+                
                     });
         
         public Step CancelSession() 
