@@ -155,7 +155,10 @@ namespace Galleon.Checkout
             child.Node.SetParent(this.Entity);
             
             if (child.Node.didSetup == false)
+            {
                 child.Node.Setup();
+                child.Node.LateSetup();
+            }
         }
         
         public void RemoveChild(IEntity child)
@@ -308,15 +311,17 @@ namespace Galleon.Checkout
         
         private void PopulateSavedVirtualEntities()
         {
-
             try
             {
+                if (!this.SessionStorage.HasKey("virtual_entities"))
+                    return;
+                
                 var savedVirtualEntityIDs = this.SessionStorage.LoadList<string>("virtual_entities");
 
                 if (savedVirtualEntityIDs == null || savedVirtualEntityIDs.Count == 0)
                     return;
 
-                foreach (var veID in savedVirtualEntityIDs)
+                foreach (var veID in savedVirtualEntityIDs) 
                 {
                     try
                     {
@@ -616,7 +621,15 @@ namespace Galleon.Checkout
                     {
                         var keys = Target.Node.SessionStorage.GetAllStoredKeys();
                         foreach (var key in keys)
-                            Debug.Log($"  {key}: {Target.Node.SessionStorage.Load(key)}");
+                        {
+                            object value;
+                            if (key.StartsWith(SessionStorageService.KEY_PREFIX))
+                                value = Root.Instance.Context.SystemServices.SessionStorageService.Load(key);
+                            else
+                                value = Target.Node.SessionStorage.Load(key);
+                            
+                            Debug.Log($"  {key}: {value ?? "null"}");
+                        }
                     });
                     dumpButton.text = "Dump Storage";
                     sessionStorageFoldout.Add(dumpButton);
@@ -636,7 +649,6 @@ namespace Galleon.Checkout
                     ////////
     
                     var keys = Target.Node.SessionStorage.GetAllStoredKeys();
-                    Debug.Log($"Session  ({Target}) keys: {string.Join(", ", keys)}");
                     foreach (var key in keys)
                     {
                         var value = Target.Node.SessionStorage.Load(key);
@@ -667,7 +679,6 @@ namespace Galleon.Checkout
                         return;
                     }
 
-                    Debug.Log($"Virtual Entities ({Target}) count: {virtualEntityIDs.Count}");
                     foreach (var veID in virtualEntityIDs)
                     {
                         var veString = Root.Instance.Context.SystemServices.SessionStorageService.Load<string>($"virtual_entity_{veID}");
@@ -805,7 +816,7 @@ namespace Galleon.Checkout
                 var veID = ve.GetStorageID();
 
                 // Store the virtual entity itself in general session storage
-                ve.StoreState();
+                // ve.StoreState(); - this is now done in virtual entity CTOR
 
                 // Store only the ID in the parent's virtual entities list
                 Entity.Node.SessionStorage.AddToList("virtual_entities", veID);

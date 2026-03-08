@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -129,7 +130,7 @@ namespace Galleon.Checkout.Foundation
                 var result = JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
 
                 if (beginningWith != null)
-                    return result.FindAll(key => key.StartsWith(beginningWith));
+                    return result.Where(key => key.StartsWith( beginningWith)).ToList();
 
                 return result;
             }

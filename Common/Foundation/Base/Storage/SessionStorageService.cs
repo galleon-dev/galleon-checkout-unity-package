@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,7 +13,7 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
 
-        public  const string KEY_PREFIX     = "session_state_";
+        public  const string KEY_PREFIX     = "SESSION_STATE_";
         private const string SAVED_KEYS_KEY = "session_state_saved_keys";
 
         private static Dictionary<string, string> _inMemoryStorage = new Dictionary<string, string>();
@@ -62,8 +63,13 @@ namespace Galleon.Checkout
         {
             #if UNITY_EDITOR
 
-            string fullKey = $"{KEY_PREFIX}{key}";
-            string json    = UnityEditor.SessionState.GetString(fullKey, string.Empty);
+            string fullKey;
+            if (key.StartsWith(KEY_PREFIX))
+                fullKey = key;
+            else
+                fullKey = $"{KEY_PREFIX}{key}";
+
+            string json = UnityEditor.SessionState.GetString(fullKey, string.Empty); 
 
             if (!string.IsNullOrEmpty(json))
             {
@@ -122,9 +128,9 @@ namespace Galleon.Checkout
             {
                 var result = JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
                 
-                if (beginningWith != null)
-                    return result.FindAll(key => key.StartsWith(beginningWith));
-                
+                if (beginningWith != null) 
+                    result = result.Where(key => key.StartsWith(KEY_PREFIX+beginningWith)).ToList();  
+
                 return result;
             }
 

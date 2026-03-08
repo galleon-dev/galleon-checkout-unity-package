@@ -114,7 +114,7 @@ namespace Galleon.Checkout.Foundation
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Operation
-        
+
         public Step ExecuteOperation() 
         =>
             new Step(name   : $"execute_operation"
@@ -123,9 +123,9 @@ namespace Galleon.Checkout.Foundation
                         this.TextNode.RawText += "#pending";
                         StoreState();
                     });
-        
+
         public bool HasPendingOperation() => this.Tags.Contains("pending");
-        
+
         public Step ResumeOperation() 
         =>
             new Step(name   : $"resume_operation"
@@ -138,6 +138,16 @@ namespace Galleon.Checkout.Foundation
                         
                         var state = this.TextNode.RawText.Contains($"pending") ? "pending" : "not-pending";
                         Debug.Log($"Resumed operation for {this.TextNode.Line} with state of {state}");
+                    });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Debug actions
+        
+        public Step DeleteVirtualEntity() 
+        =>
+            new Step(name   : $"delete_virtual_entity"
+                    ,action : async (s) =>
+                    {
+                        this.Node.Parent.Node.Live.RemoveVirtualEntity(this);
                     });
     }
 }
