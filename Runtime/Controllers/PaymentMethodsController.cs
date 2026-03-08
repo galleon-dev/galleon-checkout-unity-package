@@ -425,6 +425,15 @@ namespace Galleon.Checkout
             {
                 result.Remove(NativeStoreUserPaymentMethod);
             }
+
+            foreach (var userPaymentMethod in result)
+            {
+                if (userPaymentMethod.Type == "native")
+                    userPaymentMethod.LastSuccessfulUseTime = DateTime.MinValue;
+                
+                if (userPaymentMethod.Type == "empty_card")
+                    userPaymentMethod.LastSuccessfulUseTime = DateTime.MaxValue;
+            }
             
             result = result.OrderByDescending(x => x.LastSuccessfulUseTime).ToList();
             
@@ -458,16 +467,17 @@ namespace Galleon.Checkout
         {
             var result = new UserPaymentMethod()
             {
-                Data               = new ()
-                                   {
-                                      type = "empty_card"
-                                   },
-                DisplayName        = "Add Credit Card",
-                IsNewPaymentMethod = false,
-                IsSelected         = false,
-                SortOrder          = float.PositiveInfinity, 
-                Type               = "empty_card",
-                ButtonText         = "Add Card"
+                Data                  = new ()
+                                      {
+                                         type = "empty_card"
+                                      },
+                DisplayName           = "Add Credit Card",
+                IsNewPaymentMethod    = false,
+                IsSelected            = false,
+                SortOrder             = float.PositiveInfinity, 
+                Type                  = "empty_card",
+                ButtonText            = "Add Card",
+                LastSuccessfulUseTime = DateTime.MaxValue,
             };
             
             return result;
