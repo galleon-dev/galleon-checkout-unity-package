@@ -116,5 +116,45 @@ namespace Galleon.Checkout
                 PlayerPrefs.SetString(SAVED_KEYS_KEY, json);
             }
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Debug
+        
+        public Step DumpStorageToLog()
+        =>
+            new Step(name   : "dump_storage_to_log"
+                    ,action : async s =>
+                    {
+                        List<string> savedKeys = GetSavedKeys();
+
+                        s.Log($"Storage: Dumping {savedKeys.Count} saved keys");
+
+                        foreach (string key in savedKeys)
+                        {
+                            if (PlayerPrefs.HasKey(key))
+                            {
+                                string value = PlayerPrefs.GetString(key);
+                                s.Log($"Storage: {key} = {value}");
+                            }
+                            else
+                            {
+                                s.Log($"Storage: {key} = [KEY NOT FOUND]");
+                            }
+                        }
+                    });
+
+        public Step ClearStorage()
+        =>
+            new Step(name   : "clear_storage"
+                    ,action : async s =>
+                    {
+                        List<string> savedKeys = GetSavedKeys();
+
+                        s.Log($"Storage: Clearing {savedKeys.Count} saved keys");
+
+                        ClearAll();
+
+                        s.Log("Storage: All data cleared");
+                    });
+                
     }
 }

@@ -27,9 +27,9 @@ namespace Galleon.Checkout
                         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public UserPaymentMethod                    NativeStoreUserPaymentMethod => UserPaymentMethods     .FirstOrDefault(x => x.Type == "native");
-        public UserPaymentMethod                    AppUserPaymentMethod         => UserPaymentMethods     .FirstOrDefault(x => x.Type == "app");
-        public UserPaymentMethod                    EmptyCreditCardPaymentMethod => EmptyUserPaymentMethods.FirstOrDefault(x => x.Type == "card");
+        public UserPaymentMethod                    NativeStoreUserPaymentMethod      => UserPaymentMethods     .FirstOrDefault(x => x.Type == "native");
+        public UserPaymentMethod                    AppUserPaymentMethod              => UserPaymentMethods     .FirstOrDefault(x => x.Type == "app");
+        public UserPaymentMethod                    EmptyCreditCardPaymentMethod      => EmptyUserPaymentMethods.FirstOrDefault(x => x.Type == "card");
         
         
         
@@ -364,16 +364,17 @@ namespace Galleon.Checkout
                             #endif
                             this.UserPaymentMethods.Add(new UserPaymentMethod()
                                                         {
-                                                            Data               = new()
-                                                                               {
-                                                                                  type = "native"
-                                                                               },
-                                                            DisplayName        = nativeDisplayName,
-                                                            IsNewPaymentMethod = false,
-                                                            IsSelected         = false,
-                                                            SortOrder          = float.PositiveInfinity,
-                                                            Type               = "native",
-                                                            ButtonText         = "Continue with google play"
+                                                            Data                  = new()
+                                                                                  {
+                                                                                      type = "native"
+                                                                                  },
+                                                            DisplayName           = nativeDisplayName,
+                                                            IsNewPaymentMethod    = false,
+                                                            IsSelected            = false,
+                                                            SortOrder             = float.PositiveInfinity,
+                                                            Type                  = "native",
+                                                            ButtonText            = "Continue with google play",
+                                                            LastSuccessfulUseTime = DateTime.MinValue
                                                         });
                         }
                         
@@ -402,6 +403,11 @@ namespace Galleon.Checkout
         
         public List<UserPaymentMethod> GetUserPaymentMethodsToDisplay()
         {
+            if (UserPaymentMethods.All(pm => pm.Type != "credit_card"))
+            {
+                var emptyCard = CreateEmptyCreditCardUserPaymentMethod();
+                UserPaymentMethods.Add(emptyCard);
+            }
             var result = UserPaymentMethods.GroupBy(x => x.Type).Select(x => x.First())
               //.Concat(SpecialUserPaymentMethods)
                 .Concat(EmptyUserPaymentMethods)
@@ -410,6 +416,7 @@ namespace Galleon.Checkout
                 .Take(MAX_LAST_USED_PAYMENT_METHODS -1)
                 .OrderBy(x => x.SortOrder)
                 .ToList();
+            
 
             if (result.Count >= MAX_LAST_USED_PAYMENT_METHODS
             || !CHECKOUT.Globals.IsNativeStoreEnabled
@@ -418,6 +425,9 @@ namespace Galleon.Checkout
             {
                 result.Remove(NativeStoreUserPaymentMethod);
             }
+            
+            result = result.OrderByDescending(x => x.LastSuccessfulUseTime).ToList();
+            
 
             return result;
         }
@@ -443,6 +453,25 @@ namespace Galleon.Checkout
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
+        
+        public UserPaymentMethod CreateEmptyCreditCardUserPaymentMethod()
+        {
+            var result = new UserPaymentMethod()
+            {
+                Data               = new ()
+                                   {
+                                      type = "empty_card"
+                                   },
+                DisplayName        = "Add Credit Card",
+                IsNewPaymentMethod = false,
+                IsSelected         = false,
+                SortOrder          = float.PositiveInfinity, 
+                Type               = "empty_card",
+                ButtonText         = "Add Card"
+            };
+            
+            return result;
+        }
         
         public List<UserPaymentMethod> GetLastUsedUserPaymentMethods()
         {
