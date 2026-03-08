@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -138,23 +139,23 @@ namespace Galleon.Checkout
             if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count != 0)
                 CHECKOUT.PaymentMethods.UserPaymentMethods.First().Select();
             
-            if (UserPaymentMethodsToDisplay.Count < MAX_LAST_USED_PAYMENT_METHODS
-            &&  UserPaymentMethods.All(x => x.Type != "empty_card"))
-            {
-                this.UserPaymentMethods.Add(new UserPaymentMethod()
-                                            {
-                                                Data               = new ()
-                                                                   {
-                                                                      type = "empty_card"
-                                                                   },
-                                                DisplayName        = "Add Credit Card",
-                                                IsNewPaymentMethod = false,
-                                                IsSelected         = false,
-                                                SortOrder          = float.PositiveInfinity, 
-                                                Type               = "empty_card",
-                                                ButtonText         = "Add Card"
-                                            });
-            }
+            // if (UserPaymentMethodsToDisplay.Count < MAX_LAST_USED_PAYMENT_METHODS
+            // &&  UserPaymentMethods.All(x => x.Type != "empty_card"))
+            // {
+            //     this.UserPaymentMethods.Add(new UserPaymentMethod()
+            //                                 {
+            //                                     Data               = new ()
+            //                                                        {
+            //                                                           type = "empty_card"
+            //                                                        },
+            //                                     DisplayName        = "Add Credit Card",
+            //                                     IsNewPaymentMethod = false,
+            //                                     IsSelected         = false,
+            //                                     SortOrder          = float.PositiveInfinity, 
+            //                                     Type               = "empty_card",
+            //                                     ButtonText         = "Add Card"
+            //                                 });
+            // }
             
         }
         
@@ -164,6 +165,12 @@ namespace Galleon.Checkout
         {
             CHECKOUT.Storage.Write(key   : $"saved_payment_methods_{CHECKOUT.User.AppUserID}"
                                   ,value : LastUsedUserPaymentMethodIDs.Where(x => !x.StartsWith("local_pm_id")));
+
+            foreach (var upm in UserPaymentMethods.Where(x => !x.ID.StartsWith("local_pm_id")))
+            {
+                upm.SaveData();
+            }
+            
         }
         
         public async Task Load()
@@ -172,6 +179,12 @@ namespace Galleon.Checkout
 
             var saved = CHECKOUT.Storage.Read<List<string>>(key : $"saved_payment_methods_{CHECKOUT.User.AppUserID}");
             this.LastUsedUserPaymentMethodIDs.AddRange(saved.Where(x => !x.StartsWith("local_pm_id")));
+            
+            foreach (var upm in UserPaymentMethods.Where(x => !x.ID.StartsWith("local_pm_id")))
+            {
+                upm.LoadData();
+            }
+            
         }
         
         public async Task ClearSavedData()
@@ -187,6 +200,8 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         var usedPaymentMethod = this.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
+                        
+                        usedPaymentMethod.LastSuccessfulUseTime = DateTime.Now;
                         
                         this.LastUsedUserPaymentMethodIDs.Add(usedPaymentMethod.Data.id);
             

@@ -72,6 +72,7 @@ namespace Galleon.Checkout
                         /////////////////////////////////////// Pre Steps
                          
                         // Open Screen
+                        s.AddPreStep(InitializeSession());
                         s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
                         s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
                         s.AddPreStep(StartSession());
@@ -152,6 +153,14 @@ namespace Galleon.Checkout
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Session Steps
+        
+        public Step InitializeSession() 
+        =>
+            new Step(name   : $"initialize_session"
+                    ,action : async (s) =>
+                    {
+                        await CHECKOUT.PaymentMethods.Load();
+                    });
         
         public Step StartSession()
         =>

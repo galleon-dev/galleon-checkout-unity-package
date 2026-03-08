@@ -201,9 +201,9 @@ namespace Galleon.Checkout.UI
             _dropdownPaymentMethodIds.Clear();
 
             // Definitions
-            var myType      = this.PaymentMethod.Type;
-            var otherUpms   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Type == myType).Except(new []{this.PaymentMethod}).ToList();
-            var upms        = (new List<UserPaymentMethod>() { this.PaymentMethod }).Concat(otherUpms).ToList( );
+            var myType       = this.PaymentMethod.Type;
+            var OfSameType   = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.Type == myType).Except(new [] {this.PaymentMethod} ).ToList();
+            var upms         = (new List<UserPaymentMethod>() { this.PaymentMethod }).Concat(OfSameType).OrderByDescending(x => x.LastSuccessfulUseTime).ToList( );
 
             // Add options (display name visually, but track ID internally)
             foreach (var pm in upms)

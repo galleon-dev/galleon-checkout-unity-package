@@ -103,7 +103,7 @@ namespace Galleon.Checkout.UI
             List<string> addedPmTypes = new();
             
             // Add children
-            var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay;
+            var paymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.OrderByDescending(x => x.LastSuccessfulUseTime);
             foreach (var paymentMethod in paymentMethods)
             {
                 if (addedPmTypes.Contains(paymentMethod.Data.type))

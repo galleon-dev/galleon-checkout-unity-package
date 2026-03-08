@@ -11,14 +11,6 @@ namespace Galleon.Checkout
 {
     public class UserPaymentMethod : Entity
     {
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
-                
-        public class BonusData
-        {
-            public string displayText;
-            public string reward_type;
-        }
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public UserPaymentMethodData Data = new();
@@ -39,8 +31,10 @@ namespace Galleon.Checkout
         public bool                  IsNewPaymentMethod      = false;
         public bool                  ShouldSavePaymentMethod = false;
         
-        public string                ButtonText = null;
+        public string                ButtonText              = null;
 
+        public DateTime              LastSuccessfulUseTime   = DateTime.MinValue;
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Actions
         
         public void Select()
@@ -122,6 +116,36 @@ namespace Galleon.Checkout
             return data;
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Storage
+        
+        public struct StorageData
+        {
+            public string   id;
+            public string   type;
+            public DateTime lastSuccessfulUseTime;
+        }
+        
+        public void SaveData()
+        {
+            StorageData data = new()
+            {
+                id                    = this.ID,
+                type                  = this.Type,
+                lastSuccessfulUseTime = this.LastSuccessfulUseTime
+            };
+            
+            string json = JsonConvert.SerializeObject(data);
+            CHECKOUT.Storage.Write(this.ID, json);
+        }
+        
+        public void LoadData()
+        {
+            string json = CHECKOUT.Storage.Read<string>(this.ID);
+            if (string.IsNullOrEmpty(json)) return;
+            
+            StorageData data = JsonConvert.DeserializeObject<StorageData>(json);
+            this.LastSuccessfulUseTime = data.lastSuccessfulUseTime;
+        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Helper Methods
         
