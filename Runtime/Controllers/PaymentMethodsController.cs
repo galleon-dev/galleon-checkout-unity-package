@@ -246,7 +246,11 @@ namespace Galleon.Checkout
                         {
                             if (data.type.ToLower().Contains("google_pay") && !IsGooglePayAvailableOnDevice)
                                 continue;
-                            
+
+                            // Apply whitelist/blacklist filtering
+                            if (!ShouldIncludePaymentMethodType(data.type))
+                                continue;
+
                             this.PaymentMethodsDefinitions.Add(new PayPalPaymentMethodDefinition()
                                                            {
                                                                InitializationSteps = {},
@@ -293,6 +297,10 @@ namespace Galleon.Checkout
                         
                         foreach (var data in dataList)
                         {
+                            // Apply whitelist/blacklist filtering
+                            if (!ShouldIncludePaymentMethodType(data.type))
+                                continue;
+
                             if (data.type == "credit_card")
                             {
                                 this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
@@ -457,12 +465,36 @@ namespace Galleon.Checkout
             {
                 result.Remove(NativeStoreUserPaymentMethod);
             }
+            
             return result;
         }
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
-        
+
+        private bool ShouldIncludePaymentMethodType(string type)
+        {   
+            var config = CHECKOUT.Session.PurchaseConfiguration;
+
+            if (config == null || string.IsNullOrEmpty(type))
+                return true;
+
+            // If AllowedPaymentMethodTypes is set, only include types in the whitelist
+            if (config.AllowedPaymentMethodTypes != null && config.AllowedPaymentMethodTypes.Count > 0)
+            {
+                return config.AllowedPaymentMethodTypes.Contains(type);
+            }
+
+            // If ExcludedPaymentMethodTypes is set, exclude types in the blacklist
+            if (config.ExcludedPaymentMethodTypes != null && config.ExcludedPaymentMethodTypes.Count > 0)
+            {
+                return !config.ExcludedPaymentMethodTypes.Contains(type);
+            }
+
+            // If neither is set, include all types
+            return true;
+        }
+
         public UserPaymentMethod CreateEmptyCreditCardUserPaymentMethod()
         {
             var result = new UserPaymentMethod()

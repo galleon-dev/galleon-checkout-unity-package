@@ -22,28 +22,27 @@ namespace Galleon.Checkout
             return new InitializationResult() { IsSuccess = true };
         }
         
-        public static async Task<PurchaseResult> Purchase(CheckoutProduct            product
-                                                         ,Dictionary<string, string> metadata      = null
-                                                         ,List<BonusItem>            bonusData     = null
-                                                         ,Dictionary<string, object> config        = null)
+        public static async Task<PurchaseResult> Purchase(CheckoutProduct               product
+                                                         ,CheckoutPurchaseConfiguration configuration)
         {
             // Safty
-            if (metadata  == null) metadata  = new Dictionary<string, string>();
-            if (bonusData == null) bonusData = new List<BonusItem>();
+            if (configuration.Metadata  == null) configuration.Metadata  = new Dictionary<string, string>();
+            if (configuration.BonusData == null) configuration.BonusData = new List<BonusItem>();
             
             // apply config
-            if (config != null)
+            if (configuration.Config != null)
             {
-                foreach (var kvp in config)
+                foreach (var kvp in configuration.Config)
                     CHECKOUT.Config.SetValue(kvp.Key, kvp.Value);
             }
             
             // Create and setup session
             await CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
             
-            CheckoutClient.Instance.CurrentSession.Metadata              = metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            CheckoutClient.Instance.CurrentSession.BonusData             = bonusData;
-            CheckoutClient.Instance.CurrentSession.PurchaseConfiguration = config;
+            CheckoutClient.Instance.CurrentSession.PurchaseConfiguration = configuration;
+            
+            CheckoutClient.Instance.CurrentSession.Metadata              = configuration.Metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            CheckoutClient.Instance.CurrentSession.BonusData             = configuration.BonusData;
             
             // Run Session
             await  CheckoutClient.Instance.RunCheckoutSession().Execute();
@@ -90,6 +89,16 @@ namespace Galleon.Checkout
         {
             return $"CheckoutConfiguration: JWT={JWT}, Country={Country}, Currency={Currency}, AppUserID={AppUserID}, ApplicationDisplayName={ApplicationDisplayName}, UIPanelOrientation={UIPanelOrientation}, Config={Config}, DeepLinkName={DeepLinkName}";
         }
+    }
+    
+    [Serializable]
+    public class CheckoutPurchaseConfiguration
+    {
+        public Dictionary<string, string> Metadata                    = null;
+        public List<BonusItem>            BonusData                   = null;
+        public Dictionary<string, object> Config                      = null;
+        public List<string>               AllowedPaymentMethodTypes   = null;
+        public List<string>               ExcludedPaymentMethodTypes  = null;
     }
     
     public enum CheckoutOrientation

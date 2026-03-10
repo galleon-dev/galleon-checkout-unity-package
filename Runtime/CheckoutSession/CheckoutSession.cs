@@ -40,7 +40,7 @@ namespace Galleon.Checkout
         public Step                               OnSessionFinishedStep;
         
         // Config
-        public Dictionary<string, object>         PurchaseConfiguration             = new();
+        public CheckoutPurchaseConfiguration      PurchaseConfiguration = null;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
