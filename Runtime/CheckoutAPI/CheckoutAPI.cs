@@ -85,6 +85,11 @@ namespace Galleon.Checkout
         public CheckoutOrientation        UIPanelOrientation        = CheckoutOrientation.Auto;
         public Dictionary<string, object> Config                    = new();
         public string                     DeepLinkName              = "checkout";
+
+        public override string ToString()
+        {
+            return $"CheckoutConfiguration: JWT={JWT}, Country={Country}, Currency={Currency}, AppUserID={AppUserID}, ApplicationDisplayName={ApplicationDisplayName}, UIPanelOrientation={UIPanelOrientation}, Config={Config}, DeepLinkName={DeepLinkName}";
+        }
     }
     
     public enum CheckoutOrientation
