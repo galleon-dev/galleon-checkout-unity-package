@@ -314,12 +314,23 @@ namespace Galleon.Checkout
                                           SendSuccessAnalytics();
                                           
                                           CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
-                                                                                                    {
-                                                                                                        charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
-                                                                                                        errors      = null,
-                                                                                                        is_canceled = false,
-                                                                                                        is_success  = true,
-                                                                                                    };
+                                                                                                  {
+                                                                                                      charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
+                                                                                                      errors      = null,
+                                                                                                      is_canceled = false,
+                                                                                                      is_success  = true,
+                                                                                                  };
+                                      }
+                                      else if (status != null && status == "canceled")
+                                      {
+                                          CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+                                                                                                  {
+                                                                                                      charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
+                                                                                                      errors      = null,
+                                                                                                      is_canceled = true,
+                                                                                                      is_success  = false,
+                                                                                                  };
+                                          
                                       }
                                       else if (attemptNumber < maxAttempts)
                                       {
@@ -329,6 +340,15 @@ namespace Galleon.Checkout
                                       else
                                       {
                                           Debug.Log("max reattempts reached - transaction failed.");
+                                          
+                                          CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+                                                                                                  {
+                                                                                                      charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
+                                                                                                      errors      = new []{ "timeout. max attempts reached." },
+                                                                                                      is_canceled = true,
+                                                                                                      is_success  = false,
+                                                                                                  };
+                                          
                                           SendErrorAnalytics();
                                           s.RemoveStepsAfterThisInParentFlow();
                                           s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());

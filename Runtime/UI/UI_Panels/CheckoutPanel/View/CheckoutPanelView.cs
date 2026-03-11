@@ -79,7 +79,7 @@ namespace Galleon.Checkout.UI
 
         public void OnEnable()
         {
-            CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
+            //CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
         }
 
 

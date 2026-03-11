@@ -204,6 +204,8 @@ namespace Galleon.Checkout
                             this.Taxes.Add(t.Key, new TaxItem() { inclusive = t.Value.inclusive, tax_amount = t.Value.tax_amount });
                         }
 
+                        CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
+                        
                         // Analytics: Checkout Window Opened
                         var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
                         CheckoutAPI.InvokeAnalyticsEvent("checkout_window_opened", new Dictionary<string, object>
