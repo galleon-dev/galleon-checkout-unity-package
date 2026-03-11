@@ -183,6 +183,8 @@ namespace Galleon.Checkout.UI
         
         public void SelectUserPaymentMethod(UserPaymentMethod selectedUPM)
         {
+            if (selectedUPM == null || selectedUPM.Type.IsNullOrEmpty()) return;
+            
             selectedUPM.SelectExclusive();
             SoftRefreshState();
             
