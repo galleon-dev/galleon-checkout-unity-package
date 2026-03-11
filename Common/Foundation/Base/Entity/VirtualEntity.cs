@@ -167,19 +167,19 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp resume op
         
         
-        #if UNITY_EDITOR
-        [InitializeOnLoadMethod]
-        #endif
-        public static async void InitializeOnLoad()
-        {
-            var ves = Root.Home.SliceHub.Node.Descendants().OfType<VirtualEntity>();
-            
-            foreach (var ve in ves)
-            {
-                if (ve.State != "undefined" && ve.State != "done") 
-                await ve.PrintThing().Execute();
-            }
-        }
+        // #if UNITY_EDITOR
+        // [InitializeOnLoadMethod]
+        // #endif
+        // public static async void InitializeOnLoad()
+        // {
+        //     var ves = Root.Home.SliceHub.Node.Descendants().OfType<VirtualEntity>();
+        //     
+        //     foreach (var ve in ves)
+        //     {
+        //         if (ve.State != "undefined" && ve.State != "done") 
+        //         await ve.PrintThing().Execute();
+        //     }
+        // }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - TEMP PRINT
         
