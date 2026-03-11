@@ -156,13 +156,15 @@ namespace Galleon.SampleApp
             
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
-            var result = await CheckoutAPI.Purchase(product    : product
-                                                   ,bonusData  : bonusData
-                                                   ,config     : new()
-                                                               {
-                                                                 //  { "is_native_store_enabled",        false },
-                                                                   { "is_native_store_toggle_enabled", false  },
-                                                               });
+            var result = await CheckoutAPI.Purchase(product       : product
+                                                   ,configuration : new CheckoutPurchaseConfiguration()
+                                                                   {
+                                                                       BonusData = bonusData,
+                                                                       Config = new()
+                                                                                {
+                                                                                    { "is_preselection_screen_enabled", false },
+                                                                                }
+                                                                   });
             
             
             Debug.Log("==========================================");
@@ -262,6 +264,10 @@ namespace Galleon.SampleApp
                                                                    Sku             = "sku-1",
                                                                    Amount          = 5.99m,
                                                                    Currency        = "USD",
+                                                               },
+                                                               new CheckoutPurchaseConfiguration()
+                                                               {
+                                                                
                                                                });
                         
                         ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -325,7 +331,11 @@ namespace Galleon.SampleApp
                                                                    Sku             = "sku-2",
                                                                    Amount          = 19.99m,
                                                                    Currency        = "USD",
-                                                               });
+                                                               },
+                                                                new CheckoutPurchaseConfiguration()
+                                                                {
+                                                                
+                                                                });
                         
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                          
