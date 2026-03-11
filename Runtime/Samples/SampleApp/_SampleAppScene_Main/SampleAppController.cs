@@ -163,7 +163,13 @@ namespace Galleon.SampleApp
                                                                        Config = new()
                                                                                 {
                                                                                     { "is_preselection_screen_enabled", false },
-                                                                                }
+                                                                                },
+                                                                        AllowedPaymentMethodTypes = new ()
+                                                                                                     {
+                                                                                                         "card",
+                                                                                                         "link",
+                                                                                                         "amazon_pay"
+                                                                                                     }
                                                                    });
             
             
@@ -334,7 +340,7 @@ namespace Galleon.SampleApp
                                                                },
                                                                 new CheckoutPurchaseConfiguration()
                                                                 {
-                                                                
+                                                                    
                                                                 });
                         
                         ////////////////////////////////////////////////////////////////////////////////////////////////

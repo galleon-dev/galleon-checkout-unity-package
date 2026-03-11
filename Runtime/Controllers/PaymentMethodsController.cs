@@ -247,10 +247,6 @@ namespace Galleon.Checkout
                             if (data.type.ToLower().Contains("google_pay") && !IsGooglePayAvailableOnDevice)
                                 continue;
 
-                            // Apply whitelist/blacklist filtering
-                            if (!ShouldIncludePaymentMethodType(data.type))
-                                continue;
-
                             this.PaymentMethodsDefinitions.Add(new PayPalPaymentMethodDefinition()
                                                            {
                                                                InitializationSteps = {},
@@ -445,7 +441,9 @@ namespace Galleon.Checkout
             
             result = result.OrderByDescending(x => x.LastSuccessfulUseTime).ToList();
             
-
+            // Apply filter
+            result = result.Where(x => ShouldIncludePaymentMethodType(x.Type)).ToList();
+                            
             return result;
         }
         
@@ -465,8 +463,18 @@ namespace Galleon.Checkout
             {
                 result.Remove(NativeStoreUserPaymentMethod);
             }
+         
+            
+            // Apply filter
+            result = result.Where(x => ShouldIncludePaymentMethodType(x.Type)).ToList();
+                            
             
             return result;
+        }
+        
+        public List<PaymentMethodDefinition> GetPaymentMethodDefinitionsToSelect()
+        {
+            return PaymentMethodsDefinitions.Where(x => ShouldIncludePaymentMethodType(x.Data.type)).ToList();
         }
 
 
@@ -474,6 +482,9 @@ namespace Galleon.Checkout
 
         private bool ShouldIncludePaymentMethodType(string type)
         {   
+            if (CHECKOUT.Session == null  || CHECKOUT.Session.PurchaseConfiguration == null)
+                return true;
+            
             var config = CHECKOUT.Session.PurchaseConfiguration;
 
             if (config == null || string.IsNullOrEmpty(type))

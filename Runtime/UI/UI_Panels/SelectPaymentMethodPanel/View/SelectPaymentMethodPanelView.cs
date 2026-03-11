@@ -70,7 +70,7 @@ namespace Galleon.Checkout.UI
             /////////////////////
 
             // Add payment method definitions children
-            var paymentMethodDefinitions = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions;
+            var paymentMethodDefinitions = CHECKOUT.PaymentMethods.GetPaymentMethodDefinitionsToSelect();
             int currentIndex             = 0;
             foreach (var definition in paymentMethodDefinitions)
             {
