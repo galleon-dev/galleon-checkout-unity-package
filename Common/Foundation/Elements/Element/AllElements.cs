@@ -5,17 +5,17 @@ using Galleon.Checkout.Foundation;
 
 namespace Galleon.Checkout.ELEMENTS
 {
-    public class Elements : Entity
+    public class AllElements : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         public Collection<Element> Collection = new();
         
-        public ELEMENTS.Thing ThingElement = new Thing("thing");
+        public ELEMENTS.ThingElement ThingElement = new ThingElement();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-        public Elements()
+        public AllElements()
         {
             Element Folder    = new Element(name : "Folder"); this.Collection.Add(Folder);
             Folder.Definition = DefinitionNode.Parse(new []
@@ -98,11 +98,11 @@ namespace Galleon.Checkout.ELEMENTS
         
         public static IEnumerable<Element> GetAllElements()
         {
-            return Root.Instance.Context.Project.Package1.Elements.Collection;
+            return Root.Instance.Context.Project.Package1.allElements.Collection;
         }
         public static Element GetElementByName(string elementName)
         {
-            return Root.Instance.Context.Project.Package1.Elements.Collection.FirstOrDefault(x => x.Name == elementName); 
+            return Root.Instance.Context.Project.Package1.allElements.Collection.FirstOrDefault(x => x.Name == elementName); 
         }
     }
 }

@@ -15,7 +15,7 @@ using UnityEditor;
 namespace Galleon.Checkout
 {
     [Element("Thing")]
-    public class Thing : Entity
+    public class Thing : EntityBehaviour
     {   
     }
 }
@@ -26,7 +26,7 @@ namespace Galleon.Checkout
 namespace Galleon.Checkout.ELEMENTS
 {
     [Element("Thing")]
-    public class Thing : Element
+    public class ThingElement : Element
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
         
@@ -47,7 +47,7 @@ namespace Galleon.Checkout.ELEMENTS
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public Thing(string name) : base(name)
+        public ThingElement() : base("Thing")
         {
         }
 
@@ -303,7 +303,6 @@ namespace Galleon.Checkout.ELEMENTS
                         #endif
                     });
         
-        
         public Step CreateThingHierarchy(VirtualEntity ve) 
         =>
             new Step(name   : $"create_thing_hierarchy"
@@ -321,7 +320,7 @@ namespace Galleon.Checkout.ELEMENTS
 
                         // Add the script component
                         string scriptName = ve.thingData.ThingName;
-                        Type   scriptType = System.Type.GetType("TEST_THING." + scriptName + ", Assembly-CSharp");
+                        Type   scriptType = System.Type.GetType("Galleon.Checkout." + scriptName + ", Assembly-CSharp");
                         
                         if (scriptType != null)
                             prefabInstance.AddComponent(scriptType);
@@ -372,7 +371,6 @@ namespace Galleon.Checkout.ELEMENTS
                         #endif
                     });
         
-        
         public Step CreateThingApp(VirtualEntity ve) 
         =>
             new Step(name   : $"create_thing_app"
@@ -400,6 +398,9 @@ namespace Galleon.Checkout.ELEMENTS
                         GameObject cubeGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         cubeGO.name = "Cube";
                         cubeGO.transform.SetParent(parentGO.transform, false);
+                        
+                        
+                        parentGO.AddComponent<Checkout.Thing>();
                         
                         
                     });

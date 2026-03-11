@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Assets;
+using Galleon.Checkout.ELEMENTS;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -22,7 +23,7 @@ namespace Galleon.Checkout.Foundation
             public VirtualEntity ve;
             public ThingData(VirtualEntity ve) { this.ve = ve; }
             
-            public ELEMENTS.Thing   Element     => Root.Instance.Context.Project.Package1.Elements.ThingElement;
+            public ELEMENTS.ThingElement   Element     => Root.Instance.Context.Project.Package1.allElements.ThingElement;
             
             public string           ThingName   => ve.TextNode?.LineWords != null && ve.TextNode.LineWords.Count() >= 2 
                                                  ? ve.TextNode.LineWords.ElementAt(1) 
@@ -71,6 +72,16 @@ namespace Galleon.Checkout.Foundation
             this.StoreState();
             return id;
         }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - CRUD actions
+        
+        public Step DeleteVirtualEntity() 
+        =>
+            new Step(name   : $"delete_virtual_entity"
+                    ,action : async (s) =>
+                    {
+                        this.Node.Parent.Node.Live.RemoveVirtualEntity(this);
+                    });
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Semantics
         
@@ -120,34 +131,99 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"execute_operation"
                     ,action : async (s) =>
                     {
-                        this.TextNode.RawText += "#pending";
+                        this.TextNode.RawText += "state:pending";
                         StoreState();
                     });
+        
+        public string State
+        {
+            get
+            {
+                return this.TextNode.Colons.ContainsKey("state") ? this.TextNode.Colons["state"] : "undefined";
+            }
+            set
+            {
+                if (this.State != "undefined")
+                    this.TextNode.RawText = this.TextNode.RawText.Replace($"state:{this.State}", $"state:{value}");
+                else
+                    this.TextNode.RawText += $"state:{value}";
+            }
+        }
 
-        public bool HasPendingOperation() => this.Tags.Contains("pending");
+        public bool HasPendingOperation() => this.TextNode.Colons.ContainsKey("state") && this.TextNode.Colons["state"] == "pending";
 
         public Step ResumeOperation() 
         =>
             new Step(name   : $"resume_operation"
                     ,action : async (s) =>
                     {
-                        if (!HasPendingOperation()) return;
+                        if (!HasPendingOperation()) 
+                            return;
                         
-                        this.TextNode.RawText = this.TextNode.RawText.Replace("#pending", "");
+                        this.TextNode.RawText = this.TextNode.RawText.Replace("state:pending", "state:assets");
                         StoreState();
-                        
-                        var state = this.TextNode.RawText.Contains($"pending") ? "pending" : "not-pending";
-                        Debug.Log($"Resumed operation for {this.TextNode.Line} with state of {state}");
                     });
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Debug actions
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp resume op
         
-        public Step DeleteVirtualEntity() 
+        
+        #if UNITY_EDITOR
+        [InitializeOnLoadMethod]
+        #endif
+        public static async void InitializeOnLoad()
+        {
+            var ves = Root.Home.SliceHub.Node.Descendants().OfType<VirtualEntity>();
+            
+            foreach (var ve in ves)
+            {
+                if (ve.State != "undefined" && ve.State != "done") 
+                await ve.PrintThing().Execute();
+            }
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - TEMP PRINT
+        
+        public Step PrintThing() 
         =>
-            new Step(name   : $"delete_virtual_entity"
+            new Step(name   : $"print_thing"
                     ,action : async (s) =>
                     {
-                        this.Node.Parent.Node.Live.RemoveVirtualEntity(this);
+                        s.Log($"state = {State}");
+                        
+                        var thingElement = new ELEMENTS.ThingElement();
+                        
+                        if (State == "undefined"
+                        ||  State == "pending")
+                        {
+                            thingElement.CreateThingAsset(this).Execute();
+                            State = "assets";
+                            StoreState();
+                        }
+                        if (State == "assets")
+                        {
+                            await Task.Delay(5000);
+                            #if UNITY_EDITOR
+                            AssetDatabase.Refresh(options: ImportAssetOptions.ForceUpdate);
+                            #endif
+                            State = "reload";
+                            StoreState();
+                        }
+                        if (State == "reload")
+                        {
+                            thingElement.CreateThingHierarchy(this).Execute();
+                            State = "hierarchy";
+                            StoreState();
+                        }
+                        if (State == "hierarchy")
+                        {
+                            thingElement.CreateThingApp(this).Execute();
+                            State = "done";
+                            StoreState();
+                        }
+                        if (State == "done")
+                        {
+                            this.DeleteVirtualEntity().Execute();
+                        }
                     });
     }
 }

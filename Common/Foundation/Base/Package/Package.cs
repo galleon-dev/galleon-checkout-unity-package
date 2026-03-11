@@ -5,7 +5,6 @@ using UnityEngine.UIElements;
 using Galleon.Checkout.Assets;
 using Galleon.Checkout.ELEMENTS;
 using UnityEngine.Assertions.Must;
-using Thing = Galleon.Checkout.ELEMENTS.Thing;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,7 +17,7 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
         // Design Time
-        public Elements Elements    = new Elements();
+        public AllElements allElements    = new AllElements();
         public Assets   Assets      = new Assets();
         
         // Runtime
@@ -55,7 +54,7 @@ namespace Galleon.Checkout.Foundation
         =>
             new Step(action : async (s) =>
                     {
-                        Debug.Log($"Package.Asset.Elements = {string.Join(", ", this.Elements.Collection.Select(x => x.Name))}");
+                        Debug.Log($"Package.Asset.Elements = {string.Join(", ", this.allElements.Collection.Select(x => x.Name))}");
                         Debug.Log($"Package.Asset.Folder   = {this.Assets.rootFolder.FolderPath}");
                         Debug.Log($"Package.Asset.Scene    = {"TBD"}");
                     });

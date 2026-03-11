@@ -27,7 +27,15 @@ namespace Galleon.Checkout
         [SerializeField]
         private EntityNode entityNode   =  null;
         public  EntityNode Node         => entityNode ??= new EntityNode(this);
+
+        public Entity()
+        {
+            entityNode = new EntityNode(this);
+        }
+        
     }
+    
+    public class EntityFP : Entity {}
 
     public partial class EntityNode
     {
@@ -692,7 +700,7 @@ namespace Galleon.Checkout
                 #region STEPS
                 
                 // get all methods that return void and have no params
-                var steps = target.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                var steps = target.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy)
                                             .Where     (m => m is PropertyInfo p && p.PropertyType == typeof(Step) 
                                                           || m is MethodInfo mi && mi.GetParameters().Length == 0 && mi.ReturnType == typeof(Step) && !mi.Name.StartsWith("get_"))
                                             .ToArray   ();
@@ -770,7 +778,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element 
      
-        public Element GetElement() => Elements.GetElement(this.Entity.GetType());
+        public Element GetElement() => AllElements.GetElement(this.Entity.GetType());
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
         

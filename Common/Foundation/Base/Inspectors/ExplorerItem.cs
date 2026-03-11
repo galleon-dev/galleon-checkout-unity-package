@@ -165,6 +165,9 @@ namespace Galleon.Checkout
                     if (childItem.Target is VirtualEntity)
                         childItem.ButtonFoldout.Button.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f);
                     
+                    if (childItem.Target is EntityFP entity)
+                        childItem.ButtonFoldout.Button.style.backgroundColor = new Color(0.4f, 0.3f, 0.3f);
+                    
                     // #if UNITY_EDITOR
                     // string header = child.Node.editorExtras.HeaderAttributeText;
                     // if (header != null)
