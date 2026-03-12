@@ -297,7 +297,7 @@ namespace Galleon.Checkout
                             if (!ShouldIncludePaymentMethodType(data.type))
                                 continue;
 
-                            if (data.type == "credit_card")
+                            if (data.type == "card")
                             {
                                 this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
                                 {
@@ -317,7 +317,7 @@ namespace Galleon.Checkout
                         
                         /////////////////////////////////// Empty
                         
-                        if (UserPaymentMethods       .All(pm => pm.Data.type != "credit_card")
+                        if (UserPaymentMethods       .All(pm => pm.Data.type != "card")
                         &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "card"))
                         {
                             this.UserPaymentMethods.Add(new UserPaymentMethod()
@@ -407,7 +407,7 @@ namespace Galleon.Checkout
         
         public List<UserPaymentMethod> GetUserPaymentMethodsToDisplay()
         {
-            if (UserPaymentMethods.All(pm => pm.Type != "credit_card"))
+            if (UserPaymentMethods.All(pm => pm.Type != "card"))
             {
                 var emptyCard = CreateEmptyCreditCardUserPaymentMethod();
                 UserPaymentMethods.Add(emptyCard);
@@ -614,7 +614,7 @@ namespace Galleon.Checkout
                     {   
                        this.PaymentMethodsDefinitions.Add(new CreditCardPaymentMethodDefinition()
                                                           {
-                                                              Type             = "credit_card",
+                                                              Type             = "card",
                                                               VaultingSteps    = { "get_tokenizer", "tokenize" },
                                                               TransactionSteps = { "charge" },
                                                           });
@@ -650,11 +650,11 @@ namespace Galleon.Checkout
                     {
                         this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
                                                     {
-                                                        Type        = "credit_card",
+                                                        Type        = "card",
                                                         DisplayName = "MasterCard - **** - 4587",
                                                         Data        = new()
                                                                     {
-                                                                        type             = "credit_card",
+                                                                        type             = "card",
                                                                         credit_card_type = "mastercard",
                                                                         display_name     = "MasterCard - **** - 4587",
                                                                         id               = "master_card",
