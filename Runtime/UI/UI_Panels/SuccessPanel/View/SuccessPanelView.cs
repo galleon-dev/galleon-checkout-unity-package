@@ -140,10 +140,12 @@ namespace Galleon.Checkout.UI
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Private API Methods
 
         public Step SendReceipt()
-            =>
+        =>
             new Step(name: $"send_receipt"
                     , action: async (s) =>
                     {
+                        return; 
+                        
                         var email = this.EmailInputField.Text;
 
                         if (string.IsNullOrEmpty(email))
