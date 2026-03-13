@@ -164,23 +164,6 @@ namespace Galleon.Checkout.Foundation
                         StoreState();
                     });
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp resume op
-        
-        
-        // #if UNITY_EDITOR
-        // [InitializeOnLoadMethod]
-        // #endif
-        // public static async void InitializeOnLoad()
-        // {
-        //     var ves = Root.Home.SliceHub.Node.Descendants().OfType<VirtualEntity>();
-        //     
-        //     foreach (var ve in ves)
-        //     {
-        //         if (ve.State != "undefined" && ve.State != "done") 
-        //         await ve.PrintThing().Execute();
-        //     }
-        // }
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - TEMP PRINT
         
         public Step PrintThing() 
@@ -217,6 +200,12 @@ namespace Galleon.Checkout.Foundation
                         if (State == "hierarchy")
                         {
                             thingElement.CreateThingApp(this).Execute();
+                            State = "scene";
+                            StoreState();
+                        }
+                        if (State == "scene")
+                        {
+                            thingElement.AddThingToScene(this).Execute();
                             State = "done";
                             StoreState();
                         }
