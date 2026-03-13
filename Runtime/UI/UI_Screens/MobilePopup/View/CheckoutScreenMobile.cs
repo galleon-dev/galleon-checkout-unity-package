@@ -639,7 +639,7 @@ namespace Galleon.Checkout.UI
                                                        ,panel  : CheckoutScreenMobile.STATE.error_panel         .ToString()
                                                        ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString());
 
-        public Page CreditCardPage           = new Page(name   : "credit_card"
+        public Page CreditCardPage           = new Page(name   : "card"
                                                        ,header : HeaderPanelView     .STATE.credit_card_info    .ToString()
                                                        ,panel  : CheckoutScreenMobile.STATE.credit_card_panel   .ToString()
                                                        ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString()

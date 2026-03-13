@@ -169,7 +169,6 @@ namespace Galleon.SampleApp
                                                                                                      {
                                                                                                          "native",
                                                                                                          "card",
-                                                                                                         "credit_card",
                                                                                                          "link",
                                                                                                          "amazon_pay"
                                                                                                      }

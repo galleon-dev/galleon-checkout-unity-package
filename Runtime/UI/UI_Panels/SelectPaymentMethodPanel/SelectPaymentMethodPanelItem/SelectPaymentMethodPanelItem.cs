@@ -153,8 +153,8 @@ namespace Galleon.Checkout.UI
             
             // Dropdown
             bool shouldShowDropdown =  this.UserPaymentMethod != null
-                                    && this.UserPaymentMethod.Type == "credit_card"
-                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Type == "credit_card") > 1;
+                                    && this.UserPaymentMethod.Type == "card"
+                                    && CHECKOUT.PaymentMethods.UserPaymentMethods.Count(x => x.Type == "card") > 1;
 
             if (shouldShowDropdown)
             {                

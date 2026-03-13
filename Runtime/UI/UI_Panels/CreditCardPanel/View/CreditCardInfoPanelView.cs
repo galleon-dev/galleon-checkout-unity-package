@@ -143,7 +143,7 @@ namespace Galleon.Checkout.UI
             CheckoutAPI.InvokeAnalyticsEvent("new_credit_card_form_viewed", new Dictionary<string, object>
             {
                 { "checkout_session_id", CHECKOUT.Session?.SessionID ?? "" },
-                { "payment_method",      "credit_card"                     },
+                { "payment_method",      "card"                     },
             });
         }
         
@@ -157,7 +157,7 @@ namespace Galleon.Checkout.UI
 
                 // Create payment method object
                 var card                     = new CreditCardUserUserPaymentMethod();
-                card.Data.type               = "credit_card";
+                card.Data.type               = "card";
                 card.Data.credit_card_type   = CurrentCardFormat.Name.ToLower();
 
                 // Set card Data
@@ -176,7 +176,7 @@ namespace Galleon.Checkout.UI
                 CheckoutAPI.InvokeAnalyticsEvent("new_credit_card_details_entered", new Dictionary<string, object>
                 {
                     { "checkout_session_id", CHECKOUT.Session?.SessionID ?? ""  },
-                    { "payment_method",      "credit_card"                      },
+                    { "payment_method",      "card"                      },
                 });
 
                 // Add payment method

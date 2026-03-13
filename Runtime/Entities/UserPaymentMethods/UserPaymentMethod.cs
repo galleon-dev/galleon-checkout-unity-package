@@ -76,7 +76,6 @@ namespace Galleon.Checkout
             {
                 string myType = this.Type;
                 myType        = myType.Replace("empty_", "");
-                myType        = myType == "credit_card" ? "card" : myType;
                 return CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Type == myType);
             }
             catch (Exception e)
@@ -109,7 +108,7 @@ namespace Galleon.Checkout
             
             if (this is CreditCardUserUserPaymentMethod cc)
             {
-                data.Add("type", "credit_card");
+                data.Add("type", "card");
                 data.Add("token", cc.TokenID);
             }
             

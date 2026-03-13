@@ -407,21 +407,25 @@ namespace Galleon.Checkout
         
         public List<UserPaymentMethod> GetUserPaymentMethodsToDisplay()
         {
+            // Add empty
             if (UserPaymentMethods.All(pm => pm.Type != "card"))
             {
                 var emptyCard = CreateEmptyCreditCardUserPaymentMethod();
                 UserPaymentMethods.Add(emptyCard);
             }
-            var result = UserPaymentMethods.GroupBy(x => x.Type).Select(x => x.First())
+            
+            // Group
+            var result = UserPaymentMethods.OrderByDescending(x => x.LastSuccessfulUseTime).GroupBy(x => x.Type).Select(x => x.First())
               //.Concat(SpecialUserPaymentMethods)
                 .Concat(EmptyUserPaymentMethods)
                 .Distinct()
                 .Except(new[]{AppUserPaymentMethod})
                 .Take(MAX_LAST_USED_PAYMENT_METHODS -1)
-                .OrderBy(x => x.SortOrder)
+                .OrderByDescending(x => x.LastSuccessfulUseTime)
                 .ToList();
             
-
+            
+            // Remove Native ?
             if (result.Count >= MAX_LAST_USED_PAYMENT_METHODS
             || !CHECKOUT.Globals.IsNativeStoreEnabled
             || !CHECKOUT.Globals.IsNativeStoreEnabledInCheckoutPage
@@ -430,6 +434,7 @@ namespace Galleon.Checkout
                 result.Remove(NativeStoreUserPaymentMethod);
             }
 
+            // set last used time
             foreach (var userPaymentMethod in result)
             {
                 if (userPaymentMethod.Type == "native")
@@ -439,7 +444,6 @@ namespace Galleon.Checkout
                     userPaymentMethod.LastSuccessfulUseTime = DateTime.MaxValue;
             }
             
-            result = result.OrderByDescending(x => x.LastSuccessfulUseTime).ToList();
             
             // Apply filter
             result = result.Where(x => ShouldIncludePaymentMethodType(x.Type)).ToList();

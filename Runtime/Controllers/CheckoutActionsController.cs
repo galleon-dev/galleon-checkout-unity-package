@@ -171,7 +171,7 @@ namespace Galleon.Checkout
                                                                                                         }
                                                                                               ,body     : new AddPaymentMethodRequest()
                                                                                                         {
-                                                                                                            payment_method_definition_type = "credit_card",
+                                                                                                            payment_method_definition_type = "card",
                                                                                                             credit_card_token              = creditCard.TokenID,
                                                                                                         }
                                                                                                 );
