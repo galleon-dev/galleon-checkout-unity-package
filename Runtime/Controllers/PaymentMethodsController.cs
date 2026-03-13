@@ -490,6 +490,8 @@ namespace Galleon.Checkout
             if (config == null || string.IsNullOrEmpty(type))
                 return true;
 
+            type = type.Replace("empty_", "");
+            
             // If AllowedPaymentMethodTypes is set, only include types in the whitelist
             if (config.AllowedPaymentMethodTypes != null && config.AllowedPaymentMethodTypes.Count > 0)
             {
