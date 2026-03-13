@@ -7,6 +7,7 @@ using Galleon.Checkout.Foundation;
 using UnityEngine;
 using System.IO;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -402,7 +403,104 @@ namespace Galleon.Checkout.ELEMENTS
                         
                         parentGO.AddComponent<Checkout.Thing>();
                         
+                    });
+        
+        
+        public Step AddThingToScene(VirtualEntity ve) 
+        =>
+            new Step(name   : $"AddThingToScene"
+                    ,action : async (s) =>
+                    {
+                        #if UNITY_EDITOR
+
+                        string thingName  = ve.thingData.ThingName;
+                        string prefabPath = System.IO.Path.Combine($"Assets/package1/{thingName}/Prefabs", thingName + ".prefab");
+
+                        // Determine parent scene path (assuming it's in a known location or use a default)
+                        string parentScenePath = "Assets/TEMP/package_Slice_1/Slice_1.unity"; // Adjust this path as needed
+
+                        // Check if parent scene exists
+                        if (!System.IO.File.Exists(parentScenePath))
+                        {
+                            Debug.LogWarning($"Parent scene not found at: {parentScenePath}");
+                            return;
+                        }
+
+                        Scene scene = default;
+
+                        // Check if the parent scene is already loaded
+                        bool wasSceneAlreadyOpen = false;
+
+                        for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
+                        {
+                            var loadedScene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+                            if (loadedScene.path == parentScenePath)
+                            {
+                                wasSceneAlreadyOpen = true;
+                                scene = loadedScene;
+                                break;
+                            }
+                        }
+
+                        // Load the scene if it wasn't already open
+                        if (!wasSceneAlreadyOpen)
+                        {
+                            scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(
+                                parentScenePath, 
+                                UnityEditor.SceneManagement.OpenSceneMode.Additive
+                            );
+                        }
                         
+                        // // Check if the parent scene is already loaded
+                        // bool wasSceneAlreadyOpen = false;
+                        // UnityEngine.SceneManagement.Scene parentScene = default;
+                        // 
+                        // for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
+                        // {
+                        //     var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+                        //     if (scene.path == parentScenePath)
+                        //     {
+                        //         wasSceneAlreadyOpen = true;
+                        //         parentScene = scene;
+                        //         break;
+                        //     }
+                        // }
+                        // 
+                        // // Load the scene if it wasn't already open
+                        // if (!wasSceneAlreadyOpen)
+                        // {
+                        //     parentScene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(
+                        //         parentScenePath, 
+                        //         UnityEditor.SceneManagement.OpenSceneMode.Additive
+                        //     );
+                        // }
+
+                        // Load the prefab
+                        GameObject prefabAsset = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                        if (prefabAsset == null)
+                        {
+                            Debug.LogWarning($"Prefab not found at: {prefabPath}");
+                            return;
+                        }
+
+                        // Instantiate the prefab in the parent scene
+                        GameObject instance = PrefabUtility.InstantiatePrefab(prefabAsset, scene) as GameObject;
+
+                        if (instance != null)
+                        {
+                            Debug.Log($"Instantiated {thingName} prefab in scene: {scene.name}");
+
+                            // Mark the scene as dirty so Unity knows it needs to be saved
+                            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+                        }
+
+                        // Close the scene only if it wasn't already open
+                        // if (!wasSceneAlreadyOpen)
+                        // {
+                        //     UnityEditor.SceneManagement.EditorSceneManager.CloseScene(parentScene, true);
+                        // }
+
+                        #endif
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper methods
@@ -548,5 +646,7 @@ namespace Galleon.Checkout
         }
 
         #endregion // Helper Methods
+
+        
     }
 }
