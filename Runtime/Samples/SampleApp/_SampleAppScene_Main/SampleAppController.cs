@@ -170,7 +170,8 @@ namespace Galleon.SampleApp
                                                                                                          "native",
                                                                                                          "card",
                                                                                                          "link",
-                                                                                                         "amazon_pay"
+                                                                                                         "amazon_pay",
+                                                                                                         "google_pay_browser",
                                                                                                      }
                                                                    });
             

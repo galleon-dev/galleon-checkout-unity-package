@@ -150,9 +150,15 @@ namespace Galleon.Checkout
         
         public string GetPaymentMethodTypeeActual()
         {
+            string result;
             if (this is CreditCardUserUserPaymentMethod cc)
-                return cc.CreditCardType.ToLower();
-            else return this.Type.ToLower();
+                result = cc.CreditCardType.ToLower();
+            else 
+                result = this.Type.ToLower();
+            
+            result = result.Replace("empty_", "");
+            
+            return result;
         }
         
         public Sprite GetIconSprite()

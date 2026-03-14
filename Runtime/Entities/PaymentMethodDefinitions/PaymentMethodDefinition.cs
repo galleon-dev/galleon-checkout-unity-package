@@ -32,23 +32,24 @@ namespace Galleon.Checkout
         public Sprite IconSprite;
         public Sprite LogoSprite;
         
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
-        public string       DisplayName         => Type.ToLower().Contains("paypal")     ? "PayPal"
-                                                 : Type.ToLower().Contains("google_pay") ? "Google Pay"
-                                                 : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Type.Replace("_", " ").ToLower());
+        public string                           DisplayName                     => Type.ToLower().Contains("paypal")     ? "PayPal"
+                                                                                 : Type.ToLower().Contains("google_pay") ? "Google Pay"
+                                                                                 : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Type.Replace("_", " ").ToLower());
         
         
-        public string       LocalID             => $"local_pm_id_{this.Type}";
+        public string                           LocalID                         => $"local_pm_id_{this.Type}";
         
-        public BonusItem    BonusItem           => GetBonusItem();
+        public BonusItem                        BonusItem                       => GetBonusItem();
         
-        public bool         ShouldAddSavedUPMS  => true;
-        public bool         AllowOnlyOneUPM     => true;
-        public bool         ShouldShowDropdown  => true;
+        public bool                             ShouldAddSavedUPMS              => true;
+        public bool                             AllowOnlyOneUPM                 => true;
+        public bool                             ShouldShowDropdown              => true;
         
-        public IEnumerable<UserPaymentMethod> SavedUPMS => CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Type == this.Type);
+        public IEnumerable<UserPaymentMethod>   SavedUPMS                       => CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Type == this.Type);
+        
+        public bool                             ShouldDisplayemptyUPMIncheckout => Data?.display_empty_upm_in_checkout_page ?? false;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Transaction Steps
         
@@ -99,11 +100,37 @@ namespace Galleon.Checkout
             return userPaymentMethod;
         }
         
+        public UserPaymentMethod CreateEmptyPaymentMethod()
+        {
+            var type = this.Type;
+            
+            var upm = new UserPaymentMethod()
+                    {
+                        Data                    = new ()
+                                                {
+                                                   type = $"empty_{type}"
+                                                },
+                        DisplayName             = $"{this.DisplayName}",
+                        IsNewPaymentMethod      = true,
+                        IsSelected              = false,
+                        SortOrder               = float.PositiveInfinity, 
+                        LastSuccessfulUseTime   = DateTime.MinValue, 
+                        Type                    = $"empty_{type}",
+                        ButtonText              = $"{DisplayName}"
+                    };
+            
+            upm.Node.Tags.Add("local");
+            upm.Data.id = $"local_pm_id_{type}";
+            
+            return upm;
+        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Methods
         
         public Sprite GetIconSprite()
         {
             string type = this.Type.ToLower();
+            type = type.Replace("empty_", "");
             return CHECKOUT.Sprites.GetIconSprite(type);    
         }
         
@@ -130,74 +157,4 @@ namespace Galleon.Checkout
     }
 }
 
-
-/// {
-///     "definitions":
-///     [
-///         {
-///             "type"                      : "web_checkout",
-///             "providers"                 :
-///                                         [
-///                                             {
-///                                                 "provider"  : "custom",
-///                                                 "config"    :
-///                                                             {
-///                                                                 "flow" : "checkout_link"
-///                                                             }
-///                                             }
-///                                         ],
-///             "icon_url"                  : "",
-///             "logo_url"                  : "",
-///             "initialization_actions"    : null,
-///             "vaulting_actions"          : null,
-///             "charge_actions"            :
-///                                         [
-///                                             {
-///                                                 "action"        : "charge",
-///                                                 "parameters"    : {}
-///                                             }
-///                                         ]
-///         },
-///         {
-///             "type"                      : "test",
-///             "providers"                 :
-///                                         [
-///                                             {
-///                                                 "provider"    : "stripe",
-///                                                 "config"      :
-///                                                               {
-///                                                                   "method": "card"
-///                                                               }
-///                                             }
-///                                         ],
-///             "icon_url"                  : "",
-///             "logo_url"                  : "",
-///             "supported_card_types"      :
-///                                         [
-///                                             "visa",
-///                                             "master_card",
-///                                             "american_express"
-///                                         ],
-///             "initialization_actions"    : null,
-///             "vaulting_actions"          :
-///                                         [
-///                                             {
-///                                               "action"      : "get_tokenizer",
-///                                               "parameters"  : {}
-///                                             },
-///                                             {
-///                                               "action"      : "tokenize",
-///                                               "parameters"  : {}
-///                                             }
-///                                         ],
-///             "charge_actions"            :
-///                                         [
-///                                             {
-///                                               "action"      : "charge",
-///                                               "parameters"  : {}
-///                                             }
-///                                         ]
-///         }
-///     ]
-/// }
 

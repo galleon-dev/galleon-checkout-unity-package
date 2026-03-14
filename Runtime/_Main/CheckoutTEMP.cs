@@ -918,3 +918,4 @@ namespace Galleon.Checkout
 ///         > NO internet - show error ui
 ///         > sometimes it tries to cancel the session when it shouldnt
 ///         > total price on second purchase doesnt reset
+

@@ -316,6 +316,17 @@ namespace Galleon.Checkout
                         }
                         
                         /////////////////////////////////// Empty
+
+                        foreach (var definition in this.PaymentMethodsDefinitions)
+                        {
+                            if (definition.ShouldDisplayemptyUPMIncheckout)
+                            {
+                                var emptyUPM = definition.CreateEmptyPaymentMethod();
+                                UserPaymentMethods.Add(emptyUPM);
+                            }
+                        }
+                        
+                        /////////////////////////////////// Empty Card
                         
                         if (UserPaymentMethods       .All(pm => pm.Data.type != "card")
                         &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "card"))

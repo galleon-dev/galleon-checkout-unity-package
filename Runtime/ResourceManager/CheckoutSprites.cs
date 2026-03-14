@@ -116,7 +116,7 @@ namespace Galleon.Checkout
                 switch (paymentMethodActualType)
                 {
                     case "google_pay":           return GpaybuttonSprite;
-                    case "google_pay_browser":   return GPayIconSprite;
+                    case "google_pay_browser":   return GpaybuttonSprite;
                     case "paypal":               return PaypalbuttonSprite;
                     case "empty_paypal":         return PaypalbuttonSprite;
                     case "apple":                return AppleButtonSprite;
