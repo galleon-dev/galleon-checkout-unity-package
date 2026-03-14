@@ -82,6 +82,8 @@ namespace Galleon.Checkout.UI
         bool                            IsValidCreditCardNumber             = false;
         bool                            IsValidDate                         = false;
         
+        private bool                    isProcessingPayment                 = false;
+
         public GameObject               TestCardButton;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// View Result
@@ -120,6 +122,9 @@ namespace Galleon.Checkout.UI
             IsValidCreditCardNumber = false;
             IsValidDate             = false;
 
+            // Reset processing flag
+            isProcessingPayment     = false;
+
             // Hide Error Messages
             NameErrorTextBackground      .SetActive(false);
             CardNumberErrorTextBackground.SetActive(false);
@@ -151,40 +156,55 @@ namespace Galleon.Checkout.UI
 
         public async void On_OkClick()
         {
+            // Prevent monkey clicks
+            if (isProcessingPayment)
+            {
+                return;
+            }
+
             if (IsCorrectInputFields())
             {
-                CurrentCardFormat = GetFormatForDigits(digits: CreditCardNumberField.Text);
+                isProcessingPayment = true;
 
-                // Create payment method object
-                var card                     = new CreditCardUserUserPaymentMethod();
-                card.Data.type               = "card";
-                card.Data.credit_card_type   = CurrentCardFormat.Name.ToLower();
-
-                // Set card Data
-                card.DisplayName             = $"{CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
-                card.CardHolderName          = NameInputField.Text;
-                card.CardNumber              = CreditCardNumberField.Text;
-                card.CardCCV                 = CVVInputField.Text;
-                card.CardMonth               = DateInputField.Text.Substring(0, 2);
-                card.CardYear                = DateInputField.Text.Substring(2, 2);
-
-                // Set additional data
-                card.IsNewPaymentMethod      = true;
-                card.ShouldSavePaymentMethod = cbx_SaveCardDetails.IsChecked;
-
-                // Analytics: New Credit Card Details Entered
-                CheckoutAPI.InvokeAnalyticsEvent("new_credit_card_details_entered", new Dictionary<string, object>
+                try
                 {
-                    { "checkout_session_id", CHECKOUT.Session?.SessionID ?? ""  },
-                    { "payment_method",      "card"                      },
-                });
+                    CurrentCardFormat = GetFormatForDigits(digits: CreditCardNumberField.Text);
 
-                // Add payment method
-                await CHECKOUT.PaymentMethods.AddNewUserPaymentMethod(card).Execute();
+                    // Create payment method object
+                    var card                     = new CreditCardUserUserPaymentMethod();
+                    card.Data.type               = "card";
+                    card.Data.credit_card_type   = CurrentCardFormat.Name.ToLower();
 
-                // Finish viewing this screen
-                this.Result = ViewResult.Confirm;
-                CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
+                    // Set card Data
+                    card.DisplayName             = $"{CreditCardNumberField.Text.Substring(CreditCardNumberField.Text.Length - 4)}";
+                    card.CardHolderName          = NameInputField.Text;
+                    card.CardNumber              = CreditCardNumberField.Text;
+                    card.CardCCV                 = CVVInputField.Text;
+                    card.CardMonth               = DateInputField.Text.Substring(0, 2);
+                    card.CardYear                = DateInputField.Text.Substring(2, 2);
+
+                    // Set additional data
+                    card.IsNewPaymentMethod      = true;
+                    card.ShouldSavePaymentMethod = cbx_SaveCardDetails.IsChecked;
+
+                    // Analytics: New Credit Card Details Entered
+                    CheckoutAPI.InvokeAnalyticsEvent("new_credit_card_details_entered", new Dictionary<string, object>
+                    {
+                        { "checkout_session_id", CHECKOUT.Session?.SessionID ?? ""  },
+                        { "payment_method",      "card"                      },
+                    });
+
+                    // Add payment method
+                    await CHECKOUT.PaymentMethods.AddNewUserPaymentMethod(card).Execute();
+
+                    // Finish viewing this screen
+                    this.Result = ViewResult.Confirm;
+                    CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());
+                }
+                finally
+                {
+                    isProcessingPayment = false;
+                }
             }
         }
 

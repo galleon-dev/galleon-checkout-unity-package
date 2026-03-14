@@ -201,6 +201,7 @@ namespace Galleon.Checkout.UI
 
         public void OnConfirmPurchaseClick()
         {
+            
             var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
 
             if (selectedPaymentMethod == null)

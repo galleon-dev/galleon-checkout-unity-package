@@ -246,13 +246,20 @@ namespace Galleon.Checkout
                         {
                             if (data.type.ToLower().Contains("google_pay") && !IsGooglePayAvailableOnDevice)
                                 continue;
+                            
+                            var definition = new PayPalPaymentMethodDefinition()
+                                           {
+                                               InitializationSteps = {},
+                                               TransactionSteps    = {},
+                                               Data                = data,
+                                           };
 
-                            this.PaymentMethodsDefinitions.Add(new PayPalPaymentMethodDefinition()
-                                                           {
-                                                               InitializationSteps = {},
-                                                               TransactionSteps    = {},
-                                                               Data                = data,
-                                                           });
+                            this.PaymentMethodsDefinitions.Add(definition);
+                            
+                            if (definition.Type == "card")
+                            {
+                                definition.Data.display_empty_upm_in_checkout_page = false;
+                            }
                         }
                         
                     });

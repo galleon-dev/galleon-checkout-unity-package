@@ -52,7 +52,41 @@ namespace Galleon.Checkout.Foundation
 
         public override string ToString() => $"(ve) " + this.TextNode?.Line ?? "Virtual Entity (null)";
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// ID
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Parse
+
+        public static VirtualEntity Parse(string lines) => Parse(lines.Split('\n'));
+        public static VirtualEntity Parse(IEnumerable<string> lines)
+        {
+            VirtualEntity rootVE       = null;
+            TextNode      rootTextNode = TextNode.Parse(lines);
+            
+            foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
+            {
+                var ve = new VirtualEntity(textNode.RawText);
+                textNode.Node.SetData("paired_virtual_entity", ve);
+                
+                if (textNode.Node.Parent != null)
+                {
+                    var parentTextNode = textNode.Node.Parent;
+                    var parentVE       = parentTextNode.Node.GetData<VirtualEntity>("paired_virtual_entity");
+                    ve.Node.SetParent(parentVE);
+                }
+                else
+                {
+                    rootVE = ve;
+                }
+            }
+            
+            // cleanup
+            foreach (var textNode in rootTextNode.Node.Descendants().OfType<TextNode>())
+            {
+                textNode.Node.RemoveData("paired_virtual_entity");
+            }
+            
+            return rootVE;
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Storage ID
         
         public string GetStorageID()
         {
