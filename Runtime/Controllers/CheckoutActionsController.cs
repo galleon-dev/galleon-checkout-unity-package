@@ -308,7 +308,20 @@ namespace Galleon.Checkout
                                       var status = response?.status ?? "NULL";
                                       s.Log(status);
 
-                                      if (status != null && status == "completed")
+                                      if (response?.errors != null)
+                                      {
+                                          
+                                          CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
+                                                                                                  {
+                                                                                                      charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
+                                                                                                      errors      = response.errors,
+                                                                                                      is_canceled = false,
+                                                                                                      is_success  = false,
+                                                                                                  };
+                                          
+                                          SendErrorAnalytics();
+                                      }
+                                      else if (status != null && status == "completed")
                                       {
                                           // transaction over
                                           SendSuccessAnalytics();
@@ -547,6 +560,7 @@ namespace Galleon.Checkout
             {
                 var errors                = CHECKOUT.Session.lastChargeResult?.errors ?? new string[0];
                 var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
+                
                 CheckoutAPI.InvokeAnalyticsEvent("payment_failed", new Dictionary<string, object>
                                                 {
                                                     { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""              },

@@ -90,6 +90,19 @@ namespace Galleon.Checkout
             set => CHECKOUT.Config.SetOverrideValue("is_last_used_payment_method_in_preselection_enabled", value);
         }
         
+        public bool FakeTaxes
+        {
+            get => CHECKOUT.Config.GetBool         ("fake_taxes", defaultValue : false);
+            set => CHECKOUT.Config.SetOverrideValue("fake_taxes", value);
+        }
+        
+        public string FakeTaxesIp
+        {
+            get => CHECKOUT.Config.GetString       ("fake_taxes_ip", defaultValue : "66.213.22.193");
+            set => CHECKOUT.Config.SetOverrideValue("fake_taxes_ip", value);
+        }
+        
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
@@ -309,6 +322,34 @@ namespace Galleon.Checkout
                                                                 new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = null    },
                                                                 new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
                                                                 new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "fake_taxes", value: false)
+                                      {
+                                          displayName     = "Fake Taxes",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = false   },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "fake_taxes_ip", value: "66.213.22.193")
+                                      {
+                                          displayName     = "Fake Taxes IP",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "66.213.22.193", Value = "66.213.22.193"   },
                                                             },
                                       }
                                   );
