@@ -11,8 +11,8 @@ namespace Galleon.Checkout.Symbols
         
         public Collection<Symbol> Collection = new();
         
-        public Symbols.ThingSymbol thingSymbol = new ThingSymbol();
-        public Symbols.Slice       sliceSymbol = new Slice("slice");
+        //public Symbols.ThingSymbol thingSymbol = new ThingSymbol();
+        //public Symbols.Slice       sliceSymbol = new Slice("slice");
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 

@@ -23,7 +23,7 @@ namespace Galleon.Checkout.Foundation
             public VirtualEntity ve;
             public ThingData(VirtualEntity ve) { this.ve = ve; }
             
-            public Symbols.ThingSymbol   Symbol     => Root.Instance.Context.Project.Package1.AllSymbols.thingSymbol;
+            //public Symbols.ThingSymbol   Symbol     => Root.Instance.Context.Project.Package1.AllSymbols.thingSymbol;
             
             public string           ThingName   => ve.TextNode?.LineWords != null && ve.TextNode.LineWords.Count() >= 2 
                                                  ? ve.TextNode.LineWords.ElementAt(1) 
@@ -37,7 +37,7 @@ namespace Galleon.Checkout.Foundation
             public VirtualEntity ve;
             public SliceData(VirtualEntity ve) { this.ve = ve; }
             
-            public Symbols.Symbol   Symbol     => Root.Instance.Context.Project.Package1.AllSymbols.sliceSymbol;
+            //public Symbols.Symbol   Symbol     => Root.Instance.Context.Project.Package1.AllSymbols.sliceSymbol;
             
             public string           SliceName   => ve.TextNode?.LineWords != null && ve.TextNode.LineWords.Count() >= 2 
                                                  ? ve.TextNode.LineWords.ElementAt(1) 
