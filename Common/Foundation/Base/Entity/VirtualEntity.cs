@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Assets;
-using Galleon.Checkout.Symbols;
+//using Galleon.Checkout.Symbols;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -220,6 +220,8 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"print_thing"
                     ,action : async (s) =>
                     {
+                        #if AUTO
+                        
                         s.Log($"state = {State}");
                         
                         var thingElement = new Symbols.ThingSymbol();
@@ -266,6 +268,8 @@ namespace Galleon.Checkout.Foundation
                             State = "done";
                             StoreState();
                         }
+
+                        #endif
                     });
         
         
@@ -274,6 +278,8 @@ namespace Galleon.Checkout.Foundation
             new Step(name   : $"print_slice"
                     ,action : async (s) =>
                     {
+                        #if AUTO
+                        
                         s.Log($"state = {State}");
                         
                         var sliceName   = this.TextNode.LineWords.ElementAt(1);
@@ -310,6 +316,8 @@ namespace Galleon.Checkout.Foundation
                             State = "done";
                             StoreState();
                         }
+
+                        #endif
                     });
     }
 }
