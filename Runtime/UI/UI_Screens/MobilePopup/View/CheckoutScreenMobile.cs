@@ -519,30 +519,50 @@ namespace Galleon.Checkout.UI
             }
 
             #elif UNITY_ANDROID && !UNITY_EDITOR
-            
+
             // Get the current Android Activity and View to measure visible frame
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
             {
-                AndroidJavaObject activity  = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");                          // Get the current Android Activity
-                AndroidJavaObject view      = activity.Get<AndroidJavaObject>("mUnityPlayer").Call<AndroidJavaObject>("getView");   // Get the Unity view
-                AndroidJavaObject rect      = new AndroidJavaObject("android.graphics.Rect");                                       // Create rect to store visible frame
-                view.Call("getWindowVisibleDisplayFrame", rect);                                                                    // Get visible frame dimensions
-                int visibleHeight           = rect.Call<int>("height");                                                             // Get height of visible frame
-                var footerHeight            = (this.FooterPanelView.transform as RectTransform).rect.height;                        // Get footer height
+                AndroidJavaObject activity       = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                AndroidJavaObject view           = activity.Get<AndroidJavaObject>("mUnityPlayer").Call<AndroidJavaObject>("getView");
+                AndroidJavaObject rootView       = view.Call<AndroidJavaObject>("getRootView"); // Use getRootView() for more reliable measurements
+                int               rootViewHeight = rootView.Call<int>("getHeight"); // Get the actual visible height by using the root view's height
+                AndroidJavaObject windowInsets   = rootView.Call<AndroidJavaObject>("getRootWindowInsets"); // Get window insets to determine keyboard height
+                int bottomInset = 0;
+
+                if (windowInsets != null)
+                {
+                    // For API 30+, use getInsets()
+                    try
+                    {
+                        using (AndroidJavaClass typeClass = new AndroidJavaClass("android.view.WindowInsets$Type"))
+                        {
+                            int imeType = typeClass.CallStatic<int>("ime");
+                            AndroidJavaObject insets = windowInsets.Call<AndroidJavaObject>("getInsets", imeType);
+                            bottomInset = insets.Get<int>("bottom");
+                        }
+                    }
+                    catch
+                    {
+                        // Fallback for older APIs
+                        bottomInset = windowInsets.Call<int>("getSystemWindowInsetBottom");
+                    }
+                }
+
+                var footerHeight = (this.FooterPanelView.transform as RectTransform).rect.height;
 
                 Debug.Log("=====================================================================================");
-                Debug.Log($"activity              : {activity}");
-                Debug.Log($"view                  : {view}");
-                Debug.Log($"rect                  : {rect}");
-                Debug.Log($"visibleHeight         : {visibleHeight}");
+                Debug.Log($"rootViewHeight        : {rootViewHeight}");
+                Debug.Log($"bottomInset           : {bottomInset}");
                 Debug.Log($"footerHeight          : {footerHeight}");
                 Debug.Log($"hasInputFocus         : {hasInputFocus}");
                 Debug.Log($"maxKeyboardHeight     : {maxKeyboardHeight}");
                 Debug.Log($"currentKeyboardHeight : {currentKeyboardHeight}");
-                
-                
-                // Calculate actual keyboard height by comparing screen height to visible frame height
-                float actualKeyboardHeight = (UnityEngine.Screen.height - visibleHeight) - footerHeight;
+
+                // Calculate actual keyboard height using insets
+                float actualKeyboardHeight = bottomInset > 0 
+                                           ? bottomInset - footerHeight 
+                                           : 0;
 
                 // Track maximum keyboard height
                 if (actualKeyboardHeight > maxKeyboardHeight)
@@ -554,7 +574,7 @@ namespace Galleon.Checkout.UI
                     targetKeyboardHeight = actualKeyboardHeight;
                     keyboardHideTimer    = keyboardHideDelay;
                     hasInputFocus        = true;
-                    
+
                     if (maxKeyboardHeight > currentKeyboardHeight)
                         targetKeyboardHeight = maxKeyboardHeight;
                 }
@@ -573,10 +593,10 @@ namespace Galleon.Checkout.UI
 
                 // Smoothly interpolate current height to target height
                 currentKeyboardHeight = Mathf.Lerp(currentKeyboardHeight, targetKeyboardHeight, Time.deltaTime * 15f);
-                
+
                 if (actualKeyboardHeight > 0 || hasInputFocus)
                     currentKeyboardHeight = maxKeyboardHeight;
-                
+
                 return currentKeyboardHeight;
             }
             
