@@ -488,6 +488,7 @@ namespace Galleon.Checkout.UI
             
             if (IsPortrait)
             {
+                Debug.Log("Is Portrait");
                 ParentPanel.TryGetComponent(out RectTransform parentTransform);
                 var keyboardHeight         = Math.Max(0, GetKeyboardHeight());
                 var targetSize             = new Vector2(parentTransform.sizeDelta.x, contentTransform.sizeDelta.y + keyboardHeight);
@@ -520,6 +521,9 @@ namespace Galleon.Checkout.UI
 
             #elif UNITY_ANDROID && !UNITY_EDITOR
 
+            Debug.Log("GetKeyboardHeight");
+            
+            
             // Get the current Android Activity and View to measure visible frame
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
             {
