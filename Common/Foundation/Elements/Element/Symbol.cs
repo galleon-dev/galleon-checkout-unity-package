@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
 
-namespace Galleon.Checkout.ELEMENTS
+namespace Galleon.Checkout.Symbols
 {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Element Class
     
     [Element("element")]   
-    public partial class Element : Entity
+    public partial class Symbol : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
@@ -20,7 +20,7 @@ namespace Galleon.Checkout.ELEMENTS
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public Element(string name)
+        public Symbol(string name)
         {
             this.Name = name;
         }

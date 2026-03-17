@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Galleon.Checkout.ELEMENTS;
+using Galleon.Checkout.Symbols;
 using Galleon.Checkout.Foundation;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -778,7 +778,7 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element 
      
-        public Element GetElement() => AllElements.GetElement(this.Entity.GetType());
+        public Symbol GetElement() => AllSymbols.GetElement(this.Entity.GetType());
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
         

@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using Galleon.Checkout.Foundation;
 
-namespace Galleon.Checkout.ELEMENTS
+namespace Galleon.Checkout.Symbols
 {
-    public class AllElements : Entity
+    public class AllSymbols : Entity
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public Collection<Element> Collection = new();
+        public Collection<Symbol> Collection = new();
         
-        public ELEMENTS.ThingElement ThingElement = new ThingElement();
+        public Symbols.ThingSymbol thingSymbol = new ThingSymbol();
+        public Symbols.Slice       sliceSymbol = new Slice("slice");
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
-        public AllElements()
+        public AllSymbols()
         {
-            Element Folder    = new Element(name : "Folder"); this.Collection.Add(Folder);
+            Symbol Folder    = new Symbol(name : "Folder"); this.Collection.Add(Folder);
             Folder.Definition = DefinitionNode.Parse(new []
                                                      {
                                                         "> Element Folder $name "
@@ -25,7 +26,7 @@ namespace Galleon.Checkout.ELEMENTS
                                                      ,  "       > Folder $name  "
                                                      });
             
-            Element Package                 = new Element(name : "Package"); this.Collection.Add(Package);
+            Symbol Package                 = new Symbol(name : "Package"); this.Collection.Add(Package);
             Package.Definition = DefinitionNode.Parse(new []
                                                       {
                                                          "> Element Package             "
@@ -39,7 +40,7 @@ namespace Galleon.Checkout.ELEMENTS
                                                       ,  "       > Scene main           "
                                                       });
             
-            Element Scene    = new Element(name : "Scene"); this.Collection.Add(Scene);
+            Symbol Scene    = new Symbol(name : "Scene"); this.Collection.Add(Scene);
             Scene.Definition = DefinitionNode.Parse(new []
                                                      {
                                                         "> Element Scene $name  "
@@ -73,11 +74,11 @@ namespace Galleon.Checkout.ELEMENTS
             
         }
         
-        public static Element GetElement(string typeName)
+        public static Symbol GetElement(string typeName)
         {
             return GetAllElements().FirstOrDefault(e => e.Name == typeName);
         }
-        public static Element GetElement(Type type)
+        public static Symbol GetElement(Type type)
         {
             var elements = GetAllElements();
 
@@ -96,13 +97,13 @@ namespace Galleon.Checkout.ELEMENTS
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Static
         
-        public static IEnumerable<Element> GetAllElements()
+        public static IEnumerable<Symbol> GetAllElements()
         {
-            return Root.Instance.Context.Project.Package1.allElements.Collection;
+            return Root.Instance.Context.Project.Package1.AllSymbols.Collection;
         }
-        public static Element GetElementByName(string elementName)
+        public static Symbol GetElementByName(string elementName)
         {
-            return Root.Instance.Context.Project.Package1.allElements.Collection.FirstOrDefault(x => x.Name == elementName); 
+            return Root.Instance.Context.Project.Package1.AllSymbols.Collection.FirstOrDefault(x => x.Name == elementName); 
         }
     }
 }

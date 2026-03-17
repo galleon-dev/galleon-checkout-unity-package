@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Assets;
-using Galleon.Checkout.ELEMENTS;
+using Galleon.Checkout.Symbols;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -23,12 +23,27 @@ namespace Galleon.Checkout.Foundation
             public VirtualEntity ve;
             public ThingData(VirtualEntity ve) { this.ve = ve; }
             
-            public ELEMENTS.ThingElement   Element     => Root.Instance.Context.Project.Package1.allElements.ThingElement;
+            public Symbols.ThingSymbol   Symbol     => Root.Instance.Context.Project.Package1.AllSymbols.thingSymbol;
             
             public string           ThingName   => ve.TextNode?.LineWords != null && ve.TextNode.LineWords.Count() >= 2 
                                                  ? ve.TextNode.LineWords.ElementAt(1) 
                                                  : string.Empty;
         }
+        
+        
+        public        SliceData sliceData => new SliceData(this);
+        public struct SliceData
+        {
+            public VirtualEntity ve;
+            public SliceData(VirtualEntity ve) { this.ve = ve; }
+            
+            public Symbols.Symbol   Symbol     => Root.Instance.Context.Project.Package1.AllSymbols.sliceSymbol;
+            
+            public string           SliceName   => ve.TextNode?.LineWords != null && ve.TextNode.LineWords.Count() >= 2 
+                                                 ? ve.TextNode.LineWords.ElementAt(1) 
+                                                 : string.Empty;
+        }
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// General
         
@@ -207,10 +222,12 @@ namespace Galleon.Checkout.Foundation
                     {
                         s.Log($"state = {State}");
                         
-                        var thingElement = new ELEMENTS.ThingElement();
+                        var thingElement = new Symbols.ThingSymbol();
                         
-                        if (State == "undefined"
-                        ||  State == "pending")
+                        if (State == "undefined")
+                            return;
+                            
+                        if (State == "pending")
                         {
                             thingElement.CreateThingAsset(this).Execute();
                             State = "assets";
@@ -240,12 +257,58 @@ namespace Galleon.Checkout.Foundation
                         if (State == "scene")
                         {
                             thingElement.AddThingToScene(this).Execute();
+                            State = "delete";
+                            StoreState();
+                        }
+                        if (State == "delete")
+                        {
+                            this.DeleteVirtualEntity().Execute();
                             State = "done";
                             StoreState();
                         }
-                        if (State == "done")
+                    });
+        
+        
+        public Step PrintSlice() 
+        =>
+            new Step(name   : $"print_slice"
+                    ,action : async (s) =>
+                    {
+                        s.Log($"state = {State}");
+                        
+                        var sliceName   = this.TextNode.LineWords.ElementAt(1);
+                        var sliceSymbol = new Symbols.Slice(sliceName);
+                        
+                        if (State == "undefined")
+                            return;
+                            
+                        if (State == "pending")
+                        {
+                            sliceSymbol.PrintSliceAsset().Execute();
+                            State = "assets";
+                            StoreState();
+                        }
+                        if (State == "assets")
+                        {
+                            await Task.Delay(5000);
+                            #if UNITY_EDITOR
+                            AssetDatabase.Refresh(options: ImportAssetOptions.ForceUpdate);
+                            #endif
+                            State = "reload";
+                            StoreState();
+                        }
+                        if (State == "reload")
+                        {
+                            await Task.Delay(500);
+                            sliceSymbol.AssembleSliceHierarchy().Execute();
+                            State = "delete";
+                            StoreState();
+                        }
+                        if (State == "delete")
                         {
                             this.DeleteVirtualEntity().Execute();
+                            State = "done";
+                            StoreState();
                         }
                     });
     }

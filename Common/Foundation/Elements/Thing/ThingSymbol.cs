@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Galleon.Checkout;
-using Galleon.Checkout.ELEMENTS;
+using Galleon.Checkout.Symbols;
 using Galleon.Checkout.Foundation;
 using UnityEngine;
 using System.IO;
@@ -24,10 +24,10 @@ namespace Galleon.Checkout
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Element
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-namespace Galleon.Checkout.ELEMENTS
+namespace Galleon.Checkout.Symbols
 {
     [Element("Thing")]
-    public class ThingElement : Element
+    public class ThingSymbol : Symbol
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Types
         
@@ -48,7 +48,7 @@ namespace Galleon.Checkout.ELEMENTS
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public ThingElement() : base("Thing")
+        public ThingSymbol() : base("Thing")
         {
         }
 
