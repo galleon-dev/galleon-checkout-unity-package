@@ -530,6 +530,17 @@ namespace Galleon.Checkout.UI
                 int visibleHeight           = rect.Call<int>("height");                                                             // Get height of visible frame
                 var footerHeight            = (this.FooterPanelView.transform as RectTransform).rect.height;                        // Get footer height
 
+                Debug.Log("=====================================================================================");
+                Debug.Log($"activity              : {activity}");
+                Debug.Log($"view                  : {view}");
+                Debug.Log($"rect                  : {rect}");
+                Debug.Log($"visibleHeight         : {visibleHeight}");
+                Debug.Log($"footerHeight          : {footerHeight}");
+                Debug.Log($"hasInputFocus         : {hasInputFocus}");
+                Debug.Log($"maxKeyboardHeight     : {maxKeyboardHeight}");
+                Debug.Log($"currentKeyboardHeight : {currentKeyboardHeight}");
+                
+                
                 // Calculate actual keyboard height by comparing screen height to visible frame height
                 float actualKeyboardHeight = (UnityEngine.Screen.height - visibleHeight) - footerHeight;
 
