@@ -84,6 +84,9 @@ namespace Galleon.Checkout
                     {   
                         //return;
                         
+                        if (CHECKOUT.User.AppUserID == null)
+                            Debug.LogError("Checkout AppUserID is NULL - this shouldn't happen. did you initialize ?");
+                        
                         var accessToken = await Post(url     : $"{SERVER_BASE_URL}/authenticate"
                                                     ,headers : new()
                                                              {
@@ -92,7 +95,7 @@ namespace Galleon.Checkout
                                                              }
                                                     ,body    : new
                                                              {
-                                                                 app_user_id = CHECKOUT.User.AppUserID ?? "test_vadimski"
+                                                                 app_user_id = CHECKOUT.User.AppUserID ?? "null_user"
                                                              });
                         
                         /// Response Example :
