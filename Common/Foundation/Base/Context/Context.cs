@@ -5,10 +5,6 @@ namespace Galleon.Checkout.Foundation
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public Home                Home             = new Home();
-        public Project             Project          = new Project();
-        public Products            Products         = new Products();
-        
         public SystemServices      SystemServices   = new SystemServices();
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle

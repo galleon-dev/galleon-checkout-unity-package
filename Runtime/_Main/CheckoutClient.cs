@@ -84,7 +84,6 @@ namespace Galleon.Checkout
             
             Root.Instance.Runtime.Node.Children.Add(Instance);
             Instance.Node.Initialize();
-            Instance.Node.LateInitialize();
 
             // await Instance.SystemInitFlow();
 

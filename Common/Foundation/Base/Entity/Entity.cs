@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Galleon.Checkout.Symbols;
 using Galleon.Checkout.Foundation;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -62,11 +61,6 @@ namespace Galleon.Checkout
             foreach (var child in this.Descendants())
                 child.Node.Setup();
         }
-        public void LateInitialize()
-        {
-            foreach (var child in this.Descendants())
-                child.Node.LateSetup();
-        }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Setup
         
@@ -79,11 +73,6 @@ namespace Galleon.Checkout
             didSetup = true;
         }
 
-        public void LateSetup()
-        {
-            PopulateSavedVirtualEntities();
-            didLateSetup = true;
-        }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - General
 
         [SerializeReference] [HideInInspector] public IEntity Entity;
@@ -165,7 +154,6 @@ namespace Galleon.Checkout
             if (child.Node.didSetup == false)
             {
                 child.Node.Setup();
-                child.Node.LateSetup();
             }
         }
         
@@ -315,47 +303,6 @@ namespace Galleon.Checkout
                 }
 
             }
-        }
-        
-        private void PopulateSavedVirtualEntities()
-        {
-            try
-            {
-                if (!this.SessionStorage.HasKey("virtual_entities"))
-                    return;
-                
-                var savedVirtualEntityIDs = this.SessionStorage.LoadList<string>("virtual_entities");
-
-                if (savedVirtualEntityIDs == null || savedVirtualEntityIDs.Count == 0)
-                    return;
-
-                foreach (var veID in savedVirtualEntityIDs) 
-                {
-                    try
-                    {
-                        // Load the virtual entity from general session storage using its ID
-                        var veString = Root.Instance.Context.SystemServices.SessionStorageService.Load<string>($"virtual_entity_{veID}");
-
-                        if (string.IsNullOrEmpty(veString))
-                        {
-                            Debug.LogWarning($"Failed to load virtual entity with ID: {veID}. No data found in session storage.");
-                            continue;
-                        }
-
-                        var virtualEntity = new VirtualEntity(veString);
-                        this.AddChild(virtualEntity);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogWarning($"Failed to load virtual entity with ID: {veID}. Error: {ex.Message}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"Failed to load virtual entities from prefs storage: {ex.Message}");
-            }
-
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Quick Debug
@@ -544,31 +491,6 @@ namespace Galleon.Checkout
                 }
 
                 yield break;
-            }
-          
-            public IEnumerable<Operation> Operations()
-            {
-                var type = this.Entity.GetType();
-
-                // Retrieve all properties and fields in the type that are of type Operation
-                var members = type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                  .Where     (m => (m is FieldInfo    fi && fi.FieldType    == typeof(Operation)) 
-                                                || (m is PropertyInfo pi && pi.PropertyType == typeof(Operation)));
-
-                foreach (var member in members)
-                {
-                    var value = member switch
-                    {
-                        FieldInfo    field => field.GetValue(this.Entity),
-                        PropertyInfo prop  => prop .GetValue(this.Entity),
-                        _ => null
-                    };
-
-                    if (value is Operation operation)
-                    {
-                        yield return operation;
-                    }
-                }
             }
         }
         
@@ -776,97 +698,5 @@ namespace Galleon.Checkout
         
         #endif // UNITY_EDITOR
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Element 
-     
-        public Symbol GetElement() => AllSymbols.GetElement(this.Entity.GetType());
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Aspect - Live 
-        
-        public        LIVE Live => new(Entity as IEntity);
-        public struct LIVE
-        {
-            IEntity Entity; public LIVE(IEntity entity) => this.Entity = entity;
-            
-            ////////////////////////////////////////////////////////////////////// Operation
-            
-            public Step Operation(string OpString)
-            {
-                var entity = Entity;
-                
-                return new Step(name   : $"Operation"
-                               ,action : async (s) =>
-                                         {
-                                             string        operationID = $"operation_{entity.Node.ID.PathID}";
-                                             LiveOperation operation   = new LiveOperation(ID            : operationID
-                                                                                          ,targetEntity  : entity
-                                                                                          ,OpString      : OpString);
-                                             
-                                             await operation.Flow().Execute();
-                                         });
-            }
-            
-            ////////////////////////////////////////////////////////////////////// VirtualEntities
-            
-            public void AddVirtualEntity(string text)
-            {
-                // create node
-                var textNode = new TextNode(text);
-                var ve       = new VirtualEntity(textNode.RawText);
-                
-                // add node
-                this.AddVirtualEntity(ve);
-            }
-            public void AddVirtualEntity(VirtualEntity ve)
-            {
-                this.Entity.Node.AddChild(ve);
-
-                // Get or create the unique storage ID for this virtual entity
-                var veID = ve.GetStorageID();
-
-                // Store the virtual entity itself in general session storage
-                // ve.StoreState(); - this is now done in virtual entity CTOR
-
-                // Store only the ID in the parent's virtual entities list
-                Entity.Node.SessionStorage.AddToList("virtual_entities", veID);
-                Debug.Log($"Added VE {veID} to {Entity.Node.ID.PathID} ");
-                
-            }
-            public void RemoveVirtualEntity(VirtualEntity ve)
-            {
-                var veID = ve.GetStorageID();
-
-                // Remove from parent's children
-                this.Entity.Node.RemoveChild(ve);
-
-                // Remove the ID from the parent's list
-                Entity.Node.SessionStorage.RemoveFromList("virtual_entities", veID);
-
-                // Remove the virtual entity from general session storage
-                Root.Instance.Context.SystemServices.SessionStorageService.Remove($"virtual_entity_{veID}");
-            }
-            
-            ////////////////////////////////////////////////////////////////////// PrintME
-            
-            public Step PrintMe()
-            {
-                var type = this.Entity.GetType();
-                var method = type.GetMethod("PrintMe", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-                if (method != null && method.ReturnType == typeof(Step))
-                {
-                    return (Step)method.Invoke(this.Entity, null);
-                }
-
-                return null;
-            }
-            
-            
-        }
-        
-        public class CRUD_Params
-        {
-            public string Name;
-        }
-
     }    
 }

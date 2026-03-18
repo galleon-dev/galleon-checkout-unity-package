@@ -33,7 +33,6 @@ namespace Galleon.SampleApp
         {
             Debug.Log($"SampleAppController.Awake");
             
-            this.Node.LateInitialize();
             Root.Instance.Runtime.Node.AddChild(this);
         }
         

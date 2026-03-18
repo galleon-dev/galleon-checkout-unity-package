@@ -16,10 +16,6 @@ namespace Galleon.Checkout
         
         private static Root _instance;
         public  static Root Instance => _instance;
-
-        ////////////////////////////////////////////////////// Static
-        
-        public static Home Home => Instance.Context.Home;
         
         ////////////////////////////////////////////////////// Members
         
@@ -33,7 +29,6 @@ namespace Galleon.Checkout
         {
             _instance = new Root();
             Instance.Node.Initialize();
-            Instance.Node.LateInitialize();
         }
     }
 }
