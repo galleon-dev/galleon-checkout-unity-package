@@ -38,17 +38,19 @@ namespace Galleon.Checkout
             
             // Create and setup session
             await CheckoutClient.Instance.CreateCheckoutSession(product).Execute();
+            var sessionID = CHECKOUT.Session.SessionID;
+            var session   = CheckoutClient.Instance.CurrentSession;
             
-            CheckoutClient.Instance.CurrentSession.PurchaseConfiguration = configuration;
+            session.PurchaseConfiguration = configuration;
             
-            CheckoutClient.Instance.CurrentSession.Metadata              = configuration.Metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            CheckoutClient.Instance.CurrentSession.BonusData             = configuration.BonusData;
+            session.Metadata              = configuration.Metadata.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            session.BonusData             = configuration.BonusData;
             
             // Run Session
-            await  CheckoutClient.Instance.RunCheckoutSession().Execute();
+            await  CheckoutClient.Instance.RunCheckoutSession(session).Execute();
             
             // Return result
-            return CheckoutClient.Instance.CurrentSession.PurchaseResult;
+            return session.PurchaseResult;
         }
     
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Analytics

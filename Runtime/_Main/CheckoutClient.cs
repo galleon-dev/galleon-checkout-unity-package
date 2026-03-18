@@ -152,13 +152,13 @@ namespace Galleon.Checkout
                                   CurrentSession.SelectedProduct = product;
                               });
         
-        public Step RunCheckoutSession()
+        public Step RunCheckoutSession(CheckoutSession session)
         =>
             new Step(name   : $"run_checkout_session"
                     ,action : async (s) =>
                               {
                                   // Start Session
-                                  await CurrentSession.Flow().Execute();
+                                  await session.Flow().Execute();
                               });
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
