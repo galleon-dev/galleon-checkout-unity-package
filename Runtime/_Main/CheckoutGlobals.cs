@@ -7,8 +7,10 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public List<ConfigValue>          GlobalValues = new();
-        public CheckoutConfiguration      CheckoutInitConfiguration;
+        internal    bool                        IsInternal      = false;
+        
+        public      List<ConfigValue>           GlobalValues    = new();
+        public      CheckoutConfiguration       CheckoutInitConfiguration;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 

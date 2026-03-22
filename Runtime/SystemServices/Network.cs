@@ -58,7 +58,9 @@ namespace Galleon.Checkout
                     ,action : async s =>
                     {
                         s.AddChildStep(GetDeviceIP());
-                        s.AddChildStep(GetUserAccessToken());
+                        
+                        if (CHECKOUT.Globals.IsInternal)
+                            s.AddChildStep(GetUserAccessToken());
                     });
         
         /////////////////////////////////////////////////////////////////////////////////////////////////// Factory

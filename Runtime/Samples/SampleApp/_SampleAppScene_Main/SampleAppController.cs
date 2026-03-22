@@ -44,6 +44,8 @@ namespace Galleon.SampleApp
             ReportText.text = "> Initializing ... ";
             
             var user = $"test_user_{DateTime.Now.ToString()}";
+            
+            CHECKOUT.Globals.IsInternal = true;
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
                                             #if PROD
@@ -104,6 +106,7 @@ namespace Galleon.SampleApp
                                                        : CHECKOUT.Globals.TestUser;
             
             // Reinitialize if needed
+            CHECKOUT.Globals.IsInternal = true;
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
                                             #if PROD
