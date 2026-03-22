@@ -31,7 +31,7 @@ namespace Galleon.Checkout.UI
         
         private IBonusItemView Ibonus;
         IBonusItemView GetBonusItemView() => Ibonus ?? bonusItemView;
-        MonoBehaviour GetBonusItemMonoBehaviour() => (Ibonus ?? bonusItemView) as MonoBehaviour;
+        MonoBehaviour  GetBonusItemMonoBehaviour() => (Ibonus ?? bonusItemView) as MonoBehaviour;
         
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
@@ -76,6 +76,8 @@ namespace Galleon.Checkout.UI
             
             if (userPaymentMethod.GetPaymentMethodDefinition()?.BonusItem != null)
                 InitializeBonus(userPaymentMethod.GetPaymentMethodDefinition().BonusItem);
+            else
+                bonusItemView?.gameObject.SetActive(false);
             
             Refresh();
         }

@@ -69,7 +69,7 @@ namespace Galleon.Checkout.UI
             ||  !CHECKOUT.Globals.IsBonusEnabled)
             {
                 bonusItemView? .gameObject.SetActive(false);
-                BonusContainer?.gameObject.SetActive(false);
+                //BonusContainer?.gameObject.SetActive(false);
                 return;
             }
         
