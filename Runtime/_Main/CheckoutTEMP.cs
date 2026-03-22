@@ -108,7 +108,7 @@ namespace Galleon.Checkout
             public int number;
         }
         #if UNITY_EDITOR
-        [MenuItem("Tools/Galleon/Temp/Test Temporary Method")]
+      //[MenuItem("Tools/Galleon/Temp/Test Temporary Method")]
         private static void TestTemporaryMethod()
         {
             var list = Root.Instance.Node.Descendants().SelectMany(x => x.Node.Reflection.Steps(new temp()));
@@ -918,4 +918,7 @@ namespace Galleon.Checkout
 ///         > NO internet - show error ui
 ///         > sometimes it tries to cancel the session when it shouldnt
 ///         > total price on second purchase doesnt reset
+///         > no UPM selected
+///         > no bonus on first select item
+///         > isGPAYAvailable
 

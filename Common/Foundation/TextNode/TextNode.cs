@@ -487,7 +487,7 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Unity Test Menu
 
         #if UNITY_EDITOR
-        [MenuItem("Tools/Galleon/TextNode/Test Parse Tree")]
+      //[MenuItem("Tools/Galleon/TextNode/Test Parse Tree")]
         #endif
         public static void TestParseTree()
         {
@@ -540,7 +540,7 @@ namespace Galleon.Checkout.Foundation
         }
 
         #if UNITY_EDITOR
-        [MenuItem("Tools/Galleon/TextNode/Test Write API")]
+      //[MenuItem("Tools/Galleon/TextNode/Test Write API")]
         #endif
         public static void TestWriteAPI()
         {

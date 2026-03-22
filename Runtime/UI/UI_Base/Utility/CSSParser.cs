@@ -121,7 +121,7 @@ namespace Galleon.Checkout.UI
             }
 
             #if UNITY_EDITOR
-            [MenuItem("Tools/Galleon/Tests/Test CSS Parser")]
+          //[MenuItem("Tools/Galleon/Tests/Test CSS Parser")]
             #endif
             public static void TestCSSParser()
             {

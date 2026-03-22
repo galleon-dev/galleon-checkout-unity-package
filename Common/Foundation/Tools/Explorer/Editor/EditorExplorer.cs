@@ -8,7 +8,7 @@ namespace Galleon.Checkout
 {
     public class EditorExplorer : EditorWindow
     {
-        [MenuItem("Tools/Galleon/Explorer")]
+      //[MenuItem("Tools/Galleon/Explorer")]
         public static void ShowExample()
         {
             EditorExplorer wnd = GetWindow<EditorExplorer>();

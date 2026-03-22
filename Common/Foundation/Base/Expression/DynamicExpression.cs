@@ -93,7 +93,7 @@ namespace Galleon.Checkout.Foundation
         //////////////////////////////////////////////////////////////////////////////////////// Test
         
         #if UNITY_EDITOR
-        [MenuItem("Tools/Galleon/Test Expression Evaluation")]
+      //[MenuItem("Tools/Galleon/Test Expression Evaluation")]
         #endif
         private static void TestExpressionEvaluation()
         {
