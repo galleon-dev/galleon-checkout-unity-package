@@ -1,3 +1,5 @@
+//#define PROD
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,12 +26,14 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Consts
       
-        #if DEBUG
+        #if PROD
+        public string SERVER_BASE_URL = "https://bridge-api.galleon.so";
+        #elif DEBUG
       //public string SERVER_BASE_URL = "https://localhost:4000/v1";
       //public string SERVER_BASE_URL = "https://galleon-bridge-server-production.up.railway.app";
       //public string SERVER_BASE_URL = "http://localhost:3000";
-        public string SERVER_BASE_URL = "https://bridge-staging-api.galleon.so";
       //public string SERVER_BASE_URL = "https://galleon-bridge-server-paypal-integration.up.railway.app";
+        public string SERVER_BASE_URL = "https://bridge-staging-api.galleon.so";
         #else
         public string SERVER_BASE_URL = "https://bridge-api.galleon.so";
         #endif

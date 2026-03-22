@@ -308,7 +308,7 @@ namespace Galleon.Checkout
                                       var status = response?.status ?? "NULL";
                                       s.Log(status);
 
-                                      if (response?.errors != null)
+                                      if (response?.errors != null && response?.errors?.Count() > 0)
                                       {
                                           
                                           CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()

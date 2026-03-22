@@ -1,3 +1,5 @@
+//#define PROD
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+
 
 namespace Galleon.SampleApp
 {
@@ -43,7 +46,14 @@ namespace Galleon.SampleApp
             var user = $"test_user_{DateTime.Now.ToString()}";
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
-                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",
+                                            #if PROD
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
+                                            #elif DEBUG
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",    // TEST
+                                            #else 
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
+                                            #endif
+                                         
                                             #if DEBUG
                                             AppUserID               = $"test_user_{DateTime.Now.ToString()}",
                                             #else
@@ -96,8 +106,20 @@ namespace Galleon.SampleApp
             // Reinitialize if needed
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
-                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",
+                                            #if PROD
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
+                                            #elif DEBUG
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",    // TEST
+                                            #else 
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
+                                            #endif
+                                         
+                                            #if DEBUG
                                             AppUserID               = $"test_user_{DateTime.Now.ToString()}",
+                                            #else
+                                            AppUserID               = $"dice.prod.app",
+                                            #endif
+                                         
                                             ApplicationDisplayName  = "Dice Dreams",
                                             DeepLinkName            = "test.app",
                                             Config                  = new()
