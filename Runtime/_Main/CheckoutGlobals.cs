@@ -103,9 +103,16 @@ namespace Galleon.Checkout
             get => CHECKOUT.Config.GetString       ("fake_taxes_ip", defaultValue : "66.213.22.193");
             set => CHECKOUT.Config.SetOverrideValue("fake_taxes_ip", value);
         }
+
+        public string OtherPaymentMethodsDescription
+        {
+            get => CHECKOUT.Config.GetString       ("other_payment_methods_description", defaultValue : "Paypal, Cash-App & More");
+            set => CHECKOUT.Config.SetOverrideValue("other_payment_methods_description", value);
+        }
+
         
-        
-        
+
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
         public CheckoutGlobals()
@@ -352,6 +359,19 @@ namespace Galleon.Checkout
                                           possibleValues  = new ()
                                                             {
                                                                 new ConfigValue.PossibleValue() { DisplayName = "66.213.22.193", Value = "66.213.22.193"   },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "other_payment_methods_description", value: "Paypal, Cash-App & More")
+                                      {
+                                          displayName     = "Other Payment Methods Description",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "default", Value = "Paypal, Cash-App & More" },
                                                             },
                                       }
                                   );

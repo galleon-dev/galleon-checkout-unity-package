@@ -1,16 +1,16 @@
+using System;
+using TMPro;
 using UnityEngine;
 
-public class OtherPaymentMethodsElement : MonoBehaviour
+namespace Galleon.Checkout
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class OtherPaymentMethodsElement : MonoBehaviour
     {
-        
-    }
+        public TMP_Text OtherPaymentMethodsDescriptionText;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void Refresh()
+        {
+            this.OtherPaymentMethodsDescriptionText.text = CHECKOUT.Globals.OtherPaymentMethodsDescription;
+        }
     }
 }

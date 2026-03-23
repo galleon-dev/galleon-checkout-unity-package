@@ -116,7 +116,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 934.6167, y: -0}
+  m_AnchoredPosition: {x: 934.6167, y: -100}
   m_SizeDelta: {x: 230.76668, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4744253367467228746
@@ -803,6 +803,7 @@ GameObject:
   - component: {fileID: 4585244616770207080}
   - component: {fileID: 6239427490942656740}
   - component: {fileID: 467115589488729546}
+  - component: {fileID: 856053169780649119}
   m_Layer: 5
   m_Name: OtherPaymentMethodsElement
   m_TagString: Untagged
@@ -988,6 +989,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!114 &856053169780649119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4998081036528196255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5c19101262fe46d48628eb7a3e519d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OtherPaymentMethodsDescriptionText: {fileID: 6150927257632296668}
 --- !u!1 &5030229432787860015
 GameObject:
   m_ObjectHideFlags: 0
@@ -1276,7 +1290,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 504.35, y: -0}
+  m_AnchoredPosition: {x: 504.35, y: -100}
   m_SizeDelta: {x: 629.76666, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9057239020602273542

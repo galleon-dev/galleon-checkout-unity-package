@@ -143,6 +143,8 @@ namespace Galleon.Checkout.UI
             {
                 GenerateTaxes();
             }
+            
+            GetComponentInChildren<OtherPaymentMethodsElement>()?.Refresh();
         }
         
         public void SoftRefreshState()
