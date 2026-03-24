@@ -1,4 +1,3 @@
-#define GALLEON_DEV
 
 using System;
 using System.Collections.Generic;
@@ -12,10 +11,8 @@ using UnityEditor.Callbacks;
 
 namespace Galleon.Checkout
 {
-    #if GALLEON_DEV
-    #endif
     [CreateAssetMenu(fileName = "CheckoutResources", menuName = "Galleon/Checkout/CheckoutResources")]
-    public partial class CheckoutResources : ScriptableObject, IEntity
+    public class CheckoutResources : ScriptableObject, IEntity
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Singleton
         
@@ -83,16 +80,16 @@ namespace Galleon.Checkout
     }
     
     
-    #if UNITY_EDITOR && UNITY_CLOUD_BUILD
-    [InitializeOnLoad]
-    public static class CheckoutResourcesPreBuild
-    {
-        static CheckoutResourcesPreBuild()
-        {
-            CheckoutResources.Instance.IsTest = true;
-            EditorUtility.SetDirty(CheckoutResources.Instance);
-            AssetDatabase.SaveAssets();
-        }
-    }
-    #endif
+    //#if UNITY_EDITOR && UNITY_CLOUD_BUILD
+    //[InitializeOnLoad]
+    //public static class CheckoutResourcesPreBuild
+    //{
+    //    static CheckoutResourcesPreBuild()
+    //    {
+    //        CheckoutResources.Instance.IsTest = true;
+    //        EditorUtility.SetDirty(CheckoutResources.Instance);
+    //        AssetDatabase.SaveAssets();
+    //    }
+    //}
+    //#endif
 }
