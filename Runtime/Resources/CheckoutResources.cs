@@ -12,7 +12,7 @@ using UnityEditor.Callbacks;
 namespace Galleon.Checkout
 {
     [CreateAssetMenu(fileName = "CheckoutResources", menuName = "Galleon/Checkout/CheckoutResources")]
-    public class CheckoutResources : ScriptableObject, IEntity
+    public class CheckoutResources : ScriptableObject
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Singleton
         
@@ -36,7 +36,7 @@ namespace Galleon.Checkout
 
         public CheckoutResources()
         {
-            Node = new EntityNode(this);
+            
         }
         
         public Step Initialize()
