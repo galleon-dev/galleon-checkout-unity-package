@@ -6,9 +6,9 @@ namespace Galleon.Checkout
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
-        public string TermsOfServiceUrl = "https://marble-globe-2b8.notion.site/TERMS-OF-SERVICE-1ce0aaf8c2e080dbb6d8f16cd1fe6e66";
-        public string PrivacyPolicyUrl  = "https://marble-globe-2b8.notion.site/PRIVACY-POLICY-1ce0aaf8c2e0800c911ed43e37c2ca6d";
-        public string ReturnPolicyUrl   = "https://marble-globe-2b8.notion.site/TERMS-OF-SERVICE-1ce0aaf8c2e080dbb6d8f16cd1fe6e66";
+        public string TermsOfServiceUrl => CHECKOUT.Config.GetString("terms_of_service_url", "https://www.superplay.co/terms/");
+        public string PrivacyPolicyUrl  => CHECKOUT.Config.GetString("privacy_policy_url",   "https://www.superplay.co/terms/");
+        public string ReturnPolicyUrl   => CHECKOUT.Config.GetString("return_policy_url",    "https://www.superplay.co/terms/");
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// UI Events
         
