@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +22,7 @@ namespace Galleon.Checkout
             {
                 if (instance == null)
                     instance = Resources.Load<CheckoutResources>("Checkout_Resources");
+                
                 
                 return instance;
             }
@@ -49,8 +49,11 @@ namespace Galleon.Checkout
                         
                         
                         // Load Assets
-                        var asset = Resources.Load<CheckoutAssets>("CheckoutAssets");
-                        this._checkoutAssets = asset;
+                        var assets = Resources.Load<CheckoutAssets>("CheckoutAssets");
+                        if (assets == null) assets = Resources.Load<CheckoutAssets>("Checkout Assets");
+                        if (assets == null) assets = Resources.Load<CheckoutAssets>("Checkout_Assets");
+                        if (assets == null) assets = Resources.Load<CheckoutAssets>("CustomCheckoutAssets");
+                        this._checkoutAssets = assets;
                         
                         // Validations
                         // if (assets.Length < 1) throw new Exception("No CheckoutAssets found");
