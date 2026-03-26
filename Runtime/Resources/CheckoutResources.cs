@@ -22,7 +22,7 @@ namespace Galleon.Checkout
             get
             {
                 if (instance == null)
-                    instance = Resources.LoadAll<CheckoutResources>("").Single();
+                    instance = Resources.Load<CheckoutResources>("Checkout_Resources");
                 
                 return instance;
             }
@@ -49,8 +49,8 @@ namespace Galleon.Checkout
                         
                         
                         // Load Assets
-                        var assets = Resources.LoadAll<CheckoutAssets>("");
-                        this._checkoutAssets = assets.First();
+                        var asset = Resources.Load<CheckoutAssets>("CheckoutAssets");
+                        this._checkoutAssets = asset;
                         
                         // Validations
                         // if (assets.Length < 1) throw new Exception("No CheckoutAssets found");
