@@ -42,6 +42,11 @@ namespace Galleon.Checkout.UI
             this.ErrorText.gameObject.SetActive(false);
         }
 
+        private void OnEnable()
+        {
+            EmailInputField.Text = "";
+        }
+
         public override async void RefreshState()
         {
             // Analytics: Receipt Email Screen Viewed

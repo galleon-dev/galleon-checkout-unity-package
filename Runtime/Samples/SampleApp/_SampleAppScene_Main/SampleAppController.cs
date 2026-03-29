@@ -57,7 +57,7 @@ namespace Galleon.SampleApp
                                             #endif
                                          
                                             #if DEBUG
-                                            AppUserID               = $"test_user_{DateTime.Now.ToString()}",
+                                            AppUserID               = user,
                                             #else
                                             AppUserID               = $"dice.prod.app",
                                             #endif
@@ -118,7 +118,7 @@ namespace Galleon.SampleApp
                                             #endif
                                          
                                             #if DEBUG
-                                            AppUserID               = $"test_user_{DateTime.Now.ToString()}",
+                                            AppUserID               = appUserID,
                                             #else
                                             AppUserID               = $"dice.prod.app",
                                             #endif
