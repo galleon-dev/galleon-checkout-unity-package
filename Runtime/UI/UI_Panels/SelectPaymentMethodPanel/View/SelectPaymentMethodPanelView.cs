@@ -44,6 +44,12 @@ namespace Galleon.Checkout.UI
         
         public async override void RefreshState()
         {
+            int          currentIndex             = 0;
+            var          paymentMethodDefinitions = CHECKOUT.PaymentMethods.GetPaymentMethodDefinitionsToSelect();
+            List<string> addedPmTypes             = new();
+            
+            /////////////////////
+            
             UpdateScrollRectMaxSize();
             
             /////////////////////
@@ -68,10 +74,31 @@ namespace Galleon.Checkout.UI
             }
             
             /////////////////////
+            
+            foreach (var definition in paymentMethodDefinitions)
+            {
+                if (definition.Data.selection_page_upms_display_mode != "top")
+                    continue;
+                
+                //"none" / "top" / "trailing"
+                var upms = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Type == definition.Type);
+                foreach (var upm in upms)
+                {
+                    if (addedPmTypes.Contains(upm.Type))
+                            continue;
+                    addedPmTypes.Add(upm.Type);
+                    
+                    var upmGO   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
+                    var upmItemitem = upmGO.GetComponent<SelectPaymentMethodPanelItem>();
+                    upmItemitem.Initialize(userPaymentMethod:upm, this);
+                    Instantiate(original: CHECKOUT.Resources.UI_Seporator, parent: SelectPaymentMethodItemsHolder.transform); // seporator
+                    currentIndex++;
+                }   
+            }
+            
+            /////////////////////
 
             // Add payment method definitions children
-            var paymentMethodDefinitions = CHECKOUT.PaymentMethods.GetPaymentMethodDefinitionsToSelect();
-            int currentIndex             = 0;
             foreach (var definition in paymentMethodDefinitions)
             {
                 // Skip credit card - we already have it as the first item
@@ -88,9 +115,16 @@ namespace Galleon.Checkout.UI
                 #region UPMS
                 if (definition.ShouldAddSavedUPMS)
                 {
+                    if (definition.Data.selection_page_upms_display_mode != "trailing")
+                    continue;
+                    
                     var upms = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(upm => upm.Type == definition.Type);
                     foreach (var upm in upms)
                     {
+                        if (addedPmTypes.Contains(upm.Type))
+                            continue;
+                        addedPmTypes.Add(upm.Type);
+                        
                         var upmGO   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                         var upmItemitem = upmGO.GetComponent<SelectPaymentMethodPanelItem>();
                         upmItemitem.Initialize(userPaymentMethod:upm, this);
@@ -107,19 +141,14 @@ namespace Galleon.Checkout.UI
             
             /////////////////////
             
-            List<string> addedPmTypes = new();
-            
-            
             // Add user payment methods children
             var userPaymentMethods = CHECKOUT.PaymentMethods.UserPaymentMethodsToSelect;
             foreach (var userPaymentMethod in userPaymentMethods)
             {
                 if (addedPmTypes.Contains(userPaymentMethod.Type))
                     continue;
-                
                 addedPmTypes.Add(userPaymentMethod.Type);
             
-                
                 var go   = Instantiate(original: SelectPaymentMethodItemPrefab, parent: SelectPaymentMethodItemsHolder.transform);
                 var item = go.GetComponent<SelectPaymentMethodPanelItem>();
                 item.Initialize(userPaymentMethod:userPaymentMethod, this);
