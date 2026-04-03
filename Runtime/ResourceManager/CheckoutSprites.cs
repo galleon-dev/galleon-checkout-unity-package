@@ -34,6 +34,7 @@ namespace Galleon.Checkout
         public Sprite AmazonPayIconSprite;
         public Sprite VenmoIconSprite;
         public Sprite ZelleIconSprite;
+        public Sprite LinkIconSprite;
 
         // Buttons
         public Sprite CheckoutButtonSprite;
@@ -50,6 +51,7 @@ namespace Galleon.Checkout
         public Sprite VenmoButtonSprite;
         public Sprite VisaButtonSprite;
         public Sprite ZelleButtonSprite;
+        public Sprite LinkButtonSprite;
 
         [Header("Cloud")]
         public List<SpriteResource> SpriteResources = new();
@@ -85,6 +87,7 @@ namespace Galleon.Checkout
                     case "amazon_pay":           return AmazonPayIconSprite;
                     case "venmo":                return VenmoIconSprite;
                     case "zelle":                return ZelleIconSprite;
+                    case "link":                 return LinkIconSprite;
                     case "native":
                         #if UNITY_ANDROID
                         return GPlayIconSprite;
@@ -130,6 +133,7 @@ namespace Galleon.Checkout
                     case "venmo":                return VenmoButtonSprite;
                     case "visa":                 return VisaButtonSprite;
                     case "zelle":                return ZelleButtonSprite;
+                    case "link":                 return LinkButtonSprite;
 
                     default: return CheckoutButtonSprite;
                 }
