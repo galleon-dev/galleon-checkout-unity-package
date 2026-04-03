@@ -922,4 +922,11 @@ namespace Galleon.Checkout
 ///         > no bonus on first select item
 ///         > isGPAYAvailable
 ///         > prod token
+///         ////////////
+///         > link logo
+///         > error card saved
+///         > invalid entered info on autofill
+///         > first pm not selected
+///         > add credit card + 5595
+///         > no card logo on 2nd buy
 
