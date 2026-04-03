@@ -162,7 +162,7 @@ namespace Galleon.Checkout
                         await CHECKOUT.PaymentMethods.Load();
                     });
         
-        public Step StartSession()
+                public Step StartSession()
         =>
             new Step(name   : $"start_session"
                     ,action : async (s) =>
@@ -182,7 +182,7 @@ namespace Galleon.Checkout
                                                                                                                        currency = CHECKOUT.Session.SelectedProduct.Currency,
                                                                                                                    },
                                                                                                         expires_at = DateTime.UtcNow.AddDays(1),
-                                                                                                        metadata   = new Dictionary<string, string>() { }
+                                                                                                        metadata   = CHECKOUT.Session.Metadata
                                                                                                      });
                         this.SessionID = response.session_id;
 
