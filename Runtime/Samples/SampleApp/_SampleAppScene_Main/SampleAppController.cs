@@ -149,26 +149,26 @@ namespace Galleon.SampleApp
                 case "coins" :     product = new CheckoutProduct()
                                            { 
                                                DisplayName = "Bunch Of Coins",
-                                               PriceText   = "$24.99",
+                                               PriceText   = "$1.00",
                                              //Sku         = "sku-1-3DS", 
                                                Sku         = "sku-1",
-                                               Amount      = 24.99m,
+                                               Amount      = 1.00m,
                                                Currency    = "USD",
                                            }; break;
                 case "spins" :     product = new CheckoutProduct()
                                            { 
                                                DisplayName = "Bunch Of Spins",
-                                               PriceText   = "$1000.99",
+                                               PriceText   = "1.99",
                                                Sku         = "sku-2", 
-                                               Amount      = 1000.99m,
+                                               Amount      = 1.99m,
                                                Currency    = "USD",
                                            }; break;
                 case "spins 3ds" : product = new CheckoutProduct()
                                            { 
                                                DisplayName = "Bunch Of Spins (3DS)",
-                                               PriceText   = "$1000.99",
+                                               PriceText   = "$1.99",
                                                Sku         = "sku-3-3DS", 
-                                               Amount      = 1000.99m,
+                                               Amount      = 1.99m,
                                                Currency    = "USD",
                                            }; break;
                 

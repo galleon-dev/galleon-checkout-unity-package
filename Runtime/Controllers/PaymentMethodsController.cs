@@ -177,7 +177,11 @@ namespace Galleon.Checkout
         {
             this.LastUsedUserPaymentMethodIDs.Clear();
 
-            var saved = CHECKOUT.Storage.Read<List<string>>(key : $"saved_payment_methods_{CHECKOUT.User.AppUserID}");
+            List<string> saved = CHECKOUT.Storage.Read<List<string>>(key : $"saved_payment_methods_{CHECKOUT.User.AppUserID}");
+            
+            if (saved == null || saved.Count == 0)
+                return;
+            
             this.LastUsedUserPaymentMethodIDs.AddRange(saved.Where(x => !x.StartsWith("local_pm_id")));
             
             foreach (var upm in UserPaymentMethods.Where(x => !x.ID.StartsWith("local_pm_id")))
@@ -304,6 +308,11 @@ namespace Galleon.Checkout
                             if (!ShouldIncludePaymentMethodType(data.type))
                                 continue;
 
+                            if (data.type == "credit_card")
+                            {
+                                Debug.Log($"got UMP type 'credit_card'. should be 'card'. this is server error. fixing locally.".Color(Color.red));
+                                data.type = "card";
+                            }
                             if (data.type == "card")
                             {
                                 this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
@@ -336,7 +345,8 @@ namespace Galleon.Checkout
                         /////////////////////////////////// Empty Card
                         
                         if (UserPaymentMethods       .All(pm => pm.Data.type != "card")
-                        &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "card"))
+                        &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "card")
+                        &&  UserPaymentMethods       .All(pm => pm.Type      != "empty_card"))
                         {
                             this.UserPaymentMethods.Add(new UserPaymentMethod()
                                                         {
@@ -354,7 +364,8 @@ namespace Galleon.Checkout
                         }
                         
                         if (UserPaymentMethods       .All(pm => pm.Type      != "paypal")
-                        &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "paypal"))
+                        &&  PaymentMethodsDefinitions.Any(pm => pm.Data.type == "paypal")
+                        &&  UserPaymentMethods       .All(pm => pm.Type      != "empty_paypal"))
                         {
                             this.UserPaymentMethods.Add(new UserPaymentMethod()
                                                         {
@@ -425,23 +436,41 @@ namespace Galleon.Checkout
         
         public List<UserPaymentMethod> GetUserPaymentMethodsToDisplay()
         {
+            Debug.Log($"GetUserPaymentMethodsToDisplay - 1 ({UserPaymentMethods.Count}) : \n{string.Join("\n", UserPaymentMethods.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            
             // Add empty
-            if (UserPaymentMethods.All(pm => pm.Type != "card"))
+            if (UserPaymentMethods.All(pm => pm.Type != "card")
+            &&  UserPaymentMethods.All(pm => pm.Type != "empty_card"))
             {
                 var emptyCard = CreateEmptyCreditCardUserPaymentMethod();
                 UserPaymentMethods.Add(emptyCard);
             }
             
-            // Group
-            var result = UserPaymentMethods.OrderByDescending(x => x.LastSuccessfulUseTime).GroupBy(x => x.Type).Select(x => x.First())
-              //.Concat(SpecialUserPaymentMethods)
-                .Concat(EmptyUserPaymentMethods)
-                .Distinct()
-                .Except(new[]{AppUserPaymentMethod})
-                .Take(MAX_LAST_USED_PAYMENT_METHODS -1)
-                .OrderByDescending(x => x.LastSuccessfulUseTime)
-                .ToList();
+            Debug.Log($"GetUserPaymentMethodsToDisplay - 2 ({UserPaymentMethods.Count}) : \n{string.Join("\n", UserPaymentMethods.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
+            // Remove pending cards added temporeraly
+            ClearPendingUserPaymentMethods();
+            
+            Debug.Log($"GetUserPaymentMethodsToDisplay - 3 ({UserPaymentMethods.Count}) : \n{string.Join("\n", UserPaymentMethods.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            
+            List<UserPaymentMethod> result;
+            
+            // Group
+            result = UserPaymentMethods.OrderByDescending(x => x.LastSuccessfulUseTime)
+                                       .GroupBy(x => x.Type).Select(x => x.First()).ToList();
+            
+            Debug.Log($"GetUserPaymentMethodsToDisplay - g ({UserPaymentMethods.Count}) : \n{string.Join("\n", UserPaymentMethods.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            
+            // filter
+            result = result
+                     .Concat(EmptyUserPaymentMethods)
+                     .Distinct()
+                     .Except(new[]{AppUserPaymentMethod})
+                     .Take(MAX_LAST_USED_PAYMENT_METHODS -1)
+                     .OrderByDescending(x => x.LastSuccessfulUseTime)
+                     .ToList();
+            
+            Debug.Log($"GetUserPaymentMethodsToDisplay - 4 ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
             // Remove Native ?
             if (result.Count >= MAX_LAST_USED_PAYMENT_METHODS
@@ -451,6 +480,8 @@ namespace Galleon.Checkout
             {
                 result.Remove(NativeStoreUserPaymentMethod);
             }
+            
+            Debug.Log($"GetUserPaymentMethodsToDisplay - 5 ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
 
             // set last used time
             foreach (var userPaymentMethod in result)
@@ -462,10 +493,26 @@ namespace Galleon.Checkout
                     userPaymentMethod.LastSuccessfulUseTime = DateTime.MaxValue;
             }
             
+            Debug.Log($"GetUserPaymentMethodsToDisplay - 6 ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
             // Apply filter
-            result = result.Where(x => ShouldIncludePaymentMethodType(x.Type)).ToList();
-                            
+            for (int i = result.Count - 1; i >= 0; i--)
+            {
+                var pm = result.ElementAt(i);
+                
+                if (!ShouldIncludePaymentMethodType(pm.Type))
+                {
+                    Debug.Log($"removed upm {pm.DisplayName} = {pm.Type}");
+                    result.Remove(pm);
+                }
+                else
+                {
+                    Debug.Log($"Allowed upm {pm.DisplayName} = {pm.Type} ");
+                }
+            }
+            
+            Debug.Log($"GetUserPaymentMethodsToDisplay - final ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            
             return result;
         }
         
@@ -502,6 +549,12 @@ namespace Galleon.Checkout
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
 
+        private void ClearPendingUserPaymentMethods()
+        {
+            UserPaymentMethods.RemoveAll(x=>x.Node.Tags.Contains("pending"));
+            
+        }
+        
         private bool ShouldIncludePaymentMethodType(string type)
         {   
             if (CHECKOUT.Session == null  || CHECKOUT.Session.PurchaseConfiguration == null)

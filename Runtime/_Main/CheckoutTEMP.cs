@@ -929,4 +929,12 @@ namespace Galleon.Checkout
 ///         > first pm not selected
 ///         > add credit card + 5595
 ///         > no card logo on 2nd buy
+///         > footer
+///         > $24
+///         > dont get my card
+///         > add card twice
+///         > hardcoded PM count
+///         > "credit_card" insted of "card"
+///         > gpay priority
+///         > IP & tax
 

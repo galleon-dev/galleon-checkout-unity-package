@@ -194,6 +194,8 @@ namespace Galleon.Checkout.UI
                         { "payment_method",      "card"                      },
                     });
 
+                    card.Node.Tags.Add("pending");
+                    
                     // Add payment method
                     await CHECKOUT.PaymentMethods.AddNewUserPaymentMethod(card).Execute();
 
@@ -466,6 +468,10 @@ namespace Galleon.Checkout.UI
         
         private bool IsCorrectInputFields()
         {
+            OnValueChanged(CreditCardNumberField.Text);
+            OnDateValueChanged(DateInputField.Text);
+            OnCVVValueChanged(CVVInputField.Text);
+            
             bool InputFieldsCorrect = true;
 
             // Check if the credit card number starts with Amex prefix (34 or 37)
@@ -512,9 +518,19 @@ namespace Galleon.Checkout.UI
                 InputFieldsCorrect = false;
             }
 
-            if (!IsValidCVV || !IsValidCreditCardNumber || !IsValidDate)
+            if (!IsValidCVV)
             {
-                Debug.Log("Invalid Entered Information");
+                Debug.Log("Invalid CVV");
+                InputFieldsCorrect = false;
+            }
+            if (!IsValidCreditCardNumber)
+            {
+                Debug.Log("Invalid CARD NUMBER");
+                InputFieldsCorrect = false;
+            }
+            if (!IsValidDate)
+            {
+                Debug.Log("Invalid DATE");
                 InputFieldsCorrect = false;
             }
 
