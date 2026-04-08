@@ -21,6 +21,8 @@ namespace Galleon.Checkout
             set => Data.type = value;
         }
         
+        public string DisplayType => Type.Replace("empty_","");
+        
         public string                ID => this.Data?.id ?? "";
         
         public string                DisplayName;

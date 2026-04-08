@@ -194,7 +194,7 @@ namespace Galleon.Checkout.UI
             CheckoutAPI.InvokeAnalyticsEvent("payment_method_switched", new Dictionary<string, object>
             {
                 { "checkout_session_id",        CHECKOUT.Session?.SessionID ?? ""     },
-                { "payment_method_highlighted", selectedUPM.Type            ?? "none" },
+                { "payment_method_highlighted", selectedUPM.DisplayType     ?? "none" },
             });
             
         }
@@ -222,7 +222,7 @@ namespace Galleon.Checkout.UI
             CheckoutAPI.InvokeAnalyticsEvent("pay_button_clicked", new Dictionary<string, object>
             {
                 { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""      },
-                { "payment_method",      selectedPaymentMethod?.Type                 ?? "none"  },
+                { "payment_method",      selectedPaymentMethod?.DisplayType          ?? "none"  },
                 { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m      },
                 { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? ""      }
             });

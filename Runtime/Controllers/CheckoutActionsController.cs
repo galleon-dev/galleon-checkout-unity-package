@@ -575,7 +575,7 @@ namespace Galleon.Checkout
                 CheckoutAPI.InvokeAnalyticsEvent("payment_failed", new Dictionary<string, object>
                                                 {
                                                     { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""              },
-                                                    { "payment_method",      selectedPaymentMethod?.Type                 ?? "none"          },
+                                                    { "payment_method",      selectedPaymentMethod?.DisplayType          ?? "none"          },
                                                     { "fail_reason",         string.Join("\n", errors                    ?? new string[0])  },
                                                     { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m              },
                                                     { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? ""              }

@@ -217,7 +217,7 @@ namespace Galleon.Checkout
                             { "checkout_session_id",          CHECKOUT.Session?.SessionID                 ?? ""     },
                             { "purchase_amount",              CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m     },
                             { "currency",                     CHECKOUT.Session?.SelectedProduct?.Currency ?? ""     },
-                            { "payment_method_highlighted",   selectedPaymentMethod?.Type                 ?? "none" },
+                            { "payment_method_highlighted",   selectedPaymentMethod?.DisplayType          ?? "none" },
                         });
                 
                     });
