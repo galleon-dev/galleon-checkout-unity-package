@@ -40,7 +40,11 @@ namespace Galleon.Checkout
         public Step                               OnSessionFinishedStep;
         
         // Config
-        public CheckoutPurchaseConfiguration      PurchaseConfiguration = null;
+        public CheckoutPurchaseConfiguration      PurchaseConfiguration             = null;
+        
+        // Errors
+        public List<string>                       sessionErrors                     = new List<string>();
+        
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
@@ -49,9 +53,9 @@ namespace Galleon.Checkout
         public Transaction                        CurrentTransaction        => User.CurrentTransaction;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
-        
+
         public ChargeResultData                   lastChargeResult          = null;
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Temp
         
         public static event Action Report;
@@ -120,7 +124,7 @@ namespace Galleon.Checkout
                                                       IsSuccess                 = false,
                                                       IsCanceled                = true,
                                                       IsError                   = false,
-                                                      Errors                    = new(),
+                                                      Errors                    = this.sessionErrors,
                                                       SelectedPaymentMethodType = CHECKOUT.Session?.PreselectedPaymentMethod?.Type ?? "none",
                                                   };
                         }
@@ -317,6 +321,9 @@ namespace Galleon.Checkout
                         //                                                   ,transactionId  : "transactionID");
 
                         var result = this.lastChargeResult;
+                        
+                        if (result == null)
+                            return;
 
                         this.PurchaseResult = new PurchaseResult()
                                               {
@@ -381,6 +388,28 @@ namespace Galleon.Checkout
                                   
                                   s.AddNextStepInParentFlow(RunTransaction());
                               });
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Error Tracking
+
+        public void LogError(string source, Exception ex)
+        {
+            string errorMessage = $"[{source}] {ex.GetType().Name}: {ex.Message}";
+            sessionErrors.Add(errorMessage);
+            UnityEngine.Debug.LogError(errorMessage);
+        }
+
+        public void LogError(string source, string errorMessage)
+        {
+            string fullMessage = $"[{source}] {errorMessage}";
+            sessionErrors.Add(fullMessage);
+            UnityEngine.Debug.LogError(fullMessage);
+        }
+
+        public void ClearSessionErrors()
+        {
+            sessionErrors.Clear();
+        }
         
     }
 }

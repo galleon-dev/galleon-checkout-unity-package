@@ -222,7 +222,8 @@ namespace Galleon.Checkout
             }
             catch (Exception e)
             {
-                Debug.LogError($"[ERROR] : {e.ToString()}");
+                var endpointName = url.Replace(SERVER_BASE_URL, "");
+                CHECKOUT.Session.LogError($"NETWORK-{endpointName}", $"{e.Message.ToString()}");
                 return default;
             }
         }
@@ -339,7 +340,7 @@ namespace Galleon.Checkout
             if (!request.error.IsNullOrEmpty())
                 Debug.LogError(request.error);
             if (request.result != UnityWebRequest.Result.Success)
-                throw new Exception($"ERROR FOR NETWORK REQUEST : {url}\n{request.error}");
+                throw new Exception($" {url}\n{request.error}\n{result ?? ""}");
             
             request.Dispose();
             

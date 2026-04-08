@@ -57,7 +57,7 @@ namespace Galleon.Checkout
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogError($"Error in GetTokenizer: {ex.Message}");
+                            CHECKOUT.Session.LogError("GetTokenizer", ex);
                             s.RemoveStepsAfterThisInParentFlow();
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
                         }
@@ -148,7 +148,7 @@ namespace Galleon.Checkout
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogError($"Error in TokenizeCreditCard: {ex.Message}");
+                            CHECKOUT.Session.LogError("TokenizeCreditCard", ex);
                             s.RemoveStepsAfterThisInParentFlow();
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
                         }
@@ -180,10 +180,10 @@ namespace Galleon.Checkout
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogError($"Error in AddCreditCardPaymentMethod: {ex.Message}");
+                            CHECKOUT.Session.LogError("AddCreditCardPaymentMethod", ex);
                             s.RemoveStepsAfterThisInParentFlow();
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
-                            
+
                         }
                     });
         
@@ -223,8 +223,16 @@ namespace Galleon.Checkout
                                                                                                 });
                             
                             CheckoutClient.Instance.CurrentSession.lastChargeResult = response.result;
+                            
+                            if (response == null)
+                                throw new Exception("Error is /Charge");
+                            
                             var result = response.result;
 
+                            if (result == null)
+                            {
+                                SendErrorAnalytics();
+                            }
                             if (response.next_actions == null && result == null)
                             {
                                 // NO TRANSACTION RESULT AND NO NEXT ACTION . ERROR .
@@ -260,7 +268,8 @@ namespace Galleon.Checkout
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogError($"Error in Charge: {ex.Message}");
+                            CHECKOUT.Session.LogError("Charge", ex.Message);
+                            SendErrorAnalytics();
                             s.RemoveStepsAfterThisInParentFlow();
                             s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
@@ -310,7 +319,8 @@ namespace Galleon.Checkout
 
                                       if (response?.errors != null && response?.errors?.Count() > 0)
                                       {
-                                          
+                                          CHECKOUT.Session.LogError("CheckStatus", $"Response contains errors: {string.Join(", ", response.errors)}");
+
                                           CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
                                                                                                   {
                                                                                                       charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
@@ -318,7 +328,7 @@ namespace Galleon.Checkout
                                                                                                       is_canceled = false,
                                                                                                       is_success  = false,
                                                                                                   };
-                                          
+
                                           SendErrorAnalytics();
                                       }
                                       else if (status != null && status == "completed")
@@ -352,8 +362,9 @@ namespace Galleon.Checkout
                                       }
                                       else
                                       {
+                                          CHECKOUT.Session.LogError("CheckStatus", $"Max reattempts reached - transaction failed. Status was: {status}");
                                           Debug.Log("max reattempts reached - transaction failed.");
-                                          
+
                                           CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
                                                                                                   {
                                                                                                       charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
@@ -361,20 +372,20 @@ namespace Galleon.Checkout
                                                                                                       is_canceled = true,
                                                                                                       is_success  = false,
                                                                                                   };
-                                          
+
                                           SendErrorAnalytics();
                                           s.RemoveStepsAfterThisInParentFlow();
                                           s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
                                           s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
                                                                     ,CheckoutClient.Instance.CheckoutScreenMobile.Navigate()
                                                                     );
-                                          
+
 
                                       }
                                   }
                                   catch (Exception ex)
                                   {
-                                      Debug.LogError($"Error in CheckStatus: {ex.Message}");
+                                      CHECKOUT.Session.LogError("CheckStatus", ex.Message);
                                       SendErrorAnalytics();
                                       s.RemoveStepsAfterThisInParentFlow();
                                       s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
@@ -449,7 +460,7 @@ namespace Galleon.Checkout
                             }
                             catch (Exception ex)
                             {
-                                Debug.LogError("Socket connection failed: " + ex.Message);
+                                CHECKOUT.Session.LogError("AwaitSocket", ex.Message);
                             }
                             finally
                             {
@@ -477,7 +488,7 @@ namespace Galleon.Checkout
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogError($"Error in GetUserInfo: {ex.Message}");
+                            CHECKOUT.Session.LogError("GetUserInfo", ex.Message);
                             s.RemoveStepsAfterThisInParentFlow();
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
                         }
@@ -499,7 +510,7 @@ namespace Galleon.Checkout
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogError($"Error in SetUserInfo: {ex.Message}");
+                            CHECKOUT.Session.LogError("SetUserInfo", ex.Message);
                             s.RemoveStepsAfterThisInParentFlow();
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
                         }
@@ -526,7 +537,7 @@ namespace Galleon.Checkout
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogError($"Error in SetEmail: {ex.Message}");
+                            CHECKOUT.Session.LogError("UpdateEmail", ex.Message);
                             s.RemoveStepsAfterThisInParentFlow();
                             s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
                         }
@@ -558,14 +569,14 @@ namespace Galleon.Checkout
         {
             try
             {
-                var errors                = CHECKOUT.Session.lastChargeResult?.errors ?? new string[0];
+                var errors                = CHECKOUT.Session.sessionErrors.ToArray();
                 var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
                 
                 CheckoutAPI.InvokeAnalyticsEvent("payment_failed", new Dictionary<string, object>
                                                 {
                                                     { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""              },
                                                     { "payment_method",      selectedPaymentMethod?.Type                 ?? "none"          },
-                                                    { "fail_reason",         string.Join(", ", errors                    ?? new string[0])  },
+                                                    { "fail_reason",         string.Join("\n", errors                    ?? new string[0])  },
                                                     { "purchase_amount",     CHECKOUT.Session?.SelectedProduct?.Amount   ?? 0m              },
                                                     { "currency",            CHECKOUT.Session?.SelectedProduct?.Currency ?? ""              }
                                                 });

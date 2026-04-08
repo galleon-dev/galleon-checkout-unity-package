@@ -129,7 +129,7 @@ namespace Galleon.Checkout
 
         public override string ToString()
         {
-            return $"PurchaseResult: OrderID={OrderID}, IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, SelectedPaymentMethodType={SelectedPaymentMethodType}, Errors={string.Join(", ", Errors ?? new List<string>())}";
+            return $"PurchaseResult: OrderID={OrderID}, IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, SelectedPaymentMethodType={SelectedPaymentMethodType}, Errors={string.Join("\n", Errors ?? new List<string>())}\n\n";
         }
     }
 }
