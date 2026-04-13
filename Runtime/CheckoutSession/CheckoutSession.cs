@@ -45,7 +45,6 @@ namespace Galleon.Checkout
         // Errors
         public List<string>                       sessionErrors                     = new List<string>();
         
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public CheckoutClient                     Client                    => CheckoutClient.Instance;

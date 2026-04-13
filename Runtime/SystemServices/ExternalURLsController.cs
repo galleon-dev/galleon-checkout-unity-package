@@ -63,6 +63,7 @@ namespace Galleon.Checkout
                                                                      foreach (var key in linkValues.AllKeys)
                                                                      {
                                                                          out_valuesFromDeepLink[key] = linkValues[key];
+                                                                         Debug.Log($"deep-link-out-value : {linkValues[key]}");
                                                                      }
                                                                  }
                                                              }
@@ -120,6 +121,4 @@ namespace Galleon.Checkout
         }
     }
 }
-
-
 

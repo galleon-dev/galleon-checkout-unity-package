@@ -294,6 +294,9 @@ namespace Galleon.Checkout
                                   
                                   foreach (var kvp in values)
                                       Debug.Log($"+ value : {kvp}");
+                                  
+                                  if (values.Count == 0)
+                                      CHECKOUT.Session.LogError("URL", $"Returned from URL - But not via DeepLink - User probably canceled");
                               });
         
 
@@ -346,6 +349,9 @@ namespace Galleon.Checkout
                                       }
                                       else if (status != null && status == "canceled")
                                       {
+                                          CHECKOUT.Session.LogError("cancelede", $"User Canceled");
+                                          SendErrorAnalytics();
+                                          
                                           CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
                                                                                                   {
                                                                                                       charge_id   = CheckoutClient.Instance.CurrentSession.lastChargeResult.charge_id,
@@ -363,7 +369,9 @@ namespace Galleon.Checkout
                                       else
                                       {
                                           CHECKOUT.Session.LogError("CheckStatus", $"Max reattempts reached - transaction failed. Status was: {status}");
+                                          
                                           Debug.Log("max reattempts reached - transaction failed.");
+                                          SendErrorAnalytics();
 
                                           CheckoutClient.Instance.CurrentSession.lastChargeResult = new ChargeResultData()
                                                                                                   {
@@ -373,7 +381,6 @@ namespace Galleon.Checkout
                                                                                                       is_success  = false,
                                                                                                   };
 
-                                          SendErrorAnalytics();
                                           s.RemoveStepsAfterThisInParentFlow();
                                           s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
                                           s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
