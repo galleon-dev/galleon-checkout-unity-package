@@ -147,6 +147,12 @@ namespace Galleon.Checkout
             }
             catch (Exception e)
             {
+                var endpointName = url.Replace(SERVER_BASE_URL, "");
+                if (!(e is TimeoutException))
+                {
+                    CHECKOUT.Session?.LogError($"NETWORK-{endpointName}", $"{e.Message.ToString()}");
+                }
+                
                 Debug.LogError($"[ERROR] : {e.ToString()}");
                 return default;
             }
@@ -174,7 +180,11 @@ namespace Galleon.Checkout
             while (!op.isDone)
             {
                 if (DateTime.Now.Subtract(starTime).TotalMilliseconds >= TIMEOUT_MILLISECONDS)
+                {
+                    var endpointNameTimeout = request.url.Replace(SERVER_BASE_URL, "");
+                    CHECKOUT.Session?.LogError($"NETWORK-TIMEOUT-{endpointNameTimeout}", "Request timed out");
                     throw new TimeoutException();
+                }
                 
                 await Task.Yield();
             }
@@ -223,7 +233,10 @@ namespace Galleon.Checkout
             catch (Exception e)
             {
                 var endpointName = url.Replace(SERVER_BASE_URL, "");
-                CHECKOUT.Session.LogError($"NETWORK-{endpointName}", $"{e.Message.ToString()}");
+                if (!(e is TimeoutException))
+                {
+                    CHECKOUT.Session?.LogError($"NETWORK-{endpointName}", $"{e.Message.ToString()}");
+                }
                 return default;
             }
         }
@@ -320,7 +333,11 @@ namespace Galleon.Checkout
             while (!op.isDone)
             {
                 if (DateTime.Now.Subtract(starTime).TotalMilliseconds >= TIMEOUT_MILLISECONDS)
+                {
+                    var endpointNameTimeout = request.url.Replace(SERVER_BASE_URL, "");
+                    CHECKOUT.Session?.LogError($"NETWORK-TIMEOUT-{endpointNameTimeout}", "Request timed out");
                     throw new TimeoutException();
+                }
                 
                 await Task.Yield();
             }
