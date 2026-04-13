@@ -462,11 +462,10 @@ namespace Galleon.Checkout
             Debug.Log($"GetUserPaymentMethodsToDisplay - g ({UserPaymentMethods.Count}) : \n{string.Join("\n", UserPaymentMethods.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
             // filter
-                                                                                        Debug.Log($"GetUserPaymentMethodsToDisplay - EmptyPaymentMethods ({EmptyUserPaymentMethods.Count}) : \n{string.Join("\n", EmptyUserPaymentMethods)}");
-                                                                                        Debug.Log($"GetUserPaymentMethodsToDisplay - AppUserPaymentMethod : \n{AppUserPaymentMethod.Type} - {AppUserPaymentMethod.ID} - {AppUserPaymentMethod.DisplayName}");
+                                                                                        Debug.Log($"GetUserPaymentMethodsToDisplay - EmptyPaymentMethods ({EmptyUserPaymentMethods.Count}) : \n{string.Join("\n", EmptyUserPaymentMethods.Select(x => x.Type))}");
             result = result.Concat(EmptyUserPaymentMethods).ToList();                   Debug.Log($"GetUserPaymentMethodsToDisplay - after Concat ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             result = result.Distinct().ToList();                                        Debug.Log($"GetUserPaymentMethodsToDisplay - after Distinct ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
-            result = result.Except(new[]{AppUserPaymentMethod}).ToList();               Debug.Log($"GetUserPaymentMethodsToDisplay - after Except ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            result = result.Where(x => x.Type != "app").ToList();                       Debug.Log($"GetUserPaymentMethodsToDisplay - after Except ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             result = result.Take(MAX_LAST_USED_PAYMENT_METHODS -1).ToList();            Debug.Log($"GetUserPaymentMethodsToDisplay - after Take ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             result = result.OrderByDescending(x => x.LastSuccessfulUseTime).ToList();   Debug.Log($"GetUserPaymentMethodsToDisplay - 4 ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
@@ -518,7 +517,7 @@ namespace Galleon.Checkout
         {
             var result = UserPaymentMethods
                 .Distinct()
-                .Except(new[]{AppUserPaymentMethod})
+                .Where(x => x.Type != "app")
                 .Except(EmptyUserPaymentMethods)
                 .OrderBy(x => x.SortOrder)
                 .ToList();
