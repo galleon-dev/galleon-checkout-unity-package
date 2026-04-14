@@ -81,20 +81,13 @@ namespace Galleon.Checkout
                         s.AddPreStep(StartSession());
                         
                         /////////////////////////////////////// Steps
-                        
+
                         // Get Tax Info
-                        
+
                       //s.AddChildStep(CheckoutClient.Instance.TaxController.GetTaxInfo());
                       //s.AddChildStep("wait",        async x => await Task.Delay(1000));
-                        
-                        bool isPreselectionScreenEnabled = CHECKOUT.Globals.IsPreselectionEnabled;
-                        bool isNativeStoreEnabled        = CHECKOUT.Globals.IsNativeStoreEnabled;
-                        
-                        if (isPreselectionScreenEnabled && isNativeStoreEnabled)
-                            s.AddChildStep("view_preselection", async x => Client.CheckoutScreenMobile.NavigationNext = "preselection");
-                        else
-                            s.AddChildStep("view_checkout", async x => Client.CheckoutScreenMobile.NavigationNext = "checkout");
-                            
+
+                        s.AddChildStep(DetermineInitialPage()); // this updates the "navigation-next"
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
                         
                         /////////////////////////////////////// Post Steps
@@ -156,8 +149,33 @@ namespace Galleon.Checkout
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Session Steps
-        
-        public Step InitializeSession() 
+
+        public Step DetermineInitialPage()
+        =>
+            new Step(name   : $"determine_initial_page"
+                    ,action : async (s) =>
+                    {
+                        // Check if there are no payment methods to display (network error scenario)
+                        if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count == 0)
+                        {
+                            Client.CheckoutScreenMobile.ErrorPanelView.ErrorMessage     = "Network error";
+                            Client.CheckoutScreenMobile.ErrorPanelView.ErrorDescription = "Unable to load payment methods. Please check your connection and try again.";
+                            Client.CheckoutScreenMobile.ErrorPanelView.ButtonText       = "Try again";
+                            Client.CheckoutScreenMobile.NavigationNext = "Error";
+                        }
+                        else
+                        {
+                            bool isPreselectionScreenEnabled = CHECKOUT.Globals.IsPreselectionEnabled;
+                            bool isNativeStoreEnabled        = CHECKOUT.Globals.IsNativeStoreEnabled;
+
+                            if (isPreselectionScreenEnabled && isNativeStoreEnabled)
+                                Client.CheckoutScreenMobile.NavigationNext = "preselection";
+                            else
+                                Client.CheckoutScreenMobile.NavigationNext = "checkout";
+                        }
+                    });
+
+        public Step InitializeSession()
         =>
             new Step(name   : $"initialize_session"
                     ,action : async (s) =>

@@ -232,18 +232,20 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         PaymentMethodsDefinitions.Clear();
-                        
+
                         var country  = CHECKOUT.Globals.CheckoutInitConfiguration.Country;
                         var currency = CHECKOUT.Globals.CheckoutInitConfiguration.Currency;
-                        
+
                         var _result = await CHECKOUT.Network.Get<Shared.PaymentMethodDefinitionsResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions?currency={currency}&country={country}&platform=unity"
                                                                                                          ,headers  : new ()
                                                                                                                    {
                                                                                                                        { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                                    }
                                                                                                           );
-                        
-                        
+
+                        if (_result == null)
+                            return;
+
                         var dataList = _result.definitions;
 
                         foreach (var data in dataList)
@@ -285,15 +287,18 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         /////////////////////////////////// from server
-                        
+
                         UserPaymentMethods.Clear();
-                        
+
                         var _result = await CHECKOUT.Network.Get<Shared.UserPaymentMethodsResponse>(url     : $"{CHECKOUT.Network.SERVER_BASE_URL}/user-payment-methods"
                                                                                                    ,headers : new ()
                                                                                                    {
                                                                                                        { "Authorization", $"Bearer {CHECKOUT.Network.GalleonUserAccessToken}" }
                                                                                                    });
-                        
+
+                        if (_result == null)
+                            return;
+
                         var dataList = _result.payment_methods;
         
                         // if (dataList is not null

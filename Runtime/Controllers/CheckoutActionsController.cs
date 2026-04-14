@@ -59,7 +59,11 @@ namespace Galleon.Checkout
                         {
                             CHECKOUT.Session.LogError("GetTokenizer", ex);
                             s.RemoveStepsAfterThisInParentFlow();
-                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
+                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                errorMessage    : CHECKOUT.Config.GetString("error_network_tokenizer_message",     defaultValue: "Network Error"),
+                                errorDescription: CHECKOUT.Config.GetString("error_network_tokenizer_description", defaultValue: "Try again or use another payment method."),
+                                buttonText      : CHECKOUT.Config.GetString("error_network_tokenizer_button",      defaultValue: "Back To Payment Options"))
+                                );
                         }
                     });
         
@@ -150,7 +154,11 @@ namespace Galleon.Checkout
                         {
                             CHECKOUT.Session.LogError("TokenizeCreditCard", ex);
                             s.RemoveStepsAfterThisInParentFlow();
-                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
+                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                errorMessage    : CHECKOUT.Config.GetString("error_card_validation_message",     defaultValue: "Card validation error"),
+                                errorDescription: CHECKOUT.Config.GetString("error_card_validation_description", defaultValue: "Try again or use another payment method."),
+                                buttonText      : CHECKOUT.Config.GetString("error_card_validation_button",      defaultValue: "Back To Payment Options"))
+                                );
                         }
                     });
         
@@ -182,7 +190,11 @@ namespace Galleon.Checkout
                         {
                             CHECKOUT.Session.LogError("AddCreditCardPaymentMethod", ex);
                             s.RemoveStepsAfterThisInParentFlow();
-                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
+                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                errorMessage    : CHECKOUT.Config.GetString("error_add_card_message",     defaultValue: "Card Can Not Be Added"),
+                                errorDescription: CHECKOUT.Config.GetString("error_add_card_description", defaultValue: "Try again or use another payment method."),
+                                buttonText      : CHECKOUT.Config.GetString("error_add_card_button",      defaultValue: "Back To Payment Options"))
+                                );
 
                         }
                     });
@@ -272,7 +284,11 @@ namespace Galleon.Checkout
                             SendErrorAnalytics();
                             s.RemoveStepsAfterThisInParentFlow();
                             s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
-                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
+                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                errorMessage    : CHECKOUT.Config.GetString("error_charge_message",     defaultValue: "Payment failed"),
+                                errorDescription: CHECKOUT.Config.GetString("error_charge_description", defaultValue: "Try again or use another payment method."),
+                                buttonText      : CHECKOUT.Config.GetString("error_charge_button",      defaultValue: "Back To Payment Options"))
+                                );
                         }
                     });      
         
@@ -383,9 +399,11 @@ namespace Galleon.Checkout
 
                                           s.RemoveStepsAfterThisInParentFlow();
                                           s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
-                                          s.AddNextStepsInParentFlow(new Step(name : "set_error", action: async x => { CheckoutClient.Instance.CheckoutScreenMobile.NavigationNext = "Error"; })
-                                                                    ,CheckoutClient.Instance.CheckoutScreenMobile.Navigate()
-                                                                    );
+                                          s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                              errorMessage    : CHECKOUT.Config.GetString("error_payment_timeout_message",     defaultValue: "Payment failed"),
+                                              errorDescription: CHECKOUT.Config.GetString("error_payment_timeout_description", defaultValue: "Try again or use another payment method."),
+                                              buttonText      : CHECKOUT.Config.GetString("error_payment_timeout_button",      defaultValue: "Back To Payment Options"))
+                                              );
 
 
                                       }
@@ -396,7 +414,11 @@ namespace Galleon.Checkout
                                       SendErrorAnalytics();
                                       s.RemoveStepsAfterThisInParentFlow();
                                       s.AddNextStepInParentFlow(CHECKOUT.Session.On_ChargeError());
-                                      s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
+                                      s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                          errorMessage    : CHECKOUT.Config.GetString("error_check_status_message",     defaultValue: "Payment Failed"),
+                                          errorDescription: CHECKOUT.Config.GetString("error_check_status_description", defaultValue: "Try again or use another payment method."),
+                                          buttonText      : CHECKOUT.Config.GetString("error_check_status_button",      defaultValue: "Back To Payment Options"))
+                                          );
                                   }
                               });
         
@@ -497,7 +519,11 @@ namespace Galleon.Checkout
                         {
                             CHECKOUT.Session.LogError("GetUserInfo", ex.Message);
                             s.RemoveStepsAfterThisInParentFlow();
-                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
+                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                errorMessage    : CHECKOUT.Config.GetString("error_network_user_info_message",     defaultValue: "Network Error"),
+                                errorDescription: CHECKOUT.Config.GetString("error_network_user_info_description", defaultValue: "Try again or use another payment method."),
+                                buttonText      : CHECKOUT.Config.GetString("error_network_user_info_button",      defaultValue: "Back To Payment Options"))
+                                );
                         }
                     });
         
@@ -519,7 +545,11 @@ namespace Galleon.Checkout
                         {
                             CHECKOUT.Session.LogError("SetUserInfo", ex.Message);
                             s.RemoveStepsAfterThisInParentFlow();
-                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
+                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                errorMessage    : CHECKOUT.Config.GetString("error_network_set_user_info_message",     defaultValue: "Network Error"),
+                                errorDescription: CHECKOUT.Config.GetString("error_network_set_user_info_description", defaultValue: "Try again or use another payment method."),
+                                buttonText      : CHECKOUT.Config.GetString("error_network_set_user_info_button",      defaultValue: "Back To Payment Options"))
+                                );
                         }
                     });
         
@@ -546,7 +576,11 @@ namespace Galleon.Checkout
                         {
                             CHECKOUT.Session.LogError("UpdateEmail", ex.Message);
                             s.RemoveStepsAfterThisInParentFlow();
-                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.ErrorPage));
+                            s.AddNextStepInParentFlow(CheckoutClient.Instance.CheckoutScreenMobile.UI_ShowError(
+                                errorMessage    : CHECKOUT.Config.GetString("error_network_update_email_message",     defaultValue: "Network Error"),
+                                errorDescription: CHECKOUT.Config.GetString("error_network_update_email_description", defaultValue: "Try again or use another payment method."),
+                                buttonText      : CHECKOUT.Config.GetString("error_network_update_email_button",      defaultValue: "Back To Payment Options"))
+                                );
                         }
                     });
         

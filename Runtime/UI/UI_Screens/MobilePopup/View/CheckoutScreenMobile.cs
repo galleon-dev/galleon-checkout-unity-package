@@ -424,6 +424,19 @@ namespace Galleon.Checkout.UI
                                   s.ParentStep.AddChildStep(ViewPage(SelectPaymentMethodsPage));
                               });
 
+        public Step UI_ShowError(string errorMessage     = null
+                                ,string errorDescription = null
+                                ,string buttonText       = null)
+        =>
+            new Step(name   : $"UI_ShowError"
+                    ,action : async (s) =>
+                              {
+                                  ErrorPanelView.ErrorMessage     = errorMessage     ?? CHECKOUT.Config.GetString("error_default_message",     defaultValue: "Payment Failed");
+                                  ErrorPanelView.ErrorDescription = errorDescription ?? CHECKOUT.Config.GetString("error_default_description", defaultValue: "Try again or use another payment method.");
+                                  ErrorPanelView.ButtonText       = buttonText       ?? CHECKOUT.Config.GetString("error_default_button",      defaultValue: "Back To Payment Options");
+                                  s.ParentStep.AddChildStep(ViewPage(ErrorPage));
+                              });
+
         /////////////////////// UI Events
 
         public void On_BackFromCreditCardInfo()
