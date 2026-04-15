@@ -129,7 +129,7 @@ namespace Galleon.Checkout.UI
         {
             // CHECKOUT.User.SelectedUserPaymentMethod.Unselect();
             
-            if (CHECKOUT.PaymentMethods.RealPaymentMethods.Contains(CHECKOUT.User.SelectedUserPaymentMethod))
+            if (CHECKOUT.PaymentMethods.RealPaymentMethods.Contains(CHECKOUT.PaymentMethods.SelectedUserPaymentMethod))
                 this.Result = ViewResult.Pay;
             else
                 this.Result = ViewResult.Confirm;
@@ -163,7 +163,7 @@ namespace Galleon.Checkout.UI
         
         public Step test_preselect_checkout() => new Step(name : "preselection_panel_test_checkout", action : async (s) =>
                                                                                                             {
-                                                                                                                CHECKOUT.User.SelectPaymentMethod(CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app"));
+                                                                                                                CHECKOUT.PaymentMethods.SelectPaymentMethod(CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app"));
                                                                                                                 OnConfirmPurchaseClick();
                                                                                                             });
     }

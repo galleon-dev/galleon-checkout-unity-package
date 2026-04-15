@@ -74,7 +74,7 @@ namespace Galleon.Checkout
                     {
                         try
                         {
-                            var creditCard          = CHECKOUT.User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
+                            var creditCard          = CHECKOUT.PaymentMethods.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
 
                             var Tokenizer           = CheckoutClient.Instance.TokenizerController.Tokenizer;
 
@@ -170,7 +170,7 @@ namespace Galleon.Checkout
                     {
                         try
                         {
-                            var creditCard = CHECKOUT.User.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
+                            var creditCard = CHECKOUT.PaymentMethods.SelectedUserPaymentMethod as CreditCardUserUserPaymentMethod;
 
                             var result = await CHECKOUT.Network.Post<AddPaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/add-payment-method" 
                                                                                               ,headers  : new ()
@@ -209,7 +209,7 @@ namespace Galleon.Checkout
                     {
                         try
                         {
-                            var selectedUserPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
+                            var selectedUserPaymentMethod = CHECKOUT.PaymentMethods.SelectedUserPaymentMethod;
 
                             // ReSharper disable once SimplifyConditionalTernaryExpression
                             bool isNewPaymentMethod = (selectedUserPaymentMethod is CreditCardUserUserPaymentMethod)
@@ -591,7 +591,7 @@ namespace Galleon.Checkout
         {
             try
             {
-                var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
+                var selectedPaymentMethod = CHECKOUT.PaymentMethods.SelectedUserPaymentMethod;
                 CheckoutAPI.InvokeAnalyticsEvent("payment_succeeded", new Dictionary<string, object>
                                                 {
                                                     { "checkout_session_id", CHECKOUT.Session?.SessionID                 ?? ""     },
@@ -611,7 +611,7 @@ namespace Galleon.Checkout
             try
             {
                 var errors                = CHECKOUT.Session.sessionErrors.ToArray();
-                var selectedPaymentMethod = CHECKOUT.User.SelectedUserPaymentMethod;
+                var selectedPaymentMethod = CHECKOUT.PaymentMethods.SelectedUserPaymentMethod;
                 
                 CheckoutAPI.InvokeAnalyticsEvent("payment_failed", new Dictionary<string, object>
                                                 {

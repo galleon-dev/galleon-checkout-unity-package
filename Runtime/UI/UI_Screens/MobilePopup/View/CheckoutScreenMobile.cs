@@ -197,7 +197,7 @@ namespace Galleon.Checkout.UI
 
         public void ResetState()
         {
-            var user = CheckoutClient.Instance.CurrentSession.User;
+            //var user = CheckoutClient.Instance.CurrentSession.User;
 
             // // Deselect Payment Method
             // foreach (var paymentMethod in CHECKOUT.PaymentMethods.UserPaymentMethods)
@@ -671,9 +671,17 @@ namespace Galleon.Checkout.UI
                                                        ,footer : FooterPanelView     .STATE.none                .ToString());
 
         public Page ErrorPage                = new Page(name   : "error"
-                                                       ,header : HeaderPanelView     .STATE.back_and_text       .ToString()
+                                                       ,header : HeaderPanelView     .STATE.x_button            .ToString()
                                                        ,panel  : CheckoutScreenMobile.STATE.error_panel         .ToString()
-                                                       ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString());
+                                                       ,footer : FooterPanelView     .STATE.terms_privacy_return.ToString()
+                                                       ,setup  : page =>
+                                                               {
+                                                                   page.NavigationMap[ErrorPanelView.ViewResult.Back    .ToString()] = CHECKOUT.Session.RefreshPaymentMethodsAndReturnToCheckout();
+                                                                   page.NavigationMap[ErrorPanelView.ViewResult.Confirm .ToString()] = CHECKOUT.Session.RefreshPaymentMethodsAndReturnToCheckout();
+                                                                   page.NavigationMap[ErrorPanelView.ViewResult.None    .ToString()] = CHECKOUT.Session.RefreshPaymentMethodsAndReturnToCheckout();
+                                                                   page.NavigationMap[ErrorPanelView.ViewResult.Checkout.ToString()] = page.screen.ViewPage(page.screen.CheckoutPage);;
+                                                               }
+                                                        );
 
         public Page CreditCardPage           = new Page(name   : "card"
                                                        ,header : HeaderPanelView     .STATE.credit_card_info    .ToString()
@@ -821,8 +829,8 @@ namespace Galleon.Checkout.UI
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
-        
-        public Step TestCloseCheckoutScreenClicked() 
+
+        public Step TestCloseCheckoutScreenClicked()
         =>
             new Step(name   : $"test_close_checkout_screen_clicked"
                     ,action : async (s) =>

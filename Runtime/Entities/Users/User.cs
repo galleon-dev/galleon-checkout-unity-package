@@ -15,9 +15,6 @@ namespace Galleon.Checkout
         public Shared.UserInfo       UserInfo;
         public string                Email => UserInfo.email;
  
-        public List<Transaction>     Transactions           = new();
-        public Transaction           CurrentTransaction;
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
 
         public User()
@@ -33,26 +30,5 @@ namespace Galleon.Checkout
                         s.AddChildStep(CHECKOUT.Actions.GetUserInfo());
                     });
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Methods
-        
-        public UserPaymentMethod SelectedUserPaymentMethod => CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
-        
-        public void SelectPaymentMethod(UserPaymentMethod userPaymentMethod)
-        {
-            foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
-                method.Unselect();
-            
-            userPaymentMethod.Select();
-        }
-        
-        public void AddPaymentMethod(UserPaymentMethod userPaymentMethod)
-        {
-            CHECKOUT.PaymentMethods.UserPaymentMethods.Add(userPaymentMethod);
-        }
-        
-        public async void RemovePaymentMethod(UserPaymentMethod userPaymentMethod)
-        {
-            await CHECKOUT.PaymentMethods.RemoveUserPaymentMethod(userPaymentMethod);
-        }
     }
 }

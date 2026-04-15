@@ -45,11 +45,14 @@ namespace Galleon.Checkout
         // Errors
         public List<string>                       sessionErrors                     = new List<string>();
         
+        // Transaction
+        public Step                               CurrentTransactionStep            = default;
+        
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public CheckoutClient                     Client                    => CheckoutClient.Instance;
         public User                               User                      => Client.CurrentUser;
-        public Transaction                        CurrentTransaction        => User.CurrentTransaction;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
 
@@ -265,7 +268,7 @@ namespace Galleon.Checkout
             new Step(name   : $"run_transaction"
                     ,action : async (s) =>
                     {
-                        if (User.SelectedUserPaymentMethod.Type == "native")
+                        if (CHECKOUT.PaymentMethods.SelectedUserPaymentMethod.Type == "native")
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                 {
@@ -274,6 +277,10 @@ namespace Galleon.Checkout
                                                 };
                             return;
                         }
+                        
+                        ////////////////////////////////////////////////////////////// Prep
+                        
+                        this.CurrentTransactionStep = s;
                         
                         ////////////////////////////////////////////////////////////// Pre Steps
                         
@@ -286,8 +293,7 @@ namespace Galleon.Checkout
                         ////////////////////////////////////////////////////////////// Transaction Steps
                         
                         // Setup Transaction Steps
-                        User.CurrentTransaction = new Transaction();
-                        foreach (var transactionStep in User.SelectedUserPaymentMethod.GetTransactionSteps())
+                        foreach (var transactionStep in CHECKOUT.PaymentMethods.SelectedUserPaymentMethod.GetTransactionSteps())
                         {
                             s.Log($"scheduling transaction step : {transactionStep.Name}");
                             s.AddChildStep(transactionStep);
@@ -319,8 +325,8 @@ namespace Galleon.Checkout
                         // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());                
                     });
-        
-        
+
+
         public Step StartTransaction()
         =>
             new Step(name   : $"start_transaction"
@@ -382,7 +388,7 @@ namespace Galleon.Checkout
                                   s.AddNextStepInParentFlow(CHECKOUT.Screen.ViewPage(CHECKOUT.Screen.CreditCardPage));
                               });
         
-        public Step On_EmptyPaypalSelected() 
+        public Step On_EmptyPaypalSelected()
         =>
             new Step(name   : $"on_empty_paypal_selected"
                     ,action : async (s) =>
@@ -401,12 +407,57 @@ namespace Galleon.Checkout
                                                   Type                    = "paypal",
                                                };
                                   CHECKOUT.PaymentMethods.UserPaymentMethods.Add(paypalPM);
-                                  CHECKOUT.User.SelectPaymentMethod(paypalPM);
-                                  
+                                  CHECKOUT.PaymentMethods.SelectPaymentMethod(paypalPM);
+
                                   s.AddNextStepInParentFlow(RunTransaction());
                               });
-        
-        
+
+        public Step RefreshPaymentMethodsAndReturnToCheckout()
+        =>
+            new Step(name   : "refresh_payment_methods_and_return_to_checkout"
+                    ,action : async (s) =>
+                              {
+                                  // this step gets called inside parent transaction step
+                                  
+                                  if (CurrentTransactionStep != default)
+                                  {
+                                      // Stop the transaction
+                                      s.RemoveStepsAfterThisInParentFlow();
+                                      CurrentTransactionStep.ChildSteps.Clear();
+                                      CurrentTransactionStep.PostSteps.Clear();
+                                      CurrentTransactionStep.ActionState = Step.ACTION_STATE.Error;
+                                      CurrentTransactionStep.StepState   = Step.STEP_STATE.Completed;
+                                      CurrentTransactionStep             = default;
+                                  }
+                                  
+                                  
+                                  // Show Loading Screen
+                                  Flow().AddChildStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.LoadingPage));
+
+                                  // Refresh payment method definitions and user payment methods
+                                  Flow().AddChildStep(CHECKOUT.PaymentMethods.RefreshPaymentMethods());
+
+                                  Flow().AddChildStep("set_navigation_after_error", async s =>
+                                  {
+                                      // Check if there are no payment methods to display (network error scenario)
+                                      if (CHECKOUT.PaymentMethods.UserPaymentMethods.Count == 0)
+                                      {
+                                          Client.CheckoutScreenMobile.ErrorPanelView.ErrorMessage     = "Network error";
+                                          Client.CheckoutScreenMobile.ErrorPanelView.ErrorDescription = "Unable to load payment methods. \nPlease check your connection and try again.";
+                                          Client.CheckoutScreenMobile.ErrorPanelView.ButtonText       = "Try again";
+                                          Client.CheckoutScreenMobile.NavigationNext = "Error";
+                                          Flow().AddChildStep(Client.CheckoutScreenMobile.Navigate());
+                                      }
+                                      else
+                                      {
+                                          CHECKOUT.PaymentMethods.SelectFirstUserPaymentMethodToDisplay();
+                                          Flow().AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.CheckoutPage));
+                                      }
+                                      
+                                  });
+                              });
+
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Error Tracking
 
         public void LogError(string source, Exception ex)

@@ -89,8 +89,8 @@ namespace Galleon.Checkout
                         s.AddPreStep(name     : "setup_adding_user_payment_method"
                                      ,action  : async step =>
                                               {
-                                                  CheckoutClient.Instance.CurrentSession.User.AddPaymentMethod   (upm);
-                                                  CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
+                                                  CHECKOUT.PaymentMethods.AddPaymentMethod   (upm);
+                                                  CHECKOUT.PaymentMethods.SelectPaymentMethod(upm);
                                               });
                         
                         foreach (var vaultingStep in upm.GetVaultingSteps())
@@ -107,12 +107,12 @@ namespace Galleon.Checkout
             upm.IsNewPaymentMethod      = true;
             upm.ShouldSavePaymentMethod = true;
             
-            CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);            
+            CHECKOUT.PaymentMethods.SelectPaymentMethod(upm);            
         }
         
         public void SelectUserPaymentMethod(UserPaymentMethod upm)
         {
-            CheckoutClient.Instance.CurrentSession.User.SelectPaymentMethod(upm);
+            CHECKOUT.PaymentMethods.SelectPaymentMethod(upm);
         }
         
         public async Task RemoveUserPaymentMethod(UserPaymentMethod userPaymentMethod)
@@ -157,6 +157,41 @@ namespace Galleon.Checkout
             //                                 });
             // }
             
+        }
+        
+        public UserPaymentMethod SelectedUserPaymentMethod => CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
+        
+        public void SelectPaymentMethod(UserPaymentMethod userPaymentMethod)
+        {
+            foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
+                method.Unselect();
+            
+            userPaymentMethod.Select();
+        }
+        
+        public void SelectFirstUserPaymentMethodToDisplay()
+        {
+            try
+            {
+                foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
+                    method.Unselect();
+
+                UserPaymentMethodsToDisplay.First().Select();
+            }
+            catch (Exception e)
+            {
+                CHECKOUT.Session.LogError("Select First UPM", e);
+            }
+        }
+        
+        public void AddPaymentMethod(UserPaymentMethod userPaymentMethod)
+        {
+            CHECKOUT.PaymentMethods.UserPaymentMethods.Add(userPaymentMethod);
+        }
+        
+        public async void RemovePaymentMethod(UserPaymentMethod userPaymentMethod)
+        {
+            await CHECKOUT.PaymentMethods.RemoveUserPaymentMethod(userPaymentMethod);
         }
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Storage

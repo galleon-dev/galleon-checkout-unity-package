@@ -48,7 +48,7 @@ namespace Galleon.Checkout.UI
             Debug.Log("On Confirm Clicked");
             
             Debug.Log($"Removing Payment Method : {CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete.DisplayName}");
-            CheckoutClient.Instance.CurrentSession.User.RemovePaymentMethod(CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete);
+            CHECKOUT.PaymentMethods.RemovePaymentMethod(CheckoutClient.Instance.CurrentSession.userPaymentMethodToDelete);
             
             this.Result = DialogResult.Confirm;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(this.Result.ToString());

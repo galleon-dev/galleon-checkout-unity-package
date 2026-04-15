@@ -23,6 +23,7 @@ namespace Galleon.Checkout.UI
             None,
             Back,
             Confirm,
+            Checkout,
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -61,7 +62,7 @@ namespace Galleon.Checkout.UI
 
         public void On_TryAnotherMethodButtonClicked()
         {
-            Result = ViewResult.Back;
+            Result = ViewResult.Confirm;
             CheckoutClient.Instance.CheckoutScreenMobile.OnPageFinishedWithResult(Result.ToString());
         }
     }
