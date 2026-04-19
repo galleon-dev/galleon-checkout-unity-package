@@ -385,13 +385,14 @@ namespace Galleon.Checkout
 
                                   globals.Add
                                   (
-                                      new ConfigValue(key : "fake_taxes_ip", value: "66.213.22.193")
+                                      new ConfigValue(key : "fake_taxes_ip", value: "176.38.12.207")
                                       {
                                           displayName     = "Fake Taxes IP",
                                           tag             = "global",
                                           possibleValues  = new ()
                                                             {
-                                                                new ConfigValue.PossibleValue() { DisplayName = "66.213.22.193", Value = "66.213.22.193"   },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Ukraine 176.38.12.207",    Value = "176.38.12.207"   },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "California 66.213.22.193", Value = "66.213.22.193"   },
                                                             },
                                       }
                                   );
