@@ -45,19 +45,25 @@ namespace Galleon.Checkout.UI
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
         
-        public void Initialize(PaymentMethodDefinition      paymentMethodDefinition, 
+        public void Initialize(PaymentMethodDefinition      paymentMethodDefinition,
                                SelectPaymentMethodPanelView SelectPaymentMethodPanelView)
         {
             this.PaymentMethodDefinition      = paymentMethodDefinition;
             this.SelectPaymentMethodPanelView = SelectPaymentMethodPanelView;
-            
-            var bonusData = (PaymentMethodDefinition != null) ? PaymentMethodDefinition?.BonusItem 
-                          : (UserPaymentMethod       != null) ? UserPaymentMethod?.GetPaymentMethodDefinition()?.BonusItem 
-                          : null;
-            
+
+            BonusItem bonusData;
+
+            if (PaymentMethodDefinition != null)
+                bonusData = PaymentMethodDefinition.BonusItem;
+            else if (UserPaymentMethod != null)
+                bonusData = UserPaymentMethod.GetPaymentMethodDefinition()?.BonusItem;
+            else
+                bonusData = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions
+                    .FirstOrDefault(x => x.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)?.BonusItem;
+
             InitializeBonus(bonusData);
-            
-            
+
+
             Refresh();
         }
         
