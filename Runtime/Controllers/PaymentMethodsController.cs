@@ -12,9 +12,9 @@ namespace Galleon.Checkout
 {
     public class PaymentMethodsController : Entity
     {
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Consts
-        
-        public int                                  MAX_LAST_USED_PAYMENT_METHODS = 3;
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
+
+        public int MAX_LAST_USED_PAYMENT_METHODS => CHECKOUT.Globals.MaxPaymentMethodsToDisplay;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
@@ -169,20 +169,55 @@ namespace Galleon.Checkout
             userPaymentMethod.Select();
         }
         
-        public void SelectFirstUserPaymentMethodToDisplay()
-        {
-            try
-            {
-                foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
-                    method.Unselect();
-
-                UserPaymentMethodsToDisplay.First().Select();
-            }
-            catch (Exception e)
-            {
-                CHECKOUT.Session.LogError("Select First UPM", e);
-            }
-        }
+        public Step SelectFirstUserPaymentMethodToDisplay() 
+        =>
+            new Step(name   : $"select_first_user_payment_method_to_display"
+                    ,action : async (s) =>
+                              {
+                                foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
+                                    method.Unselect();
+        
+                                UserPaymentMethodsToDisplay.First().Select();                  
+                              });
+        
+        public Step SelectLastUsedUserPaymentMethodToDisplay() 
+        =>
+            new Step(name   : $"select_last_used_user_payment_method_to_display"
+                    ,action : async (s) =>
+                              {
+                                  if (UserPaymentMethodsToDisplay.All(x => x.Type.ToLower().Contains("empty")))
+                                  {
+                                      // special edge case - if all are empty - just select the first
+                                      s.AddChildStep(SelectFirstBetweenEmptyUserPaymentMethods());
+                                      return;
+                                  }
+                                  
+                                  foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
+                                      method.Unselect();
+          
+                                  var lastUsed = LastUsedUserPaymentMethods.FirstOrDefault();
+          
+                                  if (lastUsed != null)
+                                      lastUsed.Select();
+                                  else if (UserPaymentMethodsToDisplay.Any())
+                                      UserPaymentMethodsToDisplay.First().Select();
+                              });
+        
+        public Step SelectFirstBetweenEmptyUserPaymentMethods() 
+         =>
+            new Step(name   : $"select_first_between_empty_user_payment_methods"
+                    ,action : async (s) =>
+                              {
+                                  UserPaymentMethodsToDisplay.First().SelectExclusive();                
+                              });
+        
+         public Step SelectAppUserPaymentMethodForPreselection() 
+         =>
+            new Step(name   : $"select_app_user_payment_method_for_preselection"
+                    ,action : async (s) =>
+                              {
+                                  CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();                
+                              });
         
         public void AddPaymentMethod(UserPaymentMethod userPaymentMethod)
         {
@@ -270,7 +305,16 @@ namespace Galleon.Checkout
 
                         var country  = CHECKOUT.Globals.CheckoutInitConfiguration.Country;
                         var currency = CHECKOUT.Globals.CheckoutInitConfiguration.Currency;
+                        
+                        #region TEST
+                        if (CHECKOUT.Globals.TestCountry.ToLower() != "dont_override")
+                        {
+                            country  = CHECKOUT.Globals.TestCountry;
+                            currency = CHECKOUT.Globals.TestCurrency;
+                        }
 
+                        #endregion
+                        
                         var _result = await CHECKOUT.Network.Get<Shared.PaymentMethodDefinitionsResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions?currency={currency}&country={country}&platform=unity"
                                                                                                          ,headers  : new ()
                                                                                                                    {
@@ -499,7 +543,16 @@ namespace Galleon.Checkout
             result = UserPaymentMethods.OrderByDescending(x => x.LastSuccessfulUseTime)
                                        .GroupBy(x => x.Type).Select(x => x.First()).ToList();
             
-            Debug.Log($"GetUserPaymentMethodsToDisplay - g ({UserPaymentMethods.Count}) : \n{string.Join("\n", UserPaymentMethods.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            Debug.Log($"GetUserPaymentMethodsToDisplay - g ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            
+            // remove native if needed
+            if (!CHECKOUT.Globals.IsNativeStoreEnabled
+            ||  !CHECKOUT.Globals.IsNativeStoreEnabledInCheckoutPage)
+            {
+                result = result.Where(x => x.Type != "native").ToList();
+            }
+            
+            Debug.Log($"GetUserPaymentMethodsToDisplay - n ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
             // filter
                                                                                         Debug.Log($"GetUserPaymentMethodsToDisplay - EmptyPaymentMethods ({EmptyUserPaymentMethods.Count}) : \n{string.Join("\n", EmptyUserPaymentMethods.Select(x => x.Type))}");

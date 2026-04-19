@@ -563,6 +563,8 @@ namespace Galleon.Checkout.UI
                 }
 
                 var footerHeight = (this.FooterPanelView.transform as RectTransform).rect.height;
+                if (CurrentPage != CreditCardPage)
+                    footerHeight = 0;
 
                 // Calculate actual keyboard height using insets
                 float actualKeyboardHeight = bottomInset > 0 

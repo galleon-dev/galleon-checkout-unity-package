@@ -82,13 +82,9 @@ namespace Galleon.Checkout
                         s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
                         s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
                         s.AddPreStep(StartSession());
+                        s.AddPreStep(CHECKOUT.PaymentMethods.SelectLastUsedUserPaymentMethodToDisplay());
                         
                         /////////////////////////////////////// Steps
-
-                        // Get Tax Info
-
-                      //s.AddChildStep(CheckoutClient.Instance.TaxController.GetTaxInfo());
-                      //s.AddChildStep("wait",        async x => await Task.Delay(1000));
 
                         s.AddChildStep(DetermineInitialPage()); // this updates the "navigation-next"
                         s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
@@ -145,7 +141,7 @@ namespace Galleon.Checkout
                         }
                         else
                         {   
-                            s.ParentStep.AddChildStep("select_first_upm", async step => {CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.First().SelectExclusive();} );
+                            s.ParentStep.AddChildStep(CHECKOUT.PaymentMethods.SelectLastUsedUserPaymentMethodToDisplay());
                             s.ParentStep.AddChildStep(CheckoutClient.Instance.CheckoutScreenMobile.ViewPage(CheckoutClient.Instance.CheckoutScreenMobile.CheckoutPage));
                             
                         }
@@ -186,11 +182,15 @@ namespace Galleon.Checkout
                         await CHECKOUT.PaymentMethods.Load();
                     });
         
-                public Step StartSession()
+        public Step StartSession()
         =>
             new Step(name   : $"start_session"
                     ,action : async (s) =>
                     {   
+                        string payerIP = null;
+                        if (CHECKOUT.Globals.FakeTaxes)
+                            payerIP = CHECKOUT.Globals.FakeTaxesIp;
+                        
                         var response = await CHECKOUT.Network.Post<CheckoutSessionResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/checkout-session/create"
                                                                                            ,headers  : new ()
                                                                                                      {
@@ -206,7 +206,8 @@ namespace Galleon.Checkout
                                                                                                                        currency = CHECKOUT.Session.SelectedProduct.Currency,
                                                                                                                    },
                                                                                                         expires_at = DateTime.UtcNow.AddDays(1),
-                                                                                                        metadata   = CHECKOUT.Session.Metadata
+                                                                                                        metadata   = CHECKOUT.Session.Metadata,
+                                                                                                        payer_ip   = payerIP,
                                                                                                      });
                         this.SessionID = response.session_id;
 
@@ -227,8 +228,6 @@ namespace Galleon.Checkout
                             s.Log($" - {t.Key} : {t.Value}");
                             this.Taxes.Add(t.Key, new TaxItem() { inclusive = t.Value.inclusive, tax_amount = t.Value.tax_amount });
                         }
-
-                        CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
                         
                         // Analytics: Checkout Window Opened
                         var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
@@ -450,7 +449,7 @@ namespace Galleon.Checkout
                                       }
                                       else
                                       {
-                                          CHECKOUT.PaymentMethods.SelectFirstUserPaymentMethodToDisplay();
+                                          CHECKOUT.PaymentMethods.SelectLastUsedUserPaymentMethodToDisplay().Execute();
                                           Flow().AddChildStep(Client.CheckoutScreenMobile.ViewPage(Client.CheckoutScreenMobile.CheckoutPage));
                                       }
                                       

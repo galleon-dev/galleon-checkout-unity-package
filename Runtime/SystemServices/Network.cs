@@ -28,6 +28,8 @@ namespace Galleon.Checkout
       
         #if PROD
         public string SERVER_BASE_URL = "https://bridge-api.galleon.so";
+        #elif PROD2
+        public string SERVER_BASE_URL = "https://galleon-bridge-server-prod-clone.up.railway.app";
         #elif DEBUG
       //public string SERVER_BASE_URL = "https://localhost:4000/v1";
       //public string SERVER_BASE_URL = "https://galleon-bridge-server-production.up.railway.app";

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Galleon;
 using Galleon.Checkout;
@@ -52,6 +53,17 @@ namespace Galleon.Checkout.Samples
             // {
             //     AddStoreViewItem(product);
             // }
+            
+            #if PROD || PROD2
+            var button = GameObject.Find("buy_galleon");
+            var buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
+                
+                #if PROD
+                buttonText.text += $"\n<color=red>PROD</color>";
+                #elif PROD2
+                buttonText.text += $"\n<color=red>PROD 2</color>";
+                #endif
+            #endif
         }
 
         //////////////////////////////////////////////////////////////////////// UI Events
@@ -100,7 +112,7 @@ namespace Galleon.Checkout.Samples
             }
         }
         
-        public void ON_DropdownValueChanged(int value)
+        public async void ON_DropdownValueChanged(int value)
         {
             var dropdowns = GetComponentsInChildren<TMP_Dropdown>();
             foreach (var dropdown in dropdowns)
@@ -115,14 +127,43 @@ namespace Galleon.Checkout.Samples
                     var actualValue      = configValue.possibleValues.Find(x => x.DisplayName == valueDisplayName);
                     configValue.OverrideValue(actualValue.Value);
                 }
+                
+                #region test_country and test_currency
+
+                // If test_country dropdown changed, update test_currency to match
+                if (configValue != null && configValue.displayName == "test_country")
+                {
+                    var currencyDropdown    = dropdowns.Single(x => x.gameObject.name == "drp_test_currency");
+                    
+                    var currencyConfigValue = CHECKOUT.Globals.GlobalValues.Last(x => x.displayName == "test_currency");
+                    var countryValue        = configValue.Value as string;
+
+                    // Find currency option by splitting display name and matching currency code
+                    var currencyIndex = currencyDropdown.options.FindIndex(opt => 
+                    {
+                        var displayNameParts = opt.text.Split(' ');
+                        var countryCode = displayNameParts.Length > 0 ? displayNameParts[0] : "";
+                        return countryCode == countryValue;
+                    });
+
+                    if (currencyIndex >= 0)
+                    {
+                        // Update dropdown value without triggering another event
+                        currencyDropdown.value = currencyIndex;
+                    }
+                }
+
+                #endregion
             }
 
             foreach (var v in CHECKOUT.Globals.GlobalValues)
             {
                 Debug.Log($"- {v.displayName, -15} = ({v.Value.GetType().Name}) {v.Value}");
             }
+
+            
         }
-        
+
         //////////////////////////////////////////////////////////////////////// Helper Methods
         
         public GameObject AddStoreViewItem(CheckoutProduct checkoutProduct)

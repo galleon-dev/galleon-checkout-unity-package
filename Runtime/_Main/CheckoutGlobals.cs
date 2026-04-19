@@ -80,6 +80,12 @@ namespace Galleon.Checkout
             set => CHECKOUT.Config.SetOverrideValue("is_native_store_enabled_in_selection_page", value);
         }
 
+        public int MaxPaymentMethodsToDisplay
+        {
+            get => CHECKOUT.Config.GetInt          ("max_payment_methods_to_display", defaultValue : 3);
+            set => CHECKOUT.Config.SetOverrideValue("max_payment_methods_to_display", value);
+        }
+
         public int PanelSmoothness
         {
             get => CHECKOUT.Config.GetInt          ("panel_smoothness", defaultValue : 2);
@@ -110,7 +116,17 @@ namespace Galleon.Checkout
             set => CHECKOUT.Config.SetOverrideValue("other_payment_methods_description", value);
         }
 
-        
+        public string TestCountry
+        {
+            get => CHECKOUT.Config.GetString       ("test_country", defaultValue : "dont override");
+            set => CHECKOUT.Config.SetOverrideValue("test_country", value);
+        }
+
+        public string TestCurrency
+        {
+            get => CHECKOUT.Config.GetString       ("test_currency", defaultValue : "dont override");
+            set => CHECKOUT.Config.SetOverrideValue("test_currency", value);
+        }
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Lifecycle
@@ -303,6 +319,23 @@ namespace Galleon.Checkout
 
                                   globals.Add
                                   (
+                                      new ConfigValue(key : "max_payment_methods_to_display", value: 3)
+                                      {
+                                          displayName     = "Max Payment Methods",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = "3" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "2",             Value = "2" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "3",             Value = "3" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "4",             Value = "4" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "5",             Value = "5" },
+                                                            },
+                                      }
+                                  );
+                                  
+                                  globals.Add
+                                  (
                                       new ConfigValue(key : "panel_smoothness", value: 2)
                                       {
                                           displayName     = "Panel Smoothness",
@@ -372,6 +405,70 @@ namespace Galleon.Checkout
                                           possibleValues  = new ()
                                                             {
                                                                 new ConfigValue.PossibleValue() { DisplayName = "default", Value = "Paypal, Cash-App & More" },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "test_country", value: "dont override")
+                                      {
+                                          displayName     = "test_country",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Dont Override", Value = "dont override"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "USA",           Value = "US"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Israel",        Value = "IL"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Japan",         Value = "JP"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Germany",       Value = "DE"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "UK",            Value = "GB"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "France",        Value = "FR"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Canada",        Value = "CA"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Australia",     Value = "AU"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Italy",         Value = "IT"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Spain",         Value = "ES"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Netherlands",   Value = "NL"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Switzerland",   Value = "CH"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Sweden",        Value = "SE"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "South Korea",   Value = "KR"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Singapore",     Value = "SG"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Belgium",       Value = "BE"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Austria",       Value = "AT"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Norway",        Value = "NO"             },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Denmark",       Value = "DK"             },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "test_currency", value: "dont override")
+                                      {
+                                          displayName     = "test_currency",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Dont Override", Value = "dont override"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "US - USD",      Value = "USD"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "IL - ILS",      Value = "ILS"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "JP - JPY",      Value = "JPY"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "DE - EUR",      Value = "EUR"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "GB - GBP",      Value = "GBP"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "FR - EUR",      Value = "EUR"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "CA - CAD",      Value = "CAD"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "AU - AUD",      Value = "AUD"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "IT - EUR",      Value = "EUR"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "ES - EUR",      Value = "EUR"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "NL - EUR",      Value = "EUR"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "CH - CHF",      Value = "CHF"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "SE - SEK",      Value = "SEK"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "KR - KRW",      Value = "KRW"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "SG - SGD",      Value = "SGD"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "BE - EUR",      Value = "EUR"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "AT - EUR",      Value = "EUR"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "NO - NOK",      Value = "NOK"            },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "DK - DKK",      Value = "DKK"            },
                                                             },
                                       }
                                   );

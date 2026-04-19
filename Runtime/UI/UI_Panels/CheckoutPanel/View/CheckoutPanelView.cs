@@ -77,11 +77,22 @@ namespace Galleon.Checkout.UI
             //RefreshState();
         }
 
-        public void OnEnable()
+        public override async Task OnFocus()
         {
-            //CHECKOUT.PaymentMethods.UserPaymentMethodsToDisplay.FirstOrDefault()?.SelectExclusive();
+            await base.OnFocus();
+            
+            var selectedUPMS = CHECKOUT.PaymentMethods.UserPaymentMethods.Where(x => x.IsSelected).ToList();
+            Debug.Log($"Selected UPMs ({selectedUPMS.Count}) : {string.Join(", ", selectedUPMS.Select(x => x.Data.type))}");
+            
+            var lastUsedTimes = CHECKOUT.PaymentMethods.UserPaymentMethods.Select(x => new
+                                                                                       {
+                                                                                         type = x.Type, 
+                                                                                         time = x.LastSuccessfulUseTime.ToString() ?? "null"
+                                                                                       })
+                                                                                       .OrderByDescending(x => x.time)
+                                                                                       .ToList();
+            Debug.Log($"Last used times ({lastUsedTimes.Count}) : \n{string.Join("\n", lastUsedTimes.Select(x => $"{x.type} : {x.time}"))}");
         }
-
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh
 

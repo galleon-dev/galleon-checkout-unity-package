@@ -59,7 +59,7 @@ namespace Galleon.Checkout.UI
 
         public void OnEnable()
         {
-            CHECKOUT.PaymentMethods.UserPaymentMethods.First(x => x.Type == "app").SelectExclusive();
+            CHECKOUT.PaymentMethods.SelectAppUserPaymentMethodForPreselection().Execute();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Refresh

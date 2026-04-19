@@ -45,10 +45,14 @@ namespace Galleon.SampleApp
             
             var user = $"test_user_{DateTime.Now.ToString()}";
             
+            
+            
             CHECKOUT.Globals.IsInternal = true;
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
                                             #if PROD
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
+                                            #elif PROD2
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
                                             #elif DEBUG
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",    // TEST
@@ -95,7 +99,7 @@ namespace Galleon.SampleApp
         {
             ///////////////////////////////////////////////////////////////////////////////////// Reinitialize
             
-            ReportText.text = "> User swapped - Reinitializing ... ";
+            ReportText.text = "> Reinitializing ... ";
             
             // cleanup
             CheckoutClient.Instance.Cleanup();
@@ -105,11 +109,21 @@ namespace Galleon.SampleApp
                                                        ? $"test_user_{DateTime.Now.ToString()}" 
                                                        : CHECKOUT.Globals.TestUser;
             
+            var country  = "US";
+            var currency = "USD";
+            
+            if (CHECKOUT.Globals.TestCountry.ToLower() != "dont override")
+                country  = CHECKOUT.Globals.TestCountry;
+            if (CHECKOUT.Globals.TestCurrency.ToLower() != "dont override")
+                currency = CHECKOUT.Globals.TestCurrency;
+            
             // Reinitialize if needed
             CHECKOUT.Globals.IsInternal = true;
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
                                             #if PROD
+                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
+                                            #elif PROD2
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
                                             #elif DEBUG
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",    // TEST
@@ -129,49 +143,115 @@ namespace Galleon.SampleApp
                                                                     {
                                                                        { "is_preselection_screen_enabled", false }
                                                                     },
-                                            Country                 = "US",
-                                            Currency                = "USD"
+                                            Country                 = country,
+                                            Currency                = currency
                                          });
             
             ReportText.text = $"> ready. \n> user is <color=yellow>{appUserID}</color>.";
             
         }
         
+        private string GetCurrencySign(string currency)
+        {
+            return currency.ToUpper() switch
+            {
+                "USD" => "$",
+                "EUR" => "€",
+                "GBP" => "£",
+                "JPY" => "¥",
+                "CNY" => "¥",
+                "INR" => "₹",
+                "CAD" => "C$",
+                "AUD" => "A$",
+                "CHF" => "CHF",
+                "KRW" => "₩",
+                "BRL" => "R$",
+                "MXN" => "MX$",
+                "RUB" => "₽",
+                "TRY" => "₺",
+                "ILS" => "₪",
+                "SEK" => "kr",
+                "NOK" => "kr",
+                "DKK" => "kr",
+                "PLN" => "zł",
+                "ZAR" => "R",
+                _     => currency + " "
+            };
+        }
+
+        private decimal GetCurrencyEquivalentFor1USD(string currency)
+        {
+            return currency.ToUpper() switch
+            {
+                "USD" => 1.00m,
+                "EUR" => 0.92m,
+                "GBP" => 0.79m,
+                "JPY" => 149.50m,
+                "CNY" => 7.24m,
+                "INR" => 83.12m,
+                "CAD" => 1.36m,
+                "AUD" => 1.53m,
+                "CHF" => 0.88m,
+                "KRW" => 1340.00m,
+                "BRL" => 4.97m,
+                "MXN" => 16.80m,
+                "RUB" => 92.00m,
+                "TRY" => 32.15m,
+                "ILS" => 3.64m,
+                "SEK" => 10.87m,
+                "NOK" => 10.96m,
+                "DKK" => 6.88m,
+                "PLN" => 3.98m,
+                "ZAR" => 18.23m,
+                _     => 1.00m
+            };
+        }
+
         public async Task Purchase()
-        { 
+        {
             if (isInitializing) return;
-           
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            
+
+            var currency = "USD";
+            if (CHECKOUT.Globals.TestCurrency.ToLower() != "dont override")
+                currency = CHECKOUT.Globals.TestCurrency;
+
+            var currencySign = GetCurrencySign(currency);
+            var conversionRate = GetCurrencyEquivalentFor1USD(currency);
+
             CheckoutProduct product = default;
             switch (CHECKOUT.Globals.TestProduct.ToLower())
             {
-                case "coins" :     product = new CheckoutProduct()
-                                           { 
+                case "coins" :     var amount1 = 1.00m * conversionRate;
+                                   product = new CheckoutProduct()
+                                           {
                                                DisplayName = "Bunch Of Coins",
-                                               PriceText   = "$1.00",
-                                             //Sku         = "sku-1-3DS", 
+                                               PriceText   = $"{currencySign}{amount1:F2}",
+                                             //Sku         = "sku-1-3DS",
                                                Sku         = "sku-1",
-                                               Amount      = 1.00m,
-                                               Currency    = "USD",
+                                               Amount      = amount1,
+                                               Currency    = currency,
                                            }; break;
-                case "spins" :     product = new CheckoutProduct()
-                                           { 
+                case "spins" :     var amount2 = 1.99m * conversionRate;
+                                   product = new CheckoutProduct()
+                                           {
                                                DisplayName = "Bunch Of Spins",
-                                               PriceText   = "1.99",
-                                               Sku         = "sku-2", 
-                                               Amount      = 1.99m,
-                                               Currency    = "USD",
+                                               PriceText   = $"{currencySign}{amount2:F2}",
+                                               Sku         = "sku-2",
+                                               Amount      = amount2,
+                                               Currency    = currency,
                                            }; break;
-                case "spins 3ds" : product = new CheckoutProduct()
-                                           { 
+                case "spins 3ds" : var amount3 = 1.99m * conversionRate;
+                                   product = new CheckoutProduct()
+                                           {
                                                DisplayName = "Bunch Of Spins (3DS)",
-                                               PriceText   = "$1.99",
-                                               Sku         = "sku-3-3DS", 
-                                               Amount      = 1.99m,
-                                               Currency    = "USD",
+                                               PriceText   = $"{currencySign}{amount3:F2}",
+                                               Sku         = "sku-3-3DS",
+                                               Amount      = amount3,
+                                               Currency    = currency,
                                            }; break;
-                
+
             }
             
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,6 +273,7 @@ namespace Galleon.SampleApp
                                                                                     { "is_preselection_screen_enabled", false },
                                                                                 }
                                                                         ,
+                                                                        #if !PROD2
                                                                         AllowedPaymentMethodTypes = new ()
                                                                                                      {
                                                                                                          "native",
@@ -201,6 +282,7 @@ namespace Galleon.SampleApp
                                                                                                          "amazon_pay",
                                                                                                          "google_pay_browser",
                                                                                                      }
+                                                                        #endif
                                                                    });
             
             
@@ -230,15 +312,25 @@ namespace Galleon.SampleApp
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Events
 
         string lastUser       = "new";
+        string lastCountry    = "dont override";
+        string lastCurrency   = "dont override";
         bool   isInitializing = false;
         
         public void Update()
         {
+            if (Time.realtimeSinceStartup < 1)
+                return;
+            
             if (isInitializing) return;
             
-            if (lastUser != CHECKOUT.Globals.TestUser)
+            if (lastUser     != CHECKOUT.Globals.TestUser
+            ||  lastCountry  != CHECKOUT.Globals.TestCountry
+            ||  lastCurrency != CHECKOUT.Globals.TestCurrency)
             {
-                lastUser = CHECKOUT.Globals.TestUser;
+                lastUser     = CHECKOUT.Globals.TestUser;
+                lastCountry  = CHECKOUT.Globals.TestCountry;
+                lastCurrency = CHECKOUT.Globals.TestCurrency;
+                
                 StartReinitializing();    
             }
         }
@@ -253,140 +345,6 @@ namespace Galleon.SampleApp
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Test Steps
-        
-        public Step TestPurchaseProduct1() 
-        =>
-            new Step(name   : $"test_purchase_product_1"
-                    ,action : async (s) =>
-                    {   
-                        //////////////////////////////////////////////////////////////////////////////////////////////// 
-
-                        CHECKOUT.Config.SetOverrideValue("is_preselection_screen_enabled", true);
-                        CHECKOUT.Config.SetOverrideValue("show_tax_breakdown",             true);
-                        CHECKOUT.Config.SetOverrideValue("show_log_footer",                true);
-                        
-                        ////////////////////////////////////////////////////////////////////////////////////////////////
-                        
-                        ReportText.text = $@"
-> Test Scenario 1
-----------------------------------------------------
-> Product : 
-    > name  : ''bunch of spins''
-    > price : $5.99
-    > sku   : 'sku-1'
-----------------------------------------------------
-> Payment Method : new credit card
-----------------------------------------------------
-> Preselection : true
-----------------------------------------------------
-> show tax : true
-----------------------------------------------------
-> Is California : true
-----------------------------------------------------
-                                          ";
-                        
-                        new Step(name: $"test_scenario_1", tags: new [] {"report"} ).Execute();
-                        
-                        ////////////////////////////////////////////////////////////////////////////////////////////////
-                        
-                        await Task.Delay(1000);
-                        
-                        //////////////////////////////////////////////////////////////////////////////////////////////// 
-                        
-                        var result = await CheckoutAPI.Purchase(new CheckoutProduct
-                                                               { 
-                                                                   DisplayName     = "bunch of coins",
-                                                                   PriceText       = "$5.99",
-                                                                   //Sku           = "sku-1-3DS", 
-                                                                   Sku             = "sku-1",
-                                                                   Amount          = 5.99m,
-                                                                   Currency        = "USD",
-                                                               },
-                                                               new CheckoutPurchaseConfiguration()
-                                                               {
-                                                                
-                                                               });
-                        
-                        ////////////////////////////////////////////////////////////////////////////////////////////////
-                         
-                        Debug.Log($"==================");
-                        Debug.Log($"result : ");
-                        Debug.Log($"{result.IsSuccess}");
-                        Debug.Log($"==================");
-                        
-                        ////////////////////////////////////////////////////////////////////////////////////////////////
-                        
-                        OnBackToStoreScreen().Execute();
-                    });
-        
-        
-        public Step TestPurchaseProduct2() 
-        =>
-            new Step(name   : $"test_purchase_product_2"
-                    ,action : async (s) =>
-                    {   
-                        //////////////////////////////////////////////////////////////////////////////////////////////// 
-                        
-                        
-                        CHECKOUT.Config.SetOverrideValue("is_preselection_screen_enabled", false);
-                        CHECKOUT.Config.SetOverrideValue("show_tax_breakdown",             false);
-                        CHECKOUT.Config.SetOverrideValue("show_log_footer",                false);
-                        
-                        //////////////////////////////////////////////////////////////////////////////////////////////// 
-                         
-                        ReportText.text = @"
-> Test Scenario 2
-----------------------------------------------------
-> Product : 
-    > name  : ''bunch of spins''
-    > price : $19.99
-    > sku   : 'sku-2'
-----------------------------------------------------
-> Payment Method : first existing credit card
-----------------------------------------------------
-> Preselection : false
-----------------------------------------------------
-> show tax : false
-----------------------------------------------------
-> Is California : false
-----------------------------------------------------
-                                          ";
-                        
-                        new Step(name: $"test_scenario_1", tags: new [] {"report"} ).Execute();
-                        
-                        ////////////////////////////////////////////////////////////////////////////////////////////////
-                        
-                        await Task.Delay(1000);
-                        
-                        //////////////////////////////////////////////////////////////////////////////////////////////// 
-                        
-                        var result = await CheckoutAPI.Purchase(new CheckoutProduct
-                                                               { 
-                                                                   DisplayName     = "bunch of spins",
-                                                                   PriceText       = "$19.99",
-                                                                   //Sku           = "sku-1-3DS", 
-                                                                   Sku             = "sku-2",
-                                                                   Amount          = 19.99m,
-                                                                   Currency        = "USD",
-                                                               },
-                                                                new CheckoutPurchaseConfiguration()
-                                                                {
-                                                                    
-                                                                });
-                        
-                        ////////////////////////////////////////////////////////////////////////////////////////////////
-                         
-                        Debug.Log($"==================");
-                        Debug.Log($"result : ");
-                        Debug.Log($"{result.IsSuccess}");
-                        Debug.Log($"==================");
-                        
-                        ////////////////////////////////////////////////////////////////////////////////////////////////
-                        
-                        OnBackToStoreScreen().Execute();
-                    });
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Misc
         
         
         #if UNITY_EDITOR
