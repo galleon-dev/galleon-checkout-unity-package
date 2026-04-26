@@ -165,17 +165,23 @@ namespace Galleon.Checkout
         
         public Sprite GetIconSprite()
         {
-            return CHECKOUT.Sprites.GetIconSprite(GetPaymentMethodTypeeActual());
+            var definition = GetPaymentMethodDefinition();
+            if (definition == null) definition = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Type == "card");
+            return definition?.GetIconSprite();
         }
         
         public bool HasNonEmptyButtonSprite()
         {
-            return CHECKOUT.Sprites.GetButtonSprite(GetPaymentMethodTypeeActual()) != CHECKOUT.Sprites.CheckoutButtonSprite;
+            var definition = GetPaymentMethodDefinition();
+            if (definition == null) definition = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Type == "card");
+            return definition.GetButtonprite() != CHECKOUT.Sprites.CheckoutButtonSprite;
         }
         
         public Sprite GetButtonSprite()
         {
-            return CHECKOUT.Sprites.GetButtonSprite(GetPaymentMethodTypeeActual());
+            var definition = GetPaymentMethodDefinition();
+            if (definition == null) definition = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Type == "card");
+            return definition.GetButtonprite();
         }
     }
 }

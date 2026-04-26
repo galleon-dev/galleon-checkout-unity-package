@@ -29,9 +29,6 @@ namespace Galleon.Checkout
         }
         public Shared.PaymentMethodDefinitionData Data;
         
-        public Sprite IconSprite;
-        public Sprite LogoSprite;
-        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
         
         public string                           DisplayName                     => Type.ToLower().Contains("paypal")     ? "PayPal"
@@ -66,18 +63,32 @@ namespace Galleon.Checkout
             this.Data.type = "";
         }
         
-        public Step Initialize() 
+        public Step Initialize()
         =>
             new Step(name   : $"Initialize_method_definition_{this.DisplayName}"
                     ,action : async (s) =>
                     {
-                        // string icon_url  = "https://www.shareicon.net/data/128x128/2015/03/17/8858_512x512_512x512.png";
-                        // s.Log($"downloading icon from {icon_url}");
-                        // this.IconSprite  = await DownloadImageAsync(icon_url);
-                        // 
-                        // string logo_url  = "https://epaypolicy.com/wp-content/uploads/2022/08/11.png";
-                        // s.Log($"downloading logo from {logo_url}");
-                        // this.LogoSprite  = await DownloadImageAsync(logo_url);            
+                        // string icon_url    = "https://www.shareicon.net/data/128x128/2015/03/17/8858_512x512_512x512.png";
+                        // string button_url  = "https://epaypolicy.com/wp-content/uploads/2022/08/11.png";
+                        // this.Data.icon_url = icon_url;
+                        // this.Data.logo_url = button_url;
+                        
+                        GetIconSprite();
+                        GetButtonprite();
+                        
+                        if (!this.Data.icon_url.IsNullOrEmpty())
+                        {
+                            s.Log($"downloading icon from {Data.icon_url}");
+                            StartDownloadingSprite(Data.icon_url);
+                            
+                        }
+
+                        if (!this.Data.logo_url.IsNullOrEmpty())
+                        {
+                            s.Log($"downloading logo from {Data.logo_url}");
+                            StartDownloadingSprite(Data.logo_url);
+                            
+                        }
                     });
         
         
@@ -129,19 +140,44 @@ namespace Galleon.Checkout
         
         public Sprite GetIconSprite()
         {
+            if (!this.Data.icon_url.IsNullOrEmpty()) 
+                return CHECKOUT.Sprites.GetIconSprite(this.Data.icon_url);
+            
             string type = this.Type.ToLower();
             type = type.Replace("empty_", "");
             return CHECKOUT.Sprites.GetIconSprite(type);    
         }
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
-        
-        private async Task<Sprite> DownloadImageAsync(string url)
+
+        public Sprite GetButtonprite()
         {
-            var sprite = await CheckoutClient.Instance.Resources.Sprites.LoadSprite(name_or_url: url);
-            return sprite;
+            if (!this.Data.logo_url.IsNullOrEmpty()) 
+                return CHECKOUT.Sprites.GetButtonSprite(this.Data.logo_url);
+
+            string type = this.Type.ToLower();
+            type = type.Replace("empty_", "");
+            return CHECKOUT.Sprites.GetButtonSprite(type);    
         }
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helpers
+
+        private async void StartDownloadingSprite(string url, Action<Sprite> onComplete = null)
+        {
+            try
+            {
+                // if given a url (starts with "http") this downloads and caches the sprite from the url
+                var sprite = await CheckoutClient.Instance.Resources.Sprites.LoadOrDownloadSprite(name_or_url: url);
+                if (sprite != null)
+                {
+                    onComplete?.Invoke(sprite);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error downloading payment method sprite (url={url}) : \n{e.Message} ");
+            }
+
+        }
+
         private BonusItem GetBonusItem()
         {
             var paymentMethodType = this.Type.ToLower();

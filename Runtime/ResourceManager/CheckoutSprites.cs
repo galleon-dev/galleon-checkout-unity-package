@@ -58,15 +58,19 @@ namespace Galleon.Checkout
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// API Methods
 
-        public Sprite GetIconSprite(string paymentMethodActualType)
+        public Sprite GetIconSprite(string pmTypeOrURL)
         {
-            if (SpriteResources.Any(x => x.Name == paymentMethodActualType + "_icon"))
+            if (pmTypeOrURL.StartsWith("http"))
             {
-                return SpriteResources.FirstOrDefault(x => x.Name == paymentMethodActualType)?.Sprite;
+                return LoadOrDownloadSprite(pmTypeOrURL).Result;
+            }
+            else if (SpriteResources.Any(x => x.Name == pmTypeOrURL + "_icon"))
+            {
+                return SpriteResources.FirstOrDefault(x => x.Name == pmTypeOrURL)?.Sprite;
             }
             else
             {
-                switch (paymentMethodActualType)
+                switch (pmTypeOrURL)
                 {
                     case "empty_card":           return AddCreditCardIconSprite;
                     case "card":                 return AddCreditCardIconSprite;
@@ -99,7 +103,7 @@ namespace Galleon.Checkout
                     case "app": return AppIconSprite;
                     default:
                     {
-                        if (paymentMethodActualType.ToLower().Contains("paypal"))
+                        if (pmTypeOrURL.ToLower().Contains("paypal"))
                             return PaypalIconSprite;
 
                         return AddCreditCardIconSprite;
@@ -108,15 +112,19 @@ namespace Galleon.Checkout
             }
         }
 
-        public Sprite GetButtonSprite(string paymentMethodActualType)
+        public Sprite GetButtonSprite(string pmTypeOrURL)
         {
-            if (SpriteResources.Any(x => x.Name == paymentMethodActualType + "_button"))
+            if (pmTypeOrURL.StartsWith("http"))
             {
-                return SpriteResources.FirstOrDefault(x => x.Name == paymentMethodActualType + "_button")?.Sprite;
+                return LoadOrDownloadSprite(pmTypeOrURL).Result;
+            }
+            else if (SpriteResources.Any(x => x.Name == pmTypeOrURL + "_button"))
+            {
+                return SpriteResources.FirstOrDefault(x => x.Name == pmTypeOrURL + "_button")?.Sprite;
             }
             else
             {
-                switch (paymentMethodActualType)
+                switch (pmTypeOrURL)
                 {
                     case "google_pay":           return GpaybuttonSprite;
                     case "google_pay_browser":   return GpaybuttonSprite;
@@ -150,7 +158,7 @@ namespace Galleon.Checkout
         //                
         //            });
         
-        public async Task<Sprite> LoadSprite(string name_or_url)
+        public async Task<Sprite> LoadOrDownloadSprite(string name_or_url)
         {     
             try
             {
@@ -183,7 +191,11 @@ namespace Galleon.Checkout
                 // Download if URL
                 if (name_or_url.StartsWith("http"))
                 {
-                    return await DownloadAndCacheSprite(name_or_url, filePath);
+                    // Start download without waiting
+                    _ = DownloadAndCacheSprite(name_or_url, filePath);
+
+                    // Return default sprite immediately
+                    return AddCreditCardIconSprite;
                 }
 
                 return null;
