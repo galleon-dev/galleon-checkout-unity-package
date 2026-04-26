@@ -312,7 +312,7 @@ namespace Galleon.Checkout
                                       Debug.Log($"+ value : {kvp}");
                                   
                                   if (values.Count == 0)
-                                      CHECKOUT.Session.LogError("URL", $"Returned from URL - But not via DeepLink - User probably canceled");
+                                      Debug.LogWarning($"Returned from URL - But not via DeepLink - User probably canceled");
                               });
         
 
