@@ -1,4 +1,4 @@
-//#define PROD
+//#define GALLEON_PROD
 
 using System;
 using System.Collections;
@@ -50,9 +50,9 @@ namespace Galleon.SampleApp
             CHECKOUT.Globals.IsInternal = true;
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
-                                            #if PROD
+                                            #if GALLEON_PROD
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
-                                            #elif PROD2
+                                            #elif GALLEON_PROD2
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
                                             #elif DEBUG
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",    // TEST

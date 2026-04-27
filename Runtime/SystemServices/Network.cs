@@ -1,4 +1,4 @@
-//#define PROD
+//#define GALLEON_PROD
 
 using System;
 using System.Collections.Generic;
@@ -26,9 +26,9 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Consts
       
-        #if PROD
+        #if GALLEON_PROD
         public string SERVER_BASE_URL = "https://bridge-api.galleon.so";
-        #elif PROD2
+        #elif GALLEON_PROD2
         public string SERVER_BASE_URL = "https://galleon-bridge-server-prod-clone.up.railway.app";
         #elif DEBUG
       //public string SERVER_BASE_URL = "https://localhost:4000/v1";
