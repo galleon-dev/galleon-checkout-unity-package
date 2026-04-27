@@ -48,8 +48,7 @@ namespace Galleon.Checkout
             
             // Run Session
             await  CheckoutClient.Instance.RunCheckoutSession(session).Execute();
-            
-            // Return result
+
             return session.PurchaseResult;
         }
     
@@ -119,17 +118,17 @@ namespace Galleon.Checkout
     [Serializable]
     public class PurchaseResult
     {
-        public string       OrderID;
-        public bool         IsSuccess;
-        public bool         IsCanceled;
-        public bool         IsError;
-        public List<string> Errors;
-        public bool         DidUserSelectNativeIAP;
-        public string       SelectedPaymentMethodType = "none";
+        public string                     OrderID;
+        public bool                       IsSuccess;
+        public bool                       IsCanceled;
+        public bool                       IsError;
+        public List<string>               Errors;
+        public bool                       DidUserSelectNativeIAP;
+        public string                     SelectedPaymentMethodType = "none";
 
         public override string ToString()
         {
-            return $"PurchaseResult: OrderID={OrderID}, IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, SelectedPaymentMethodType={SelectedPaymentMethodType}, Errors={string.Join("\n", Errors ?? new List<string>())}\n\n";
+            return $"PurchaseResult: OrderID={OrderID}, IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, SelectedPaymentMethodType={SelectedPaymentMethodType}, Errors={string.Join("\n", Errors ?? new List<string>())},\n";
         }
     }
 }
