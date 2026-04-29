@@ -26,6 +26,12 @@ namespace Galleon.Checkout
             set => CHECKOUT.Config.SetOverrideValue("show_tax_breakdown", value);
         }
 
+        public bool ShowCurrencySign
+        {
+            get => CHECKOUT.Config.GetBool         ("show_currency_sign", defaultValue : true);
+            set => CHECKOUT.Config.SetOverrideValue("show_currency_sign", value);
+        }
+
         public bool ShowLongFooter
         {
             get => CHECKOUT.Config.GetBool         ("show_long_footer", defaultValue : false);
@@ -208,6 +214,21 @@ namespace Galleon.Checkout
                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override",  Value = null    },
                                                                new ConfigValue.PossibleValue() { DisplayName = "inclusive",      Value = "false" },
                                                                new ConfigValue.PossibleValue() { DisplayName = "show-breakdown", Value = "true"  },
+                                                           },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "show_currency_sign", value: true)
+                                      {
+                                          displayName      = "currency_sign",
+                                          tag              = "global",
+                                          possibleValues   = new ()
+                                                           {
+                                                               new ConfigValue.PossibleValue() { DisplayName = "dont override",  Value = null    },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "show-sign",      Value = "true"  },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "show-code",      Value = "false" },
                                                            },
                                       }
                                   );

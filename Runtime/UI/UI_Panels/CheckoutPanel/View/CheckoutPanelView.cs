@@ -101,7 +101,7 @@ namespace Galleon.Checkout.UI
             if (CheckoutClient.Instance.CurrentSession == null) return;
 
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
-            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+            this.PriceText.text        = FormatMoney(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Amount);
 
             ///////////////
 
@@ -163,7 +163,7 @@ namespace Galleon.Checkout.UI
             if (CheckoutClient.Instance.CurrentSession == null) return;
 
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
-            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
+            this.PriceText.text        = FormatMoney(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Amount);
 
             // Set Button Display
             var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
@@ -347,19 +347,10 @@ namespace Galleon.Checkout.UI
 
             if (Checkout.CheckoutClient.Instance != null)
             {
-                float SubTotal = 0f;
-                var currencySign = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Currency;
-
-                if (float.TryParse(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText.Replace("$", "")
-                                  ,NumberStyles.Float
-                                  ,CultureInfo.InvariantCulture
-                                  ,out float result))
-                {
-                    SubTotal = result;
-                }
+                decimal SubTotal = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Amount;
 
                 // CultureInfo.InvariantCulture is important from parsing perspective from string to float as on mobile devices it can appear ",", instead "." in float values
-                SubtotalPriceText.text = $"{currencySign} {SubTotal.ToString(CultureInfo.InvariantCulture)}";
+                SubtotalPriceText.text = FormatMoney(SubTotal);
 
                 decimal TaxesAmount = 0;
 
@@ -368,13 +359,13 @@ namespace Galleon.Checkout.UI
                 {
                     foreach (var tax in taxes)
                     {
-                        CreateTaxPrefab(tax.Key, tax.Value.tax_amount.ToString(CultureInfo.InvariantCulture));
+                        CreateTaxPrefab(tax.Key, tax.Value.tax_amount);
                         TaxesAmount += tax.Value.tax_amount;
                     }
                     
                     ShowTaxesPanels(true);
                     TaxText.gameObject.SetActive(false);
-                    TaxText.text = $"{currencySign} {TaxesAmount.ToString(CultureInfo.InvariantCulture)}";
+                    TaxText.text = FormatMoney(TaxesAmount);
                     
                     TaxesAndFeesRow.gameObject.SetActive(false);
                 }
@@ -392,19 +383,116 @@ namespace Galleon.Checkout.UI
                     TaxesAndFeesRow.gameObject.SetActive(true);
                 }
                 
-                TotalPriceText.text = $"{currencySign} {(SubTotal + (float)TaxesAmount).ToString(CultureInfo.InvariantCulture)}";
+                TotalPriceText.text = FormatMoney(SubTotal + TaxesAmount);
                 
                 if (taxes.Count == 0)
                     TotalPriceText.text = PriceText.text;
             }
         }
 
-        void CreateTaxPrefab(string taxName, string taxAmount)
+        void CreateTaxPrefab(string taxName, decimal taxAmount)
         {
-            var currencySign = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Currency;
             var taxPrefab = Instantiate(original: TaxPrefab, parent: TaxesContainer.transform);
             taxPrefab.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = taxName;
-            taxPrefab.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = $"{currencySign} {taxAmount}";
+            taxPrefab.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = FormatMoney(taxAmount);
+        }
+
+        string FormatMoney(decimal amount)
+        {
+            var currencyCode = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Currency;
+            var currencyDisplay = CHECKOUT.Globals.ShowCurrencySign
+                                  ? GetCurrencySign(currencyCode)
+                                  : currencyCode;
+            var separator = CHECKOUT.Globals.ShowCurrencySign ? string.Empty : " ";
+            return $"{currencyDisplay}{separator}{amount.ToString("0.00", CultureInfo.CurrentCulture)}";
+        }
+
+        string GetCurrencySign(string currency)
+        {
+            if (string.IsNullOrEmpty(currency))
+                return currency;
+
+            var currencyCode = currency.ToUpperInvariant();
+            var configKey = $"currency_sign_{currencyCode}";
+            var configuredSign = CHECKOUT.Config.GetString(configKey, defaultValue: null);
+            if (!string.IsNullOrEmpty(configuredSign))
+                return configuredSign;
+
+            var knownSign = currencyCode switch
+            {
+                "USD" => "$",
+                "EUR" => "€",
+                "GBP" => "£",
+                "JPY" => "¥",
+                "CNY" => "¥",
+                "HKD" => "HK$",
+                "SGD" => "S$",
+                "NZD" => "NZ$",
+                "INR" => "₹",
+                "CAD" => "C$",
+                "AUD" => "A$",
+                "CHF" => "CHF",
+                "KRW" => "₩",
+                "VND" => "₫",
+                "THB" => "฿",
+                "PHP" => "₱",
+                "IDR" => "Rp",
+                "MYR" => "RM",
+                "TWD" => "NT$",
+                "BRL" => "R$",
+                "MXN" => "MX$",
+                "ARS" => "$",
+                "CLP" => "$",
+                "COP" => "$",
+                "PEN" => "S/",
+                "RUB" => "₽",
+                "TRY" => "₺",
+                "ILS" => "₪",
+                "SEK" => "kr",
+                "NOK" => "kr",
+                "DKK" => "kr",
+                "ISK" => "kr",
+                "PLN" => "zł",
+                "CZK" => "Kč",
+                "HUF" => "Ft",
+                "RON" => "lei",
+                "BGN" => "лв",
+                "UAH" => "₴",
+                "ZAR" => "R",
+                "AED" => "د.إ",
+                "SAR" => "﷼",
+                "QAR" => "ر.ق",
+                "KWD" => "د.ك",
+                "BHD" => ".د.ب",
+                "OMR" => "ر.ع.",
+                "EGP" => "E£",
+                "MAD" => "د.م.",
+                "NGN" => "₦",
+                _     => null
+            };
+
+            if (!string.IsNullOrEmpty(knownSign))
+                return knownSign;
+
+            try
+            {
+                var region = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+                                        .Select(culture =>
+                                        {
+                                            try { return new RegionInfo(culture.Name); }
+                                            catch { return null; }
+                                        })
+                                        .FirstOrDefault(r => r != null && r.ISOCurrencySymbol.Equals(currencyCode, StringComparison.OrdinalIgnoreCase));
+
+                if (region != null && !region.CurrencySymbol.Equals(currencyCode, StringComparison.OrdinalIgnoreCase))
+                    return region.CurrencySymbol;
+            }
+            catch
+            {
+                // Fallback to currency code
+            }
+
+            return currency;
         }
 
         void ShowTaxesPanels(bool status)
