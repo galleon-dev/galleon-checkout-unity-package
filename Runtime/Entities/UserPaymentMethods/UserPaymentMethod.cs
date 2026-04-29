@@ -165,13 +165,21 @@ namespace Galleon.Checkout
         
         public Sprite GetIconSprite()
         {
+            if (this is CreditCardUserUserPaymentMethod)
+                return CHECKOUT.Sprites.GetIconSprite(GetPaymentMethodTypeeActual());
+            
             var definition = GetPaymentMethodDefinition();
-            if (definition == null) definition = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Type == "card");
+            if (definition == null) 
+                return CHECKOUT.Sprites.GetIconSprite(GetPaymentMethodTypeeActual());
             return definition?.GetIconSprite();
         }
         
         public bool HasNonEmptyButtonSprite()
         {
+            
+            if (this is CreditCardUserUserPaymentMethod)
+                return true;
+            
             var definition = GetPaymentMethodDefinition();
             if (definition == null) definition = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Type == "card");
             return definition.GetButtonprite() != CHECKOUT.Sprites.CheckoutButtonSprite;
@@ -179,8 +187,13 @@ namespace Galleon.Checkout
         
         public Sprite GetButtonSprite()
         {
+            if (this is CreditCardUserUserPaymentMethod)
+                return CHECKOUT.Sprites.GetButtonSprite(GetPaymentMethodTypeeActual());
+            
             var definition = GetPaymentMethodDefinition();
-            if (definition == null) definition = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions.FirstOrDefault(x => x.Type == "card");
+            if (definition == null) 
+                return CHECKOUT.Sprites.GetButtonSprite(GetPaymentMethodTypeeActual());
+            
             return definition.GetButtonprite();
         }
     }
