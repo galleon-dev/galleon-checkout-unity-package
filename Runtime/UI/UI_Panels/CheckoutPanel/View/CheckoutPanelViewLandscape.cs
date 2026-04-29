@@ -33,7 +33,6 @@ namespace Galleon.Checkout.UI
             if (CheckoutClient.Instance.CurrentSession == null) return;
 
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
-            this.PriceText.text        = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText;
 
             if (TaxesContainer != null)
             {
@@ -65,10 +64,10 @@ namespace Galleon.Checkout.UI
             if (Checkout.CheckoutClient.Instance != null)
             {
                 float SubTotal = 0f;
-                if (float.TryParse(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText.Replace("$", ""), NumberStyles.Float, CultureInfo.InvariantCulture, out float result))
-                {
-                    SubTotal = result;
-                }
+                // if (float.TryParse(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText.Replace("$", ""), NumberStyles.Float, CultureInfo.InvariantCulture, out float result))
+                // {
+                //     SubTotal = result;
+                // }
 
                 Debug.Log("SubTotal Parsed: " + SubTotal);
 

@@ -171,7 +171,6 @@ namespace Galleon.Checkout.UI
                                              <h1>Thank you for your purchase!</h1>
                                              <p>Here is your receipt:</p>
                                              <p>product : {CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName}</p>
-                                             <p>price   : {CheckoutClient.Instance.CurrentSession.SelectedProduct.PriceText  }</p>
                                              <p>Time    : {DateTime.UtcNow.ToLongDateString()} - {DateTime.UtcNow.ToShortTimeString()} (UTC)</p>
                                          </body>
                                          </html>",

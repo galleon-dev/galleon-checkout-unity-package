@@ -227,7 +227,6 @@ namespace Galleon.SampleApp
                                    product = new CheckoutProduct()
                                            {
                                                DisplayName = "Bunch Of Coins",
-                                               PriceText   = $"{currencySign}{amount1:F2}",
                                              //Sku         = "sku-1-3DS",
                                                Sku         = "sku-1",
                                                Amount      = amount1,
@@ -237,7 +236,6 @@ namespace Galleon.SampleApp
                                    product = new CheckoutProduct()
                                            {
                                                DisplayName = "Bunch Of Spins",
-                                               PriceText   = $"{currencySign}{amount2:F2}",
                                                Sku         = "sku-2",
                                                Amount      = amount2,
                                                Currency    = currency,
@@ -246,7 +244,6 @@ namespace Galleon.SampleApp
                                    product = new CheckoutProduct()
                                            {
                                                DisplayName = "Bunch Of Spins (3DS)",
-                                               PriceText   = $"{currencySign}{amount3:F2}",
                                                Sku         = "sku-3-3DS",
                                                Amount      = amount3,
                                                Currency    = currency,
