@@ -66,7 +66,7 @@ namespace Galleon.Checkout
             }
             else if (SpriteResources.Any(x => x.Name == pmTypeOrURL + "_icon"))
             {
-                return SpriteResources.FirstOrDefault(x => x.Name == pmTypeOrURL)?.Sprite;
+                return SpriteResources.FirstOrDefault(x => x.Name == pmTypeOrURL + "_icon")?.Sprite;
             }
             else
             {
