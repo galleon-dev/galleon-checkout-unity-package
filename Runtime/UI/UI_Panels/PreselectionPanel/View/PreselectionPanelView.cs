@@ -69,6 +69,7 @@ namespace Galleon.Checkout.UI
             if (CheckoutClient.Instance.CurrentSession == null) return;
             
             this.ProductTitleText.text = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.DisplayName;
+            this.PriceText.text        = CHECKOUT.Currency.FormatMoney(Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Amount);
 
             ///////////////
 

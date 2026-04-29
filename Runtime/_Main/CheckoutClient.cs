@@ -46,6 +46,7 @@ namespace Galleon.Checkout
         [Header("Entities")]
         public ProductsController           Products                    = new();
         public UsersController              Users                       = new();
+        public CurrencyController           Currency                    = new();
         public User                         CurrentUser                 = new();
         
         // Sessions
@@ -118,6 +119,7 @@ namespace Galleon.Checkout
                         
                                   // Entities
                                   s.AddChildStep(Products                       .Initialize());
+                                  s.AddChildStep(Currency                       .Initialize());
                                   s.AddChildStep(Users                          .Initialize()); //
                                   
                                   // UI
@@ -186,6 +188,7 @@ namespace Galleon.Checkout
         
         public static PaymentMethodsController  PaymentMethods  => CheckoutClient.Instance.PaymentMethodsController;
         public static ProductsController        Products        => CheckoutClient.Instance.Products;
+        public static CurrencyController        Currency        => CheckoutClient.Instance.Currency;
         public static UsersController           Users           => CheckoutClient.Instance.Users;
         public static User                      User            => CheckoutClient.Instance.CurrentUser;
          
