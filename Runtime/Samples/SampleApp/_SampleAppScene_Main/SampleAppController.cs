@@ -10,6 +10,7 @@ using Galleon.Checkout.Samples;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Environment = Galleon.Checkout.Environment;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -45,8 +46,6 @@ namespace Galleon.SampleApp
             
             var user = $"test_user_{DateTime.Now.ToString()}";
             
-            
-            
             CHECKOUT.Globals.IsInternal = true;
             await CheckoutAPI.Initialize(new CheckoutConfiguration()
                                          {
@@ -72,7 +71,12 @@ namespace Galleon.SampleApp
                                                                        { "is_preselection_screen_enabled", false },
                                                                     },
                                             Country                 = "US",
-                                            Currency                = "USD"
+                                            Currency                = "USD",
+                                            #if GALLEON_PROD || GALLEON_PROD2
+                                            Environment             = Environment.Prod,
+                                            #else
+                                            Environment             = Environment.Test,
+                                            #endif
                                          });
             
             StoreView.RefreshConfigPanel();
@@ -144,41 +148,18 @@ namespace Galleon.SampleApp
                                                                        { "is_preselection_screen_enabled", false }
                                                                     },
                                             Country                 = country,
-                                            Currency                = currency
+                                            Currency                = currency,
+                                            #if GALLEON_PROD || GALLEON_PROD2
+                                            Environment             = Environment.Prod,
+                                            #else
+                                            Environment             = Environment.Test,
+                                            #endif
                                          });
             
             ReportText.text = $"> ready. \n> user is <color=yellow>{appUserID}</color>.";
             
         }
         
-        private string GetCurrencySign(string currency)
-        {
-            return currency.ToUpper() switch
-            {
-                "USD" => "$",
-                "EUR" => "€",
-                "GBP" => "£",
-                "JPY" => "¥",
-                "CNY" => "¥",
-                "INR" => "₹",
-                "CAD" => "C$",
-                "AUD" => "A$",
-                "CHF" => "CHF",
-                "KRW" => "₩",
-                "BRL" => "R$",
-                "MXN" => "MX$",
-                "RUB" => "₽",
-                "TRY" => "₺",
-                "ILS" => "₪",
-                "SEK" => "kr",
-                "NOK" => "kr",
-                "DKK" => "kr",
-                "PLN" => "zł",
-                "ZAR" => "R",
-                _     => currency + " "
-            };
-        }
-
         private decimal GetCurrencyEquivalentFor1USD(string currency)
         {
             return currency.ToUpper() switch
@@ -217,7 +198,6 @@ namespace Galleon.SampleApp
             if (CHECKOUT.Globals.TestCurrency.ToLower() != "dont override")
                 currency = CHECKOUT.Globals.TestCurrency;
 
-            var currencySign = GetCurrencySign(currency);
             var conversionRate = GetCurrencyEquivalentFor1USD(currency);
 
             CheckoutProduct product = default;

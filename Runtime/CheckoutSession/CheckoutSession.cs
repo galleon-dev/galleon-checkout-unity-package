@@ -218,7 +218,7 @@ namespace Galleon.Checkout
                         s.Log($"tax.should_display_taxes         : {taxData.should_display_taxes}");
                         s.Log($"tax.taxes({taxData.taxes.Count}) : ");
 
-                        CHECKOUT.Globals.ShowTaxBreakdown = taxData.should_display_taxes;
+                        CHECKOUT.Config.SetValue("show_tax_breakdown", taxData.should_display_taxes);
                         
                         // Taxes.Add("IRS",       new TaxItem() { inclusive = true, tax_amount = 2.99m} );
                         // Taxes.Add("Levan Tax", new TaxItem() { inclusive = true, tax_amount = 4.99m} );

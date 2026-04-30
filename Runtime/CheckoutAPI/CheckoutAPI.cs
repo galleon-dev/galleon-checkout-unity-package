@@ -74,6 +74,12 @@ namespace Galleon.Checkout
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Helper Types
     
+    public enum Environment
+    {
+        Test,
+        Prod,
+    }
+    
     [Serializable]
     public class CheckoutConfiguration
     {
@@ -85,6 +91,7 @@ namespace Galleon.Checkout
         public CheckoutOrientation        UIPanelOrientation        = CheckoutOrientation.Auto;
         public Dictionary<string, object> Config                    = new();
         public string                     DeepLinkName              = "checkout";
+        public Environment                Environment               = Environment.Prod;
 
         public override string ToString()
         {

@@ -26,6 +26,26 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Consts
       
+        public string SERVER_BASE_URL
+        {
+            get
+            {
+                if (CHECKOUT.Globals.CheckoutInitConfiguration.Environment == Environment.Prod)
+                {
+                    #if GALLEON_PROD2
+                    return "https://galleon-bridge-server-prod-clone.up.railway.app";
+                    #endif
+                    
+                    return "https://bridge-api.galleon.so"; // Prod
+                }
+                else
+                {
+                    return "https://bridge-staging-api.galleon.so"; // Staging
+                }
+            }
+        }
+        
+        /*
         #if GALLEON_PROD
         public string SERVER_BASE_URL = "https://bridge-api.galleon.so";
         #elif GALLEON_PROD2
@@ -39,7 +59,7 @@ namespace Galleon.Checkout
         #else
         public string SERVER_BASE_URL = "https://bridge-api.galleon.so";
         #endif
-      
+        */
       
       
         public const int TIMEOUT_MILLISECONDS = 10000;

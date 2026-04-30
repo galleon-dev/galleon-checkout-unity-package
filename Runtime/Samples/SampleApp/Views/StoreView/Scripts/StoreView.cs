@@ -54,13 +54,13 @@ namespace Galleon.Checkout.Samples
             //     AddStoreViewItem(product);
             // }
             
-            #if PROD || PROD2
+            #if GALLEON_PROD || GALLEON_PROD2
             var button = GameObject.Find("buy_galleon");
             var buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
                 
-                #if PROD
+                #if GALLEON_PROD
                 buttonText.text += $"\n<color=red>PROD</color>";
-                #elif PROD2
+                #elif GALLEON_PROD2
                 buttonText.text += $"\n<color=red>PROD 2</color>";
                 #endif
             #endif
