@@ -91,7 +91,7 @@ namespace Galleon.Checkout
         public CheckoutOrientation        UIPanelOrientation        = CheckoutOrientation.Auto;
         public Dictionary<string, object> Config                    = new();
         public string                     DeepLinkName              = "checkout";
-        public Environment                Environment               = Environment.Prod;
+        public Environment                Environment               = Environment.Test;
 
         public override string ToString()
         {
