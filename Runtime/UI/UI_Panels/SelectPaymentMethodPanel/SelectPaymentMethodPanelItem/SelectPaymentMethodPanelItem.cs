@@ -129,7 +129,7 @@ namespace Galleon.Checkout.UI
             if (this.PaymentMethodDefinition      == null
             &&  this.UserPaymentMethod            == null)
             {
-                this.Label.text  = "Add Credit or Debit Card";
+                this.Label.text  = CHECKOUT.Globals.AddCardText;
                 this.Icon.sprite = CHECKOUT.Sprites.AddCreditCardIconSprite;
             }
             //////////////////////////////////////////////// Payment Method Definitions
@@ -138,7 +138,7 @@ namespace Galleon.Checkout.UI
                 this.Icon.sprite = this.PaymentMethodDefinition.GetIconSprite();
 
                 if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)
-                    this.Label.text  = "Add Credit or Debit Card";
+                    this.Label.text  = CHECKOUT.Globals.AddCardText;
                 
                 // Dropdown
                 DropdownButton.gameObject.SetActive(this.PaymentMethodDefinition.ShouldShowDropdown);

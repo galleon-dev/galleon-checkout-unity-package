@@ -74,6 +74,12 @@ namespace Galleon.Checkout
             set => CHECKOUT.Config.SetOverrideValue("settings_back_button", value);
         }
 
+        public string AddCardText
+        {
+            get => CHECKOUT.Config.GetString       ("add_card_text", defaultValue : "Add Credit or Debit Card");
+            set => CHECKOUT.Config.SetOverrideValue("add_card_text", value);
+        }
+
         public bool IsNativeStoreEnabledInCheckoutPage
         {
             get => CHECKOUT.Config.GetBool         ("is_native_store_enabled_in_checkout_page", defaultValue : true);
