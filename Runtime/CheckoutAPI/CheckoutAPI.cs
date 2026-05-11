@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.Shared;
 using UnityEngine;
 
 namespace Galleon.Checkout
@@ -126,6 +127,7 @@ namespace Galleon.Checkout
     public class PurchaseResult
     {
         public string                     OrderID;
+        public PriceData                  PriceData;
         public bool                       IsSuccess;
         public bool                       IsCanceled;
         public bool                       IsError;

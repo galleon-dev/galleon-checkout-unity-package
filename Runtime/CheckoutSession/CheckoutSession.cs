@@ -24,6 +24,7 @@ namespace Galleon.Checkout
         // Tax data
         public bool                               ShouldDisplayPriceIncludingTax    = true;
         public Dictionary<string, TaxItem>        Taxes                             = new(); // <name_of_tax, tax_data>
+        public PriceData                          SessionPriceData                  = null;
         
         // Simple Dialog Panel data
         public string                             LastDialogRequest                 = null;
@@ -112,6 +113,7 @@ namespace Galleon.Checkout
                             this.PurchaseResult = new PurchaseResult()
                                                   {
                                                       OrderID                   = CHECKOUT.Session?.SessionID ?? "NULL",
+                                                      PriceData                 = this.SessionPriceData,
                                                       IsSuccess                 = false,
                                                       IsCanceled                = true,
                                                       IsError                   = false,
@@ -132,6 +134,7 @@ namespace Galleon.Checkout
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                 {
+                                                    PriceData                 = this.SessionPriceData,
                                                     IsSuccess                 = true,
                                                     DidUserSelectNativeIAP    = true,
                                                     SelectedPaymentMethodType = "native"
@@ -210,6 +213,7 @@ namespace Galleon.Checkout
                                                                                                         payer_ip   = payerIP,
                                                                                                      });
                         this.SessionID = response.session_id;
+                        this.SessionPriceData = response.price_data;
 
                         // Store tax data in session
                         var taxData = response.price_data.tax;
@@ -272,6 +276,7 @@ namespace Galleon.Checkout
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                 {
+                                                    PriceData              = this.SessionPriceData,
                                                     IsSuccess              = true,
                                                     DidUserSelectNativeIAP = true,
                                                 };
@@ -351,6 +356,7 @@ namespace Galleon.Checkout
                         this.PurchaseResult = new PurchaseResult()
                                               {
                                                   OrderID     = CHECKOUT.Session?.SessionID ?? "NULL",
+                                                  PriceData   = this.SessionPriceData,
                                                   IsSuccess   = result.is_success,
                                                   IsCanceled  = result.is_canceled,
                                                   Errors      = result.errors?.ToList(),
