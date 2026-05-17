@@ -508,7 +508,7 @@ namespace Galleon.Checkout
 
             foreach (var taxItem in priceData.tax.taxes)
             {
-                result[taxItem.Key] = taxItem.Value.ToString();
+                result[taxItem.Key] = taxItem.Value.tax_amount.ToString();
             }
 
             // Final defaults to ensure all requested fields are present
