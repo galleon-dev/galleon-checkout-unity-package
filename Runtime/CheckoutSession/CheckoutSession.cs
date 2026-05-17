@@ -511,6 +511,9 @@ namespace Galleon.Checkout
                 result[taxItem.Key] = taxItem.Value.tax_amount.ToString();
             }
 
+            var totalTax = priceData.tax.taxes.Sum(x => x.Value.tax_amount);
+            result["total_tax"] = totalTax.ToString();
+            
             // Final defaults to ensure all requested fields are present
             if (!result.ContainsKey("exchange_rate"))         result["exchange_rate"]       = "1.0";
             if (!result.ContainsKey("usd_amount"))            result["usd_amount"]          = result["amount"];
