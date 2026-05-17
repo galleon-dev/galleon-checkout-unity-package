@@ -490,61 +490,36 @@ namespace Galleon.Checkout
         {
             if (priceData == null) return new Dictionary<string, string>();
 
-            var metadata = new Dictionary<string, string>();
+            var result = new Dictionary<string, string>();
 
             // Basic price data
-            metadata["amount"]              = priceData.subtotal_price.ToString(CultureInfo.InvariantCulture);
-            metadata["amount_with_tax"]     = priceData.total_price.ToString(CultureInfo.InvariantCulture);
+            result["amount"]              = priceData.subtotal_price.ToString(CultureInfo.InvariantCulture);
+            result["amount_with_tax"]     = priceData.total_price.ToString(CultureInfo.InvariantCulture);
             
             // Currency from session or product
-            metadata["currency"]            = CHECKOUT.Session?.SelectedProduct?.Currency ?? "";
+            result["currency"]            = CHECKOUT.Session?.SelectedProduct?.Currency ?? "";
 
             // Tax related data
             if (priceData.tax != null)
             {
-                metadata["tax_state"]   = priceData.tax.tax_state   ?? "";
-                metadata["tax_country"] = priceData.tax.tax_country ?? "";
-                
-                if (priceData.tax.taxes != null)
-                {
-                    // Look for specific keys in the taxes dictionary (case-insensitive)
-                    foreach (var kvp in priceData.tax.taxes)
-                    {
-                        var key = kvp.Key.ToLowerInvariant();
-                        if (key == "vat")                 metadata["vat"]                 = kvp.Value.tax_amount.ToString("0.000", CultureInfo.InvariantCulture);
-                        if (key == "usd_vat")             metadata["usd_vat"]             = kvp.Value.tax_amount.ToString("0.000", CultureInfo.InvariantCulture);
-                        if (key == "exchange_rate")       metadata["exchange_rate"]       = kvp.Value.tax_amount.ToString(CultureInfo.InvariantCulture);
-                        if (key == "usd_amount")          metadata["usd_amount"]          = kvp.Value.tax_amount.ToString(CultureInfo.InvariantCulture);
-                        if (key == "usd_amount_with_tax") metadata["usd_amount_with_tax"] = kvp.Value.tax_amount.ToString(CultureInfo.InvariantCulture);
-                    }
-                }
+                result["tax_state"]   = priceData.tax.tax_state   ?? "";
+                result["tax_country"] = priceData.tax.tax_country ?? "";
             }
 
-            // Fallback to Session Metadata for missing fields
-            var session = CHECKOUT.Session;
-            if (session != null && session.Metadata != null)
+            foreach (var taxItem in priceData.tax.taxes)
             {
-                string[] keysToSync = { "exchange_rate", "usd_amount", "usd_amount_with_tax", "vat", "usd_vat", "currency", "checkout_type" };
-                foreach (var key in keysToSync)
-                {
-                    if (!metadata.ContainsKey(key) && session.Metadata.TryGetValue(key, out var val))
-                    {
-                        metadata[key] = val;
-                    }
-                }
+                result[taxItem.Key] = taxItem.Value.ToString();
             }
 
             // Final defaults to ensure all requested fields are present
-            if (!metadata.ContainsKey("exchange_rate"))         metadata["exchange_rate"]       = "1.0";
-            if (!metadata.ContainsKey("usd_amount"))            metadata["usd_amount"]          = metadata["amount"];
-            if (!metadata.ContainsKey("usd_amount_with_tax"))   metadata["usd_amount_with_tax"] = metadata["amount_with_tax"];
-            if (!metadata.ContainsKey("vat"))                   metadata["vat"]                 = "0.000";
-            if (!metadata.ContainsKey("usd_vat"))               metadata["usd_vat"]             = "0.000";
-            if (!metadata.ContainsKey("tax_state"))             metadata["tax_state"]           = "";
-            if (!metadata.ContainsKey("tax_country"))           metadata["tax_country"]         = "";
-            if (!metadata.ContainsKey("checkout_type"))         metadata["checkout_type"]       = "Galleon";
+            if (!result.ContainsKey("exchange_rate"))         result["exchange_rate"]       = "1.0";
+            if (!result.ContainsKey("usd_amount"))            result["usd_amount"]          = result["amount"];
+            if (!result.ContainsKey("usd_amount_with_tax"))   result["usd_amount_with_tax"] = result["amount_with_tax"];
+            if (!result.ContainsKey("tax_state"))             result["tax_state"]           = "";
+            if (!result.ContainsKey("tax_country"))           result["tax_country"]         = "";
+            if (!result.ContainsKey("checkout_type"))         result["checkout_type"]       = "Galleon";
 
-            return metadata;
+            return result;
         }
         
     }
