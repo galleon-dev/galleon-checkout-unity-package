@@ -85,7 +85,7 @@ namespace Galleon.Checkout
                 "PLN" => "zł",
                 "CZK" => "Kč",
                 "HUF" => "Ft",
-                "RON" => "lei",
+                "RON" => "lei ",
                 "BGN" => "лв",
                 "UAH" => "₴",
                 "ZAR" => "R",
