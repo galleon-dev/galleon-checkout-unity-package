@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Galleon.Checkout.Shared;
 using UnityEngine;
 
 namespace Galleon.Checkout
@@ -126,6 +127,7 @@ namespace Galleon.Checkout
     public class PurchaseResult
     {
         public string                     OrderID;
+        public Dictionary<string, string> price_metadata;
         public bool                       IsSuccess;
         public bool                       IsCanceled;
         public bool                       IsError;
@@ -135,7 +137,8 @@ namespace Galleon.Checkout
 
         public override string ToString()
         {
-            return $"PurchaseResult: OrderID={OrderID}, IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, SelectedPaymentMethodType={SelectedPaymentMethodType}, Errors={string.Join("\n", Errors ?? new List<string>())},\n";
+            var priceMetadataString = price_metadata != null ? string.Join(", ", price_metadata.Select(kvp => $"{kvp.Key}={kvp.Value}")) : "null";
+            return $"PurchaseResult: OrderID={OrderID}, price_metadata={{{priceMetadataString}}}, IsSuccess={IsSuccess}, IsCanceled={IsCanceled}, IsError={IsError}, DidUserSelectNativeIAP={DidUserSelectNativeIAP}, SelectedPaymentMethodType={SelectedPaymentMethodType}, Errors={string.Join("\n", Errors ?? new List<string>())},\n";
         }
     }
 }

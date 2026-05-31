@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Galleon.Checkout.Shared;
@@ -24,6 +25,7 @@ namespace Galleon.Checkout
         // Tax data
         public bool                               ShouldDisplayPriceIncludingTax    = true;
         public Dictionary<string, TaxItem>        Taxes                             = new(); // <name_of_tax, tax_data>
+        public PriceData                          SessionPriceData                  = null;
         
         // Simple Dialog Panel data
         public string                             LastDialogRequest                 = null;
@@ -112,6 +114,7 @@ namespace Galleon.Checkout
                             this.PurchaseResult = new PurchaseResult()
                                                   {
                                                       OrderID                   = CHECKOUT.Session?.SessionID ?? "NULL",
+                                                      price_metadata            = MapPriceDataToMetadata(this.SessionPriceData),
                                                       IsSuccess                 = false,
                                                       IsCanceled                = true,
                                                       IsError                   = false,
@@ -132,6 +135,7 @@ namespace Galleon.Checkout
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                 {
+                                                    price_metadata            = MapPriceDataToMetadata(this.SessionPriceData),
                                                     IsSuccess                 = true,
                                                     DidUserSelectNativeIAP    = true,
                                                     SelectedPaymentMethodType = "native"
@@ -210,6 +214,7 @@ namespace Galleon.Checkout
                                                                                                         payer_ip   = payerIP,
                                                                                                      });
                         this.SessionID = response.session_id;
+                        this.SessionPriceData = response.price_data;
 
                         // Store tax data in session
                         var taxData = response.price_data.tax;
@@ -272,6 +277,7 @@ namespace Galleon.Checkout
                         {
                             this.PurchaseResult = new PurchaseResult()
                                                 {
+                                                    price_metadata         = MapPriceDataToMetadata(this.SessionPriceData),
                                                     IsSuccess              = true,
                                                     DidUserSelectNativeIAP = true,
                                                 };
@@ -350,11 +356,12 @@ namespace Galleon.Checkout
 
                         this.PurchaseResult = new PurchaseResult()
                                               {
-                                                  OrderID     = CHECKOUT.Session?.SessionID ?? "NULL",
-                                                  IsSuccess   = result.is_success,
-                                                  IsCanceled  = result.is_canceled,
-                                                  Errors      = result.errors?.ToList(),
-                                                  IsError     = result.errors?.Length > 0,
+                                                  OrderID        = CHECKOUT.Session?.SessionID ?? "NULL",
+                                                  price_metadata = MapPriceDataToMetadata(this.SessionPriceData),
+                                                  IsSuccess      = result.is_success,
+                                                  IsCanceled     = result.is_canceled,
+                                                  Errors         = result.errors?.ToList(),
+                                                  IsError        = result.errors?.Length > 0,
                                               };
 
                     });
@@ -477,6 +484,45 @@ namespace Galleon.Checkout
         public void ClearSessionErrors()
         {
             sessionErrors.Clear();
+        }
+
+        private Dictionary<string, string> MapPriceDataToMetadata(PriceData priceData)
+        {
+            if (priceData == null) return new Dictionary<string, string>();
+
+            var result = new Dictionary<string, string>();
+
+            // Basic price data
+            result["amount"]              = priceData.subtotal_price.ToString(CultureInfo.InvariantCulture);
+            result["amount_with_tax"]     = priceData.total_price.ToString(CultureInfo.InvariantCulture);
+            
+            // Currency from session or product
+            result["currency"]            = CHECKOUT.Session?.SelectedProduct?.Currency ?? "";
+
+            // Tax related data
+            if (priceData.tax != null)
+            {
+                result["tax_state"]   = priceData.tax.tax_state   ?? "";
+                result["tax_country"] = priceData.tax.tax_country ?? "";
+            }
+
+            foreach (var taxItem in priceData.tax.taxes)
+            {
+                result[taxItem.Key] = taxItem.Value.tax_amount.ToString();
+            }
+
+            var totalTax = priceData.tax.taxes.Sum(x => x.Value.tax_amount);
+            result["total_tax"] = totalTax.ToString();
+            
+            // Final defaults to ensure all requested fields are present
+            if (!result.ContainsKey("exchange_rate"))         result["exchange_rate"]       = "1.0";
+            if (!result.ContainsKey("usd_amount"))            result["usd_amount"]          = result["amount"];
+            if (!result.ContainsKey("usd_amount_with_tax"))   result["usd_amount_with_tax"] = result["amount_with_tax"];
+            if (!result.ContainsKey("tax_state"))             result["tax_state"]           = "";
+            if (!result.ContainsKey("tax_country"))           result["tax_country"]         = "";
+            if (!result.ContainsKey("checkout_type"))         result["checkout_type"]       = "Galleon";
+
+            return result;
         }
         
     }
