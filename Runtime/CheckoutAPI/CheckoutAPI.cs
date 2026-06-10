@@ -20,6 +20,7 @@ namespace Galleon.Checkout
             
             await CheckoutClient.Instance.SystemInitFlow().Execute();
             
+            
             return new InitializationResult() { IsSuccess = true };
         }
         

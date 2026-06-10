@@ -119,6 +119,14 @@ namespace Galleon.Checkout
                 Debug.Log(step.Name);
             }        
         }
+
+        [MenuItem("Tools/Galleon/Clear Player Prefs")]
+        private static void ClearPlayerPrefs()
+        {
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.Save();
+            Debug.Log("Player Prefs Cleared");
+        }
         #endif
         
         

@@ -306,14 +306,13 @@ namespace Galleon.Checkout
                         var country  = CHECKOUT.Globals.CheckoutInitConfiguration.Country;
                         var currency = CHECKOUT.Globals.CheckoutInitConfiguration.Currency;
                         
-                        #region TEST
-                        if (CHECKOUT.Globals.TestCountry.ToLower() != "dont_override")
-                        {
-                            country  = CHECKOUT.Globals.TestCountry;
-                            currency = CHECKOUT.Globals.TestCurrency;
-                        }
-
-                        #endregion
+                        // #region TEST
+                        // if (CHECKOUT.Globals.TestCountry.ToLower() != "dont_override")
+                        // {
+                        //     country  = CHECKOUT.Globals.TestCountry;
+                        //     currency = CHECKOUT.Globals.TestCurrency;
+                        // }
+                        // #endregion
                         
                         var _result = await CHECKOUT.Network.Get<Shared.PaymentMethodDefinitionsResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/payment-method-definitions?currency={currency}&country={country}&platform=unity"
                                                                                                          ,headers  : new ()
@@ -554,9 +553,35 @@ namespace Galleon.Checkout
             
             Debug.Log($"GetUserPaymentMethodsToDisplay - n ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
+            
+            // Apply filter
+            for (int i = result.Count - 1; i >= 0; i--)
+            {
+                var pm = result.ElementAt(i);
+                
+                if (!ShouldIncludePaymentMethodType(pm.Type))
+                {
+                    Debug.Log($"removed upm {pm.DisplayName} = {pm.Type}");
+                    result.Remove(pm);
+                }
+                else
+                {
+                    Debug.Log($"Allowed upm {pm.DisplayName} = {pm.Type} ");
+                }
+            }
+            
+            Debug.Log($"GetUserPaymentMethodsToDisplay - f ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            
+            // sort empties
+            var sortedEmpties = EmptyUserPaymentMethods
+                .OrderBy(x => x.Type == "empty_card" ? 0 : 1)
+                .ThenBy(x => x.Type)
+                .ToList();
+            result = result.Concat(sortedEmpties).ToList();                   Debug.Log($"GetUserPaymentMethodsToDisplay - after Concat ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+
+            Debug.Log($"GetUserPaymentMethodsToDisplay - e ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            
             // filter
-                                                                                        Debug.Log($"GetUserPaymentMethodsToDisplay - EmptyPaymentMethods ({EmptyUserPaymentMethods.Count}) : \n{string.Join("\n", EmptyUserPaymentMethods.Select(x => x.Type))}");
-            result = result.Concat(EmptyUserPaymentMethods).ToList();                   Debug.Log($"GetUserPaymentMethodsToDisplay - after Concat ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             result = result.Distinct().ToList();                                        Debug.Log($"GetUserPaymentMethodsToDisplay - after Distinct ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             result = result.Where(x => x.Type != "app").ToList();                       Debug.Log($"GetUserPaymentMethodsToDisplay - after Except ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             result = result.Take(MAX_LAST_USED_PAYMENT_METHODS -1).ToList();            Debug.Log($"GetUserPaymentMethodsToDisplay - after Take ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
@@ -583,23 +608,6 @@ namespace Galleon.Checkout
                     userPaymentMethod.LastSuccessfulUseTime = DateTime.MaxValue;
             }
             
-            Debug.Log($"GetUserPaymentMethodsToDisplay - 6 ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
-            
-            // Apply filter
-            for (int i = result.Count - 1; i >= 0; i--)
-            {
-                var pm = result.ElementAt(i);
-                
-                if (!ShouldIncludePaymentMethodType(pm.Type))
-                {
-                    Debug.Log($"removed upm {pm.DisplayName} = {pm.Type}");
-                    result.Remove(pm);
-                }
-                else
-                {
-                    Debug.Log($"Allowed upm {pm.DisplayName} = {pm.Type} ");
-                }
-            }
             
             Debug.Log($"GetUserPaymentMethodsToDisplay - final ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
