@@ -577,7 +577,7 @@ namespace Galleon.Checkout
                 .OrderBy(x => x.Type == "empty_card" ? 0 : 1)
                 .ThenBy(x => x.Type)
                 .ToList();
-            result = result.Concat(sortedEmpties).ToList();                   Debug.Log($"GetUserPaymentMethodsToDisplay - after Concat ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            result = sortedEmpties.Concat(result).ToList();                   Debug.Log($"GetUserPaymentMethodsToDisplay - after Concat ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
 
             Debug.Log($"GetUserPaymentMethodsToDisplay - e ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
