@@ -256,6 +256,7 @@ namespace Galleon.SampleApp
                                                                                                          "native",
                                                                                                          "card",
                                                                                                          "link",
+                                                                                                         //"galleon-wrapped-paypal-vaulted",
                                                                                                          "paypal",
                                                                                                          "amazon_pay",
                                                                                                          "google_pay_browser",
