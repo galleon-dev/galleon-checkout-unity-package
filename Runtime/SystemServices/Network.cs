@@ -40,8 +40,8 @@ namespace Galleon.Checkout
                 }
                 else
                 {
-                    //return "https://bridge-staging-api.galleon.so"; // Staging
-                    return "https://bridge-sandbox-api.galleon.so";
+                    return "https://bridge-staging-api.galleon.so"; // Staging
+                    // return "https://bridge-sandbox-api.galleon.so";
                 }
             }
         }
