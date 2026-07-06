@@ -57,7 +57,13 @@ namespace Galleon.Checkout.UI
                 { "currency",               CHECKOUT.Session?.SelectedProduct?.Currency ?? "" }
             });
 
-            if (CHECKOUT.User.Email.IsNullOrEmpty())
+            // If the payment method used for this session was PayPal, we already have the
+            // buyer's email from PayPal, so we skip asking for it and auto-confirm (same
+            // path as when the email is already known).
+            bool isPayPal = CHECKOUT.PaymentMethods.SelectedUserPaymentMethod?.Type == "paypal";
+            bool hasEmail = !CHECKOUT.User.Email.IsNullOrEmpty();
+
+            if (!hasEmail && !isPayPal)
             {
                 if (EmailInputFieldContainer)
                     ShowEmail();
@@ -66,7 +72,8 @@ namespace Galleon.Checkout.UI
             }
             else
             {
-                EmailInputField.Text = CHECKOUT.User.Email;
+                if (hasEmail)
+                    EmailInputField.Text = CHECKOUT.User.Email;
 
                 if (EmailInputFieldContainer)
                     HideEmail();
