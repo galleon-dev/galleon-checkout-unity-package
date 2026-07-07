@@ -185,6 +185,9 @@ namespace Galleon.Checkout
             new Step(name   : $"select_last_used_user_payment_method_to_display"
                     ,action : async (s) =>
                               {
+                                  // Safety net (runs last): guarantee the selected row is actually on screen.
+                                  s.AddPostStep(EnsureSelectedPaymentMethodIsDisplayed());
+
                                   if (UserPaymentMethodsToDisplay.All(x => x.Type.ToLower().Contains("empty")))
                                   {
                                       // special edge case - if all are empty - just select the first
@@ -195,15 +198,59 @@ namespace Galleon.Checkout
                                   foreach (var method in CHECKOUT.PaymentMethods.UserPaymentMethods)
                                       method.Unselect();
           
-                                  var lastUsed = LastUsedUserPaymentMethods.FirstOrDefault();
-          
+                                  // "last used" = the shown real method used most recently
+                                  var lastUsed = UserPaymentMethodsToDisplay
+                                                 .Where(x => !x.Type.ToLower().Contains("empty"))
+                                                 .Where(x => x.LastSuccessfulUseTime > DateTime.MinValue)
+                                                 .OrderByDescending(x => x.LastSuccessfulUseTime)
+                                                 .FirstOrDefault();
+
                                   if (lastUsed != null)
-                                      lastUsed.Select();
+                                      lastUsed.Select();                       // pick last used
                                   else if (UserPaymentMethodsToDisplay.Any())
-                                      UserPaymentMethodsToDisplay.First().Select();
+                                      UserPaymentMethodsToDisplay.First().Select(); // else pick the default (top option)
                               });
         
-        public Step SelectFirstBetweenEmptyUserPaymentMethods() 
+        public Step EnsureSelectedPaymentMethodIsDisplayed()
+        =>
+            new Step(name   : $"ensure_selected_payment_method_is_displayed"
+                    ,action : async (s) =>
+                    {
+                        var displayed = UserPaymentMethodsToDisplay;
+
+                        if (displayed == null || displayed.Count == 0)
+                        {
+                            Debug.Log($"[EnsureSelected] nothing to display - skipping.");
+                            return;
+                        }
+
+                        // Is the currently-selected method one of the rows actually on screen?
+                        var selectedOnScreen = displayed.FirstOrDefault(x => x.IsSelected);
+                        if (selectedOnScreen != null)
+                        {
+                            Debug.Log($"[EnsureSelected] OK - selected row is on screen: {selectedOnScreen.Type} ({selectedOnScreen.DisplayName})");
+                            return;
+                        }
+
+                        var currentlySelected = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
+                        Debug.Log($"[EnsureSelected] selected method '{currentlySelected?.Type ?? "none"}' is NOT on screen - falling back to a displayed row.");
+
+                        // Prefer the most-recently-used displayed real method; otherwise the first displayed row.
+                        var fallback = displayed
+                                           .Where(x => x.Type != null && !x.Type.ToLower().Contains("empty"))
+                                           .Where(x => x.LastSuccessfulUseTime > DateTime.MinValue)
+                                           .OrderByDescending(x => x.LastSuccessfulUseTime)
+                                           .FirstOrDefault()
+                                       ?? displayed.First();
+
+                        foreach (var m in CHECKOUT.PaymentMethods.UserPaymentMethods)
+                            m.Unselect();
+                        fallback.Select();
+
+                        Debug.Log($"[EnsureSelected] fallback selected: {fallback.Type} ({fallback.DisplayName})");
+                    });
+
+        public Step SelectFirstBetweenEmptyUserPaymentMethods()
          =>
             new Step(name   : $"select_first_between_empty_user_payment_methods"
                     ,action : async (s) =>
@@ -274,16 +321,28 @@ namespace Galleon.Checkout
                     ,action : async (s) =>
                     {
                         var usedPaymentMethod = this.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
-                        
+
+                        if (usedPaymentMethod == null)
+                            return;
+
                         usedPaymentMethod.LastSuccessfulUseTime = DateTime.Now;
-                        
+
+                        // A newly-registered method only has a temporary local id right now; its real
+                        // id arrives from the server on the next refresh. Leave a note so we can stamp
+                        // the real method as "used now" once it shows up (see GetUserPaymentMethods).
+                        if (usedPaymentMethod.ID.StartsWith("local_pm_id"))
+                        {
+                            CHECKOUT.Storage.Write("pending_used_type",  usedPaymentMethod.DisplayType);
+                            CHECKOUT.Storage.Write("pending_used_ticks", DateTime.Now.Ticks);
+                        }
+
                         this.LastUsedUserPaymentMethodIDs.Add(usedPaymentMethod.Data.id);
-            
+
                         if (this.LastUsedUserPaymentMethodIDs.Count > MAX_LAST_USED_PAYMENT_METHODS)
                             this.LastUsedUserPaymentMethodIDs.RemoveAt(0);
-                        
+
                         Save();
-                        
+
                     });
         
         public Step LoadLastUsedUserPaymentMethods() 
@@ -414,6 +473,30 @@ namespace Galleon.Checkout
                             }
                         }
                         
+                        /////////////////////////////////// Restore recency + resolve pending "used" note
+
+                        // Re-apply each real method's saved last-used time (server objects come back blank).
+                        foreach (var upm in this.UserPaymentMethods)
+                            upm.LoadData();
+
+                        // If a purchase just registered a new method, its real id only appears now.
+                        // The new one is the method of that type not yet saved to disk ("the fridge list").
+                        string pendingType = CHECKOUT.Storage.Read<string>("pending_used_type");
+                        if (!string.IsNullOrEmpty(pendingType))
+                        {
+                            long pendingTicks = CHECKOUT.Storage.Read<long>("pending_used_ticks");
+
+                            var newlyAdded = this.UserPaymentMethods.FirstOrDefault(x => x.DisplayType == pendingType
+                                                                                     && !x.ID.StartsWith("local_pm_id")
+                                                                                     && !CHECKOUT.Storage.HasKey<string>(x.ID));
+                            if (newlyAdded != null)
+                            {
+                                newlyAdded.LastSuccessfulUseTime = pendingTicks > 0 ? new DateTime(pendingTicks) : DateTime.Now;
+                                newlyAdded.SaveData();                       // now it's on the fridge list
+                                CHECKOUT.Storage.Write("pending_used_type", ""); // consume the note
+                            }
+                        }
+
                         /////////////////////////////////// Empty
 
                         foreach (var definition in this.PaymentMethodsDefinitions)
@@ -572,12 +655,17 @@ namespace Galleon.Checkout
             
             Debug.Log($"GetUserPaymentMethodsToDisplay - f ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
-            // sort empties
-            var sortedEmpties = EmptyUserPaymentMethods
-                .OrderBy(x => x.Type == "empty_card" ? 0 : 1)
-                .ThenBy(x => x.Type)
-                .ToList();
-            result = sortedEmpties.Concat(result).ToList();                   Debug.Log($"GetUserPaymentMethodsToDisplay - after Concat ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            // The credit-card slot always comes first: the real saved card if the user has one,
+            // otherwise the "Add Credit Card" line. (Priority by role, not a hard-coded index.)
+            var cardSlot = result.FirstOrDefault(x => x.Type == "card")
+                        ?? result.FirstOrDefault(x => x.Type == "empty_card");
+
+            // Remaining slots are filled most-recently-used first, so a recently used method
+            // (e.g. a just-added PayPal) ranks ahead of unused "Add X" placeholders.
+            var rest = result.Where(x => x != cardSlot)
+                             .OrderByDescending(x => x.LastSuccessfulUseTime)
+                             .ToList();
+            result = new List<UserPaymentMethod>(); if (cardSlot != null) result.Add(cardSlot); result.AddRange(rest);                   Debug.Log($"GetUserPaymentMethodsToDisplay - after Concat ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
 
             Debug.Log($"GetUserPaymentMethodsToDisplay - e ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
@@ -585,7 +673,7 @@ namespace Galleon.Checkout
             result = result.Distinct().ToList();                                        Debug.Log($"GetUserPaymentMethodsToDisplay - after Distinct ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             result = result.Where(x => x.Type != "app").ToList();                       Debug.Log($"GetUserPaymentMethodsToDisplay - after Except ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             result = result.Take(MAX_LAST_USED_PAYMENT_METHODS -1).ToList();            Debug.Log($"GetUserPaymentMethodsToDisplay - after Take ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
-            result = result.OrderByDescending(x => x.LastSuccessfulUseTime).ToList();   Debug.Log($"GetUserPaymentMethodsToDisplay - 4 ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
+            /* keep card-first order established above; no re-sort by recency here */   Debug.Log($"GetUserPaymentMethodsToDisplay - 4 ({result.Count}) : \n{string.Join("\n", result.Select(x => $"{x.Type}-({x.DisplayName})-{x.ID}"))}\n");
             
             // Remove Native ?
             if (result.Count >= MAX_LAST_USED_PAYMENT_METHODS
