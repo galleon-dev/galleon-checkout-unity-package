@@ -501,6 +501,32 @@ namespace Galleon.Checkout
                                       }
                                   );
 
+                                  //////////////////////////////////////////////////// Currency sign letter-overrides
+                                  // These currencies use a Unicode symbol that is NOT present in the price font atlas,
+                                  // so the symbol renders as "?" (e.g. UAH "₴" under a Ukrainian locale). Override each
+                                  // with an ASCII letter code so all currencies display. Key format is read by
+                                  // CurrencyController.GetCurrencySign() -> "currency_sign_{ISOCODE}" (highest priority).
+                                  // Trailing space is intentional: sign mode concatenates as "{sign}{amount}".
+                                  var currencySignLetterOverrides = new (string code, string sign)[]
+                                  {
+                                      ("INR", "Rs " ), ("KRW", "KRW "), ("VND", "VND "), ("THB", "THB "),
+                                      ("PHP", "PHP "), ("RUB", "RUB "), ("TRY", "TRY "), ("ILS", "ILS "),
+                                      ("PLN", "zl " ), ("CZK", "Kc " ), ("BGN", "lv " ), ("UAH", "UAH "),
+                                      ("AED", "AED "), ("SAR", "SAR "), ("QAR", "QAR "), ("KWD", "KWD "),
+                                      ("BHD", "BHD "), ("OMR", "OMR "), ("MAD", "MAD "), ("NGN", "NGN "),
+                                  };
+                                  foreach (var (code, sign) in currencySignLetterOverrides)
+                                  {
+                                      globals.Add
+                                      (
+                                          new ConfigValue(key : $"currency_sign_{code}", value: sign)
+                                          {
+                                              displayName     = $"Currency Sign {code}",
+                                              tag             = "global",
+                                          }
+                                      );
+                                  }
+
                                   foreach (var configValue in globals.Where(v => v.tag == "global"))
                                   {
                                       GlobalValues.Add(configValue);
