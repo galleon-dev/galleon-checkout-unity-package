@@ -85,7 +85,8 @@ namespace Galleon.Checkout
                         s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
                         s.AddPreStep(StartSession());
                         s.AddPreStep(CHECKOUT.PaymentMethods.SelectLastUsedUserPaymentMethodToDisplay());
-                        
+                        s.AddPreStep(ReportCheckoutWindowOpened()); // must run AFTER selection so payment_method_highlighted is populated
+
                         /////////////////////////////////////// Steps
 
                         s.AddChildStep(DetermineInitialPage()); // this updates the "navigation-next"
@@ -234,8 +235,18 @@ namespace Galleon.Checkout
                             s.Log($" - {t.Key} : {t.Value}");
                             this.Taxes.Add(t.Key, new TaxItem() { inclusive = t.Value.inclusive, tax_amount = t.Value.tax_amount });
                         }
-                        
+
+                    });
+
+        public Step ReportCheckoutWindowOpened()
+        =>
+            new Step(name   : $"report_checkout_window_opened"
+                    ,action : async (s) =>
+                    {
                         // Analytics: Checkout Window Opened
+                        // NOTE: must run AFTER the initial payment method is selected/highlighted
+                        //       (SelectLastUsedUserPaymentMethodToDisplay), otherwise
+                        //       payment_method_highlighted is always reported as "none".
                         var selectedPaymentMethod = CHECKOUT.PaymentMethods.UserPaymentMethods.FirstOrDefault(x => x.IsSelected);
                         CheckoutAPI.InvokeAnalyticsEvent("checkout_window_opened", new Dictionary<string, object>
                         {
@@ -244,9 +255,8 @@ namespace Galleon.Checkout
                             { "currency",                     CHECKOUT.Session?.SelectedProduct?.Currency ?? ""     },
                             { "payment_method_highlighted",   selectedPaymentMethod?.DisplayType          ?? "none" },
                         });
-                
                     });
-        
+
         public Step CancelSession() 
         =>
             new Step(name   : $"cancel_session"
