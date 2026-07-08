@@ -126,6 +126,13 @@ namespace Galleon.Checkout
             public DateTime lastSuccessfulUseTime;
         }
         
+        // Recency is persisted keyed by the server payment-method id WHEN we have a reliable one
+        // (e.g. credit cards) — that keeps per-instance recency. Only when there's no stable id
+        // (empty / local ids, and wallets like Google Pay that have no per-user id) do we fall back
+        // to keying by TYPE, so their last-used still survives across sessions.
+        private bool   HasReliableID     => !string.IsNullOrEmpty(this.ID) && !this.ID.StartsWith("local_pm_id");
+        private string RecencyStorageKey => HasReliableID ? this.ID : $"pm_last_used_{this.DisplayType}";
+
         public void SaveData()
         {
             StorageData data = new()
@@ -134,16 +141,16 @@ namespace Galleon.Checkout
                 type                  = this.Type,
                 lastSuccessfulUseTime = this.LastSuccessfulUseTime
             };
-            
+
             string json = JsonConvert.SerializeObject(data);
-            CHECKOUT.Storage.Write(this.ID, json);
+            CHECKOUT.Storage.Write(this.RecencyStorageKey, json);
         }
-        
+
         public void LoadData()
         {
-            string json = CHECKOUT.Storage.Read<string>(this.ID);
+            string json = CHECKOUT.Storage.Read<string>(this.RecencyStorageKey);
             if (string.IsNullOrEmpty(json)) return;
-            
+
             StorageData data = JsonConvert.DeserializeObject<StorageData>(json);
             this.LastSuccessfulUseTime = data.lastSuccessfulUseTime;
         }

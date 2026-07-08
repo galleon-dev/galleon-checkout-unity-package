@@ -214,7 +214,7 @@ namespace Galleon.Checkout
                                                                                                         metadata   = CHECKOUT.Session.Metadata,
                                                                                                         payer_ip   = payerIP,
                                                                                                      });
-                        this.SessionID = response.session_id;
+                        this.SessionID        = response.session_id;
                         this.SessionPriceData = response.price_data;
 
                         // Store tax data in session

@@ -118,8 +118,12 @@ namespace Galleon.Checkout
         public async Task RemoveUserPaymentMethod(UserPaymentMethod userPaymentMethod)
         {
             UserPaymentMethods.Remove(userPaymentMethod);
-            
-            if (userPaymentMethod.Data.id != null)
+
+            // Only hit the server for real, server-stored methods. Local / wallet tiles
+            // (empty_*, local_pm_id_*, e.g. the Google Pay display tile) have no server-side
+            // record, so never POST remove-payment-method for them.
+            if (userPaymentMethod.Data.id != null
+            && !userPaymentMethod.Data.id.StartsWith("local_pm_id"))
             {
                 var result = await CHECKOUT.Network.Post<RemovePaymentMethodResponse>(url      : $"{CHECKOUT.Network.SERVER_BASE_URL}/remove-payment-method" 
                                                                                      ,headers  : new ()
@@ -326,6 +330,14 @@ namespace Galleon.Checkout
                             return;
 
                         usedPaymentMethod.LastSuccessfulUseTime = DateTime.Now;
+
+                        // Persist recency immediately. RecencyStorageKey falls back to a TYPE-keyed slot
+                        // (pm_last_used_<type>) for wallets / local ids, so methods the server never
+                        // returns as a stored payment method (e.g. Google Pay, which has no per-user id)
+                        // still keep their last-used time across sessions - instead of relying only on
+                        // the pending-note round-trip below, which only resolves for methods that come
+                        // back from the server with a real id.
+                        usedPaymentMethod.SaveData();
 
                         // A newly-registered method only has a temporary local id right now; its real
                         // id arrives from the server on the next refresh. Leave a note so we can stamp
@@ -547,9 +559,35 @@ namespace Galleon.Checkout
                                                             ButtonText         = "Add Paypal Account"
                                                         });
                         }
-                        
-                        
-                        
+
+                        /////////////////////////////////// Last-used tiles for methods the server doesn't store
+
+                        // Some methods are never returned by the server as stored payment methods
+                        // (wallets like Google Pay have no per-user id). Their last-used time is persisted
+                        // TYPE-keyed (pm_last_used_<type>). Recreate a display-only tile for any *available*
+                        // definition (definitions are already filtered by device support + country) that
+                        // the user has used before and that isn't already on the list.
+                        //
+                        // Driven by persisted usage, NOT hardcoded per type - so it generalises to every
+                        // method, and it only appears AFTER first use: display_empty_upm_in_checkout_page
+                        // = false still keeps it off the default (never-used) checkout screen.
+                        foreach (var definition in this.PaymentMethodsDefinitions)
+                        {
+                            var type = definition.Type;
+
+                            if (UserPaymentMethods.Any(pm => pm.DisplayType == type))        // already have a tile for it
+                                continue;
+
+                            if (!CHECKOUT.Storage.HasKey<string>($"pm_last_used_{type}"))    // never used before
+                                continue;
+
+                            var tile = definition.CreateEmptyPaymentMethod();   // empty_<type>, local id, no server record
+                            tile.LoadData();                                    // restore last-used time (type-keyed)
+                            this.UserPaymentMethods.Add(tile);
+                        }
+
+
+
                         /////////////////////////////////// Native
                         
                         if (CHECKOUT.Globals.IsNativeStoreEnabled
@@ -592,10 +630,18 @@ namespace Galleon.Checkout
                                                             IsSelected         = false,
                                                             SortOrder          = float.PositiveInfinity, 
                                                             Type               = "app"
-                                                        });    
+                                                        });
                         }
-                        
-                        
+
+                        /////////////////////////////////// Restore recency onto wallet / empty tiles
+
+                        // The recency load pass above ran before these empty/wallet tiles existed.
+                        // Re-load now so TYPE-keyed recency (pm_last_used_<type>) is restored onto them
+                        // for last-used sorting. Only "empty_"-typed tiles are touched, so native/app
+                        // keep their intentional sentinel times.
+                        foreach (var upm in this.UserPaymentMethods.Where(x => x.Type != null && x.Type.Contains("empty")))
+                            upm.LoadData();
+
                     });
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Collections
