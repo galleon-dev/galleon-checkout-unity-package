@@ -234,10 +234,11 @@ namespace Galleon.Checkout
                                                                                                     return_url              = CheckoutClient.Instance.URLs.AppDeepLinkReturnURL
                                                                                                 });
                             
-                            CheckoutClient.Instance.CurrentSession.lastChargeResult = response.result;
                             
                             if (response == null)
-                                throw new Exception("Error is /Charge");
+                                throw new Exception("/Charge unsuccessfull - (did you enter invalid/test card-info in prod ?)");
+                                
+                            CheckoutClient.Instance.CurrentSession.lastChargeResult = response.result;
                             
                             var result = response.result;
 
