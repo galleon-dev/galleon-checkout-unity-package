@@ -97,11 +97,11 @@ namespace Galleon.Checkout.UI
             if (CheckoutPanelView == null)
             {
                 this.Icon.sprite = CHECKOUT.Sprites.AddCreditCardIconSprite;
-                this.Label.text  = "Add Credit Card";
+                SetLabelText("Add Credit Card");
                 return;
             }
 
-            this.Label.text    = PaymentMethod.DisplayName;
+            SetLabelText(PaymentMethod.DisplayName);
             this.CheckedImage  .gameObject.SetActive( this.PaymentMethod.IsSelected);
             this.UncheckedImage.gameObject.SetActive(!this.PaymentMethod.IsSelected);
             
@@ -221,7 +221,16 @@ namespace Galleon.Checkout.UI
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
-        
+
+        /// <summary> Applies the "checkout_panel_item_max_label_length" config before writing the label. </summary>
+        private void SetLabelText(string text)
+        {
+            if (this.Label == null)
+                return;
+
+            this.Label.text = text.Truncate(CHECKOUT.Globals.CheckoutPanelItemMaxLabelLength);
+        }
+
         private void SetSeperatorColor(Color _Color, bool _Status)
         {
             for (int i = 0; i < Separators.Count; i++)

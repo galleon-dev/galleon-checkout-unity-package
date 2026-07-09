@@ -90,23 +90,31 @@ namespace Galleon.Checkout.Samples
             
             foreach (var configValue in CHECKOUT.Globals.GlobalValues)
             {
+                // Skip configs that have nothing to pick from (e.g. the currency_sign_* overrides).
+                // A dropdown with zero options would throw on the first selection.
+                if (configValue.possibleValues == null || configValue.possibleValues.Count == 0)
+                    continue;
+
                 // Instantiate item
                 var item     = Instantiate(ConfigPanelItemTemplate, ConfigPanel.transform);
                 item.SetActive(true);
-                
+
                 // Get ui components
                 var label    = item.GetComponentInChildren<TMP_Text>();
                 var dropdown = item.GetComponentInChildren<TMP_Dropdown>();
                 dropdown.gameObject.name = $"drp_{configValue.displayName}";
-                
+
                 // set label
                 label.text = configValue.displayName;
-                
+
                 // set options
-                dropdown.options.Clear();
+                dropdown.ClearOptions();
                 foreach (var possibleValue in configValue.possibleValues)
                     dropdown.options.Add(new TMP_Dropdown.OptionData(possibleValue.DisplayName));
-                
+
+                dropdown.SetValueWithoutNotify(0);
+                dropdown.RefreshShownValue();
+
                 // set event
                 dropdown.onValueChanged.AddListener(delegate { ON_DropdownValueChanged(dropdown.value); });
             }
@@ -118,38 +126,49 @@ namespace Galleon.Checkout.Samples
             foreach (var dropdown in dropdowns)
             {
                 var configValue = CHECKOUT.Globals.GlobalValues.Find(x => x.displayName == dropdown.gameObject.name.Replace("drp_", ""));
-                
-                if (dropdown.value.ToString().ToLower() == "dont override")
+
+                // Not a config dropdown, or it has no options to read - leave it alone.
+                if (configValue == null)
+                    continue;
+
+                if (dropdown.value < 0 || dropdown.value >= dropdown.options.Count)
+                    continue;
+
+                var valueDisplayName = dropdown.options[dropdown.value].text;
+                var actualValue      = configValue.possibleValues.Find(x => x.DisplayName == valueDisplayName);
+
+                if (actualValue == null)
+                    continue;
+
+                // A possible value of null means "dont override" - fall back to the config's default.
+                if (actualValue.Value == null)
                     configValue.ClearOverrideValue();
                 else
-                {
-                    var valueDisplayName = dropdown.options[dropdown.value].text;
-                    var actualValue      = configValue.possibleValues.Find(x => x.DisplayName == valueDisplayName);
                     configValue.OverrideValue(actualValue.Value);
-                }
-                
+
                 #region test_country and test_currency
 
                 // If test_country dropdown changed, update test_currency to match
-                if (configValue != null && configValue.displayName == "test_country")
+                if (configValue.displayName == "test_country")
                 {
-                    var currencyDropdown    = dropdowns.Single(x => x.gameObject.name == "drp_test_currency");
-                    
-                    var currencyConfigValue = CHECKOUT.Globals.GlobalValues.Last(x => x.displayName == "test_currency");
-                    var countryValue        = configValue.Value as string;
+                    var currencyDropdown = dropdowns.FirstOrDefault(x => x.gameObject.name == "drp_test_currency");
+                    var countryValue     = configValue.Value as string;
 
-                    // Find currency option by splitting display name and matching currency code
-                    var currencyIndex = currencyDropdown.options.FindIndex(opt => 
+                    if (currencyDropdown != null && !string.IsNullOrEmpty(countryValue))
                     {
-                        var displayNameParts = opt.text.Split(' ');
-                        var countryCode = displayNameParts.Length > 0 ? displayNameParts[0] : "";
-                        return countryCode == countryValue;
-                    });
+                        // Find currency option by splitting display name and matching currency code
+                        var currencyIndex = currencyDropdown.options.FindIndex(opt =>
+                        {
+                            var displayNameParts = opt.text.Split(' ');
+                            var countryCode = displayNameParts.Length > 0 ? displayNameParts[0] : "";
+                            return countryCode == countryValue;
+                        });
 
-                    if (currencyIndex >= 0)
-                    {
-                        // Update dropdown value without triggering another event
-                        currencyDropdown.value = currencyIndex;
+                        if (currencyIndex >= 0)
+                        {
+                            // Update dropdown value without triggering another event
+                            currencyDropdown.value = currencyIndex;
+                        }
                     }
                 }
 
@@ -158,7 +177,7 @@ namespace Galleon.Checkout.Samples
 
             foreach (var v in CHECKOUT.Globals.GlobalValues)
             {
-                Debug.Log($"- {v.displayName, -15} = ({v.Value.GetType().Name}) {v.Value}");
+                Debug.Log($"- {v.displayName, -15} = ({v.Value?.GetType().Name ?? "null"}) {v.Value}");
             }
 
             

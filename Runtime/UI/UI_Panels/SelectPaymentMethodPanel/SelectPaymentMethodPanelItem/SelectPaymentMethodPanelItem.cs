@@ -120,26 +120,23 @@ namespace Galleon.Checkout.UI
         
         public override void RefreshState()
         {   
-            if (PaymentMethodDefinition != null)
-                this.Label.text = PaymentMethodDefinition.DisplayName;
-            else if (UserPaymentMethod != null)
-                this.Label.text = UserPaymentMethod.DisplayName;
-
             //////////////////////////////////////////////// Default
             if (this.PaymentMethodDefinition      == null
             &&  this.UserPaymentMethod            == null)
             {
+                // "Add Credit or Debit Card" is a fixed call-to-action, never truncated.
                 this.Label.text  = CHECKOUT.Globals.AddCardText;
                 this.Icon.sprite = CHECKOUT.Sprites.AddCreditCardIconSprite;
             }
             //////////////////////////////////////////////// Payment Method Definitions
             else if (this.PaymentMethodDefinition != null)
             {
+                SetLabelText(this.PaymentMethodDefinition.DisplayName);
                 this.Icon.sprite = this.PaymentMethodDefinition.GetIconSprite();
 
                 if (this.PaymentMethodDefinition.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_CREDIT_CARD)
-                    this.Label.text  = CHECKOUT.Globals.AddCardText;
-                
+                    this.Label.text = CHECKOUT.Globals.AddCardText;   // fixed call-to-action, never truncated
+
                 // Dropdown
                 DropdownButton.gameObject.SetActive(this.PaymentMethodDefinition.ShouldShowDropdown);
                 DropdownArrow .gameObject.SetActive(this.PaymentMethodDefinition.ShouldShowDropdown);
@@ -147,7 +144,7 @@ namespace Galleon.Checkout.UI
             //////////////////////////////////////////////// UserPaymentMethods
             else if (this.UserPaymentMethod != null)
             {
-                this.Label.text  = this.UserPaymentMethod.DisplayName;
+                SetLabelText(this.UserPaymentMethod.DisplayName);
                 this.Icon.sprite = this.UserPaymentMethod.GetIconSprite();
             }
             
@@ -179,8 +176,20 @@ namespace Galleon.Checkout.UI
         }
         
         
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Events 
-        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// helper Methods
+
+        /// <summary> Applies the "selection_panel_item_max_label_length" config before writing the label. </summary>
+        private void SetLabelText(string text)
+        {
+            if (this.Label == null)
+                return;
+
+            this.Label.text = text.Truncate(CHECKOUT.Globals.SelectionPanelItemMaxLabelLength);
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Dropdown Events
+
         public void On_DropdownValueChanged(int newValue)
         {
             var paymentMethodId = upms[newValue].ID;

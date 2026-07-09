@@ -34,8 +34,28 @@ namespace Galleon.Checkout
         {
             if (target == null)
                 return "";
-            
+
             return target.ToString();
+        }
+
+        /// <summary>
+        /// Truncates <paramref name="text"/> so that its total length never exceeds <paramref name="maxLength"/>.
+        /// When truncation occurs the result ends with an ellipsis, which is counted inside the budget.
+        /// A <paramref name="maxLength"/> of 0 (or less) disables truncation.
+        /// </summary>
+        public static string Truncate(this string text, int maxLength, string ellipsis = "...")
+        {
+            if (maxLength    <= 0)             return text;
+            if (text          == null)         return text;
+            if (text.Length   <= maxLength)    return text;
+
+            ellipsis = ellipsis ?? "";
+
+            // Not enough room for the ellipsis itself - hard cut.
+            if (maxLength <= ellipsis.Length)
+                return text.Substring(0, maxLength);
+
+            return text.Substring(0, maxLength - ellipsis.Length).TrimEnd() + ellipsis;
         }
     }
     

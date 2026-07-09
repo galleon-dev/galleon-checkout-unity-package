@@ -128,6 +128,20 @@ namespace Galleon.Checkout
             set => CHECKOUT.Config.SetOverrideValue("other_payment_methods_description", value);
         }
 
+        /// <summary> Max label length on the checkout panel payment-method rows. 0 = no truncation. </summary>
+        public int CheckoutPanelItemMaxLabelLength
+        {
+            get => CHECKOUT.Config.GetInt          ("checkout_panel_item_max_label_length", defaultValue : 0);
+            set => CHECKOUT.Config.SetOverrideValue("checkout_panel_item_max_label_length", value);
+        }
+
+        /// <summary> Max label length on the select-payment-method (selection) panel rows. 0 = no truncation. </summary>
+        public int SelectionPanelItemMaxLabelLength
+        {
+            get => CHECKOUT.Config.GetInt          ("selection_panel_item_max_label_length", defaultValue : 0);
+            set => CHECKOUT.Config.SetOverrideValue("selection_panel_item_max_label_length", value);
+        }
+
         public string TestCountry
         {
             get => CHECKOUT.Config.GetString       ("test_country", defaultValue : "dont override");
@@ -433,6 +447,62 @@ namespace Galleon.Checkout
                                           possibleValues  = new ()
                                                             {
                                                                 new ConfigValue.PossibleValue() { DisplayName = "default", Value = "Paypal, Cash-App & More" },
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "checkout_panel_item_max_label_length", value: 0)
+                                      {
+                                          displayName     = "Checkout Panel Max Label Length",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override (off)", Value = "0"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "1  (hard cut)",       Value = "1"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "3  (hard cut)",       Value = "3"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "4  (min ellipsis)",   Value = "4"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "6",                   Value = "6"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "8",                   Value = "8"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "10",                  Value = "10" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "12",                  Value = "12" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "14",                  Value = "14" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "16",                  Value = "16" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "18",                  Value = "18" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "20",                  Value = "20" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "24",                  Value = "24" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "30",                  Value = "30" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "40",                  Value = "40" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "999 (never trims)",   Value = "999"},
+                                                            },
+                                      }
+                                  );
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "selection_panel_item_max_label_length", value: 0)
+                                      {
+                                          displayName     = "Selection Panel Max Label Length",
+                                          tag             = "global",
+                                          possibleValues  = new ()
+                                                            {
+                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override (off)", Value = "0"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "1  (hard cut)",       Value = "1"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "3  (hard cut)",       Value = "3"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "4  (min ellipsis)",   Value = "4"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "6",                   Value = "6"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "8",                   Value = "8"  },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "10",                  Value = "10" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "12",                  Value = "12" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "14",                  Value = "14" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "16",                  Value = "16" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "18",                  Value = "18" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "20",                  Value = "20" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "24",                  Value = "24" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "30",                  Value = "30" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "40",                  Value = "40" },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "999 (never trims)",   Value = "999"},
                                                             },
                                       }
                                   );
