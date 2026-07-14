@@ -467,6 +467,22 @@ namespace Galleon.Checkout
                                 Debug.Log($"got UMP type 'credit_card'. should be 'card'. this is server error. fixing locally.".Color(Color.red));
                                 data.type = "card";
                             }
+
+                            // Hide "non-defined" UPMs: skip any server payment method whose type has no
+                            // matching definition for the current country/currency (definitions are fetched
+                            // just before this step, filtered by country/currency + device support).
+                            //
+                            // Example: a vaulted PayPal that lingers on the account after the user switches
+                            // to a country where PayPal isn't offered. We do NOT delete it server-side - it's
+                            // simply not added to the local list, so it stays out of EVERY UI. Because UPMs and
+                            // definitions are re-fetched on each refresh, the method reappears automatically
+                            // once the user returns to a country whose definitions include this type.
+                            if (!HasDefinitionForType(data.type))
+                            {
+                                Debug.Log($"hiding non-defined user payment method: {data.type} ({data.display_name}) - no definition for current country/currency".Color(Color.yellow));
+                                continue;
+                            }
+
                             if (data.type == "card")
                             {
                                 this.UserPaymentMethods.Add(new CreditCardUserUserPaymentMethod()
@@ -787,8 +803,21 @@ namespace Galleon.Checkout
             
         }
         
+        // True if the current country/currency's definitions cover this payment-method type.
+        // Used to hide "non-defined" user payment methods (e.g. a leftover vaulted PayPal after
+        // the user switched to an unsupported country). Compares against both the definition's
+        // Type and its raw Data.type. "empty_" tiles are created FROM definitions and native/app
+        // are locally synthesized, so this is only applied to server-returned UPMs at ingestion.
+        private bool HasDefinitionForType(string type)
+        {
+            if (string.IsNullOrEmpty(type))
+                return false;
+
+            return PaymentMethodsDefinitions.Any(d => d.Data?.type == type);
+        }
+
         private bool ShouldIncludePaymentMethodType(string type)
-        {   
+        {
             if (CHECKOUT.Session == null  || CHECKOUT.Session.PurchaseConfiguration == null)
                 return true;
             
