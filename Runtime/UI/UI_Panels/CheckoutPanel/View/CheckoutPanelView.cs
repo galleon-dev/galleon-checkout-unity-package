@@ -333,60 +333,48 @@ namespace Galleon.Checkout.UI
                 Destroy(child.gameObject);
             }
 
-            var taxes = CheckoutClient.Instance.CurrentSession.Taxes;
+            if (Checkout.CheckoutClient.Instance == null)
+                return;
 
-            #if UNITY_EDITOR
-            // These are Taxes added only for testing. Should be commented out later on
-            // taxes.Clear();
-            // taxes.Add("VAT",          new Shared.TaxItem { tax_amount = 9.90m,  inclusive = false });
-            // taxes.Add("IRS",          new Shared.TaxItem { tax_amount = 5.50m,  inclusive = false });            
-            // taxes.Add("CUSTOMS",      new Shared.TaxItem { tax_amount = 25.15m, inclusive = false });
-            // taxes.Add("Delivery Fee", new Shared.TaxItem { tax_amount = 6.00m,  inclusive = false });
-            #endif
+            // All money on this panel comes from the session breakdown, which respects
+            // TaxItem.inclusive. Do not add taxes up here: an inclusive tax (PL, most of EU)
+            // is already inside SubTotal, and adding it again shows a total the server will
+            // never charge.
+            var breakdown = Checkout.CheckoutClient.Instance.CurrentSession.PriceBreakdown;
 
-            if (Checkout.CheckoutClient.Instance != null)
+            SubtotalPriceText.text = CHECKOUT.Currency.FormatMoney(breakdown.SubTotal);
+
+            if (CHECKOUT.Globals.ShowTaxBreakdown)
             {
-                decimal SubTotal = Checkout.CheckoutClient.Instance.CurrentSession.SelectedProduct.Amount;
+                // Itemised rows. Inclusive rows are labelled "(incl.)" so that
+                // subtotal / tax / total read coherently instead of appearing not to add up.
+                foreach (var line in breakdown.Lines)
+                    CreateTaxPrefab(line.DisplayName, line.Amount);
 
-                // CultureInfo.InvariantCulture is important from parsing perspective from string to float as on mobile devices it can appear ",", instead "." in float values
-                SubtotalPriceText.text = CHECKOUT.Currency.FormatMoney(SubTotal);
+                ShowTaxesPanels(true);
+                TaxText.gameObject.SetActive(false);
+                TaxText.text = CHECKOUT.Currency.FormatMoney(breakdown.AddedTax);
 
-                decimal TaxesAmount = 0;
-
-                // If Location is USA or Canada generate taxes
-                if (CHECKOUT.Globals.ShowTaxBreakdown)
-                {
-                    foreach (var tax in taxes)
-                    {
-                        CreateTaxPrefab(tax.Key, tax.Value.tax_amount);
-                        TaxesAmount += tax.Value.tax_amount;
-                    }
-                    
-                    ShowTaxesPanels(true);
-                    TaxText.gameObject.SetActive(false);
-                    TaxText.text = CHECKOUT.Currency.FormatMoney(TaxesAmount);
-                    
-                    TaxesAndFeesRow.gameObject.SetActive(false);
-                }
-                else
-                {
-                    foreach (var tax in taxes)
-                    {
-                        TaxesAmount += tax.Value.tax_amount;
-                    }
-
-                    ShowTaxesPanels(false);
-                    TaxText.gameObject.SetActive(true);
-                    TaxText.text = "Inclusive"; // $"${TaxesAmount.ToString(CultureInfo.InvariantCulture)}";
-                    
-                    TaxesAndFeesRow.gameObject.SetActive(true);
-                }
-                
-                TotalPriceText.text = CHECKOUT.Currency.FormatMoney(SubTotal + TaxesAmount);
-                
-                if (taxes.Count == 0)
-                    TotalPriceText.text = PriceText.text;
+                TaxesAndFeesRow.gameObject.SetActive(false);
             }
+            else
+            {
+                // Single collapsed row: show the amount actually added on top, or
+                // state that tax is already included when nothing is added.
+                ShowTaxesPanels(false);
+                TaxText.gameObject.SetActive(true);
+                TaxText.text = breakdown.HasAddedTax ? CHECKOUT.Currency.FormatMoney(breakdown.AddedTax)
+                                                     : "Inclusive";
+
+                TaxesAndFeesRow.gameObject.SetActive(true);
+            }
+
+            TotalPriceText.text = CHECKOUT.Currency.FormatMoney(breakdown.Total);
+
+            // With no taxes at all, mirror the product price string exactly rather than
+            // reformatting it, so the two rows can never disagree on formatting.
+            if (!breakdown.HasTaxes)
+                TotalPriceText.text = PriceText.text;
         }
 
         void CreateTaxPrefab(string taxName, decimal taxAmount)

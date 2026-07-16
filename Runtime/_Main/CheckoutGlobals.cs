@@ -20,10 +20,29 @@ namespace Galleon.Checkout
             set => CHECKOUT.Config.SetOverrideValue("is_preselection_screen_enabled", value);
         }
 
+        /// <summary>
+        /// Display-only : whether the itemised tax rows are shown.
+        /// Server-driven via price_data.tax.should_display_taxes.
+        /// This says NOTHING about whether a tax is added on top — see <see cref="Galleon.Checkout.TaxMode"/> for that.
+        /// </summary>
         public bool ShowTaxBreakdown
         {
             get => CHECKOUT.Config.GetBool         ("show_tax_breakdown", defaultValue : true);
             set => CHECKOUT.Config.SetOverrideValue("show_tax_breakdown", value);
+        }
+
+        /// <summary>
+        /// Debug override for how TaxItem.inclusive is interpreted.
+        ///
+        /// Defaults to "dont override", so for every real user the server's per-tax flag is used
+        /// exactly as sent. The value only changes when a human picks another option in the debug
+        /// tool window, and even then it is display-only : ChargeRequest carries no amount, so the
+        /// server charges the session it priced regardless of what this client draws.
+        /// </summary>
+        public TaxMode TaxMode
+        {
+            get => CheckoutPriceBreakdown.ParseTaxMode(CHECKOUT.Config.GetString("tax_mode", defaultValue : "dont override"));
+            set => CHECKOUT.Config.SetOverrideValue   ("tax_mode", CheckoutPriceBreakdown.ToConfigValue(value));
         }
 
         public bool ShowCurrencySign
@@ -223,17 +242,40 @@ namespace Galleon.Checkout
                                       }
                                   );
                         
+                                  // Display-only : show the itemised tax rows or not.
+                                  // NOTE : the option here used to be called "inclusive", which wrongly implied that
+                                  //        hiding the breakdown was the same thing as tax-inclusive pricing. It is not.
+                                  //        Tax arithmetic now lives in "tax_mode" below.
                                   globals.Add
                                   (
                                       new ConfigValue(key : "show_tax_breakdown", value: true)
                                       {
-                                          displayName      = "tax",
+                                          displayName      = "tax breakdown",
                                           tag              = "global",
                                           possibleValues   = new ()
                                                            {
                                                                new ConfigValue.PossibleValue() { DisplayName = "dont override",  Value = null    },
-                                                               new ConfigValue.PossibleValue() { DisplayName = "inclusive",      Value = "false" },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "hide-breakdown", Value = "false" },
                                                                new ConfigValue.PossibleValue() { DisplayName = "show-breakdown", Value = "true"  },
+                                                           },
+                                      }
+                                  );
+
+                                  // Debug override for TaxItem.inclusive.
+                                  // "dont override" is the default and the only value a real user ever runs with :
+                                  // the server's per-tax flag is used as sent. Picking another value affects the
+                                  // displayed total only — the charge comes from the server-priced session.
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "tax_mode", value: "dont override")
+                                      {
+                                          displayName      = "tax mode",
+                                          tag              = "global",
+                                          possibleValues   = new ()
+                                                           {
+                                                               new ConfigValue.PossibleValue() { DisplayName = "dont override (server flag)", Value = "dont override" },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "force inclusive (PL / EU)",   Value = "inclusive"     },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "force added-on-top (US / CA)",Value = "added"         },
                                                            },
                                       }
                                   );

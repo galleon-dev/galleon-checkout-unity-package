@@ -23,10 +23,11 @@ namespace Galleon.Checkout
         public Dictionary<string, string>         Metadata                          = new();
 
         // Tax data
+        [Obsolete("Never read by anything, in any commit, since it was introduced. Use PriceBreakdown instead.")]
         public bool                               ShouldDisplayPriceIncludingTax    = true;
         public Dictionary<string, TaxItem>        Taxes                             = new(); // <name_of_tax, tax_data>
         public PriceData                          SessionPriceData                  = null;
-        
+
         // Simple Dialog Panel data
         public string                             LastDialogRequest                 = null;
         public SimpleDialogPanelView.DialogResult LastDialogResult                  = SimpleDialogPanelView.DialogResult.None;
@@ -55,7 +56,18 @@ namespace Galleon.Checkout
         
         public CheckoutClient                     Client                    => CheckoutClient.Instance;
         public User                               User                      => Client.CurrentUser;
-        
+
+        /// <summary>
+        /// The only sanctioned source of displayable money for this session.
+        /// Respects TaxItem.inclusive, so tax-inclusive markets (PL, most of EU) are not
+        /// charged tax twice on screen. Do not re-derive totals at the call site.
+        /// </summary>
+        public CheckoutPriceBreakdown             PriceBreakdown
+        => CheckoutPriceBreakdown.Build(priceData        : this.SessionPriceData
+                                       ,taxes            : this.Taxes
+                                       ,fallbackSubTotal : this.SelectedProduct?.Amount ?? 0m
+                                       ,mode             : CHECKOUT.Globals.TaxMode);
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Last transaction result
 
         public ChargeResultData                   lastChargeResult          = null;
@@ -232,10 +244,21 @@ namespace Galleon.Checkout
                         
                         foreach (var t in taxData.taxes)
                         {
-                            s.Log($" - {t.Key} : {t.Value}");
+                            s.Log($" - {t.Key} : amount:{t.Value.tax_amount.ToString(CultureInfo.InvariantCulture)} inclusive:{t.Value.inclusive}");
                             this.Taxes.Add(t.Key, new TaxItem() { inclusive = t.Value.inclusive, tax_amount = t.Value.tax_amount });
                         }
 
+                        // Resolve the breakdown once here so the numbers the UI will draw are in the flow log,
+                        // and so a server/client disagreement about inclusive is loud rather than silent.
+                        var breakdown = this.PriceBreakdown;
+                        s.Log(breakdown.ToString());
+
+                        if (breakdown.HasMismatch)
+                            s.Log($"TAX MISMATCH : server says total({breakdown.Total.ToString(CultureInfo.InvariantCulture)}) "
+                                + $"- subtotal({breakdown.SubTotal.ToString(CultureInfo.InvariantCulture)}) "
+                                + $"= {breakdown.ServerAddedTax.ToString(CultureInfo.InvariantCulture)} added tax, "
+                                + $"but the taxes flagged inclusive=false sum to {breakdown.AddedTax.ToString(CultureInfo.InvariantCulture)}. "
+                                + $"Displaying the server total. Check the inclusive flags for tax_country:{taxData.tax_country}.");
                     });
 
         public Step ReportCheckoutWindowOpened()
@@ -496,41 +519,103 @@ namespace Galleon.Checkout
             sessionErrors.Clear();
         }
 
+        /// <summary>
+        /// Flattens the session's price data for analytics.
+        ///
+        /// Every value here must be either true or absent. This method previously ended with a
+        /// block of "defaults to ensure all requested fields are present" which invented
+        /// exchange_rate = 1.0 and usd_amount = the local amount. Nothing ever populated those
+        /// keys beforehand, so the defaults fired on every single event: PLN was reported as USD
+        /// at a rate of 1.0. A missing field is a gap; a fabricated field is a wrong answer that
+        /// looks like data.
+        /// </summary>
         private Dictionary<string, string> MapPriceDataToMetadata(PriceData priceData)
         {
             if (priceData == null) return new Dictionary<string, string>();
 
+            var c      = CultureInfo.InvariantCulture;
             var result = new Dictionary<string, string>();
 
             // Basic price data
-            result["amount"]              = priceData.subtotal_price.ToString(CultureInfo.InvariantCulture);
-            result["amount_with_tax"]     = priceData.total_price.ToString(CultureInfo.InvariantCulture);
-            
+            result["amount"]              = priceData.subtotal_price.ToString(c);
+            result["amount_with_tax"]     = priceData.total_price.ToString(c);
+
             // Currency from session or product
             result["currency"]            = CHECKOUT.Session?.SelectedProduct?.Currency ?? "";
 
+            result["checkout_type"]       = "Galleon";
+
             // Tax related data
-            if (priceData.tax != null)
+            result["tax_state"]           = priceData.tax?.tax_state   ?? "";
+            result["tax_country"]         = priceData.tax?.tax_country ?? "";
+
+            // NOTE : priceData.tax could be null here and this loop used to run unguarded.
+            if (priceData.tax?.taxes != null)
             {
-                result["tax_state"]   = priceData.tax.tax_state   ?? "";
-                result["tax_country"] = priceData.tax.tax_country ?? "";
+                foreach (var taxItem in priceData.tax.taxes)
+                {
+                    // ToString() without a culture emits "5,61" under a Polish locale, which then
+                    // lands in analytics as a decimal-comma string. Always pin the culture.
+                    result[taxItem.Key] = taxItem.Value.tax_amount.ToString(c);
+                }
+
+                result["total_tax"] = priceData.tax.taxes.Sum(x => x.Value.tax_amount).ToString(c);
+            }
+            else
+            {
+                result["total_tax"] = 0m.ToString(c);
             }
 
-            foreach (var taxItem in priceData.tax.taxes)
-            {
-                result[taxItem.Key] = taxItem.Value.tax_amount.ToString();
-            }
+            // How the tax relates to the price, so a consumer can tell 29.99-incl-5.61
+            // apart from 5.99-plus-1.38 without guessing from the country.
+            // "none" is distinct from "inclusive" : no tax at all is not the same claim as
+            // tax that happens to sit inside the price.
+            // Built from the priceData argument, not from this.SessionPriceData, so this
+            // method stays honest about describing what it was handed.
+            var breakdown = CheckoutPriceBreakdown.Build(priceData        : priceData
+                                                        ,taxes            : this.Taxes
+                                                        ,fallbackSubTotal : this.SelectedProduct?.Amount ?? 0m
+                                                        ,mode             : CHECKOUT.Globals.TaxMode);
+            result["tax_behavior"]         = !breakdown.HasTaxes    ? "none"
+                                           :  breakdown.HasAddedTax ? "added"
+                                                                    : "inclusive";
+            result["tax_inclusive_amount"] = breakdown.InclusiveTax.ToString(c);
+            result["tax_added_amount"]     = breakdown.AddedTax    .ToString(c);
 
-            var totalTax = priceData.tax.taxes.Sum(x => x.Value.tax_amount);
-            result["total_tax"] = totalTax.ToString();
-            
-            // Final defaults to ensure all requested fields are present
-            if (!result.ContainsKey("exchange_rate"))         result["exchange_rate"]       = "1.0";
-            if (!result.ContainsKey("usd_amount"))            result["usd_amount"]          = result["amount"];
-            if (!result.ContainsKey("usd_amount_with_tax"))   result["usd_amount_with_tax"] = result["amount_with_tax"];
-            if (!result.ContainsKey("tax_state"))             result["tax_state"]           = "";
-            if (!result.ContainsKey("tax_country"))           result["tax_country"]         = "";
-            if (!result.ContainsKey("checkout_type"))         result["checkout_type"]       = "Galleon";
+            //////////////////////////////////////// USD reference values
+
+            // Forwarded when the server sends them. The client cannot compute these : it is handed
+            // a local-currency product (29.99 PLN) and never sees the USD reference price, so it
+            // has the denominator of the rate and not the numerator. Only the server knows both.
+            if (priceData.exchange_rate       .HasValue) result["exchange_rate"]       = priceData.exchange_rate      .Value.ToString(c);
+            if (priceData.usd_amount          .HasValue) result["usd_amount"]          = priceData.usd_amount         .Value.ToString(c);
+            if (priceData.usd_amount_with_tax .HasValue) result["usd_amount_with_tax"] = priceData.usd_amount_with_tax.Value.ToString(c);
+
+            //////////////////////////////////////// TEMPORARY : fabricated values. DELETE THIS BLOCK.
+            //
+            // These numbers are NOT TRUE. exchange_rate = 1.0 asserts that a zloty and a dollar are
+            // worth the same, and usd_amount relabels the local amount as USD without converting it.
+            // They have been reported to analytics on every purchase for months.
+            //
+            // They are kept ONLY because price_metadata is part of the public PurchaseResult contract
+            // and the host game already reads these keys — removing them outright risks throwing in
+            // its purchase-completion handler, which is worse than a wrong number.
+            //
+            // This block is self-retiring : the guards below only fire while the server is silent.
+            // The moment /session returns exchange_rate / usd_amount in price_data, the real values
+            // above win and these never run again. Delete this block once that has shipped and the
+            // real values are confirmed in analytics.
+            //
+            // Do NOT copy this pattern. An absent field is a gap someone fixes; a fabricated one is
+            // a wrong answer wearing a data costume, which is why this went unnoticed for so long.
+            if (!result.ContainsKey("exchange_rate"))       result["exchange_rate"]       = "1.0";
+            if (!result.ContainsKey("usd_amount"))          result["usd_amount"]          = result["amount"];
+            if (!result.ContainsKey("usd_amount_with_tax")) result["usd_amount_with_tax"] = result["amount_with_tax"];
+
+            if (CHECKOUT.Globals.IsInternal && !priceData.exchange_rate.HasValue)
+                UnityEngine.Debug.LogWarning("[Galleon.Checkout] price_metadata is reporting a FABRICATED exchange_rate of 1.0 "
+                                           + "because /session did not return one. Analytics for this purchase are not trustworthy. "
+                                           + "This warning is internal-only and will stop once the server sends the real value.");
 
             return result;
         }
