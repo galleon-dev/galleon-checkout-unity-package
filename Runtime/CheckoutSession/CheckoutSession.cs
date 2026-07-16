@@ -582,40 +582,20 @@ namespace Galleon.Checkout
             result["tax_inclusive_amount"] = breakdown.InclusiveTax.ToString(c);
             result["tax_added_amount"]     = breakdown.AddedTax    .ToString(c);
 
-            //////////////////////////////////////// USD reference values
-
-            // Forwarded when the server sends them. The client cannot compute these : it is handed
-            // a local-currency product (29.99 PLN) and never sees the USD reference price, so it
-            // has the denominator of the rate and not the numerator. Only the server knows both.
-            if (priceData.exchange_rate       .HasValue) result["exchange_rate"]       = priceData.exchange_rate      .Value.ToString(c);
-            if (priceData.usd_amount          .HasValue) result["usd_amount"]          = priceData.usd_amount         .Value.ToString(c);
-            if (priceData.usd_amount_with_tax .HasValue) result["usd_amount_with_tax"] = priceData.usd_amount_with_tax.Value.ToString(c);
-
-            //////////////////////////////////////// TEMPORARY : fabricated values. DELETE THIS BLOCK.
+            // NOT EMITTED, deliberately : exchange_rate, usd_amount, usd_amount_with_tax.
             //
-            // These numbers are NOT TRUE. exchange_rate = 1.0 asserts that a zloty and a dollar are
-            // worth the same, and usd_amount relabels the local amount as USD without converting it.
-            // They have been reported to analytics on every purchase for months.
+            // The client cannot know these. It is handed a local-currency product (29.99 PLN) and
+            // never sees the USD reference price, so it has the denominator of the rate and not the
+            // numerator. There is no honest value it could put here.
             //
-            // They are kept ONLY because price_metadata is part of the public PurchaseResult contract
-            // and the host game already reads these keys — removing them outright risks throwing in
-            // its purchase-completion handler, which is worse than a wrong number.
+            // These keys previously existed and were FABRICATED : a trailing "defaults to ensure all
+            // requested fields are present" block set exchange_rate = 1.0 and usd_amount = the local
+            // amount. Nothing ever populated them beforehand, so the defaults fired on every event —
+            // reporting zloty as dollars at parity for months. It went unnoticed because for USD
+            // purchases a rate of 1.0 is correct, so every spot-check in the biggest market passed.
             //
-            // This block is self-retiring : the guards below only fire while the server is silent.
-            // The moment /session returns exchange_rate / usd_amount in price_data, the real values
-            // above win and these never run again. Delete this block once that has shipped and the
-            // real values are confirmed in analytics.
-            //
-            // Do NOT copy this pattern. An absent field is a gap someone fixes; a fabricated one is
-            // a wrong answer wearing a data costume, which is why this went unnoticed for so long.
-            if (!result.ContainsKey("exchange_rate"))       result["exchange_rate"]       = "1.0";
-            if (!result.ContainsKey("usd_amount"))          result["usd_amount"]          = result["amount"];
-            if (!result.ContainsKey("usd_amount_with_tax")) result["usd_amount_with_tax"] = result["amount_with_tax"];
-
-            if (CHECKOUT.Globals.IsInternal && !priceData.exchange_rate.HasValue)
-                UnityEngine.Debug.LogWarning("[Galleon.Checkout] price_metadata is reporting a FABRICATED exchange_rate of 1.0 "
-                                           + "because /session did not return one. Analytics for this purchase are not trustworthy. "
-                                           + "This warning is internal-only and will stop once the server sends the real value.");
+            // Do not reintroduce them without a real source. A missing field is a gap someone fixes;
+            // a fabricated one is a wrong answer wearing a data costume.
 
             return result;
         }
