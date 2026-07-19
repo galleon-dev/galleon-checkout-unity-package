@@ -476,6 +476,7 @@ namespace Galleon.Checkout
                                                             {
                                                                 new ConfigValue.PossibleValue() { DisplayName = "Ukraine 176.38.12.207",    Value = "176.38.12.207"   },
                                                                 new ConfigValue.PossibleValue() { DisplayName = "California 66.213.22.193", Value = "66.213.22.193"   },
+                                                                new ConfigValue.PossibleValue() { DisplayName = "Texas 676.142.231.100",    Value = "76.142.231.100"   },
                                                             },
                                       }
                                   );
