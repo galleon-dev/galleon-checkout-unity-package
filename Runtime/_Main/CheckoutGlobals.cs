@@ -14,11 +14,20 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
-        public bool WebCheckout
+        public string WebCheckout
         {
-            get => CHECKOUT.Config.GetBool         ("web_checkout", defaultValue : false);
+            get => CHECKOUT.Config.GetString       ("web_checkout", defaultValue : "disabled");
             set => CHECKOUT.Config.SetOverrideValue("web_checkout", value);
         }
+        
+        /// <summary> Normalised web-checkout mode : "disabled" | "enabled" | "direct". </summary>
+        public string WebCheckoutMode   => (WebCheckout ?? "disabled").Trim().ToLower();
+        
+        /// <summary> True when web checkout should be used at all (enabled OR direct). </summary>
+        public bool   IsWebCheckoutOn     => WebCheckoutMode == "enabled" || WebCheckoutMode == "direct";
+        
+        /// <summary> True only for "direct" : open web checkout with no plugin UI. </summary>
+        public bool   IsWebCheckoutDirect => WebCheckoutMode == "direct";
         
         public bool IsPreselectionEnabled
         {
@@ -648,15 +657,15 @@ namespace Galleon.Checkout
 
                                   globals.Add
                                   (
-                                      new ConfigValue(key : "web_checkout", value: false)
+                                      new ConfigValue(key : "web_checkout", value: "disabled")
                                       {
                                           displayName      = "Web Checkout",
                                           tag              = "global",
                                           possibleValues   = new ()
                                                            {
-                                                               new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = null    },
-                                                               new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
-                                                               new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "disabled", Value = "disabled" },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "enabled",  Value = "enabled"  },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "direct",   Value = "direct"   },
                                                            },
                                       }
                                   );

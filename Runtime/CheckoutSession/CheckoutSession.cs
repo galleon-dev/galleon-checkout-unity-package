@@ -98,6 +98,25 @@ namespace Galleon.Checkout
                         // and pay directly through the hosted web checkout page.
                         if (IsWebCheckoutAvailable())
                         {
+                            //////////////////// DIRECT mode : no plugin UI at all.
+                            // Open the hosted web checkout, await the deep-link return, and finish with
+                            // the charge result. No checkout screen, no loading panel, no success panel.
+                            if (CHECKOUT.Globals.IsWebCheckoutDirect)
+                            {
+                                s.AddPreStep(InitializeSession());
+                                s.AddPreStep(StartSession());
+                                s.AddPreStep(ReportCheckoutWindowOpened());
+                                
+                                s.AddChildStep(RunWebCheckoutTransactionDirect());
+                                
+                                s.AddPostStep(EndCheckoutSession());
+                                s.AddPostStep(OnSessionFinishedStep);
+                                s.AddPostStep("report", async x => { Report?.Invoke(); });
+                                
+                                return;
+                            }
+                            
+                            // ENABLED mode : full checkout screen (loading panel + checkmark success)
                             // Pre Steps : open screen + create session
                             s.AddPreStep(InitializeSession());
                             s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
@@ -399,7 +418,7 @@ namespace Galleon.Checkout
         /// </summary>
         public bool IsWebCheckoutAvailable()
         {
-            return CHECKOUT.Globals.WebCheckout
+            return CHECKOUT.Globals.IsWebCheckoutOn
                 && CHECKOUT.PaymentMethods.PaymentMethodsDefinitions
                            .Any(d => d.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_WEB_CHECKOUT);
         }
@@ -463,6 +482,52 @@ namespace Galleon.Checkout
                         OnSessionFinishedStep.AddChildStep(CHECKOUT.PaymentMethods.RefreshPaymentMethods());
 
                         // Finally, handle transaction result
+                        s.AddPostStep(HandleTransactionResult());
+                    });
+
+
+        /// <summary>
+        /// DIRECT web-checkout : no plugin UI. Auto-selects the web_checkout method, runs its charge
+        /// actions (charge -> open_url -> await deep-link -> check status) and records the PurchaseResult
+        /// from the charge result. No checkout screen is opened and no loading/success panel is shown;
+        /// completion is driven by the deep-link return (registered independently of the screen).
+        /// </summary>
+        public Step RunWebCheckoutTransactionDirect()
+        =>
+            new Step(name   : $"run_web_checkout_transaction_direct"
+                    ,action : async (s) =>
+                    {
+                        var definition = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions
+                                                 .FirstOrDefault(d => d.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_WEB_CHECKOUT);
+
+                        if (definition == null)
+                        {
+                            // Availability was checked in Flow(); guard so a race just yields a canceled result.
+                            CHECKOUT.Session.LogError("RunWebCheckoutTransactionDirect", "no web_checkout definition available");
+                            return;
+                        }
+
+                        // Create + exclusively select a local web-checkout payment method.
+                        CHECKOUT.PaymentMethods.SelectPaymentMethodDefinition(definition);
+
+                        this.CurrentTransactionStep = s;
+
+                        // No loading screen is shown in direct mode.
+                        s.AddPreStep(StartTransaction());
+
+                        // Charge -> open_url -> await deep-link -> check status.
+                        // The deep-link listener is registered inside OpenAndAwaitURL, so the return is
+                        // handled even though the checkout screen is never opened.
+                        foreach (var transactionStep in CHECKOUT.PaymentMethods.SelectedUserPaymentMethod.GetTransactionSteps())
+                        {
+                            s.Log($"scheduling direct web-checkout transaction step : {transactionStep.Name}");
+                            s.AddChildStep(transactionStep);
+                        }
+
+                        // Refresh user payment methods after the session finishes.
+                        OnSessionFinishedStep.AddChildStep(CHECKOUT.PaymentMethods.RefreshPaymentMethods());
+
+                        // Record the final PurchaseResult from the charge result (no success panel).
                         s.AddPostStep(HandleTransactionResult());
                     });
 
