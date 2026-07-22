@@ -260,6 +260,7 @@ namespace Galleon.SampleApp
                                                                                                          "paypal",
                                                                                                          "amazon_pay",
                                                                                                          "google_pay_browser",
+                                                                                                        // "web_checkout",
                                                                                                      }
                                                                         #endif
                                                                    });

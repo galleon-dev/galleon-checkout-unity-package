@@ -14,6 +14,12 @@ namespace Galleon.Checkout
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Properties
 
+        public bool WebCheckout
+        {
+            get => CHECKOUT.Config.GetBool         ("web_checkout", defaultValue : false);
+            set => CHECKOUT.Config.SetOverrideValue("web_checkout", value);
+        }
+        
         public bool IsPreselectionEnabled
         {
             get => CHECKOUT.Config.GetBool         ("is_preselection_screen_enabled", defaultValue : true);
@@ -639,6 +645,21 @@ namespace Galleon.Checkout
                                           }
                                       );
                                   }
+
+                                  globals.Add
+                                  (
+                                      new ConfigValue(key : "web_checkout", value: false)
+                                      {
+                                          displayName      = "Web Checkout",
+                                          tag              = "global",
+                                          possibleValues   = new ()
+                                                           {
+                                                               new ConfigValue.PossibleValue() { DisplayName = "dont override", Value = null    },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "disabled",      Value = "false" },
+                                                               new ConfigValue.PossibleValue() { DisplayName = "enabled",       Value = "true"  },
+                                                           },
+                                      }
+                                  );
 
                                   foreach (var configValue in globals.Where(v => v.tag == "global"))
                                   {

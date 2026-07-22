@@ -92,6 +92,31 @@ namespace Galleon.Checkout
                         /////////////////////////////////////// Pre Steps
                          
                         // Open Screen
+                        /////////////////////////////////////// Web Checkout (direct) flow
+                        // When the "web_checkout" global is ON and the server offers a web_checkout
+                        // payment method definition, skip the payment-method-selection UI entirely
+                        // and pay directly through the hosted web checkout page.
+                        if (IsWebCheckoutAvailable())
+                        {
+                            // Pre Steps : open screen + create session
+                            s.AddPreStep(InitializeSession());
+                            s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
+                            s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
+                            s.AddPreStep(StartSession());
+                            s.AddPreStep(ReportCheckoutWindowOpened());
+                            
+                            // Steps : pay directly with web checkout
+                            s.AddChildStep(RunWebCheckoutTransaction());
+                            
+                            // Post Steps : close
+                            s.AddPostStep(CheckoutScreenMobile.EndCheckoutScreenMobile());
+                            s.AddPostStep(EndCheckoutSession());
+                            s.AddPostStep(OnSessionFinishedStep);
+                            s.AddPostStep("report", async x => { Report?.Invoke(); });
+                            
+                            return;
+                        }
+                        
                         s.AddPreStep(InitializeSession());
                         s.AddPreStep(CheckoutScreenMobile.OpenCheckoutScreenMobile());
                         s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.CheckoutLoadingPage));
@@ -363,6 +388,82 @@ namespace Galleon.Checkout
                         
                         // Finally, handle transaction result
                         s.AddPostStep(HandleTransactionResult());                
+                    });
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Web Checkout Steps
+
+        /// <summary>
+        /// True when the "web_checkout" global is enabled AND the server has returned a
+        /// web_checkout payment method definition for the current country/currency.
+        /// </summary>
+        public bool IsWebCheckoutAvailable()
+        {
+            return CHECKOUT.Globals.WebCheckout
+                && CHECKOUT.PaymentMethods.PaymentMethodsDefinitions
+                           .Any(d => d.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_WEB_CHECKOUT);
+        }
+
+        /// <summary>
+        /// Direct web-checkout transaction : auto-select the web_checkout payment method and run its
+        /// charge actions (charge -> open_url -> deep-link return -> check status), then navigate to the
+        /// success screen. Mirrors <see cref="RunTransaction"/> but skips payment-method selection and the
+        /// native-IAP branch, since the method is chosen for the user.
+        /// </summary>
+        public Step RunWebCheckoutTransaction()
+        =>
+            new Step(name   : $"run_web_checkout_transaction"
+                    ,action : async (s) =>
+                    {
+                        ////////////////////////////////////////////////////////////// Select web checkout
+
+                        var definition = CHECKOUT.PaymentMethods.PaymentMethodsDefinitions
+                                                 .FirstOrDefault(d => d.Type == PaymentMethodDefinition.PAYMENT_METHOD_TYPE_WEB_CHECKOUT);
+
+                        if (definition == null)
+                        {
+                            // Availability was checked in Flow(); guard anyway so a race can't crash the charge.
+                            s.RemoveStepsAfterThisInParentFlow();
+                            s.AddNextStepInParentFlow(Client.CheckoutScreenMobile.UI_ShowError(
+                                errorMessage    : CHECKOUT.Config.GetString("error_web_checkout_message",     defaultValue: "Payment failed"),
+                                errorDescription: CHECKOUT.Config.GetString("error_web_checkout_description", defaultValue: "Web checkout is not available. Please try again."),
+                                buttonText      : CHECKOUT.Config.GetString("error_web_checkout_button",      defaultValue: "Back")));
+                            return;
+                        }
+
+                        // Create + exclusively select a local web-checkout payment method.
+                        CHECKOUT.PaymentMethods.SelectPaymentMethodDefinition(definition);
+
+                        ////////////////////////////////////////////////////////////// Prep
+
+                        this.CurrentTransactionStep = s;
+
+                        ////////////////////////////////////////////////////////////// Pre Steps
+
+                        // Loading screen (also stays up while the hosted web page is open)
+                        s.AddPreStep(Client.CheckoutScreenMobile.SetPage(Client.CheckoutScreenMobile.LoadingPage));
+                        s.AddPreStep(StartTransaction());
+
+                        ////////////////////////////////////////////////////////////// Transaction Steps
+
+                        foreach (var transactionStep in CHECKOUT.PaymentMethods.SelectedUserPaymentMethod.GetTransactionSteps())
+                        {
+                            s.Log($"scheduling web-checkout transaction step : {transactionStep.Name}");
+                            s.AddChildStep(transactionStep);
+                        }
+
+                        ////////////////////////////////////////////////////////////// Final Navigation Step
+
+                        s.AddChildStep("set_success", async x => Client.CheckoutScreenMobile.NavigationNext = "Success");
+                        s.AddChildStep(Client.CheckoutScreenMobile.Navigate());
+
+                        ////////////////////////////////////////////////////////////// Post Steps
+
+                        // Refresh user payment methods after the session finishes
+                        OnSessionFinishedStep.AddChildStep(CHECKOUT.PaymentMethods.RefreshPaymentMethods());
+
+                        // Finally, handle transaction result
+                        s.AddPostStep(HandleTransactionResult());
                     });
 
 

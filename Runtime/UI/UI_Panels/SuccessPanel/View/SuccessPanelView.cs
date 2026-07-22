@@ -61,9 +61,12 @@ namespace Galleon.Checkout.UI
             // buyer's email from PayPal, so we skip asking for it and auto-confirm (same
             // path as when the email is already known).
             bool isPayPal = CHECKOUT.PaymentMethods.SelectedUserPaymentMethod?.Type == "paypal";
+            // Web checkout completes on a hosted page; treat it like PayPal / a known email:
+            // skip the email prompt, just show the success checkmark, then auto-close.
+            bool isWebCheckout = CHECKOUT.PaymentMethods.SelectedUserPaymentMethod?.Type == "web_checkout";
             bool hasEmail = !CHECKOUT.User.Email.IsNullOrEmpty();
 
-            if (!hasEmail && !isPayPal)
+            if (!hasEmail && !isPayPal && !isWebCheckout)
             {
                 if (EmailInputFieldContainer)
                     ShowEmail();

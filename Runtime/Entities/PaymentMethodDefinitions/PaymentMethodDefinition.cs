@@ -19,6 +19,7 @@ namespace Galleon.Checkout
         public const string PAYMENT_METHOD_TYPE_CREDIT_CARD = "card";
         public const string PAYMENT_METHOD_TYPE_PAYPAL      = "paypal";
         public const string PAYMENT_METHOD_TYPE_GOOGLE_PAY  = "google_pay";
+        public const string PAYMENT_METHOD_TYPE_WEB_CHECKOUT = "web_checkout";
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Members
         
