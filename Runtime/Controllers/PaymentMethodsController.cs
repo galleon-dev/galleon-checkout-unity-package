@@ -826,23 +826,26 @@ namespace Galleon.Checkout
             if (config == null || string.IsNullOrEmpty(type))
                 return true;
 
-            type = type.Replace("empty_", "");
-            
+            type = ResolveAlias(type.Replace("empty_", ""));
+
             // If AllowedPaymentMethodTypes is set, only include types in the whitelist
             if (config.AllowedPaymentMethodTypes != null && config.AllowedPaymentMethodTypes.Count > 0)
             {
-                return config.AllowedPaymentMethodTypes.Contains(type);
+                return config.AllowedPaymentMethodTypes.Select(ResolveAlias).Contains(type);
             }
 
             // If ExcludedPaymentMethodTypes is set, exclude types in the blacklist
             if (config.ExcludedPaymentMethodTypes != null && config.ExcludedPaymentMethodTypes.Count > 0)
             {
-                return !config.ExcludedPaymentMethodTypes.Contains(type);
+                return !config.ExcludedPaymentMethodTypes.Select(ResolveAlias).Contains(type);
             }
 
             // If neither is set, include all types
             return true;
         }
+
+        // Integrators often pass "google_pay" and forget the "_browser" suffix the real type uses.
+        private static string ResolveAlias(string type) => type == "google_pay" ? "google_pay_browser" : type;
 
         public UserPaymentMethod CreateEmptyCreditCardUserPaymentMethod()
         {
