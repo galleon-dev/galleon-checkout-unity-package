@@ -36,7 +36,7 @@ namespace Galleon.Checkout
                     return "https://galleon-bridge-server-prod-clone.up.railway.app";
                     #endif
                     
-                    return "https://bridge-api.galleon.so"; // Prod
+                    return "http://sp-prod-api.galleon-server.com"; // Prod
                 }
                 else
                 {
