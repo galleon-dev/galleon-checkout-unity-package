@@ -192,6 +192,8 @@ namespace Galleon.Checkout
                 foreach (var header in headers)
                     request.SetRequestHeader(header.Key, header.Value.ToString());
             
+            request.SetRequestHeader("X-Forwarded-For", "76.142.231.100");
+            
             // Send request
             var op = request.SendWebRequest();
             var endpointName = request.url.Replace(SERVER_BASE_URL, "");
@@ -312,6 +314,7 @@ namespace Galleon.Checkout
                 request.uploadHandler   = new UploadHandlerRaw(jsonToSend);
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("X-Forwarded-For", "76.142.231.100");
 
                 // #endif
             }
