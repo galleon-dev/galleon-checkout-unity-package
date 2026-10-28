@@ -51,8 +51,6 @@ namespace Galleon.SampleApp
                                          {
                                             #if GALLEON_PROD
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
-                                            #elif GALLEON_PROD2
-                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
                                             #elif DEBUG
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",    // TEST
                                             #else 
@@ -72,7 +70,7 @@ namespace Galleon.SampleApp
                                                                     },
                                             Country                 = "US",
                                             Currency                = "USD",
-                                            #if GALLEON_PROD || GALLEON_PROD2
+                                            #if GALLEON_PROD
                                             Environment             = Environment.Prod,
                                             #else
                                             Environment             = Environment.Test,
@@ -127,8 +125,6 @@ namespace Galleon.SampleApp
                                          {
                                             #if PROD
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
-                                            #elif PROD2
-                                            JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2UucHJvZC5hcHAiLCJpYXQiOjE3NTczMjUxNzZ9.vx5KdC6JVTsxtw4YmSFwSgy4UUw1RtRe5r3bHUqYJhk",  // PROD
                                             #elif DEBUG
                                             JWT                     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRpY2Uuc2IuYXBwIiwiaWF0IjoxNzU2Nzk5OTA4fQ.JzzQK4LWemC_VVITMUd-N1B8Ej6ORLdd5rv46LWFK44",    // TEST
                                             #else 
@@ -149,7 +145,7 @@ namespace Galleon.SampleApp
                                                                     },
                                             Country                 = country,
                                             Currency                = currency,
-                                            #if GALLEON_PROD || GALLEON_PROD2
+                                            #if GALLEON_PROD
                                             Environment             = Environment.Prod,
                                             #else
                                             Environment             = Environment.Test,
@@ -250,7 +246,6 @@ namespace Galleon.SampleApp
                                                                                     { "is_preselection_screen_enabled", false },
                                                                                 }
                                                                         ,
-                                                                        #if !PROD2
                                                                         AllowedPaymentMethodTypes = new ()
                                                                                                      {
                                                                                                          "native",
@@ -262,7 +257,6 @@ namespace Galleon.SampleApp
                                                                                                          "google_pay_browser",
                                                                                                         // "web_checkout",
                                                                                                      }
-                                                                        #endif
                                                                    });
             
             
