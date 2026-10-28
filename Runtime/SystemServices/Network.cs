@@ -26,17 +26,26 @@ namespace Galleon.Checkout
     {
         /////////////////////////////////////////////////////////////////////////////////////////////////// Consts
       
+        public const string SERVER_BASE_URL_OVERRIDE_CONFIG_KEY = "server_base_url_override";
+        
         public string SERVER_BASE_URL
         {
             get
             {
-                if (CHECKOUT.Globals.CheckoutInitConfiguration.Environment == Environment.Prod)
+                // Read straight from the init configuration (not CHECKOUT.Config) - authentication runs
+                // before CHECKOUT.Config is populated, and server config / cleanup must not affect it.
+                var initConfiguration = CHECKOUT.Globals.CheckoutInitConfiguration;
+                
+                if (initConfiguration?.Config != null
+                &&  initConfiguration.Config.TryGetValue(SERVER_BASE_URL_OVERRIDE_CONFIG_KEY, out var overrideValue)
+                &&  !string.IsNullOrWhiteSpace(overrideValue?.ToString()))
                 {
-                    #if GALLEON_PROD2
-                    return "https://galleon-bridge-server-prod-clone.up.railway.app";
-                    #endif
-                    
-                    return "http://sp-prod-api.galleon-server.com"; // Prod
+                    return overrideValue.ToString().Trim().TrimEnd('/');
+                }
+                
+                if (initConfiguration?.Environment == Environment.Prod)
+                {
+                    return "https://sp-prod-api.galleon-server.com"; // Prod
                 }
                 else
                 {
@@ -49,8 +58,6 @@ namespace Galleon.Checkout
         /*
         #if GALLEON_PROD
         public string SERVER_BASE_URL = "https://bridge-api.galleon.so";
-        #elif GALLEON_PROD2
-        public string SERVER_BASE_URL = "https://galleon-bridge-server-prod-clone.up.railway.app";
         #elif DEBUG
       //public string SERVER_BASE_URL = "https://localhost:4000/v1";
       //public string SERVER_BASE_URL = "https://galleon-bridge-server-production.up.railway.app";
